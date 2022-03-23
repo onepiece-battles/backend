@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="EntityProcessor-1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/EntityProcessor/build/libs/EntityProcessor-1.0-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

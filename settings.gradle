@@ -1,1 +1,3 @@
 rootProject.name = 'OnePieceBattles'
+include 'EntityProcessor'
+
