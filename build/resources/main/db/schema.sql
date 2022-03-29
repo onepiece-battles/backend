@@ -1,0 +1,9 @@
+-- THIS IS THE DB GOLDEN SCHEMA FOR UNIT TEST.
+
+-- user
+CREATE TABLE `user`(
+    `id` BINARY(16) NOT NULL,
+    `user_name` VARCHAR(255) NOT NULL,
+    `organization` TEXT NOT NULL
+);
+ALTER TABLE `user` ADD CONSTRAINT PRIMARY KEY(`id`);

@@ -36,7 +36,9 @@ dependencies {
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.2"
     implementation "org.flywaydb:flyway-core"
     implementation "mysql:mysql-connector-java:$mysql_connector_version"
+    implementation "org.springframework.boot:spring-boot-starter-web"
 
+    testImplementation "com.h2database:h2"
     testImplementation "org.testng:testng:$testng_version"
     testImplementation "org.mockito:mockito-core:$mockito_version"
     testImplementation "org.mockito:mockito-inline:$mockito_version"
