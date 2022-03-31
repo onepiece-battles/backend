@@ -2,7 +2,6 @@ package com.yichi.onepiece.Login.Model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
@@ -17,16 +16,12 @@ public class LoginDaoTests extends AbstractTestNGSpringContextTests {
 
   @Test
   public void testInsertAndGet() {
-    UUID userId = UUID.randomUUID();
     UserEntity user =
-        UserEntityBuilder.newBuilder()
-            .setId(userId)
-            .setUserName("Yichi")
-            .setOrganization("Yaocheng")
-            .build();
+        UserEntityBuilder.newBuilder().setUserName("Yichi").setOrganization("Yaocheng").build();
     loginDao.insert(user);
 
     var result = loginDao.getAllUsers();
+    System.out.println(result);
     assertThat(result.get(0)).isEqualTo(user);
   }
 }
