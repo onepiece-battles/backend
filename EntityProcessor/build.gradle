@@ -2,8 +2,8 @@ plugins {
     id 'java'
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+group 'org.onepiece'
+version 'EAST_BLUE_SAGA'
 
 ext {
     mybatis_spring_boot_version = "2.1.3"

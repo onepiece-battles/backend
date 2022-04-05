@@ -1,4 +1,4 @@
-package com.yichi.infra.support.Utils;
+package com.yichi.infra.support.utils;
 
 import java.nio.ByteBuffer;
 import java.util.Base64;

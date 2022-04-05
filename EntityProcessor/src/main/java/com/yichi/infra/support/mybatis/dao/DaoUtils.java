@@ -1,6 +1,6 @@
 package com.yichi.infra.support.mybatis.dao;
 
-import com.yichi.infra.support.Utils.JavaTypeUtils;
+import com.yichi.infra.support.utils.JavaTypeUtils;
 
 public class DaoUtils {
   private DaoUtils() {}

@@ -1,4 +1,4 @@
-package com.yichi.infra.support.Utils;
+package com.yichi.infra.support.utils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

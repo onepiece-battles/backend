@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+    id "org.openapi.generator" version "5.4.0"
+}
+
+group 'org.onepiece'
+version 'VERSION_1.0'
+
+
+openApiGenerate {
+    generatorName = "spring"
+    inputSpec = "$rootDir/api/openapi.yaml".toString()
+    outputDir = "$project.buildDir/openapi".toString()
+    apiPackage = "com.yichi.onepiece.api".toString()
+    modelPackage = "com.yichi.onepiece.model".toString()
+    generateModelTests = false
+    generateApiTests = false
+
+    globalProperties = [
+            apis: "",
+            models: ""
+    ]
+}

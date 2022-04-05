@@ -18,7 +18,7 @@
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$PROJECT_DIR$/EntityProcessor/build/libs/EntityProcessor-1.0-SNAPSHOT.jar" />
+          <entry name="$PROJECT_DIR$/EntityProcessor/build/libs/EntityProcessor-EAST_BLUE_SAGA.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mapstruct/mapstruct-processor/1.4.2.Final/e55bd90d51cddd638c07d5bd89fc7535d4e3d069/mapstruct-processor-1.4.2.Final.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mybatis.spring.boot/mybatis-spring-boot-starter/2.1.3/7f4904f050c7f1393cf98fd2316c2587496a0b75/mybatis-spring-boot-starter-2.1.3.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mybatis/mybatis/3.5.5/1c8974cdec88c9259b6fa21147ea4538216e447/mybatis-3.5.5.jar" />

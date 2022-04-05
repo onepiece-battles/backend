@@ -1,0 +1,9 @@
+openapi: "3.0.2"
+info:
+  title: OnePiece APIs
+  version: 1.0.0
+servers:
+  - url: http://onepiece:8080
+paths:
+  /api/onepiece/login:
+    $ref: "src/login/user_login.yaml#/apis/login"

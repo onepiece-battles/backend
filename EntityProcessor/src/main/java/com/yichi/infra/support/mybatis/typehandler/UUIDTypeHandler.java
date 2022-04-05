@@ -1,6 +1,6 @@
 package com.yichi.infra.support.mybatis.typehandler;
 
-import com.yichi.infra.support.Utils.UUIDUtils;
+import com.yichi.infra.support.utils.UUIDUtils;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
