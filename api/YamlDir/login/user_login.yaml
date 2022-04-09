@@ -3,8 +3,8 @@ apis:
     summary: user login by user id.
     post:
       tags:
-        - login
-      operation_id: userLogin
+        - "Login"
+      operationId: login
       requestBody:
         description: request to login to system
         content:

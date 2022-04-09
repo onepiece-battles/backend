@@ -2,18 +2,17 @@ package com.yichi.onepiece.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.*;
 import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.Generated;
 import javax.validation.Valid;
-import javax.validation.constraints.*;
 
-/** User */
-@Generated(
-    value = "org.openapitools.codegen.languages.SpringCodegen",
-    date = "2022-04-05T23:39:08.017521+08:00[Asia/Shanghai]")
-public class User {
+/**
+ * User
+ */
+
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-09T21:02:16.503851+08:00[Asia/Shanghai]")
+public class User   {
 
   @JsonProperty("user_id")
   private UUID userId;
@@ -31,10 +30,9 @@ public class User {
 
   /**
    * Get userId
-   *
    * @return userId
-   */
-  @Valid
+  */
+  @Valid 
   @Schema(name = "user_id", required = false)
   public UUID getUserId() {
     return userId;
@@ -51,9 +49,9 @@ public class User {
 
   /**
    * Get userName
-   *
    * @return userName
-   */
+  */
+  
   @Schema(name = "user_name", required = false)
   public String getUserName() {
     return userName;
@@ -70,9 +68,9 @@ public class User {
 
   /**
    * Get organization
-   *
    * @return organization
-   */
+  */
+  
   @Schema(name = "organization", required = false)
   public String getOrganization() {
     return organization;
@@ -91,9 +89,9 @@ public class User {
       return false;
     }
     User user = (User) o;
-    return Objects.equals(this.userId, user.userId)
-        && Objects.equals(this.userName, user.userName)
-        && Objects.equals(this.organization, user.organization);
+    return Objects.equals(this.userId, user.userId) &&
+        Objects.equals(this.userName, user.userName) &&
+        Objects.equals(this.organization, user.organization);
   }
 
   @Override
@@ -113,7 +111,8 @@ public class User {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -122,3 +121,4 @@ public class User {
     return o.toString().replace("\n", "\n    ");
   }
 }
+

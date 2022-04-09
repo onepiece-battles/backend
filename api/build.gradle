@@ -6,18 +6,44 @@ plugins {
 group 'org.onepiece'
 version 'VERSION_1.0'
 
+ext {
+    guava_version = "27.0.1-jre"
+    apache_poi_version = "4.1.2"
+}
+
+repositories {
+    mavenCentral()
+}
 
 openApiGenerate {
     generatorName = "spring"
+    library = "spring-boot"
     inputSpec = "$rootDir/api/openapi.yaml".toString()
-    outputDir = "$project.buildDir/openapi".toString()
+    outputDir = "$rootDir/api".toString()
     apiPackage = "com.yichi.onepiece.api".toString()
     modelPackage = "com.yichi.onepiece.model".toString()
-    generateModelTests = false
-    generateApiTests = false
+    configOptions = [
+            basePackage: "com.yichi.onepiece".toString(),
+            sourceFolder: "src/main/java".toString(),
+            useTags: true.toString(),
+            interfaceOnly: true.toString(),
+            skipDefaultInterface: true.toString()
+    ]
 
     globalProperties = [
             apis: "",
             models: ""
     ]
+}
+
+compileJava.dependsOn tasks.openApiGenerate
+
+dependencies {
+    implementation "org.openapitools:openapi-generator:5.4.0"
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.2"
+    // https://mvnrepository.com/artifact/javax.annotation/javax.annotation-api
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    implementation 'org.springframework:spring-web:5.3.10'
+    implementation 'org.springframework:spring-context:5.2.20.RELEASE'
 }
