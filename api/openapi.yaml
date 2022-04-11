@@ -3,10 +3,15 @@ info:
   title: OnePiece APIs
   version: 1.0.0
 servers:
-  - url: http://onepiece:8080
+  - url: http://localhost:8080
 
 tags:
-  - name: "Login"
+  - name: "Account"
 paths:
-  /api/onepiece/login:
-    $ref: "YamlDir/login/user_login.yaml#/apis/login"
+  # Account apis
+  /api/onepiece/account/login:
+    $ref: "yaml/account/account.yaml#/apis/login"
+  /api/onepiece/account/register:
+    $ref: "yaml/account/account.yaml#/apis/register"
+  /api/onepiece/account/logout:
+    $ref: "yaml/account/account.yaml#/apis/logout"

@@ -2,6 +2,9 @@ package com.yichi.onepiece.Login.Model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.yichi.onepiece.Account.Model.AccountDao;
+import com.yichi.onepiece.Account.Model.UserEntity;
+import com.yichi.onepiece.Account.Model.UserEntityBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
@@ -12,7 +15,7 @@ import org.testng.annotations.Test;
 @TestPropertySource(locations = "classpath:test-h2.properties")
 public class LoginDaoTests extends AbstractTestNGSpringContextTests {
 
-  @Autowired LoginDao loginDao;
+  @Autowired AccountDao loginDao;
 
   @Test
   public void testInsertAndGet() {

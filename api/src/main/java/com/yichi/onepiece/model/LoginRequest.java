@@ -3,38 +3,81 @@ package com.yichi.onepiece.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Objects;
-import java.util.UUID;
 import javax.annotation.Generated;
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-/**
- * LoginRequest
- */
+/** LoginRequest */
+@Generated(
+    value = "org.openapitools.codegen.languages.SpringCodegen",
+    date = "2022-04-11T22:52:51.681056+08:00[Asia/Shanghai]")
+public class LoginRequest {
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-09T21:02:16.503851+08:00[Asia/Shanghai]")
-public class LoginRequest   {
+  @JsonProperty("user_name")
+  private String userName;
 
-  @JsonProperty("user_id")
-  private UUID userId;
+  @JsonProperty("organization")
+  private String organization;
 
-  public LoginRequest userId(UUID userId) {
-    this.userId = userId;
+  @JsonProperty("password")
+  private String password;
+
+  public LoginRequest userName(String userName) {
+    this.userName = userName;
     return this;
   }
 
   /**
-   * Get userId
-   * @return userId
-  */
-  @NotNull @Valid 
-  @Schema(name = "user_id", required = true)
-  public UUID getUserId() {
-    return userId;
+   * Get userName
+   *
+   * @return userName
+   */
+  @NotNull
+  @Schema(name = "user_name", required = true)
+  public String getUserName() {
+    return userName;
   }
 
-  public void setUserId(UUID userId) {
-    this.userId = userId;
+  public void setUserName(String userName) {
+    this.userName = userName;
+  }
+
+  public LoginRequest organization(String organization) {
+    this.organization = organization;
+    return this;
+  }
+
+  /**
+   * Get organization
+   *
+   * @return organization
+   */
+  @Schema(name = "organization", required = false)
+  public String getOrganization() {
+    return organization;
+  }
+
+  public void setOrganization(String organization) {
+    this.organization = organization;
+  }
+
+  public LoginRequest password(String password) {
+    this.password = password;
+    return this;
+  }
+
+  /**
+   * Get password
+   *
+   * @return password
+   */
+  @NotNull
+  @Schema(name = "password", required = true)
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
   }
 
   @Override
@@ -46,26 +89,29 @@ public class LoginRequest   {
       return false;
     }
     LoginRequest loginRequest = (LoginRequest) o;
-    return Objects.equals(this.userId, loginRequest.userId);
+    return Objects.equals(this.userName, loginRequest.userName)
+        && Objects.equals(this.organization, loginRequest.organization)
+        && Objects.equals(this.password, loginRequest.password);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(userId);
+    return Objects.hash(userName, organization, password);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class LoginRequest {\n");
-    sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
+    sb.append("    userName: ").append(toIndentedString(userName)).append("\n");
+    sb.append("    organization: ").append(toIndentedString(organization)).append("\n");
+    sb.append("    password: ").append(toIndentedString(password)).append("\n");
     sb.append("}");
     return sb.toString();
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -74,4 +120,3 @@ public class LoginRequest   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-
