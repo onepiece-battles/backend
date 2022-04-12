@@ -1,16 +1,25 @@
 package com.yichi.onepiece.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.net.URI;
 import java.util.Objects;
-import javax.annotation.Generated;
-import javax.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-/** RegisterResponse */
-@Generated(
-    value = "org.openapitools.codegen.languages.SpringCodegen",
-    date = "2022-04-11T22:52:51.681056+08:00[Asia/Shanghai]")
-public class RegisterResponse {
+
+import java.util.*;
+import javax.annotation.Generated;
+
+/**
+ * RegisterResponse
+ */
+
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-12T12:49:11.921555+08:00[Asia/Shanghai]")
+public class RegisterResponse   {
 
   @JsonProperty("regirster_result")
   private Boolean regirsterResult;
@@ -25,13 +34,10 @@ public class RegisterResponse {
 
   /**
    * Whether user has successfully registered into system.
-   *
    * @return regirsterResult
-   */
-  @Schema(
-      name = "regirster_result",
-      description = "Whether user has successfully registered into system.",
-      required = false)
+  */
+  
+  @Schema(name = "regirster_result", description = "Whether user has successfully registered into system.", required = false)
   public Boolean getRegirsterResult() {
     return regirsterResult;
   }
@@ -47,14 +53,10 @@ public class RegisterResponse {
 
   /**
    * OK if successfully registered, otherwise explain why register failed.
-   *
    * @return verification
-   */
-  @NotNull
-  @Schema(
-      name = "verification",
-      description = "OK if successfully registered, otherwise explain why register failed.",
-      required = true)
+  */
+  @NotNull 
+  @Schema(name = "verification", description = "OK if successfully registered, otherwise explain why register failed.", required = true)
   public String getVerification() {
     return verification;
   }
@@ -72,8 +74,8 @@ public class RegisterResponse {
       return false;
     }
     RegisterResponse registerResponse = (RegisterResponse) o;
-    return Objects.equals(this.regirsterResult, registerResponse.regirsterResult)
-        && Objects.equals(this.verification, registerResponse.verification);
+    return Objects.equals(this.regirsterResult, registerResponse.regirsterResult) &&
+        Objects.equals(this.verification, registerResponse.verification);
   }
 
   @Override
@@ -92,7 +94,8 @@ public class RegisterResponse {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -101,3 +104,4 @@ public class RegisterResponse {
     return o.toString().replace("\n", "\n    ");
   }
 }
+

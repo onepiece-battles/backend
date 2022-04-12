@@ -6,11 +6,12 @@ import java.util.Objects;
 import javax.annotation.Generated;
 import javax.validation.constraints.NotNull;
 
-/** LoginRequest */
-@Generated(
-    value = "org.openapitools.codegen.languages.SpringCodegen",
-    date = "2022-04-11T22:52:51.681056+08:00[Asia/Shanghai]")
-public class LoginRequest {
+/**
+ * LoginRequest
+ */
+
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-12T12:49:11.921555+08:00[Asia/Shanghai]")
+public class LoginRequest   {
 
   @JsonProperty("user_name")
   private String userName;
@@ -28,10 +29,9 @@ public class LoginRequest {
 
   /**
    * Get userName
-   *
    * @return userName
-   */
-  @NotNull
+  */
+  @NotNull 
   @Schema(name = "user_name", required = true)
   public String getUserName() {
     return userName;
@@ -48,9 +48,9 @@ public class LoginRequest {
 
   /**
    * Get organization
-   *
    * @return organization
-   */
+  */
+  
   @Schema(name = "organization", required = false)
   public String getOrganization() {
     return organization;
@@ -67,10 +67,9 @@ public class LoginRequest {
 
   /**
    * Get password
-   *
    * @return password
-   */
-  @NotNull
+  */
+  @NotNull 
   @Schema(name = "password", required = true)
   public String getPassword() {
     return password;
@@ -89,9 +88,9 @@ public class LoginRequest {
       return false;
     }
     LoginRequest loginRequest = (LoginRequest) o;
-    return Objects.equals(this.userName, loginRequest.userName)
-        && Objects.equals(this.organization, loginRequest.organization)
-        && Objects.equals(this.password, loginRequest.password);
+    return Objects.equals(this.userName, loginRequest.userName) &&
+        Objects.equals(this.organization, loginRequest.organization) &&
+        Objects.equals(this.password, loginRequest.password);
   }
 
   @Override
@@ -111,7 +110,8 @@ public class LoginRequest {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -120,3 +120,4 @@ public class LoginRequest {
     return o.toString().replace("\n", "\n    ");
   }
 }
+

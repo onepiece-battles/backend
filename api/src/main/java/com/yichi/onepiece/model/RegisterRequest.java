@@ -1,16 +1,25 @@
 package com.yichi.onepiece.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.net.URI;
 import java.util.Objects;
-import javax.annotation.Generated;
-import javax.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-/** RegisterRequest */
-@Generated(
-    value = "org.openapitools.codegen.languages.SpringCodegen",
-    date = "2022-04-11T22:52:51.681056+08:00[Asia/Shanghai]")
-public class RegisterRequest {
+
+import java.util.*;
+import javax.annotation.Generated;
+
+/**
+ * RegisterRequest
+ */
+
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-12T12:49:11.921555+08:00[Asia/Shanghai]")
+public class RegisterRequest   {
 
   @JsonProperty("user_name")
   private String userName;
@@ -31,10 +40,9 @@ public class RegisterRequest {
 
   /**
    * Get userName
-   *
    * @return userName
-   */
-  @NotNull
+  */
+  @NotNull 
   @Schema(name = "user_name", required = true)
   public String getUserName() {
     return userName;
@@ -51,10 +59,9 @@ public class RegisterRequest {
 
   /**
    * Get password
-   *
    * @return password
-   */
-  @NotNull
+  */
+  @NotNull 
   @Schema(name = "password", required = true)
   public String getPassword() {
     return password;
@@ -71,10 +78,9 @@ public class RegisterRequest {
 
   /**
    * Get confirmedPassword
-   *
    * @return confirmedPassword
-   */
-  @NotNull
+  */
+  @NotNull 
   @Schema(name = "confirmed_password", required = true)
   public String getConfirmedPassword() {
     return confirmedPassword;
@@ -91,10 +97,9 @@ public class RegisterRequest {
 
   /**
    * Get organization
-   *
    * @return organization
-   */
-  @NotNull
+  */
+  @NotNull 
   @Schema(name = "organization", required = true)
   public String getOrganization() {
     return organization;
@@ -113,10 +118,10 @@ public class RegisterRequest {
       return false;
     }
     RegisterRequest registerRequest = (RegisterRequest) o;
-    return Objects.equals(this.userName, registerRequest.userName)
-        && Objects.equals(this.password, registerRequest.password)
-        && Objects.equals(this.confirmedPassword, registerRequest.confirmedPassword)
-        && Objects.equals(this.organization, registerRequest.organization);
+    return Objects.equals(this.userName, registerRequest.userName) &&
+        Objects.equals(this.password, registerRequest.password) &&
+        Objects.equals(this.confirmedPassword, registerRequest.confirmedPassword) &&
+        Objects.equals(this.organization, registerRequest.organization);
   }
 
   @Override
@@ -137,7 +142,8 @@ public class RegisterRequest {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -146,3 +152,4 @@ public class RegisterRequest {
     return o.toString().replace("\n", "\n    ");
   }
 }
+

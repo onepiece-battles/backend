@@ -1,15 +1,25 @@
 package com.yichi.onepiece.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.net.URI;
 import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+
+import java.util.*;
 import javax.annotation.Generated;
 
-/** LogoutResponse */
-@Generated(
-    value = "org.openapitools.codegen.languages.SpringCodegen",
-    date = "2022-04-11T22:52:51.681056+08:00[Asia/Shanghai]")
-public class LogoutResponse {
+/**
+ * LogoutResponse
+ */
+
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-12T12:49:11.921555+08:00[Asia/Shanghai]")
+public class LogoutResponse   {
 
   @JsonProperty("user_name")
   private String userName;
@@ -24,9 +34,9 @@ public class LogoutResponse {
 
   /**
    * Get userName
-   *
    * @return userName
-   */
+  */
+  
   @Schema(name = "user_name", required = false)
   public String getUserName() {
     return userName;
@@ -43,13 +53,10 @@ public class LogoutResponse {
 
   /**
    * whether user has successfully logout.
-   *
    * @return logoutResult
-   */
-  @Schema(
-      name = "logout_result",
-      description = "whether user has successfully logout.",
-      required = false)
+  */
+  
+  @Schema(name = "logout_result", description = "whether user has successfully logout.", required = false)
   public String getLogoutResult() {
     return logoutResult;
   }
@@ -67,8 +74,8 @@ public class LogoutResponse {
       return false;
     }
     LogoutResponse logoutResponse = (LogoutResponse) o;
-    return Objects.equals(this.userName, logoutResponse.userName)
-        && Objects.equals(this.logoutResult, logoutResponse.logoutResult);
+    return Objects.equals(this.userName, logoutResponse.userName) &&
+        Objects.equals(this.logoutResult, logoutResponse.logoutResult);
   }
 
   @Override
@@ -87,7 +94,8 @@ public class LogoutResponse {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -96,3 +104,4 @@ public class LogoutResponse {
     return o.toString().replace("\n", "\n    ");
   }
 }
+

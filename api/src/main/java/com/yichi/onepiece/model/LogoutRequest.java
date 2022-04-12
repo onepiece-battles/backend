@@ -1,17 +1,26 @@
 package com.yichi.onepiece.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.net.URI;
 import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.UUID;
-import javax.annotation.Generated;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import javax.validation.Valid;
+import javax.validation.constraints.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-/** LogoutRequest */
-@Generated(
-    value = "org.openapitools.codegen.languages.SpringCodegen",
-    date = "2022-04-11T22:52:51.681056+08:00[Asia/Shanghai]")
-public class LogoutRequest {
+
+import java.util.*;
+import javax.annotation.Generated;
+
+/**
+ * LogoutRequest
+ */
+
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-12T12:49:11.921555+08:00[Asia/Shanghai]")
+public class LogoutRequest   {
 
   @JsonProperty("user_id")
   private UUID userId;
@@ -23,10 +32,9 @@ public class LogoutRequest {
 
   /**
    * Get userId
-   *
    * @return userId
-   */
-  @Valid
+  */
+  @Valid 
   @Schema(name = "user_id", required = false)
   public UUID getUserId() {
     return userId;
@@ -63,7 +71,8 @@ public class LogoutRequest {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -72,3 +81,4 @@ public class LogoutRequest {
     return o.toString().replace("\n", "\n    ");
   }
 }
+

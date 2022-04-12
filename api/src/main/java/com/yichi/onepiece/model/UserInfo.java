@@ -1,19 +1,26 @@
 package com.yichi.onepiece.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.*;
+import java.net.URI;
 import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.UUID;
-import javax.annotation.Generated;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-/** UserInfo */
-@Generated(
-    value = "org.openapitools.codegen.languages.SpringCodegen",
-    date = "2022-04-11T22:52:51.681056+08:00[Asia/Shanghai]")
-public class UserInfo {
+
+import java.util.*;
+import javax.annotation.Generated;
+
+/**
+ * UserInfo
+ */
+
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-12T12:49:11.921555+08:00[Asia/Shanghai]")
+public class UserInfo   {
 
   @JsonProperty("user_id")
   private UUID userId;
@@ -31,11 +38,9 @@ public class UserInfo {
 
   /**
    * Get userId
-   *
    * @return userId
-   */
-  @NotNull
-  @Valid
+  */
+  @NotNull @Valid 
   @Schema(name = "user_id", required = true)
   public UUID getUserId() {
     return userId;
@@ -52,10 +57,9 @@ public class UserInfo {
 
   /**
    * Get userName
-   *
    * @return userName
-   */
-  @NotNull
+  */
+  @NotNull 
   @Schema(name = "user_name", required = true)
   public String getUserName() {
     return userName;
@@ -72,9 +76,9 @@ public class UserInfo {
 
   /**
    * Get organization
-   *
    * @return organization
-   */
+  */
+  
   @Schema(name = "organization", required = false)
   public String getOrganization() {
     return organization;
@@ -93,9 +97,9 @@ public class UserInfo {
       return false;
     }
     UserInfo userInfo = (UserInfo) o;
-    return Objects.equals(this.userId, userInfo.userId)
-        && Objects.equals(this.userName, userInfo.userName)
-        && Objects.equals(this.organization, userInfo.organization);
+    return Objects.equals(this.userId, userInfo.userId) &&
+        Objects.equals(this.userName, userInfo.userName) &&
+        Objects.equals(this.organization, userInfo.organization);
   }
 
   @Override
@@ -115,7 +119,8 @@ public class UserInfo {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -124,3 +129,4 @@ public class UserInfo {
     return o.toString().replace("\n", "\n    ");
   }
 }
+

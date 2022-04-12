@@ -1,16 +1,26 @@
 package com.yichi.onepiece.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.net.URI;
 import java.util.Objects;
-import javax.annotation.Generated;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.yichi.onepiece.model.UserInfo;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import javax.validation.Valid;
+import javax.validation.constraints.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-/** LoginResponse */
-@Generated(
-    value = "org.openapitools.codegen.languages.SpringCodegen",
-    date = "2022-04-11T22:52:51.681056+08:00[Asia/Shanghai]")
-public class LoginResponse {
+
+import java.util.*;
+import javax.annotation.Generated;
+
+/**
+ * LoginResponse
+ */
+
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-12T12:49:11.921555+08:00[Asia/Shanghai]")
+public class LoginResponse   {
 
   @JsonProperty("user_info")
   private UserInfo userInfo;
@@ -25,10 +35,9 @@ public class LoginResponse {
 
   /**
    * Get userInfo
-   *
    * @return userInfo
-   */
-  @Valid
+  */
+  @Valid 
   @Schema(name = "user_info", required = false)
   public UserInfo getUserInfo() {
     return userInfo;
@@ -45,9 +54,9 @@ public class LoginResponse {
 
   /**
    * Get verification
-   *
    * @return verification
-   */
+  */
+  
   @Schema(name = "verification", required = false)
   public String getVerification() {
     return verification;
@@ -66,8 +75,8 @@ public class LoginResponse {
       return false;
     }
     LoginResponse loginResponse = (LoginResponse) o;
-    return Objects.equals(this.userInfo, loginResponse.userInfo)
-        && Objects.equals(this.verification, loginResponse.verification);
+    return Objects.equals(this.userInfo, loginResponse.userInfo) &&
+        Objects.equals(this.verification, loginResponse.verification);
   }
 
   @Override
@@ -86,7 +95,8 @@ public class LoginResponse {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -95,3 +105,4 @@ public class LoginResponse {
     return o.toString().replace("\n", "\n    ");
   }
 }
+
