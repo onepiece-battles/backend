@@ -7,6 +7,8 @@ servers:
 
 tags:
   - name: "Account"
+  - name: "Character"
+  - name: "Fruit"
 paths:
   # Account apis
   /api/onepiece/account/login:
@@ -15,3 +17,21 @@ paths:
     $ref: "yaml/account/account.yaml#/apis/register"
   /api/onepiece/account/logout:
     $ref: "yaml/account/account.yaml#/apis/logout"
+
+  # Character apis
+  /api/onepiece/character/add:
+    $ref: "yaml/character/character.yaml#/apis/add"
+  /api/onepiece/character/add_profile:
+    $ref: "yaml/character/character.yaml#/apis/add_profile"
+  /api/onepiece/character/eat_fruit:
+    $ref: "yaml/character/character.yaml#/apis/eat_fruit"
+  /api/onepiece/character/list:
+    $ref: "yaml/character/character.yaml#/apis/list"
+
+  # Fruit apis
+  /api/onepiece/fruit/add:
+    $ref: "yaml/fruit/fruit.yaml#/apis/add"
+  /api/onepiece/fruit/list:
+    $ref: "yaml/fruit/fruit.yaml#/apis/list"
+  /api/onepiece/fruit/update:
+    $ref: "yaml/fruit/fruit.yaml#/apis/update"

@@ -1,0 +1,1 @@
+ALTER TABLE fruit RENAME COLUMN getGroupGainStrengthen TO group_gain_strengthen

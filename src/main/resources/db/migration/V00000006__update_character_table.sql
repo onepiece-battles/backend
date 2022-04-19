@@ -1,0 +1,1 @@
+alter table character_book rename column has_fruit to has_fruits

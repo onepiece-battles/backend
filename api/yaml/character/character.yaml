@@ -1,0 +1,292 @@
+apis:
+  add:
+    summary: add new character into system
+    post:
+      tags:
+        - "Character"
+      operationId: addCharacter
+      requestBody:
+        description: request to add new character to system
+        content:
+          application/json:
+            schema:
+              $ref: "#/schemas/AddCharacterRequest"
+        required: true
+      responses:
+        "200":
+          description: character information
+          content:
+            application/json:
+              schema:
+                $ref: "#/schemas/Character"
+
+  add_profile:
+    summary: add image for character
+    post:
+      tags:
+        - "Character"
+      operationId: addProfile
+      requestBody:
+        description: request to add picture to character
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                character_id:
+                  type: string
+                  format: uuid
+                profile_image:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        "200":
+          description: character information
+          content:
+            application/json:
+              schema:
+                $ref: "#/schemas/AddProfileResponse"
+
+  eat_fruit:
+    summary: character eat fruit
+    post:
+      tags:
+        - "Character"
+      operationId: eatFruit
+      requestBody:
+        description: request for character to eat fruit
+        content:
+          application/json:
+            schema:
+              $ref: "#/schemas/EatFruitRequest"
+        required: true
+      responses:
+        "200":
+          description: result and fruit information
+          content:
+            application/json:
+              schema:
+                $ref: "#/schemas/EatFruitResponse"
+
+  list:
+    summary: list all characters
+    post:
+      tags:
+        - "Character"
+      operationId: listCharacters
+      requestBody:
+        description: request for list all characters
+        content:
+          application/json:
+            schema:
+              $ref: "#/schemas/ListCharacterRequest"
+        required: true
+      responses:
+        "200":
+          description: list of characters
+          content:
+            application/json:
+              schema:
+                $ref: "#/schemas/ListCharacterResponse"
+
+schemas:
+  FruitInCharacter:
+    description: >
+      describe the fruit condition after it is eaten by character
+    type: object
+    required:
+      - fruit_id
+      - wake_up
+    properties:
+      fruit_id:
+        type: string
+        format: uuid
+      wake_up:
+        type: boolean
+
+  Character:
+    description: >
+      Character that contains all necessary information.
+    type: object
+    required:
+      - id
+      - name
+      - has_fruits
+      - fruit_limit
+      - group_gain
+      - attack
+      - defense
+      - intelligence
+      - blood
+      - magic
+    properties:
+      id:
+        type: string
+        format: uuid
+      profile_image:
+        type: string
+        format: binary
+      character_types:
+        description: type of fighting skills
+        type: array
+        items:
+          $ref: "#/schemas/CharacterTypeInfo"
+      name:
+        type: string
+      group_oid:
+        description: Which group this character is in.
+        type: string
+      has_fruits:
+        description: Whether this character has eaten fruit
+        type: boolean
+      fruits:
+        type: array
+        items:
+          $ref: "#/schemas/FruitInCharacter"
+      fruit_limit:
+        description: Maximum number of fruit this character can eat.
+        type: integer
+        default: 1
+        minimum: 1
+      group_gain:
+        type: integer
+        minimum: 1
+        maximum: 5
+        default: 1.5
+      attack:
+        type: integer
+        minimum: 1
+      defense:
+        type: integer
+        minimum: 1
+      intelligence:
+        type: integer
+        minimum: 100
+      blood:
+        type: integer
+        minimum: 10
+      magic:
+        type: integer
+        minimum: 10
+
+  CharacterType:
+    description: types that defines how character fight in battles.
+    enum:
+      - Katana
+      - Fist
+      - Foot
+      - Shooter
+      - Body
+      # shills are typically from fruits
+      - Skill
+
+  CharacterTypeInfo:
+    description: List of CharacterType above can not be serialize in Response body. Use a class to wrap it.
+    type: object
+    properties:
+      type:
+        $ref: "#/schemas/CharacterType"
+      index:
+        type: integer
+
+  AddCharacterRequest:
+    type: object
+    required:
+      - name
+      - fruit_limit
+      - group_gain
+      - attack
+      - defense
+      - intelligence
+      - blood
+      - magic
+    properties:
+      character_types:
+        description: type of fighting skills
+        type: array
+        items:
+          $ref: "#/schemas/CharacterTypeInfo"
+      name:
+        type: string
+      group_oid:
+        description: Which group this character is in.
+        type: string
+      fruit_limit:
+        description: Maximum number of fruit this character can eat.
+        type: integer
+        default: 1
+        minimum: 1
+      group_gain:
+        type: integer
+        minimum: 1
+        maximum: 5
+        default: 1.5
+      attack:
+        type: integer
+        minimum: 1
+      defense:
+        type: integer
+        minimum: 1
+      intelligence:
+        type: integer
+        minimum: 100
+      blood:
+        type: integer
+        minimum: 10
+      magic:
+        type: integer
+        minimum: 10
+
+  AddProfileResponse:
+    type: object
+    required:
+      - character
+    properties:
+      character:
+        $ref: "#/schemas/Character"
+
+  EatFruitRequest:
+    type: object
+    required:
+      - character_id
+      - fruit_id
+    properties:
+      character_id:
+        type: string
+        format: uuid
+      fruit_id:
+        type: string
+        format: uuid
+
+  EatFruitResponse:
+    type: object
+    required:
+      - character
+      - fruit_message
+    properties:
+      character:
+        $ref: "#/schemas/Character"
+      fruit_message:
+        type: string
+
+  ListCharacterRequest:
+    type: object
+    required:
+      - page_size
+      - page_index
+    properties:
+      page_size:
+        type: integer
+        minimum: 0
+      page_index:
+        type: integer
+        minimum: 1
+
+  ListCharacterResponse:
+    type: object
+    properties:
+      Characters:
+        type: array
+        items:
+          $ref: "#/schemas/Character"

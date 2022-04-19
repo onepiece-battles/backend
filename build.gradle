@@ -29,7 +29,9 @@ dependencies {
     implementation "org.mybatis:mybatis:$mybatis_version"
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:$mybatis_spring_boot_version"
     implementation "org.mapstruct:mapstruct:$mapstruct_version"
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
+    implementation "org.mapstruct:mapstruct-processor:$mapstruct_version"
+    annotationProcessor "org.mapstruct:mapstruct-processor:$mapstruct_version"
+    implementation "org.apache.commons:commons-lang3:3.12.0"
     implementation "com.google.guava:guava:$guava_version"
     implementation "org.apache.poi:poi-ooxml:$apache_poi_version"
     implementation "org.apache.poi:poi:$apache_poi_version"
