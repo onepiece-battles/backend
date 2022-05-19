@@ -22,6 +22,10 @@ repositories {
     mavenCentral()
 }
 
+test {
+    useTestNG()
+}
+
 dependencies {
     implementation project(":EntityProcessor")
     implementation project(":api")

@@ -27,7 +27,9 @@ openApiGenerate {
             sourceFolder: "src/main/java".toString(),
             useTags: true.toString(),
             interfaceOnly: true.toString(),
-            skipDefaultInterface: true.toString()
+            skipDefaultInterface: true.toString(),
+            serializableModel: true.toString(),
+            serializationLibrary: "jackson".toString()
     ]
 
     globalProperties = [
