@@ -35,3 +35,6 @@ paths:
     $ref: "yaml/fruit/fruit.yaml#/apis/list"
   /api/onepiece/fruit/update:
     $ref: "yaml/fruit/fruit.yaml#/apis/update"
+
+  /api/onepiece/battle/add:
+    $ref: "yaml/battle/battle.yaml#/apis/add"
