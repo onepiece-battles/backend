@@ -1,2 +1,69 @@
 apis:
   add:
+    summary: create a new battle
+    post:
+      tags:
+        - "Battle"
+      operationId: addBattle
+      requestBody:
+        description: request to create a battle
+        content:
+          application/json:
+            schema:
+              $ref: "#/schemas/AddBattleRequest"
+        required: true
+      responses:
+        "200":
+          description: battle information
+          content:
+            application/json:
+              schema:
+                $ref: "#/schemas/Battle"
+
+schemas:
+  BattleType:
+    description: types of battles.
+    enum:
+      - Single
+      - Group
+
+  AddBattleRequest:
+    type: object
+    required:
+      - user_id
+      - initiate_character_id
+      - receiver_character_id
+    properties:
+      user_id:
+        type: string
+        format: uuid
+      initiate_character_id:
+        type: string
+        format: uuid
+      receiver_character_id:
+        type: string
+        format: uuid
+  Battle:
+    type: object
+    required:
+      - battle_id
+      - user_id
+      - initiate_character_id
+      - receiver_character_id
+      - type
+    properties:
+      battle_id:
+        type: string
+        format: uuid
+      user_id:
+        type: string
+        format: uuid
+      initiate_character_id:
+        type: string
+        format: uuid
+      receiver_character_id:
+        type: string
+        format: uuid
+      type:
+        $ref: "#/schemas/BattleType"
+

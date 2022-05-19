@@ -21,13 +21,13 @@ apis:
                 $ref: "#/schemas/Fruit"
 
   list:
-    summary: list all fruits avaliable
+    summary: list all fruits available
     post:
       tags:
         - "Fruit"
       operationId: listFruit
       requestBody:
-        description: request to list all fruits avaliable
+        description: request to list all fruits available
         content:
           application/json:
             schema:

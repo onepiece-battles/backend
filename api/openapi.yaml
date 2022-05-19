@@ -9,6 +9,7 @@ tags:
   - name: "Account"
   - name: "Character"
   - name: "Fruit"
+  - name: "Battle"
 paths:
   # Account apis
   /api/onepiece/account/login:
@@ -36,5 +37,6 @@ paths:
   /api/onepiece/fruit/update:
     $ref: "yaml/fruit/fruit.yaml#/apis/update"
 
+  # Battle apis
   /api/onepiece/battle/add:
     $ref: "yaml/battle/battle.yaml#/apis/add"
