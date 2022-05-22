@@ -5,6 +5,6 @@ create table battle (
     action_timestamp BIGINT NOT NULL COMMENT 'the timestamp when this fight is created'
 );
 ALTER TABLE battle ADD CONSTRAINT character_id_initiator
-    FOREIGN KEY(owner_id) REFERENCES character_book(id);
+    FOREIGN KEY(character_id_initiator) REFERENCES character_book(id);
 ALTER TABLE battle ADD CONSTRAINT character_id_receiver
-    FOREIGN KEY(owner_id) REFERENCES character_book(id);
+    FOREIGN KEY(character_id_receiver) REFERENCES character_book(id);

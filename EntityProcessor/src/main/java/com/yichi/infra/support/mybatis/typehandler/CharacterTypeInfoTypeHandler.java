@@ -10,5 +10,5 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnExpression("${mybatis.enabled:true}")
 public class CharacterTypeInfoTypeHandler extends AbstractJsonObjectTypeHandler<CharacterTypeInfo> {
-  CharacterTypeInfoTypeHandler() {}
+  public CharacterTypeInfoTypeHandler() {}
 }
