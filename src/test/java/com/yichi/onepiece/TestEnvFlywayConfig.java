@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class FlywayConfig {
-  private final Logger logger = LoggerFactory.getLogger(FlywayConfig.class);
+public class TestEnvFlywayConfig {
+  private final Logger logger = LoggerFactory.getLogger(TestEnvFlywayConfig.class);
 
   @Autowired DataSource dataSource;
 

@@ -22,9 +22,9 @@ repositories {
     mavenCentral()
 }
 
-//test {
-//    useTestNG()
-//}
+test {
+    useTestNG()
+}
 
 dependencies {
     implementation project(":EntityProcessor")
