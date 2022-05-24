@@ -10,10 +10,10 @@ import org.apache.ibatis.annotations.Select;
 
 @Dao
 @Mapper
-public interface CharacterBookDao extends BaseDao<CharacterBookEntity, UUID> {
-  @Select("SELECT * FROM character_book LIMIT #{offset}, #{size}")
-  List<CharacterBookEntity> listCharacters(@Param("offset") int offset, @Param("size") int size);
+public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
+  @Select("SELECT * FROM character_entity LIMIT #{offset}, #{size}")
+  List<CharacterEntity> listCharacters(@Param("offset") int offset, @Param("size") int size);
 
-  @Select("SELECT COUNT(id) FROM character_book")
+  @Select("SELECT COUNT(id) FROM character_entity")
   int countCharacter();
 }

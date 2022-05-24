@@ -8,7 +8,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 @Entity
-public interface CharacterBookEntity {
+public interface CharacterEntity {
   UUID getId();
 
   List<CharacterTypeInfo> getCharacterTypes();
@@ -41,5 +41,5 @@ public interface CharacterBookEntity {
   // magic will be used if character has fruit in Paramecia type.
   Integer getMagic();
 
-  CharacterBookEntityBuilder toBuilder();
+  CharacterEntityBuilder toBuilder();
 }

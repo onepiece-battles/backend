@@ -221,12 +221,11 @@ public class DatabaseSchemaTests extends AbstractTransactionalTestNGSpringContex
         // Check DROP CONSTRAINT
         .as("DROP CONSTRAINT is not supported")
         .doesNotMatch(
-            Pattern.compile(".*DROP\\s+CONSTRAINT.*", Pattern.CASE_INSENSITIVE + Pattern.DOTALL));
-    // Check ALTER TABLE xxx RENAME COLUMN xxx TO
-    //        .as("RENAME COLUMN TO is not supported")
-    //        .doesNotMatch(
-    //            Pattern.compile(".*RENAME\\s+COLUMN.*TO.*", Pattern.CASE_INSENSITIVE +
-    // Pattern.DOTALL));
+            Pattern.compile(".*DROP\\s+CONSTRAINT.*", Pattern.CASE_INSENSITIVE + Pattern.DOTALL))
+        //      Check ALTER TABLE xxx RENAME COLUMN xxx TO
+        .as("RENAME COLUMN TO is not supported")
+        .doesNotMatch(
+            Pattern.compile(".*RENAME\\s+COLUMN.*TO.*", Pattern.CASE_INSENSITIVE + Pattern.DOTALL));
   }
 
   private String readGoldenSchema() throws IOException {
