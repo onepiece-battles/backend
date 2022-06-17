@@ -1,6 +1,7 @@
 package com.yichi.onepiece.Character.Service;
 
 import com.yichi.onepiece.Character.Model.CharacterDao;
+import com.yichi.onepiece.Character.Model.CharacterEntity;
 import com.yichi.onepiece.Character.Model.Converter.CharacterEntityConverter;
 import com.yichi.onepiece.Exception.ExceptionUtils;
 import com.yichi.onepiece.Fruits.Service.FruitService;
@@ -32,7 +33,8 @@ public class CharacterService {
 
   public Character addCharacter(AddCharacterRequest request) {
     var characterEntity = CharacterEntityConverter.INSTANCE.toCharacterEntity(request);
-    characterEntity = characterEntity.toBuilder().setHasFruits(false).build();
+    // character does not eat any fruit by default.
+    characterEntity = characterEntity.toBuilder().setHasFruits(false).setFruits(List.of()).build();
     CharacterDao.insert(characterEntity);
     var insertedEntity =
         CharacterDao.findById(characterEntity.getId())
@@ -106,5 +108,10 @@ public class CharacterService {
     return CharacterDao.listCharacters(offset, request.getPageSize()).stream()
         .map(CharacterEntityConverter.INSTANCE::toCharacter)
         .collect(Collectors.toList());
+  }
+
+  public CharacterEntity getCharacterEntityById(UUID characterId) {
+    return CharacterDao.findById(characterId)
+        .orElseThrow(ExceptionUtils.notFound("Character with id: %s not found", characterId));
   }
 }

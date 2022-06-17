@@ -25,7 +25,6 @@ public interface CharacterEntity {
   // default to be 1, unless special characters.
   Integer getFruitLimit();
 
-  @Nullable
   List<FruitInCharacter> getFruits();
   // some characters are better when fighting in a group
   Integer getGroupGain();
@@ -37,6 +36,8 @@ public interface CharacterEntity {
   Integer getIntelligence();
 
   Integer getBlood();
+
+  Integer getSpeed();
 
   // magic will be used if character has fruit in Paramecia type.
   Integer getMagic();

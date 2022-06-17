@@ -2,6 +2,7 @@ package com.yichi.onepiece.Login.Model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.yichi.onepiece.Account.Model.AccountCondition;
 import com.yichi.onepiece.Account.Model.AccountDao;
 import com.yichi.onepiece.Account.Model.UserEntity;
 import com.yichi.onepiece.Account.Model.UserEntityBuilder;
@@ -20,7 +21,12 @@ public class LoginDaoTests extends AbstractTestNGSpringContextTests {
   @Test
   public void testInsertAndGet() {
     UserEntity user =
-        UserEntityBuilder.newBuilder().setUserName("Yichi").setOrganization("Yaocheng").build();
+        UserEntityBuilder.newBuilder()
+            .setEncryptedPassword("abc")
+            .setAccountCondition(AccountCondition.SignIn)
+            .setUserName("yichi")
+            .setOrganization("tesla")
+            .build();
     loginDao.insert(user);
 
     var result = loginDao.getAllUsers();

@@ -19,15 +19,17 @@ public interface FruitEntity {
   // Paramecia fruits consume positive magic, other types consume 0 magic.
   Integer getMagicConsume();
 
-  Integer getGroupGainStrengthen();
+  Double getGroupGainStrengthen();
 
-  Integer getAttackStrengthen();
+  Double getAttackStrengthen();
 
-  Integer getDefenseStrengthen();
+  Double getDefenseStrengthen();
 
-  Integer getIntelligenceStrengthen();
+  Double getIntelligenceStrengthen();
 
-  Integer getBloodStrengthen();
+  Double getBloodStrengthen();
+
+  Double getSpeedStrengthen();
 
   FruitEntityBuilder toBuilder();
 }

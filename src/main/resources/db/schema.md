@@ -42,7 +42,7 @@ CREATE TABLE `character_entity`(
     `group_oid` VARCHAR(30),
     `has_fruits` TINYINT NOT NULL,
     `fruit_limit` TINYINT NOT NULL,
-    `fruits` TEXT,
+    `fruits` TEXT NOT NULL,
     `group_gain` INT NOT NULL,
     `attack` INT NOT NULL,
     `defense` INT NOT NULL,
