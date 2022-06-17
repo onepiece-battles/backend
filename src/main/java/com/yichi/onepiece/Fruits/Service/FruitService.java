@@ -3,6 +3,7 @@ package com.yichi.onepiece.Fruits.Service;
 import com.yichi.onepiece.Exception.ExceptionUtils;
 import com.yichi.onepiece.Fruits.Model.Converter.FruitConverter;
 import com.yichi.onepiece.Fruits.Model.FruitDao;
+import com.yichi.onepiece.Fruits.Model.FruitEntity;
 import com.yichi.onepiece.model.AddFruitRequest;
 import com.yichi.onepiece.model.Fruit;
 import com.yichi.onepiece.model.ListFruitRequest;
@@ -58,5 +59,12 @@ public class FruitService {
                 ExceptionUtils.notFound("Can not update fruit with id: %s, not found", fruitId));
     var updatedEntity = fruitEntity.toBuilder().setOwnerId(ownId).build();
     fruitDao.update(updatedEntity);
+  }
+
+  public List<FruitEntity> getFruitsByIds(List<UUID> fruitIds) {
+    if (fruitIds.isEmpty()) {
+      return List.of();
+    }
+    return fruitDao.batchFindById(fruitIds);
   }
 }

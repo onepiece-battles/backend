@@ -1,1 +1,0 @@
-ALTER TABLE character_book RENAME COLUMN has_fruit TO has_fruits

@@ -40,3 +40,5 @@ paths:
   # Battle apis
   /api/onepiece/battle/add:
     $ref: "yaml/battle/battle.yaml#/apis/add"
+  /api/onepiece/battle/start_battle:
+    $ref: "yaml/battle/battle.yaml#/apis/start_battle"

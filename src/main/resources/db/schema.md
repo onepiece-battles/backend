@@ -5,6 +5,7 @@
 ```sql
 CREATE TABLE `battle`(
     `id` BIGINT AUTO_INCREMENT,
+    `user_id` BINARY(16) NOT NULL,
     `character_id_initiator` BINARY(16) NOT NULL,
     `character_id_receiver` BINARY(16) NOT NULL,
     `action_timestamp` BIGINT NOT NULL COMMENT 'the timestamp when this fight is created'
@@ -16,19 +17,24 @@ ALTER TABLE `battle` ADD CONSTRAINT PRIMARY KEY(`id`);
 ```
 
 ```sql
-ALTER TABLE `battle` ADD CONSTRAINT `character_id_initiator`
-  FOREIGN KEY(`character_id_initiator`) REFERENCES `character_book`(`id`);
+ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__character_id_initiator`
+  FOREIGN KEY(`character_id_initiator`) REFERENCES `character_entity`(`id`);
 ```
 
 ```sql
-ALTER TABLE `battle` ADD CONSTRAINT `character_id_receiver`
-  FOREIGN KEY(`character_id_receiver`) REFERENCES `character_book`(`id`);
+ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__character_id_receiver`
+  FOREIGN KEY(`character_id_receiver`) REFERENCES `character_entity`(`id`);
 ```
 
-## character_book
+```sql
+ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__user_id`
+  FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
+```
+
+## character_entity
 
 ```sql
-CREATE TABLE `character_book`(
+CREATE TABLE `character_entity`(
     `id` BINARY(16) NOT NULL,
     `character_types` TEXT NOT NULL,
     `profile_image` LONGBLOB,
@@ -36,7 +42,7 @@ CREATE TABLE `character_book`(
     `group_oid` VARCHAR(30),
     `has_fruits` TINYINT NOT NULL,
     `fruit_limit` TINYINT NOT NULL,
-    `fruits` TEXT,
+    `fruits` TEXT NOT NULL,
     `group_gain` INT NOT NULL,
     `attack` INT NOT NULL,
     `defense` INT NOT NULL,
@@ -47,7 +53,7 @@ CREATE TABLE `character_book`(
 ```
 
 ```sql
-ALTER TABLE `character_book` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `character_entity` ADD CONSTRAINT PRIMARY KEY(`id`);
 ```
 
 ## fruit
@@ -73,7 +79,7 @@ ALTER TABLE `fruit` ADD CONSTRAINT PRIMARY KEY(`id`);
 
 ```sql
 ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__owner_id`
-  FOREIGN KEY(`owner_id`) REFERENCES `character_book`(`id`);
+  FOREIGN KEY(`owner_id`) REFERENCES `character_entity`(`id`);
 ```
 
 ## user

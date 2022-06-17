@@ -96,6 +96,8 @@ schemas:
         type: integer
       blood_strengthen:
         type: integer
+      speed_strengthen:
+        type: integer
 
   AddFruitRequest:
     type: object
@@ -115,6 +117,8 @@ schemas:
       intelligence_strengthen:
         type: integer
       blood_strengthen:
+        type: integer
+      speed_strengthen:
         type: integer
 
   ListFruitRequest:
@@ -162,4 +166,6 @@ schemas:
       intelligence_strengthen:
         type: integer
       blood_strengthen:
+        type: integer
+      speed_strengthen:
         type: integer

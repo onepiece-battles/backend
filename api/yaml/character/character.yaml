@@ -119,6 +119,7 @@ schemas:
       - defense
       - intelligence
       - blood
+      - speed
       - magic
     properties:
       id:
@@ -166,6 +167,9 @@ schemas:
       blood:
         type: integer
         minimum: 10
+      speed:
+        type: integer
+        minimum: 10
       magic:
         type: integer
         minimum: 10
@@ -200,6 +204,7 @@ schemas:
       - defense
       - intelligence
       - blood
+      - speed
       - magic
     properties:
       character_types:
@@ -232,6 +237,9 @@ schemas:
         type: integer
         minimum: 100
       blood:
+        type: integer
+        minimum: 10
+      speed:
         type: integer
         minimum: 10
       magic:

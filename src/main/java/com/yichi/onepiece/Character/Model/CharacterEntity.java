@@ -8,7 +8,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 @Entity
-public interface CharacterBookEntity {
+public interface CharacterEntity {
   UUID getId();
 
   List<CharacterTypeInfo> getCharacterTypes();
@@ -25,7 +25,6 @@ public interface CharacterBookEntity {
   // default to be 1, unless special characters.
   Integer getFruitLimit();
 
-  @Nullable
   List<FruitInCharacter> getFruits();
   // some characters are better when fighting in a group
   Integer getGroupGain();
@@ -38,8 +37,10 @@ public interface CharacterBookEntity {
 
   Integer getBlood();
 
+  Integer getSpeed();
+
   // magic will be used if character has fruit in Paramecia type.
   Integer getMagic();
 
-  CharacterBookEntityBuilder toBuilder();
+  CharacterEntityBuilder toBuilder();
 }

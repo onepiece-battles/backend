@@ -4,6 +4,7 @@ import com.yichi.onepiece.Account.Model.AccountCondition;
 import com.yichi.onepiece.Account.Model.AccountDao;
 import com.yichi.onepiece.Account.Model.UserEntity;
 import com.yichi.onepiece.Account.Model.UserEntityBuilder;
+import com.yichi.onepiece.Exception.ExceptionUtils;
 import com.yichi.onepiece.Utils.EncryptHelper;
 import com.yichi.onepiece.model.LoginResponse;
 import com.yichi.onepiece.model.LogoutResponse;
@@ -96,5 +97,18 @@ public class AccountService {
     var signedOutUser = user.toBuilder().setAccountCondition(AccountCondition.SignOut).build();
     accountDao.update(signedOutUser);
     return new LogoutResponse().logoutResult(SUCCESS).userName(user.getUserName());
+  }
+
+  public void justifyUser(UUID userId) {
+    var userEntity =
+        accountDao
+            .findById(userId)
+            .orElseThrow(ExceptionUtils.notFound("User with id: %s not found in database", userId));
+    if (!AccountCondition.SignIn.equals(userEntity.getAccountCondition())) {
+      throw ExceptionUtils.notFound(
+              "Account condition of user with id: %s invalid, account condition: %s",
+              userId, userEntity.getAccountCondition())
+          .get();
+    }
   }
 }
