@@ -9,6 +9,8 @@ public interface UserEntity {
 
   String getUserName();
 
+  String getEmail();
+
   String getOrganization();
 
   String getEncryptedPassword();
