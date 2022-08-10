@@ -69,6 +69,8 @@ schemas:
     properties:
       user_name:
         type: string
+      email:
+        type: string
       organization:
         type: string
       password:
@@ -102,11 +104,14 @@ schemas:
     type: object
     required:
       - user_name
+      - email
       - password
       - confirmed_password
       - organization
     properties:
       user_name:
+        type: string
+      email:
         type: string
       password:
         type: string
@@ -121,7 +126,7 @@ schemas:
       - register_result
       - verification
     properties:
-      regirster_result:
+      register_result:
         description: Whether user has successfully registered into system.
         type: boolean
       verification:

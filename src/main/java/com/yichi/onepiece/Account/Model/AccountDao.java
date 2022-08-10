@@ -21,4 +21,7 @@ public interface AccountDao extends BaseDao<UserEntity, UUID> {
 
   @Select("SELECT * FROM user WHERE user_name = #{user_name}")
   List<UserEntity> listByName(@Param("user_name") String userName);
+
+  @Select("SELECT * FROM user WHERE email= #{email}")
+  List<UserEntity> listByEmailAddress(@Param("email") String email);
 }

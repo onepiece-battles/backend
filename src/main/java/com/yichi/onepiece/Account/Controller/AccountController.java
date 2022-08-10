@@ -24,9 +24,10 @@ public class AccountController implements AccountApi {
   public ResponseEntity<LoginResponse> login(LoginRequest loginRequest) {
     var userName = loginRequest.getUserName();
     var password = loginRequest.getPassword();
+    var email = loginRequest.getEmail();
     var org = loginRequest.getOrganization();
-    var user = accountService.login(userName, password, org);
-    return ResponseEntity.ok(user);
+    var loginResponse = accountService.login(userName, password,email, org);
+    return ResponseEntity.ok(loginResponse);
   }
 
   @Override
@@ -41,10 +42,11 @@ public class AccountController implements AccountApi {
         accountService.register(
             registerRequest.getUserName(),
             registerRequest.getPassword(),
+            registerRequest.getEmail(),
             registerRequest.getConfirmedPassword(),
             registerRequest.getOrganization());
     var registerResult = verification.equals(AccountService.SUCCESS);
     return ResponseEntity.ok(
-        new RegisterResponse().regirsterResult(registerResult).verification(verification));
+        new RegisterResponse().registerResult(registerResult).verification(verification));
   }
 }
