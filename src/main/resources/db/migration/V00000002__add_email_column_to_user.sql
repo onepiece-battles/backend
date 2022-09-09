@@ -1,1 +1,1 @@
-alter table user add column email VARCHAR(255),
+alter table user add column email VARCHAR(255);
