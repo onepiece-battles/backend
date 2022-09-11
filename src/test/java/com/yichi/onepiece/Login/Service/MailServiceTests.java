@@ -1,0 +1,24 @@
+package com.yichi.onepiece.Login.Service;
+
+import com.yichi.onepiece.Email.EmailClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
+import org.testng.annotations.Test;
+
+import javax.mail.MessagingException;
+
+@SpringBootTest
+public class MailServiceTests extends AbstractTransactionalTestNGSpringContextTests {
+    @Autowired
+    private EmailClient emailService;
+
+    @Test
+    public void testSendEmail() throws MessagingException {
+        String sunnyPath = "src/test/resources/email_resources/sunny.png";
+        String subject = "Test Email From OnePiece Battles";
+        String toEmail = "zhangyichiwind@163.com";
+        String body = "<h1>Welcome to OnePiece Battles!</h1>";
+        emailService.sendMail(toEmail, body, subject);
+    }
+}
