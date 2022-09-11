@@ -58,6 +58,7 @@ CREATE TABLE `user`(
     `user_name` VARCHAR(255) NOT NULL,
     `organization` TEXT NOT NULL,
     `encrypted_password` VARCHAR(255) NOT NULL,
-    `account_condition` VARCHAR(40) NOT NULL
+    `account_condition` VARCHAR(40) NOT NULL,
+    `email` VARCHAR(255)
 );
 ALTER TABLE `user` ADD CONSTRAINT PRIMARY KEY(`id`);

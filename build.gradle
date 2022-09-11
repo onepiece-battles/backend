@@ -17,6 +17,7 @@ ext {
     assertj_guava_version = "3.4.0"
     assertj_db_version = "2.0.2"
     mysql_connector_version = "8.0.27"
+    spring_mail_version = "2.7.3"
 }
 repositories {
     mavenCentral()
@@ -31,6 +32,7 @@ dependencies {
     implementation project(":api")
     annotationProcessor project(":EntityProcessor")
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:$mybatis_spring_boot_version"
+    implementation "org.springframework.boot:spring-boot-starter-mail:$spring_mail_version"
     implementation "org.mapstruct:mapstruct:$mapstruct_version"
     implementation "org.mapstruct:mapstruct-processor:$mapstruct_version"
     annotationProcessor "org.mapstruct:mapstruct-processor:$mapstruct_version"

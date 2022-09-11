@@ -30,7 +30,7 @@ public class AccountService {
   private static final String INVALID_EMAIL_ADDRESS = "This email address is invalid, please check it again";
   private static final String WRONG_PASSWORD = "wrong password, please try again";
   // logout info
-  private static final String NO_USER_FOUND = "sign fail, no user found";
+  public static final String NO_USER_FOUND = "sign fail, no user found";
   // pure success for register, login and logout.
   public static final String SUCCESS = "SUCCESS";
   private final AccountDao accountDao;
