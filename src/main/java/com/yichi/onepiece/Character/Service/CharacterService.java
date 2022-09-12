@@ -23,11 +23,11 @@ public class CharacterService {
   private static final String EAT_FRUIT_SUCCESS = "EAT FRUIT SUCCESS";
   private static final String NO_MORE_FRUIT = "NO MORE FRUIT CAN BE TAKEN";
 
-  private final CharacterDao CharacterDao;
+  private final CharacterDao characterDao;
   private final FruitService fruitService;
 
   public CharacterService(CharacterDao CharacterDao, FruitService fruitService) {
-    this.CharacterDao = CharacterDao;
+    this.characterDao = CharacterDao;
     this.fruitService = fruitService;
   }
 
@@ -35,16 +35,16 @@ public class CharacterService {
     var characterEntity = CharacterEntityConverter.INSTANCE.toCharacterEntity(request);
     // character does not eat any fruit by default.
     characterEntity = characterEntity.toBuilder().setHasFruits(false).setFruits(List.of()).build();
-    CharacterDao.insert(characterEntity);
+    characterDao.insert(characterEntity);
     var insertedEntity =
-        CharacterDao.findById(characterEntity.getId())
+        characterDao.findById(characterEntity.getId())
             .orElseThrow(
                 ExceptionUtils.notFound(
                     "Can not find inserted character with id %s", characterEntity.getId()));
     return CharacterEntityConverter.INSTANCE.toCharacter(insertedEntity);
   }
 
-  public Character addProfile(UUID characterId, MultipartFile profile) {
+  public byte [] updateProfile(UUID characterId, MultipartFile profile) {
     Byte[] profileByte = new Byte[0];
     try {
       profileByte = ArrayUtils.toObject(profile.getInputStream().readAllBytes());
@@ -52,15 +52,22 @@ public class CharacterService {
       e.printStackTrace();
     }
     var character =
-        CharacterDao.findById(characterId)
+        characterDao.findById(characterId)
             .orElseThrow(ExceptionUtils.notFound("character with id %s not found", characterId));
     var updatedCharacter = character.toBuilder().setProfileImage(profileByte).build();
-    CharacterDao.insert(updatedCharacter);
-    return CharacterEntityConverter.INSTANCE.toCharacter(updatedCharacter);
+    characterDao.update(updatedCharacter);
+    return ArrayUtils.toPrimitive(updatedCharacter.getProfileImage());
+  }
+
+  public byte [] getProfile(UUID characterId) {
+    var character =
+            characterDao.findById(characterId)
+                    .orElseThrow(ExceptionUtils.notFound("character with id %s not found", characterId));
+    return ArrayUtils.toPrimitive(character.getProfileImage());
   }
 
   public EatFruitResponse eatFruit(UUID characterId, UUID fruitId) {
-    var characterEntityOptional = CharacterDao.findById(characterId);
+    var characterEntityOptional = characterDao.findById(characterId);
     if (characterEntityOptional.isEmpty()) {
       throw new RuntimeException("can not add fruit to character that doesn't exist");
     }
@@ -72,11 +79,11 @@ public class CharacterService {
       // this character hasn't taken any fruit yet
       var characterEntityUpdated =
           characterEntity.toBuilder().setHasFruits(true).setFruits(List.of(newFruit)).build();
-      CharacterDao.update(characterEntityUpdated);
+      characterDao.update(characterEntityUpdated);
       fruitService.updateOwner(fruitId, characterId);
       response.setFruitMessage(EAT_FRUIT_SUCCESS);
       response.setCharacter(
-          CharacterEntityConverter.INSTANCE.toCharacter(CharacterDao.findById(characterId).get()));
+          CharacterEntityConverter.INSTANCE.toCharacter(characterDao.findById(characterId).get()));
     } else {
       int fruitLimit = characterEntity.getFruitLimit();
       if (fruits.size() > fruitLimit) {
@@ -88,7 +95,7 @@ public class CharacterService {
       } else {
         fruits.add(newFruit);
         var updatedCharacter = characterEntity.toBuilder().setFruits(fruits).build();
-        CharacterDao.update(updatedCharacter);
+        characterDao.update(updatedCharacter);
         fruitService.updateOwner(fruitId, characterId);
         response.setCharacter(CharacterEntityConverter.INSTANCE.toCharacter(updatedCharacter));
         response.setFruitMessage(EAT_FRUIT_SUCCESS);
@@ -98,20 +105,20 @@ public class CharacterService {
   }
 
   public List<Character> listCharacters(ListCharacterRequest request) {
-    var totalSize = CharacterDao.countCharacter();
+    var totalSize = characterDao.countCharacter();
     // pageIndex is 1- based. offset is 0- based.
     var offset = (request.getPageIndex() - 1) * request.getPageSize();
     if (offset >= totalSize || offset < 0) {
       return List.of();
     }
 
-    return CharacterDao.listCharacters(offset, request.getPageSize()).stream()
+    return characterDao.listCharacters(offset, request.getPageSize()).stream()
         .map(CharacterEntityConverter.INSTANCE::toCharacter)
         .collect(Collectors.toList());
   }
 
   public CharacterEntity getCharacterEntityById(UUID characterId) {
-    return CharacterDao.findById(characterId)
+    return characterDao.findById(characterId)
         .orElseThrow(ExceptionUtils.notFound("Character with id: %s not found", characterId));
   }
 }
