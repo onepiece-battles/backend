@@ -20,14 +20,14 @@ apis:
               schema:
                 $ref: "#/schemas/Character"
 
-  add_profile:
-    summary: add image for character
+  update_profile:
+    summary: update image for character
     post:
       tags:
         - "Character"
-      operationId: addProfile
+      operationId: updateProfile
       requestBody:
-        description: request to add picture to character
+        description: request to update picture to character
         content:
           multipart/form-data:
             schema:
@@ -42,11 +42,35 @@ apis:
         required: true
       responses:
         "200":
-          description: character information
+          description: profile information
           content:
-            application/json:
+            image/*:
               schema:
-                $ref: "#/schemas/AddProfileResponse"
+                type: string
+                format: binary
+
+  get_profile:
+    summary: get profile image for character by id
+    post:
+      tags:
+        - Character
+      operationId: getProfile
+      parameters:
+        - name: id
+          in: path
+          description: character id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: the profile image
+          content:
+            multipart/form-data:
+              schema:
+                type: string
+                format: binary
 
   eat_fruit:
     summary: character eat fruit
@@ -125,9 +149,6 @@ schemas:
       id:
         type: string
         format: uuid
-      profile_image:
-        type: string
-        format: binary
       character_types:
         description: type of fighting skills
         type: array

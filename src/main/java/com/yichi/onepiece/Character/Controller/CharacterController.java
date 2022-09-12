@@ -3,13 +3,14 @@ package com.yichi.onepiece.Character.Controller;
 import com.yichi.onepiece.Character.Service.CharacterService;
 import com.yichi.onepiece.api.CharacterApi;
 import com.yichi.onepiece.model.AddCharacterRequest;
-import com.yichi.onepiece.model.AddProfileResponse;
 import com.yichi.onepiece.model.Character;
 import com.yichi.onepiece.model.EatFruitRequest;
 import com.yichi.onepiece.model.EatFruitResponse;
 import com.yichi.onepiece.model.ListCharacterRequest;
 import com.yichi.onepiece.model.ListCharacterResponse;
 import java.util.UUID;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,10 +32,14 @@ public class CharacterController implements CharacterApi {
   }
 
   @Override
-  public ResponseEntity<AddProfileResponse> addProfile(
-      UUID characterId, MultipartFile profileImage) {
-    var character = characterService.addProfile(characterId, profileImage);
-    return ResponseEntity.ok(new AddProfileResponse().character(character));
+  public ResponseEntity<Resource> updateProfile(UUID characterId, MultipartFile profileImage) {
+    var image = characterService.updateProfile(characterId, profileImage);
+    return ResponseEntity.ok(new ByteArrayResource(image));
+  }
+
+  @Override
+  public ResponseEntity<Resource> getProfile(UUID id) {
+    return ResponseEntity.ok(new ByteArrayResource(characterService.getProfile(id)));
   }
 
   @Override

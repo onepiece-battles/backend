@@ -6,7 +6,7 @@ create table user(
       account_condition VARCHAR(40) NOT NULL
 );
 
-create table character_entity (
+create table `character` (
         id BINARY(16) PRIMARY KEY,
         character_types TEXT NOT NULL,
         profile_image LONGBLOB,
@@ -19,6 +19,7 @@ create table character_entity (
         attack INT NOT NULL,
         defense INT NOT NULL,
         intelligence INT NOT NULL,
+        speed INT NOT NULL,
         blood INT NOT NULL,
         magic INT NOT NULL
 );
@@ -36,7 +37,7 @@ create table fruit (
        blood_strengthen INT NOT NULL
 );
 ALTER TABLE fruit ADD CONSTRAINT fk_fruit__owner_id
-    FOREIGN KEY(owner_id) REFERENCES character_entity(id);
+    FOREIGN KEY(owner_id) REFERENCES `character`(id);
 
 create table battle (
         id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -48,6 +49,6 @@ create table battle (
 ALTER TABLE battle ADD CONSTRAINT fk_battle__user_id
     FOREIGN KEY(user_id) REFERENCES user(id);
 ALTER TABLE battle ADD CONSTRAINT fk_battle__character_id_initiator
-    FOREIGN KEY(character_id_initiator) REFERENCES character_entity(id);
+    FOREIGN KEY(character_id_initiator) REFERENCES `character`(id);
 ALTER TABLE battle ADD CONSTRAINT fk_battle__character_id_receiver
-    FOREIGN KEY(character_id_receiver) REFERENCES character_entity(id);
+    FOREIGN KEY(character_id_receiver) REFERENCES `character`(id);
