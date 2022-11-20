@@ -72,6 +72,7 @@ public class AccountService {
             .setUserName(userName)
             .setAccountCondition(AccountCondition.Registered)
             .setEncryptedPassword(encryptedPassword)
+                .setEmail(email)
             .setOrganization(organization)
             .build();
     accountDao.insert(user);
