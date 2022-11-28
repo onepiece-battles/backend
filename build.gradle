@@ -61,11 +61,6 @@ configurations.implementation {
     exclude group: 'org.slf4j', module: 'slf4j-simple'
 }
 
-//configurations.all {
-//    resolutionStrategy {
-//        force('org.slf4j:slf4j-api:1.7.36')
-//    }
-//}
 
 test {
     // uncomment testLogging to print logs to stdout

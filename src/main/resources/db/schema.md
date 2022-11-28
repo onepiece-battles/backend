@@ -18,12 +18,12 @@ ALTER TABLE `battle` ADD CONSTRAINT PRIMARY KEY(`id`);
 
 ```sql
 ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__character_id_initiator`
-  FOREIGN KEY(`character_id_initiator`) REFERENCES `character_entity`(`id`);
+  FOREIGN KEY(`character_id_initiator`) REFERENCES `character`(`id`);
 ```
 
 ```sql
 ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__character_id_receiver`
-  FOREIGN KEY(`character_id_receiver`) REFERENCES `character_entity`(`id`);
+  FOREIGN KEY(`character_id_receiver`) REFERENCES `character`(`id`);
 ```
 
 ```sql
@@ -31,10 +31,10 @@ ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__user_id`
   FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
 ```
 
-## character_entity
+## character
 
 ```sql
-CREATE TABLE `character_entity`(
+CREATE TABLE `character`(
     `id` BINARY(16) NOT NULL,
     `character_types` TEXT NOT NULL,
     `profile_image` LONGBLOB,
@@ -47,13 +47,14 @@ CREATE TABLE `character_entity`(
     `attack` INT NOT NULL,
     `defense` INT NOT NULL,
     `intelligence` INT NOT NULL,
+    `speed` INT NOT NULL,
     `blood` INT NOT NULL,
     `magic` INT NOT NULL
 );
 ```
 
 ```sql
-ALTER TABLE `character_entity` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `character` ADD CONSTRAINT PRIMARY KEY(`id`);
 ```
 
 ## fruit
@@ -79,7 +80,7 @@ ALTER TABLE `fruit` ADD CONSTRAINT PRIMARY KEY(`id`);
 
 ```sql
 ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__owner_id`
-  FOREIGN KEY(`owner_id`) REFERENCES `character_entity`(`id`);
+  FOREIGN KEY(`owner_id`) REFERENCES `character`(`id`);
 ```
 
 ## user
