@@ -1,0 +1,27 @@
+user:
+  constants:
+    DUPLICATE_USER_NAME:
+      displayName:
+        en-US: "User name is taken, please consider anther name"
+        zh-CN: "用户名被占用，请选择其他名字"
+    PASSWORD_CONFIRMATION:
+      displayName:
+        en-US: "Please confirm your password again"
+        zh-CN: "请再次确认您的密码"
+    # login constants
+    REGISTER_FIRST_BEFORE_LOGIN:
+      displayName:
+        en-US: "please register first before login"
+        zh-CN: "请先注册再登录"
+    EMAIL_HAS_BEEN_REGISTERED:
+      displayName:
+        en-US: "Email has already been registered, please use another email account"
+        zh-CN: "邮箱已被注册，请选择其他邮箱"
+    WRONG_PASSWORD:
+      displayName:
+        en-US: "User name or password incorrect"
+        zh-CN: "用户名或密码错误"
+    NO_USER_FOUND:
+      displayName:
+        en-US: "Sign out fail, no user found"
+        zh-CN: "登录系统失败，找不到用户"

@@ -4,7 +4,7 @@ import com.yichi.onepiece.Account.Model.AccountDao;
 import com.yichi.onepiece.Account.Service.AccountService;
 import com.yichi.onepiece.BaseServiceTests;
 
-import static com.yichi.onepiece.Account.Service.AccountService.NO_USER_FOUND;
+import static com.yichi.onepiece.UFC.UserFacingConstantsKey.NO_USER_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.yichi.onepiece.model.LogoutResponse;

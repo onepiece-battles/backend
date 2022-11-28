@@ -1,6 +1,8 @@
 package com.yichi.onepiece.Account.Controller;
 
 import com.yichi.onepiece.Account.Service.AccountService;
+import com.yichi.onepiece.UFC.UserFacingConstants;
+import static com.yichi.onepiece.Constants.ConstantsContainer.SUCCESS;
 import com.yichi.onepiece.api.AccountApi;
 import com.yichi.onepiece.model.LoginRequest;
 import com.yichi.onepiece.model.LoginResponse;
@@ -38,15 +40,17 @@ public class AccountController implements AccountApi {
 
   @Override
   public ResponseEntity<RegisterResponse> register(RegisterRequest registerRequest) {
-    var verification =
+    var verificationKey =
         accountService.register(
             registerRequest.getUserName(),
             registerRequest.getPassword(),
             registerRequest.getEmail(),
             registerRequest.getConfirmedPassword(),
             registerRequest.getOrganization());
-    var registerResult = verification.equals(AccountService.SUCCESS);
+    var registerSuccess = verificationKey.equals(SUCCESS);
     return ResponseEntity.ok(
-        new RegisterResponse().registerResult(registerResult).verification(verification));
+        new RegisterResponse()
+                .registerResult(registerSuccess)
+                .verification(registerSuccess?null:UserFacingConstants.getConstant(verificationKey).getDisplayName()));
   }
 }
