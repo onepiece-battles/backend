@@ -8,6 +8,10 @@ user:
       displayName:
         en-US: "Please confirm your password again"
         zh-CN: "请再次确认您的密码"
+    INVALID_EMAIL_ADDRESS:
+      displayName:
+        en-US: "Invalid email address"
+        zh-CN: "邮箱格式错误"
     # login constants
     REGISTER_FIRST_BEFORE_LOGIN:
       displayName:
