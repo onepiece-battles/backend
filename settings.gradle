@@ -1,4 +1,5 @@
 rootProject.name = 'OnePieceBattles'
 include 'EntityProcessor'
+include 'spring-boot-configuration-processor'
 include 'api'
 
