@@ -28,7 +28,7 @@ public class AccountController implements AccountApi {
     var password = loginRequest.getPassword();
     var email = loginRequest.getEmail();
     var org = loginRequest.getOrganization();
-    var loginResponse = accountService.login(userName, password,email, org);
+    var loginResponse = accountService.login(userName, password, email, org);
     return ResponseEntity.ok(loginResponse);
   }
 

@@ -45,6 +45,8 @@ dependencies {
     implementation 'org.flywaydb:flyway-mysql:8.5.10'
     implementation "mysql:mysql-connector-java:$mysql_connector_version"
     implementation "org.springframework.boot:spring-boot-starter-web:2.7.0"
+    implementation 'io.micrometer:micrometer-core:1.9.3'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.9.3'
 
     // test dependencies
     testImplementation 'com.h2database:h2:1.4.200'
