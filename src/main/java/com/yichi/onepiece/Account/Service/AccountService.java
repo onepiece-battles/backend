@@ -73,7 +73,6 @@ public class AccountService {
     I18nText verification = null;
     if (users.isEmpty()) {
       verification = UserFacingConstants.getConstant(REGISTER_FIRST_BEFORE_LOGIN).getDisplayName();
-      System.out.printf("verification is %s",verification);
       return new LoginResponse().verification(verification);
     }
 
