@@ -19,7 +19,7 @@ ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__user_id`
 -- character
 CREATE TABLE `character`(
     `id` BINARY(16) NOT NULL,
-    `character_types` TEXT NOT NULL,
+    `character_type` VARCHAR(30) NOT NULL,
     `profile_image` LONGBLOB,
     `name` VARCHAR(30) NOT NULL,
     `group_oid` VARCHAR(30),

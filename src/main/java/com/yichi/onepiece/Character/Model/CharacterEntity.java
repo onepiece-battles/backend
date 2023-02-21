@@ -1,7 +1,7 @@
 package com.yichi.onepiece.Character.Model;
 
 import com.yichi.infra.support.entity.Entity;
-import com.yichi.onepiece.model.CharacterTypeInfo;
+import com.yichi.onepiece.model.CharacterType;
 import com.yichi.onepiece.model.FruitInCharacter;
 import java.util.List;
 import java.util.UUID;
@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 public interface CharacterEntity {
   UUID getId();
 
-  List<CharacterTypeInfo> getCharacterTypes();
+  CharacterType getCharacterType();
 
   @Nullable
   Byte[] getProfileImage();
