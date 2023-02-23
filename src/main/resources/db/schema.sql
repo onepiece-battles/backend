@@ -32,9 +32,12 @@ CREATE TABLE `character`(
     `intelligence` INT NOT NULL,
     `speed` INT NOT NULL,
     `blood` INT NOT NULL,
-    `magic` INT NOT NULL
+    `magic` INT NOT NULL,
+    `user_id` BINARY(16)
 );
 ALTER TABLE `character` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `character` ADD CONSTRAINT `fk_character__user_id`
+  FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
 
 -- fruit
 CREATE TABLE `fruit`(
@@ -47,11 +50,14 @@ CREATE TABLE `fruit`(
     `attack_strengthen` INT NOT NULL,
     `defense_strengthen` INT NOT NULL,
     `intelligence_strengthen` INT NOT NULL,
-    `blood_strengthen` INT NOT NULL
+    `blood_strengthen` INT NOT NULL,
+    `user_id` BINARY(16)
 );
 ALTER TABLE `fruit` ADD CONSTRAINT PRIMARY KEY(`id`);
 ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__owner_id`
   FOREIGN KEY(`owner_id`) REFERENCES `character`(`id`);
+ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__user_id`
+  FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
 
 -- user
 CREATE TABLE `user`(
