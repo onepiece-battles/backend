@@ -1,0 +1,3 @@
+[submodule "onepiece-battles-api"]
+	path = onepiece-battles-api
+	url = https://gitee.com/monkeyZhangyichi/onepiece-battles-api.git

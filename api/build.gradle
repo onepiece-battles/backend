@@ -13,7 +13,7 @@ repositories {
 openApiGenerate {
     generatorName = "spring"
     library = "spring-boot"
-    inputSpec = "$rootDir/api/openapi.yaml".toString()
+    inputSpec = "$rootDir/onepiece-battles-api/api/openapi.yaml".toString()
     outputDir = "$rootDir/api".toString()
     apiPackage = "com.yichi.onepiece.api".toString()
     modelPackage = "com.yichi.onepiece.model".toString()
