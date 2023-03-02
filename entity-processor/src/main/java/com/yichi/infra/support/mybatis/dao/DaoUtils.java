@@ -5,12 +5,12 @@ import com.yichi.infra.support.utils.JavaTypeUtils;
 public class DaoUtils {
   private DaoUtils() {}
 
-  public static final boolean isEntityDao(Class<?> daoClass) {
+  public static boolean isEntityDao(Class<?> daoClass) {
     return BaseDao.class.isAssignableFrom(daoClass)
         || DeletableDao.class.isAssignableFrom(daoClass);
   }
 
-  public static final Class<?> getEntityType(Class<?> daoClass) {
+  public static Class<?> getEntityType(Class<?> daoClass) {
     if (BaseDao.class.isAssignableFrom(daoClass)) {
       return JavaTypeUtils.getReifiedGenericType(daoClass, BaseDao.class, 0);
     } else if (DeletableDao.class.isAssignableFrom(daoClass)) {
@@ -20,7 +20,7 @@ public class DaoUtils {
     }
   }
 
-  public static final Class<?> getKeyType(Class<?> daoClass) {
+  public static Class<?> getKeyType(Class<?> daoClass) {
     if (BaseDao.class.isAssignableFrom(daoClass)) {
       return JavaTypeUtils.getReifiedGenericType(daoClass, BaseDao.class, 1);
     } else if (DeletableDao.class.isAssignableFrom(daoClass)) {

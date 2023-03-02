@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+}
+
+ext {
+    mapstruct_version = "1.5.2.Final"
+    guava_version = "31.1-jre"
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation project(":api")
+    implementation "org.mapstruct:mapstruct:$mapstruct_version"
+    implementation "org.mapstruct:mapstruct-processor:$mapstruct_version"
+    annotationProcessor "org.mapstruct:mapstruct-processor:$mapstruct_version"
+    implementation "com.google.guava:guava:$guava_version"
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.2'
+    implementation 'org.mybatis:mybatis:3.5.9'
+    implementation 'org.springframework:spring-core'
+    implementation 'org.springframework.boot:spring-boot'
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+    implementation "org.apache.commons:commons-lang3:3.12.0"
+    implementation "org.slf4j:slf4j-api:1.7.36"
+}
