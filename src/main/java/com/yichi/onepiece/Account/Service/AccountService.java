@@ -70,7 +70,7 @@ public class AccountService {
     var users = accountDao.listByName(userName);
     var userByEmail = accountDao.listByEmailAddress(email);
     users.addAll(userByEmail);
-    I18nText verification = null;
+    I18nText verification;
     if (users.isEmpty()) {
       verification = UserFacingConstants.getConstant(REGISTER_FIRST_BEFORE_LOGIN).getDisplayName();
       return new LoginResponse().verification(verification);

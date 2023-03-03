@@ -1,71 +1,82 @@
 plugins {
-    id "java"
+    id 'java'
+    id 'org.springframework.boot' version '2.7.5'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
-group "org.onepiece"
+group "org.onepiece-battles"
 version "EAST_BLUE_SAGA"
+java.sourceCompatibility(JavaVersion.VERSION_17)
 
 ext {
-    mybatis_spring_boot_version = "2.2.2"
-    mybatis_version = "3.5.5"
-    mapstruct_version = "1.4.2.Final"
-    guava_version = "27.0.1-jre"
-    apache_poi_version = "4.1.2"
-    mockito_version = "3.4.6"
-    mockito_testng_version = "0.4.13"
-    testng_version = "7.1.0"
-    assertj_guava_version = "3.4.0"
     assertj_db_version = "2.0.2"
-    mysql_connector_version = "8.0.27"
-    spring_mail_version = "2.7.3"
+    apache_commons_version = "3.12.0"
+    flyway_version= "8.5.10"
+    guava_version = "31.1-jre"
+    jackson_dataformat_version = "2.13.3"
+    h2_database_version = "1.4.200"
+    mybatis_version = "3.5.9"
+    mybatis_spring_version = "2.0.6"
+    mybatis_spring_autoconfig_version = "2.2.2"
+    mapstruct_version = "1.5.2.Final"
+    testng_version = "7.1.0"
+    mockito_version = "3.12.0"
+    mockito_testng_version = "0.4.13"
+    mysql_connector_version = "8.0.28"
+    micrometer_registry_version = "1.9.3"
 }
+
 repositories {
     mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation project(":entity-processor")
+    implementation project(":api")
+    annotationProcessor project(":entity-processor")
+
+    // mapstruct
+    implementation "org.mapstruct:mapstruct:$mapstruct_version"
+    implementation "org.mapstruct:mapstruct-processor:$mapstruct_version"
+    annotationProcessor "org.mapstruct:mapstruct-processor:$mapstruct_version"
+
+    // spring security
+    implementation 'org.springframework.security:spring-security-core'
+
+
+    // database
+    implementation "org.flywaydb:flyway-core:$flyway_version"
+    implementation "org.flywaydb:flyway-mysql:$flyway_version"
+    implementation "mysql:mysql-connector-java:$mysql_connector_version"
+
+    implementation "org.mybatis:mybatis:$mybatis_version"
+    implementation "org.mybatis:mybatis-spring:$mybatis_spring_version"
+    implementation "org.mybatis.spring.boot:mybatis-spring-boot-autoconfigure:$mybatis_spring_autoconfig_version"
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // special
+    implementation "io.micrometer:micrometer-registry-prometheus:$micrometer_registry_version"
+    implementation "org.springframework.boot:spring-boot-starter-mail"
+    implementation "org.springframework:spring-web"
+    implementation "org.springframework:spring-webmvc"
+
+
+    implementation "org.apache.commons:commons-lang3:$apache_commons_version"
+    implementation "com.google.guava:guava:$guava_version"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jackson_dataformat_version"
+
+    // --- test dependencies ---
+    testImplementation "com.h2database:h2:$h2_database_version"
+    testImplementation "org.mockito:mockito-testng:$mockito_testng_version"
+    testImplementation "org.mockito:mockito-core:$mockito_version"
+    testImplementation "org.mockito:mockito-inline:$mockito_version"
+    testImplementation "org.assertj:assertj-db:$assertj_db_version"
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
 }
 
 test {
     useTestNG()
 }
 
-dependencies {
-    implementation project(":EntityProcessor")
-    implementation project(":api")
-    annotationProcessor project(":EntityProcessor")
-    implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:$mybatis_spring_boot_version"
-    implementation "org.springframework.boot:spring-boot-starter-mail:$spring_mail_version"
-    implementation "org.mapstruct:mapstruct:$mapstruct_version"
-    implementation "org.mapstruct:mapstruct-processor:$mapstruct_version"
-    annotationProcessor "org.mapstruct:mapstruct-processor:$mapstruct_version"
-    implementation "org.apache.commons:commons-lang3:3.12.0"
-    implementation "com.google.guava:guava:$guava_version"
-    implementation "org.apache.poi:poi-ooxml:$apache_poi_version"
-    implementation "org.apache.poi:poi:$apache_poi_version"
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.3'
-    implementation "org.flywaydb:flyway-core:8.5.10"
-    implementation 'org.flywaydb:flyway-mysql:8.5.10'
-    implementation "mysql:mysql-connector-java:$mysql_connector_version"
-    implementation "org.springframework.boot:spring-boot-starter-web:2.7.0"
-    implementation 'io.micrometer:micrometer-core:1.9.3'
-    implementation 'io.micrometer:micrometer-registry-prometheus:1.9.3'
-    implementation 'org.springframework.security:spring-security-core:5.7.5'
-
-    // test dependencies
-    testImplementation 'com.h2database:h2:1.4.200'
-    testImplementation "org.testng:testng:$testng_version"
-    testImplementation "org.mockito:mockito-core:$mockito_version"
-    testImplementation "org.mockito:mockito-inline:$mockito_version"
-    testImplementation "org.mockito:mockito-testng:$mockito_testng_version"
-    testImplementation "org.assertj:assertj-guava:$assertj_guava_version"
-    testImplementation "org.assertj:assertj-db:$assertj_db_version"
-    testImplementation "org.springframework.boot:spring-boot-starter-test:2.6.7"
-}
-
-configurations.implementation {
-    exclude group: 'org.slf4j', module: 'slf4j-simple'
-}
-
-
-test {
-    // uncomment testLogging to print logs to stdout
-    // testLogging.showStandardStreams = true
-}

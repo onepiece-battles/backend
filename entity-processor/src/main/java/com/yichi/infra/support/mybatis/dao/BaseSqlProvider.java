@@ -11,10 +11,10 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.ibatis.binding.MapperMethod.ParamMap;
 import org.apache.ibatis.builder.annotation.ProviderContext;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class BaseSqlProvider {
-  private static Map<String, EntityInfo> cachedEntityInfo = new HashMap();
+  private static final Map<String, EntityInfo> cachedEntityInfo = new HashMap<>();
 
   public BaseSqlProvider() {}
 

@@ -1,15 +1,18 @@
 package com.yichi.onepiece.Login.Service;
 
 import com.yichi.onepiece.Email.EmailClient;
+import org.mockito.testng.MockitoTestNGListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import javax.mail.MessagingException;
 
 @SpringBootTest
-public class MailServiceTests extends AbstractTransactionalTestNGSpringContextTests {
+@Listeners(MockitoTestNGListener.class)
+public class MailServiceTests extends AbstractTestNGSpringContextTests{
     @Autowired
     private EmailClient emailService;
 
