@@ -7,6 +7,10 @@ plugins {
 ext {
     mapstruct_version = "1.5.2.Final"
     guava_version = "31.1-jre"
+    jackson_databind_nullable_version = "0.2.2"
+    mybatis_version = "3.5.9"
+    commons_lang3_version = "3.12.0"
+    slf4j_api_version = "1.7.36"
 }
 
 repositories {
@@ -18,13 +22,16 @@ dependencies {
     implementation project(":api")
     implementation "org.mapstruct:mapstruct:$mapstruct_version"
     implementation "org.mapstruct:mapstruct-processor:$mapstruct_version"
-    annotationProcessor "org.mapstruct:mapstruct-processor:$mapstruct_version"
+    //annotationProcessor "org.mapstruct:mapstruct-processor:$mapstruct_version"
     implementation "com.google.guava:guava:$guava_version"
-    implementation 'org.openapitools:jackson-databind-nullable:0.2.2'
-    implementation 'org.mybatis:mybatis:3.5.9'
-    implementation 'org.springframework:spring-core'
+    implementation "org.openapitools:jackson-databind-nullable:$jackson_databind_nullable_version"
+    implementation "org.mybatis:mybatis:$mybatis_version"
     implementation 'org.springframework.boot:spring-boot'
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
-    implementation "org.apache.commons:commons-lang3:3.12.0"
-    implementation "org.slf4j:slf4j-api:1.7.36"
+    implementation "org.apache.commons:commons-lang3:$commons_lang3_version"
+    implementation "org.slf4j:slf4j-api:$slf4j_api_version"
+}
+
+bootJar {
+    enabled = false
 }
