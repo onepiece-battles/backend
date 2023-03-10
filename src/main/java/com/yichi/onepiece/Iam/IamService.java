@@ -16,10 +16,10 @@ public class IamService {
 
     public UUID getCurrentUserId() {
         IamCache cache = getCache();
-        if (cache.currentUserID!=null) {
+        if (cache.currentUserID != null) {
             return cache.currentUserID;
         }
-        if (SecurityContextHolder.getContext()!=null) {
+        if (SecurityContextHolder.getContext() != null) {
             var authentication = SecurityContextHolder.getContext();
             if (authentication instanceof AnonymousAuthenticationToken) {
                 cache.currentUserID = UUID.fromString(((AnonymousAuthenticationToken) authentication).getPrincipal().toString());
@@ -41,12 +41,13 @@ public class IamService {
     void invalidateCache() {
         cache.remove();
     }
+
     static class IamCache {
         UUID currentUserID;
         UUID isNika;
     }
 
-    public enum Permission{
+    public enum Permission {
         SELECT,
         UPDATE,
         DELETE

@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @ComponentScan({"com.yichi"})
 public class OnePieceApplication {
-  public static void main(String[] args) {
-    SpringApplication.run(OnePieceApplication.class, args);
-  }
+    public static void main(String[] args) {
+        SpringApplication.run(OnePieceApplication.class, args);
+    }
 }

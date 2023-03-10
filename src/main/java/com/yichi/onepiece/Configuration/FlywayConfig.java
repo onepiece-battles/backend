@@ -6,13 +6,13 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FlywayConfig {
-  @Bean
-  public FlywayMigrationStrategy repair() {
-    return flyway -> {
-      // repair each script checksum
-      flyway.repair();
-      // before migration is executed
-      flyway.migrate();
-    };
-  }
+    @Bean
+    public FlywayMigrationStrategy repair() {
+        return flyway -> {
+            // repair each script checksum
+            flyway.repair();
+            // before migration is executed
+            flyway.migrate();
+        };
+    }
 }

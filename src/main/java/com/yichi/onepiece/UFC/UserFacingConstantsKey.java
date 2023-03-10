@@ -9,5 +9,6 @@ public class UserFacingConstantsKey {
     public static final String WRONG_PASSWORD = "WRONG_PASSWORD";
     public static final String NO_USER_FOUND = "NO_USER_FOUND";
 
-    public UserFacingConstantsKey() {}
+    public UserFacingConstantsKey() {
+    }
 }

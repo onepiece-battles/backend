@@ -4,7 +4,7 @@ import com.yichi.infra.support.entity.Entity;
 
 @Entity
 public interface AttackEntity {
-  Integer getAttack();
+    Integer getAttack();
 
-  AttackEntityBuilder toBuilder();
+    AttackEntityBuilder toBuilder();
 }

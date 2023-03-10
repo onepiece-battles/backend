@@ -26,11 +26,11 @@ public class UserFacingConstants {
         if (constants == null) {
             constants = defaultConstantsHolder.get();
             holder.set(constants);
-            if (threadLocalSize!=null) {
+            if (threadLocalSize != null) {
                 threadLocalSize.incrementAndGet();
             }
         }
-        if (constants !=null) {
+        if (constants != null) {
             return constants;
         }
         throw new RuntimeException("No UserFacingConstants found");
@@ -38,21 +38,22 @@ public class UserFacingConstants {
 
     public static void init(UserFacingConstants constants, MeterRegistry meterRegistry, String cacheGaugeName) {
         defaultConstantsHolder.set(constants);
-        threadLocalSize = meterRegistry.gauge(cacheGaugeName, Tags.of("collection_name","UserFacingConstants.threadLocal"),
+        threadLocalSize = meterRegistry.gauge(cacheGaugeName, Tags.of("collection_name", "UserFacingConstants.threadLocal"),
                 new AtomicLong(0));
     }
 
     public static Constant getConstant(String key) {
-        return Objects.requireNonNull(get().constants.get(key), key+" is not initialized");
+        return Objects.requireNonNull(get().constants.get(key), key + " is not initialized");
     }
 
     // constant.key -> constant map
     public Map<String, Constant> getConstantMap() {
         return constants;
     }
+
     public void setConstants(Map<String, Constant> constants) {
         this.constants = constants;
-        for (var entry: this.constants.entrySet()) {
+        for (var entry : this.constants.entrySet()) {
             entry.getValue().setKey(entry.getKey());
         }
     }
@@ -61,7 +62,7 @@ public class UserFacingConstants {
         private String key;
         private I18nText displayName;
 
-        public String getKey(){
+        public String getKey() {
             return key;
         }
 
@@ -80,7 +81,7 @@ public class UserFacingConstants {
 
     public static void clear() {
         holder.remove();
-        if (threadLocalSize!=null) {
+        if (threadLocalSize != null) {
             threadLocalSize.decrementAndGet();
         }
     }

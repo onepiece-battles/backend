@@ -11,13 +11,13 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(uses = EntityBuilder.class)
 public interface FruitConverter {
-  FruitConverter INSTANCE = Mappers.getMapper(FruitConverter.class);
+    FruitConverter INSTANCE = Mappers.getMapper(FruitConverter.class);
 
-  @Mapping(target = "id", ignore = true)
-  @Mapping(target = "ownerId", ignore = true)
-  FruitEntity toFruitEntity(AddFruitRequest request);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "ownerId", ignore = true)
+    FruitEntity toFruitEntity(AddFruitRequest request);
 
-  FruitEntity toFruitEntity(UpdateFruitRequest request);
+    FruitEntity toFruitEntity(UpdateFruitRequest request);
 
-  Fruit toFruit(FruitEntity entity);
+    Fruit toFruit(FruitEntity entity);
 }

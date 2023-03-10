@@ -3,44 +3,46 @@ package com.yichi.onepiece.Character.Model;
 import com.yichi.infra.support.entity.Entity;
 import com.yichi.onepiece.model.CharacterType;
 import com.yichi.onepiece.model.FruitInCharacter;
+
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 @Entity
 public interface CharacterEntity {
-  UUID getId();
+    UUID getId();
 
-  CharacterType getCharacterType();
+    CharacterType getCharacterType();
 
-  @Nullable
-  Byte[] getProfileImage();
+    @Nullable
+    Byte[] getProfileImage();
 
-  String getName();
+    String getName();
 
-  String getGroupOid();
+    String getGroupOid();
 
-  Boolean getHasFruits();
+    Boolean getHasFruits();
 
-  // default to be 1, unless special characters.
-  Integer getFruitLimit();
+    // default to be 1, unless special characters.
+    Integer getFruitLimit();
 
-  List<FruitInCharacter> getFruits();
-  // some characters are better when fighting in a group
-  Integer getGroupGain();
+    List<FruitInCharacter> getFruits();
 
-  Integer getAttack();
+    // some characters are better when fighting in a group
+    Integer getGroupGain();
 
-  Integer getDefense();
+    Integer getAttack();
 
-  Integer getIntelligence();
+    Integer getDefense();
 
-  Integer getBlood();
+    Integer getIntelligence();
 
-  Integer getSpeed();
+    Integer getBlood();
 
-  // magic will be used if character has fruit in Paramecia type.
-  Integer getMagic();
+    Integer getSpeed();
 
-  CharacterEntityBuilder toBuilder();
+    // magic will be used if character has fruit in Paramecia type.
+    Integer getMagic();
+
+    CharacterEntityBuilder toBuilder();
 }

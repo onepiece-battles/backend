@@ -2,10 +2,10 @@ package com.yichi.onepiece.Login.Model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.yichi.onepiece.Account.Model.AccountCondition;
-import com.yichi.onepiece.Account.Model.AccountDao;
-import com.yichi.onepiece.Account.Model.UserEntity;
-import com.yichi.onepiece.Account.Model.UserEntityBuilder;
+import com.yichi.onepiece.User.Model.UserAccountCondition;
+import com.yichi.onepiece.User.Model.UserDao;
+import com.yichi.onepiece.User.Model.UserEntity;
+import com.yichi.onepiece.User.Model.UserEntityBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
@@ -16,14 +16,15 @@ import org.testng.annotations.Test;
 @TestPropertySource(locations = "classpath:test-h2.properties")
 public class LoginDaoTests extends AbstractTestNGSpringContextTests {
 
-  @Autowired AccountDao loginDao;
+  @Autowired
+  UserDao loginDao;
 
   @Test
   public void testInsertAndGet() {
     UserEntity user =
         UserEntityBuilder.newBuilder()
             .setEncryptedPassword("abc")
-            .setAccountCondition(AccountCondition.SignIn)
+            .setAccountCondition(UserAccountCondition.SignIn)
             .setUserName("yichi")
             .setOrganization("tesla")
             .build();
