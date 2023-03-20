@@ -26,7 +26,7 @@ public class BattleController implements BattleApi {
   }
 
   @Override
-  public ResponseEntity<Battle> addBattle(AddBattleRequest addBattleRequest)     {
+  public ResponseEntity<Battle> addBattle(AddBattleRequest addBattleRequest)    {
     userService.justifyUser(addBattleRequest.getUserId());
     var battle = battleService.addBattle(addBattleRequest);
     return ResponseEntity.ok(battle);

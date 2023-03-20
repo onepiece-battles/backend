@@ -1,0 +1,29 @@
+#!/bin/bash
+set -e
+
+INFO='\033[0;32m'
+ERROR='\033[0;31m'
+NC='\033[0m' # No Color
+
+SCRIPT_DIR=$(dirname $(readlink ${BASH_SOURCE[0]} || echo "${BASH_SOURCE[0]}") )
+LINT_SCRIPT=$SCRIPT_DIR/../git-scripts/lint.py
+FIX_SCRIPT=$SCRIPT_DIR/../git-fix.sh
+
+changed_files=$(git diff --cached --name-only --diff-filter=ACMR || true)
+
+if ! $LINT_SCRIPT $changed_files
+then
+  echo "\n${ERROR}ERROR: Aborting commit due to format error.${NC}"
+  echo "\n${INFO}Please fix the style of staged files or you can run following command to fix all staged all together.${NC}"
+  echo "$FIX_SCRIPT"
+  exit 1
+fi
+
+if [ -f package.json ]
+then
+    echo "Checking styles of frontend project files"
+    yarn lint
+fi
+
+# Check trailing spaces.
+git diff --check --cached -- . ':(exclude)gradlew.bat'
