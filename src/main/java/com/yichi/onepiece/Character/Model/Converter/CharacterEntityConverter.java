@@ -13,20 +13,20 @@ import org.springframework.core.io.Resource;
 
 @Mapper(uses = EntityBuilder.class)
 public interface CharacterEntityConverter {
-  CharacterEntityConverter INSTANCE = Mappers.getMapper(CharacterEntityConverter.class);
+    CharacterEntityConverter INSTANCE = Mappers.getMapper(CharacterEntityConverter.class);
 
-  Character toCharacter(CharacterEntity entity);
+    Character toCharacter(CharacterEntity entity);
 
-  @Mapping(target = "id", ignore = true)
-  @Mapping(target = "profileImage", ignore = true)
-  @Mapping(target = "fruits", ignore = true)
-  @Mapping(target = "hasFruits", ignore = true)
-  CharacterEntity toCharacterEntity(AddCharacterRequest addCharacterRequest);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "profileImage", ignore = true)
+    @Mapping(target = "fruits", ignore = true)
+    @Mapping(target = "hasFruits", ignore = true)
+    CharacterEntity toCharacterEntity(AddCharacterRequest addCharacterRequest);
 
-  default Resource blobToResource(Byte[] profileByteArray) {
-    if (profileByteArray == null) {
-      return null;
+    default Resource blobToResource(Byte[] profileByteArray) {
+        if (profileByteArray == null) {
+            return null;
+        }
+        return new ByteArrayResource(ArrayUtils.toPrimitive(profileByteArray));
     }
-    return new ByteArrayResource(ArrayUtils.toPrimitive(profileByteArray));
-  }
 }
