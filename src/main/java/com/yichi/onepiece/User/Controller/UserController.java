@@ -30,7 +30,7 @@ public class UserController implements UserApi {
         var org = loginRequest.getOrganization();
         // Authenticate username and password with registered information.
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, password));
-        var loginResponse = userService.login(userName, password, email, org);
+        var loginResponse = userService.login(userName);
         return ResponseEntity.ok(loginResponse);
     }
 

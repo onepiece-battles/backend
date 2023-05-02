@@ -14,7 +14,6 @@ import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.LoginResponse;
 import com.yichi.onepiece.model.LogoutResponse;
 import com.yichi.onepiece.model.UserInfo;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -71,7 +70,7 @@ public class UserService {
         return SUCCESS;
     }
 
-    public LoginResponse login(String userName, String password, String email, String org) {
+    public LoginResponse login(String userName) {
         var users = userDao.listByName(userName);
         I18nText verification;
         if (users.isEmpty()) {
@@ -99,6 +98,8 @@ public class UserService {
         userDao.update(userLogin);
         return new LoginResponse()
                 .verification(null)
+                .accessToken(jwtToken)
+                .refreshToken(jwtRefreshToken)
                 .userInfo(
                         new UserInfo()
                                 .userId(userLogin.getId())
