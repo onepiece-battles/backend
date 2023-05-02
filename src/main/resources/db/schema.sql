@@ -59,6 +59,19 @@ ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__owner_id`
 ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__user_id`
   FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
 
+-- token
+CREATE TABLE `token`(
+    `id` BINARY(16) NOT NULL,
+    `token` VARCHAR(255) NOT NULL,
+    `token_type` VARCHAR(255) NOT NULL,
+    `revoked` TINYINT NOT NULL,
+    `expired` TINYINT NOT NULL,
+    `user_id` BINARY(16)
+);
+ALTER TABLE `token` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `token` ADD CONSTRAINT `fk_token__user_id`
+  FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
+
 -- user
 CREATE TABLE `user`(
     `id` BINARY(16) NOT NULL,

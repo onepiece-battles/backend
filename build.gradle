@@ -24,6 +24,8 @@ ext {
     mockito_testng_version = "0.4.13"
     mysql_connector_version = "8.0.28"
     micrometer_registry_version = "1.9.3"
+    json_web_token_version = "0.11.5"
+    spring_security_version = "5.8.3"
 }
 
 repositories {
@@ -42,7 +44,12 @@ dependencies {
     annotationProcessor "org.mapstruct:mapstruct-processor:$mapstruct_version"
 
     // spring security
-    implementation 'org.springframework.security:spring-security-core'
+    implementation "org.springframework.security:spring-security-core:$spring_security_version"
+    implementation "org.springframework.security:spring-security-config:$spring_security_version"
+    implementation "org.springframework.security:spring-security-web:$spring_security_version"
+    implementation "io.jsonwebtoken:jjwt-impl:$json_web_token_version"
+    implementation "io.jsonwebtoken:jjwt-api:$json_web_token_version"
+    implementation "io.jsonwebtoken:jjwt-jackson:$json_web_token_version"
 
 
     // database

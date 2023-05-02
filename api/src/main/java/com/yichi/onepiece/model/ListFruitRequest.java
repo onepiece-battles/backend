@@ -19,7 +19,7 @@ import javax.annotation.Generated;
  * ListFruitRequest
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-09T16:50:20.075306800+08:00[Asia/Shanghai]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-02T23:12:16.773454300+08:00[Asia/Shanghai]")
 public class ListFruitRequest  implements Serializable {
 
   private static final long serialVersionUID = 1L;
