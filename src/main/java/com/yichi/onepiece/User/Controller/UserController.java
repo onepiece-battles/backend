@@ -5,6 +5,8 @@ import com.yichi.onepiece.User.Service.UserService;
 import com.yichi.onepiece.api.UserApi;
 import com.yichi.onepiece.model.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 
 import static com.yichi.onepiece.Constants.ConstantsContainer.SUCCESS;
@@ -13,9 +15,11 @@ import static com.yichi.onepiece.Constants.ConstantsContainer.SUCCESS;
 public class UserController implements UserApi {
 
     private final UserService userService;
+    private final AuthenticationManager authenticationManager;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, AuthenticationManager authenticationManager) {
         this.userService = userService;
+        this.authenticationManager = authenticationManager;
     }
 
     @Override
@@ -24,6 +28,8 @@ public class UserController implements UserApi {
         var password = loginRequest.getPassword();
         var email = loginRequest.getEmail();
         var org = loginRequest.getOrganization();
+        // Authenticate username and password with registered information.
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, password));
         var loginResponse = userService.login(userName, password, email, org);
         return ResponseEntity.ok(loginResponse);
     }

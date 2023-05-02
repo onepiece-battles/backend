@@ -14,8 +14,7 @@ import java.util.UUID;
 @Mapper
 public interface UserDao extends BaseDao<UserEntity, UUID> {
 
-    @Select("SELECT * FROM user WHERE id = #{id}")
-    Optional<UserEntity> getById(@Param("id") UUID id);
+
 
     @Select("SELECT * FROM user")
     List<UserEntity> getAllUsers();

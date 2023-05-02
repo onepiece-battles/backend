@@ -25,7 +25,7 @@ public class UserServiceTests extends BaseServiceTests {
 
     @BeforeMethod
     public void setup() {
-        userService = new UserService(userDao);
+        userService = new UserService(userDao, tokenDao);
     }
 
     @Test

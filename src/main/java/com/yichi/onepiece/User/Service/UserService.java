@@ -1,17 +1,20 @@
 package com.yichi.onepiece.User.Service;
 
 import com.yichi.onepiece.Exception.ExceptionUtils;
+import com.yichi.onepiece.Iam.model.TokenDao;
+import com.yichi.onepiece.Iam.model.TokenEntity;
+import com.yichi.onepiece.Iam.model.TokenEntityBuilder;
+import com.yichi.onepiece.Iam.model.TokenType;
 import com.yichi.onepiece.UFC.UserFacingConstants;
 import com.yichi.onepiece.UFC.UserFacingConstantsKey;
-import com.yichi.onepiece.User.Model.UserAccountCondition;
-import com.yichi.onepiece.User.Model.UserDao;
-import com.yichi.onepiece.User.Model.UserEntity;
-import com.yichi.onepiece.User.Model.UserEntityBuilder;
+import com.yichi.onepiece.User.Model.*;
 import com.yichi.onepiece.Utils.EncryptHelper;
+import com.yichi.onepiece.Utils.JwtHelper;
 import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.LoginResponse;
 import com.yichi.onepiece.model.LogoutResponse;
 import com.yichi.onepiece.model.UserInfo;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -23,9 +26,11 @@ import static com.yichi.onepiece.UFC.UserFacingConstantsKey.*;
 @Service
 public class UserService {
     private final UserDao userDao;
+    private final TokenDao tokenDao;
 
-    public UserService(UserDao userDao) {
+    public UserService(UserDao userDao, TokenDao tokenDao) {
         this.userDao = userDao;
+        this.tokenDao = tokenDao;
     }
 
     /**
@@ -68,24 +73,29 @@ public class UserService {
 
     public LoginResponse login(String userName, String password, String email, String org) {
         var users = userDao.listByName(userName);
-        var userByEmail = userDao.listByEmailAddress(email);
-        users.addAll(userByEmail);
         I18nText verification;
         if (users.isEmpty()) {
-            verification = UserFacingConstants.getConstant(REGISTER_FIRST_BEFORE_LOGIN).getDisplayName();
+             verification = UserFacingConstants.getConstant(REGISTER_FIRST_BEFORE_LOGIN).getDisplayName();
             return new LoginResponse().verification(verification);
         }
+        var user = (UserDetailImpl) users.get(0);
 
-        var userEntity = users.get(0);
-        if (!EncryptHelper.getMd5String(password).equals(userEntity.getEncryptedPassword())) {
-            verification = UserFacingConstants.getConstant(WRONG_PASSWORD).getDisplayName();
-            return new LoginResponse().verification(verification);
-        }
-        var userLogin =
-                userEntity.toBuilder()
-                        .setOrganization(org)
-                        .setAccountCondition(UserAccountCondition.SignIn)
-                        .build();
+        var jwtToken = JwtHelper.generateAccessToken(user);
+        var jwtRefreshToken = JwtHelper.generateRefreshToken(user);
+
+        // revoke all user tokens
+        tokenDao.revokeAllUserTokensByUserId(user.getId());
+        // add new token
+        TokenEntity tokenEntity = TokenEntityBuilder.newBuilder()
+                .setUserId(user.getId())
+                .setTokenType(TokenType.BEARER)
+                .setTokenValue(jwtToken)
+                .setExpired(false)
+                .setRevoked(false)
+                .build();
+        tokenDao.insert(tokenEntity);
+
+        var userLogin = user.toBuilder().setAccountCondition(UserAccountCondition.SignIn).build();
         userDao.update(userLogin);
         return new LoginResponse()
                 .verification(null)

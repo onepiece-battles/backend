@@ -21,7 +21,7 @@ import javax.annotation.Generated;
  * LoginResponse
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-09T16:50:20.075306800+08:00[Asia/Shanghai]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-02T23:12:16.773454300+08:00[Asia/Shanghai]")
 public class LoginResponse  implements Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -31,6 +31,12 @@ public class LoginResponse  implements Serializable {
 
   @JsonProperty("verification")
   private I18nText verification;
+
+  @JsonProperty("access_token")
+  private String accessToken;
+
+  @JsonProperty("refresh_token")
+  private String refreshToken;
 
   public LoginResponse userInfo(UserInfo userInfo) {
     this.userInfo = userInfo;
@@ -70,6 +76,44 @@ public class LoginResponse  implements Serializable {
     this.verification = verification;
   }
 
+  public LoginResponse accessToken(String accessToken) {
+    this.accessToken = accessToken;
+    return this;
+  }
+
+  /**
+   * Get accessToken
+   * @return accessToken
+  */
+  
+  @Schema(name = "access_token", required = false)
+  public String getAccessToken() {
+    return accessToken;
+  }
+
+  public void setAccessToken(String accessToken) {
+    this.accessToken = accessToken;
+  }
+
+  public LoginResponse refreshToken(String refreshToken) {
+    this.refreshToken = refreshToken;
+    return this;
+  }
+
+  /**
+   * Get refreshToken
+   * @return refreshToken
+  */
+  
+  @Schema(name = "refresh_token", required = false)
+  public String getRefreshToken() {
+    return refreshToken;
+  }
+
+  public void setRefreshToken(String refreshToken) {
+    this.refreshToken = refreshToken;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -80,12 +124,14 @@ public class LoginResponse  implements Serializable {
     }
     LoginResponse loginResponse = (LoginResponse) o;
     return Objects.equals(this.userInfo, loginResponse.userInfo) &&
-        Objects.equals(this.verification, loginResponse.verification);
+        Objects.equals(this.verification, loginResponse.verification) &&
+        Objects.equals(this.accessToken, loginResponse.accessToken) &&
+        Objects.equals(this.refreshToken, loginResponse.refreshToken);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(userInfo, verification);
+    return Objects.hash(userInfo, verification, accessToken, refreshToken);
   }
 
   @Override
@@ -94,6 +140,8 @@ public class LoginResponse  implements Serializable {
     sb.append("class LoginResponse {\n");
     sb.append("    userInfo: ").append(toIndentedString(userInfo)).append("\n");
     sb.append("    verification: ").append(toIndentedString(verification)).append("\n");
+    sb.append("    accessToken: ").append(toIndentedString(accessToken)).append("\n");
+    sb.append("    refreshToken: ").append(toIndentedString(refreshToken)).append("\n");
     sb.append("}");
     return sb.toString();
   }
