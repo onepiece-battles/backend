@@ -1,26 +1,18 @@
 package com.yichi.onepiece.model;
 
-import java.net.URI;
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.io.Serializable;
-import java.time.OffsetDateTime;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-
-
+import java.io.Serializable;
 import java.util.*;
+import java.util.Objects;
 import javax.annotation.Generated;
+import javax.validation.constraints.*;
 
-/**
- * LoginRequest
- */
-
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-02T23:12:16.773454300+08:00[Asia/Shanghai]")
-public class LoginRequest  implements Serializable {
+/** LoginRequest */
+@Generated(
+    value = "org.openapitools.codegen.languages.SpringCodegen",
+    date = "2023-05-03T15:23:47.500171+08:00[Asia/Shanghai]")
+public class LoginRequest implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -43,9 +35,10 @@ public class LoginRequest  implements Serializable {
 
   /**
    * Get userName
+   *
    * @return userName
-  */
-  @NotNull 
+   */
+  @NotNull
   @Schema(name = "user_name", required = true)
   public String getUserName() {
     return userName;
@@ -62,9 +55,10 @@ public class LoginRequest  implements Serializable {
 
   /**
    * Get email
+   *
    * @return email
-  */
-  @NotNull 
+   */
+  @NotNull
   @Schema(name = "email", required = true)
   public String getEmail() {
     return email;
@@ -81,9 +75,9 @@ public class LoginRequest  implements Serializable {
 
   /**
    * Get organization
+   *
    * @return organization
-  */
-  
+   */
   @Schema(name = "organization", required = false)
   public String getOrganization() {
     return organization;
@@ -100,9 +94,10 @@ public class LoginRequest  implements Serializable {
 
   /**
    * Get password
+   *
    * @return password
-  */
-  @NotNull 
+   */
+  @NotNull
   @Schema(name = "password", required = true)
   public String getPassword() {
     return password;
@@ -121,10 +116,10 @@ public class LoginRequest  implements Serializable {
       return false;
     }
     LoginRequest loginRequest = (LoginRequest) o;
-    return Objects.equals(this.userName, loginRequest.userName) &&
-        Objects.equals(this.email, loginRequest.email) &&
-        Objects.equals(this.organization, loginRequest.organization) &&
-        Objects.equals(this.password, loginRequest.password);
+    return Objects.equals(this.userName, loginRequest.userName)
+        && Objects.equals(this.email, loginRequest.email)
+        && Objects.equals(this.organization, loginRequest.organization)
+        && Objects.equals(this.password, loginRequest.password);
   }
 
   @Override
@@ -145,8 +140,7 @@ public class LoginRequest  implements Serializable {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -155,4 +149,3 @@ public class LoginRequest  implements Serializable {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

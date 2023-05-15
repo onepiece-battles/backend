@@ -1,27 +1,20 @@
 package com.yichi.onepiece.model;
 
-import java.net.URI;
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import java.util.UUID;
-import org.openapitools.jackson.nullable.JsonNullable;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
-import java.time.OffsetDateTime;
+import java.util.*;
+import java.util.Objects;
+import java.util.UUID;
+import javax.annotation.Generated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 
-
-import java.util.*;
-import javax.annotation.Generated;
-
-/**
- * BattleResult
- */
-
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-02T23:12:16.773454300+08:00[Asia/Shanghai]")
-public class BattleResult  implements Serializable {
+/** BattleResult */
+@Generated(
+    value = "org.openapitools.codegen.languages.SpringCodegen",
+    date = "2023-05-03T15:23:47.500171+08:00[Asia/Shanghai]")
+public class BattleResult implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -41,9 +34,10 @@ public class BattleResult  implements Serializable {
 
   /**
    * character id of winner.
+   *
    * @return winnerId
-  */
-  @Valid 
+   */
+  @Valid
   @Schema(name = "winner_id", description = "character id of winner.", required = false)
   public UUID getWinnerId() {
     return winnerId;
@@ -60,9 +54,10 @@ public class BattleResult  implements Serializable {
 
   /**
    * character id of loser.
+   *
    * @return loserId
-  */
-  @Valid 
+   */
+  @Valid
   @Schema(name = "loser_id", description = "character id of loser.", required = false)
   public UUID getLoserId() {
     return loserId;
@@ -79,10 +74,13 @@ public class BattleResult  implements Serializable {
 
   /**
    * remaining blood/ total blood
+   *
    * @return winnerRemainBloodPercentage
-  */
-  
-  @Schema(name = "winner_remain_blood_percentage", description = "remaining blood/ total blood", required = false)
+   */
+  @Schema(
+      name = "winner_remain_blood_percentage",
+      description = "remaining blood/ total blood",
+      required = false)
   public Double getWinnerRemainBloodPercentage() {
     return winnerRemainBloodPercentage;
   }
@@ -100,9 +98,10 @@ public class BattleResult  implements Serializable {
       return false;
     }
     BattleResult battleResult = (BattleResult) o;
-    return Objects.equals(this.winnerId, battleResult.winnerId) &&
-        Objects.equals(this.loserId, battleResult.loserId) &&
-        Objects.equals(this.winnerRemainBloodPercentage, battleResult.winnerRemainBloodPercentage);
+    return Objects.equals(this.winnerId, battleResult.winnerId)
+        && Objects.equals(this.loserId, battleResult.loserId)
+        && Objects.equals(
+            this.winnerRemainBloodPercentage, battleResult.winnerRemainBloodPercentage);
   }
 
   @Override
@@ -116,14 +115,15 @@ public class BattleResult  implements Serializable {
     sb.append("class BattleResult {\n");
     sb.append("    winnerId: ").append(toIndentedString(winnerId)).append("\n");
     sb.append("    loserId: ").append(toIndentedString(loserId)).append("\n");
-    sb.append("    winnerRemainBloodPercentage: ").append(toIndentedString(winnerRemainBloodPercentage)).append("\n");
+    sb.append("    winnerRemainBloodPercentage: ")
+        .append(toIndentedString(winnerRemainBloodPercentage))
+        .append("\n");
     sb.append("}");
     return sb.toString();
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -132,4 +132,3 @@ public class BattleResult  implements Serializable {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

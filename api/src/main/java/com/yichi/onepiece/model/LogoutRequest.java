@@ -1,27 +1,20 @@
 package com.yichi.onepiece.model;
 
-import java.net.URI;
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import java.util.UUID;
-import org.openapitools.jackson.nullable.JsonNullable;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
-import java.time.OffsetDateTime;
+import java.util.*;
+import java.util.Objects;
+import java.util.UUID;
+import javax.annotation.Generated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 
-
-import java.util.*;
-import javax.annotation.Generated;
-
-/**
- * LogoutRequest
- */
-
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-02T23:12:16.773454300+08:00[Asia/Shanghai]")
-public class LogoutRequest  implements Serializable {
+/** LogoutRequest */
+@Generated(
+    value = "org.openapitools.codegen.languages.SpringCodegen",
+    date = "2023-05-03T15:23:47.500171+08:00[Asia/Shanghai]")
+public class LogoutRequest implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -35,9 +28,10 @@ public class LogoutRequest  implements Serializable {
 
   /**
    * Get userId
+   *
    * @return userId
-  */
-  @Valid 
+   */
+  @Valid
   @Schema(name = "user_id", required = false)
   public UUID getUserId() {
     return userId;
@@ -74,8 +68,7 @@ public class LogoutRequest  implements Serializable {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -84,4 +77,3 @@ public class LogoutRequest  implements Serializable {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

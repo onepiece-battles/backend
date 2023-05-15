@@ -1,26 +1,18 @@
 package com.yichi.onepiece.model;
 
-import java.net.URI;
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.io.Serializable;
-import java.time.OffsetDateTime;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-
-
+import java.io.Serializable;
 import java.util.*;
+import java.util.Objects;
 import javax.annotation.Generated;
+import javax.validation.constraints.*;
 
-/**
- * ListFruitRequest
- */
-
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-02T23:12:16.773454300+08:00[Asia/Shanghai]")
-public class ListFruitRequest  implements Serializable {
+/** ListFruitRequest */
+@Generated(
+    value = "org.openapitools.codegen.languages.SpringCodegen",
+    date = "2023-05-03T15:23:47.500171+08:00[Asia/Shanghai]")
+public class ListFruitRequest implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -36,11 +28,12 @@ public class ListFruitRequest  implements Serializable {
   }
 
   /**
-   * Get pageSize
-   * minimum: 0
+   * Get pageSize minimum: 0
+   *
    * @return pageSize
-  */
-  @NotNull @Min(0) 
+   */
+  @NotNull
+  @Min(0)
   @Schema(name = "page_size", required = true)
   public Integer getPageSize() {
     return pageSize;
@@ -56,11 +49,12 @@ public class ListFruitRequest  implements Serializable {
   }
 
   /**
-   * Get pageIndex
-   * minimum: 1
+   * Get pageIndex minimum: 1
+   *
    * @return pageIndex
-  */
-  @NotNull @Min(1) 
+   */
+  @NotNull
+  @Min(1)
   @Schema(name = "page_index", required = true)
   public Integer getPageIndex() {
     return pageIndex;
@@ -79,8 +73,8 @@ public class ListFruitRequest  implements Serializable {
       return false;
     }
     ListFruitRequest listFruitRequest = (ListFruitRequest) o;
-    return Objects.equals(this.pageSize, listFruitRequest.pageSize) &&
-        Objects.equals(this.pageIndex, listFruitRequest.pageIndex);
+    return Objects.equals(this.pageSize, listFruitRequest.pageSize)
+        && Objects.equals(this.pageIndex, listFruitRequest.pageIndex);
   }
 
   @Override
@@ -99,8 +93,7 @@ public class ListFruitRequest  implements Serializable {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -109,4 +102,3 @@ public class ListFruitRequest  implements Serializable {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

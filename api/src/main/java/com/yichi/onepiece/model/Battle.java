@@ -1,28 +1,20 @@
 package com.yichi.onepiece.model;
 
-import java.net.URI;
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.yichi.onepiece.model.BattleType;
-import java.util.UUID;
-import org.openapitools.jackson.nullable.JsonNullable;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
-import java.time.OffsetDateTime;
+import java.util.*;
+import java.util.Objects;
+import java.util.UUID;
+import javax.annotation.Generated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 
-
-import java.util.*;
-import javax.annotation.Generated;
-
-/**
- * Battle
- */
-
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-02T23:12:16.773454300+08:00[Asia/Shanghai]")
-public class Battle  implements Serializable {
+/** Battle */
+@Generated(
+    value = "org.openapitools.codegen.languages.SpringCodegen",
+    date = "2023-05-03T15:23:47.500171+08:00[Asia/Shanghai]")
+public class Battle implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -51,10 +43,14 @@ public class Battle  implements Serializable {
 
   /**
    * the timestamp this battle is created
+   *
    * @return actionTimestamp
-  */
-  @NotNull 
-  @Schema(name = "action_timestamp", description = "the timestamp this battle is created", required = true)
+   */
+  @NotNull
+  @Schema(
+      name = "action_timestamp",
+      description = "the timestamp this battle is created",
+      required = true)
   public Long getActionTimestamp() {
     return actionTimestamp;
   }
@@ -70,9 +66,11 @@ public class Battle  implements Serializable {
 
   /**
    * Get battleId
+   *
    * @return battleId
-  */
-  @NotNull @Valid 
+   */
+  @NotNull
+  @Valid
   @Schema(name = "battle_id", required = true)
   public UUID getBattleId() {
     return battleId;
@@ -89,9 +87,11 @@ public class Battle  implements Serializable {
 
   /**
    * Get userId
+   *
    * @return userId
-  */
-  @NotNull @Valid 
+   */
+  @NotNull
+  @Valid
   @Schema(name = "user_id", required = true)
   public UUID getUserId() {
     return userId;
@@ -108,9 +108,11 @@ public class Battle  implements Serializable {
 
   /**
    * Get initiateCharacterId
+   *
    * @return initiateCharacterId
-  */
-  @NotNull @Valid 
+   */
+  @NotNull
+  @Valid
   @Schema(name = "initiate_character_id", required = true)
   public UUID getInitiateCharacterId() {
     return initiateCharacterId;
@@ -127,9 +129,11 @@ public class Battle  implements Serializable {
 
   /**
    * Get receiverCharacterId
+   *
    * @return receiverCharacterId
-  */
-  @NotNull @Valid 
+   */
+  @NotNull
+  @Valid
   @Schema(name = "receiver_character_id", required = true)
   public UUID getReceiverCharacterId() {
     return receiverCharacterId;
@@ -146,9 +150,11 @@ public class Battle  implements Serializable {
 
   /**
    * Get type
+   *
    * @return type
-  */
-  @NotNull @Valid 
+   */
+  @NotNull
+  @Valid
   @Schema(name = "type", required = true)
   public BattleType getType() {
     return type;
@@ -167,17 +173,18 @@ public class Battle  implements Serializable {
       return false;
     }
     Battle battle = (Battle) o;
-    return Objects.equals(this.actionTimestamp, battle.actionTimestamp) &&
-        Objects.equals(this.battleId, battle.battleId) &&
-        Objects.equals(this.userId, battle.userId) &&
-        Objects.equals(this.initiateCharacterId, battle.initiateCharacterId) &&
-        Objects.equals(this.receiverCharacterId, battle.receiverCharacterId) &&
-        Objects.equals(this.type, battle.type);
+    return Objects.equals(this.actionTimestamp, battle.actionTimestamp)
+        && Objects.equals(this.battleId, battle.battleId)
+        && Objects.equals(this.userId, battle.userId)
+        && Objects.equals(this.initiateCharacterId, battle.initiateCharacterId)
+        && Objects.equals(this.receiverCharacterId, battle.receiverCharacterId)
+        && Objects.equals(this.type, battle.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(actionTimestamp, battleId, userId, initiateCharacterId, receiverCharacterId, type);
+    return Objects.hash(
+        actionTimestamp, battleId, userId, initiateCharacterId, receiverCharacterId, type);
   }
 
   @Override
@@ -187,16 +194,19 @@ public class Battle  implements Serializable {
     sb.append("    actionTimestamp: ").append(toIndentedString(actionTimestamp)).append("\n");
     sb.append("    battleId: ").append(toIndentedString(battleId)).append("\n");
     sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
-    sb.append("    initiateCharacterId: ").append(toIndentedString(initiateCharacterId)).append("\n");
-    sb.append("    receiverCharacterId: ").append(toIndentedString(receiverCharacterId)).append("\n");
+    sb.append("    initiateCharacterId: ")
+        .append(toIndentedString(initiateCharacterId))
+        .append("\n");
+    sb.append("    receiverCharacterId: ")
+        .append(toIndentedString(receiverCharacterId))
+        .append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -205,4 +215,3 @@ public class Battle  implements Serializable {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

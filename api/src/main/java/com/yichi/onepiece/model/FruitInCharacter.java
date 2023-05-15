@@ -1,28 +1,23 @@
 package com.yichi.onepiece.model;
 
-import java.net.URI;
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import java.util.UUID;
-import org.openapitools.jackson.nullable.JsonNullable;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
-import java.time.OffsetDateTime;
+import java.util.*;
+import java.util.Objects;
+import java.util.UUID;
+import javax.annotation.Generated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 
-
-import java.util.*;
-import javax.annotation.Generated;
-
-/**
- * describe the fruit condition after it is eaten by character 
- */
-
-@Schema(name = "FruitInCharacter", description = "describe the fruit condition after it is eaten by character ")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-02T23:12:16.773454300+08:00[Asia/Shanghai]")
-public class FruitInCharacter  implements Serializable {
+/** describe the fruit condition after it is eaten by character */
+@Schema(
+    name = "FruitInCharacter",
+    description = "describe the fruit condition after it is eaten by character ")
+@Generated(
+    value = "org.openapitools.codegen.languages.SpringCodegen",
+    date = "2023-05-03T15:23:47.500171+08:00[Asia/Shanghai]")
+public class FruitInCharacter implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -39,9 +34,11 @@ public class FruitInCharacter  implements Serializable {
 
   /**
    * Get fruitId
+   *
    * @return fruitId
-  */
-  @NotNull @Valid 
+   */
+  @NotNull
+  @Valid
   @Schema(name = "fruit_id", required = true)
   public UUID getFruitId() {
     return fruitId;
@@ -58,9 +55,10 @@ public class FruitInCharacter  implements Serializable {
 
   /**
    * Get wakeUp
+   *
    * @return wakeUp
-  */
-  @NotNull 
+   */
+  @NotNull
   @Schema(name = "wake_up", required = true)
   public Boolean getWakeUp() {
     return wakeUp;
@@ -79,8 +77,8 @@ public class FruitInCharacter  implements Serializable {
       return false;
     }
     FruitInCharacter fruitInCharacter = (FruitInCharacter) o;
-    return Objects.equals(this.fruitId, fruitInCharacter.fruitId) &&
-        Objects.equals(this.wakeUp, fruitInCharacter.wakeUp);
+    return Objects.equals(this.fruitId, fruitInCharacter.fruitId)
+        && Objects.equals(this.wakeUp, fruitInCharacter.wakeUp);
   }
 
   @Override
@@ -99,8 +97,7 @@ public class FruitInCharacter  implements Serializable {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -109,4 +106,3 @@ public class FruitInCharacter  implements Serializable {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

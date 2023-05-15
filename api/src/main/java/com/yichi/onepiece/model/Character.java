@@ -1,32 +1,23 @@
 package com.yichi.onepiece.model;
 
-import java.net.URI;
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.yichi.onepiece.model.CharacterType;
-import com.yichi.onepiece.model.FruitInCharacter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
+import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.io.Serializable;
-import java.time.OffsetDateTime;
+import javax.annotation.Generated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 
-
-import java.util.*;
-import javax.annotation.Generated;
-
-/**
- * Character that contains all necessary information. 
- */
-
+/** Character that contains all necessary information. */
 @Schema(name = "Character", description = "Character that contains all necessary information. ")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-02T23:12:16.773454300+08:00[Asia/Shanghai]")
-public class Character  implements Serializable {
+@Generated(
+    value = "org.openapitools.codegen.languages.SpringCodegen",
+    date = "2023-05-03T15:23:47.500171+08:00[Asia/Shanghai]")
+public class Character implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -80,9 +71,11 @@ public class Character  implements Serializable {
 
   /**
    * Get id
+   *
    * @return id
-  */
-  @NotNull @Valid 
+   */
+  @NotNull
+  @Valid
   @Schema(name = "id", required = true)
   public UUID getId() {
     return id;
@@ -99,9 +92,11 @@ public class Character  implements Serializable {
 
   /**
    * Get characterType
+   *
    * @return characterType
-  */
-  @NotNull @Valid 
+   */
+  @NotNull
+  @Valid
   @Schema(name = "character_type", required = true)
   public CharacterType getCharacterType() {
     return characterType;
@@ -118,9 +113,10 @@ public class Character  implements Serializable {
 
   /**
    * Get name
+   *
    * @return name
-  */
-  @NotNull 
+   */
+  @NotNull
   @Schema(name = "name", required = true)
   public String getName() {
     return name;
@@ -137,9 +133,9 @@ public class Character  implements Serializable {
 
   /**
    * Which group this character is in.
+   *
    * @return groupOid
-  */
-  
+   */
   @Schema(name = "group_oid", description = "Which group this character is in.", required = false)
   public String getGroupOid() {
     return groupOid;
@@ -156,10 +152,14 @@ public class Character  implements Serializable {
 
   /**
    * Whether this character has eaten fruit
+   *
    * @return hasFruits
-  */
-  @NotNull 
-  @Schema(name = "has_fruits", description = "Whether this character has eaten fruit", required = true)
+   */
+  @NotNull
+  @Schema(
+      name = "has_fruits",
+      description = "Whether this character has eaten fruit",
+      required = true)
   public Boolean getHasFruits() {
     return hasFruits;
   }
@@ -183,9 +183,10 @@ public class Character  implements Serializable {
 
   /**
    * Get fruits
+   *
    * @return fruits
-  */
-  @Valid 
+   */
+  @Valid
   @Schema(name = "fruits", required = false)
   public List<FruitInCharacter> getFruits() {
     return fruits;
@@ -201,13 +202,17 @@ public class Character  implements Serializable {
   }
 
   /**
-   * Maximum number of fruit this character can eat.
-   * minimum: 1
-   * maximum: 2
+   * Maximum number of fruit this character can eat. minimum: 1 maximum: 2
+   *
    * @return fruitLimit
-  */
-  @NotNull @Min(1) @Max(2) 
-  @Schema(name = "fruit_limit", description = "Maximum number of fruit this character can eat.", required = true)
+   */
+  @NotNull
+  @Min(1)
+  @Max(2)
+  @Schema(
+      name = "fruit_limit",
+      description = "Maximum number of fruit this character can eat.",
+      required = true)
   public Integer getFruitLimit() {
     return fruitLimit;
   }
@@ -222,12 +227,13 @@ public class Character  implements Serializable {
   }
 
   /**
-   * Get groupGain
-   * minimum: 1
-   * maximum: 5
+   * Get groupGain minimum: 1 maximum: 5
+   *
    * @return groupGain
-  */
-  @NotNull @Min(1) @Max(5) 
+   */
+  @NotNull
+  @Min(1)
+  @Max(5)
   @Schema(name = "group_gain", required = true)
   public Integer getGroupGain() {
     return groupGain;
@@ -243,12 +249,13 @@ public class Character  implements Serializable {
   }
 
   /**
-   * Get attack
-   * minimum: 10
-   * maximum: 1000
+   * Get attack minimum: 10 maximum: 1000
+   *
    * @return attack
-  */
-  @NotNull @Min(10) @Max(1000) 
+   */
+  @NotNull
+  @Min(10)
+  @Max(1000)
   @Schema(name = "attack", required = true)
   public Integer getAttack() {
     return attack;
@@ -264,12 +271,13 @@ public class Character  implements Serializable {
   }
 
   /**
-   * Get defense
-   * minimum: 10
-   * maximum: 1000
+   * Get defense minimum: 10 maximum: 1000
+   *
    * @return defense
-  */
-  @NotNull @Min(10) @Max(1000) 
+   */
+  @NotNull
+  @Min(10)
+  @Max(1000)
   @Schema(name = "defense", required = true)
   public Integer getDefense() {
     return defense;
@@ -285,12 +293,13 @@ public class Character  implements Serializable {
   }
 
   /**
-   * Get intelligence
-   * minimum: 70
-   * maximum: 260
+   * Get intelligence minimum: 70 maximum: 260
+   *
    * @return intelligence
-  */
-  @NotNull @Min(70) @Max(260) 
+   */
+  @NotNull
+  @Min(70)
+  @Max(260)
   @Schema(name = "intelligence", required = true)
   public Integer getIntelligence() {
     return intelligence;
@@ -306,12 +315,13 @@ public class Character  implements Serializable {
   }
 
   /**
-   * Get blood
-   * minimum: 100
-   * maximum: 10000
+   * Get blood minimum: 100 maximum: 10000
+   *
    * @return blood
-  */
-  @NotNull @Min(100) @Max(10000) 
+   */
+  @NotNull
+  @Min(100)
+  @Max(10000)
   @Schema(name = "blood", required = true)
   public Integer getBlood() {
     return blood;
@@ -327,12 +337,13 @@ public class Character  implements Serializable {
   }
 
   /**
-   * Get speed
-   * minimum: 10
-   * maximum: 200
+   * Get speed minimum: 10 maximum: 200
+   *
    * @return speed
-  */
-  @NotNull @Min(10) @Max(200) 
+   */
+  @NotNull
+  @Min(10)
+  @Max(200)
   @Schema(name = "speed", required = true)
   public Integer getSpeed() {
     return speed;
@@ -348,12 +359,13 @@ public class Character  implements Serializable {
   }
 
   /**
-   * Get magic
-   * minimum: 10
-   * maximum: 50
+   * Get magic minimum: 10 maximum: 50
+   *
    * @return magic
-  */
-  @NotNull @Min(10) @Max(50) 
+   */
+  @NotNull
+  @Min(10)
+  @Max(50)
   @Schema(name = "magic", required = true)
   public Integer getMagic() {
     return magic;
@@ -372,25 +384,39 @@ public class Character  implements Serializable {
       return false;
     }
     Character character = (Character) o;
-    return Objects.equals(this.id, character.id) &&
-        Objects.equals(this.characterType, character.characterType) &&
-        Objects.equals(this.name, character.name) &&
-        Objects.equals(this.groupOid, character.groupOid) &&
-        Objects.equals(this.hasFruits, character.hasFruits) &&
-        Objects.equals(this.fruits, character.fruits) &&
-        Objects.equals(this.fruitLimit, character.fruitLimit) &&
-        Objects.equals(this.groupGain, character.groupGain) &&
-        Objects.equals(this.attack, character.attack) &&
-        Objects.equals(this.defense, character.defense) &&
-        Objects.equals(this.intelligence, character.intelligence) &&
-        Objects.equals(this.blood, character.blood) &&
-        Objects.equals(this.speed, character.speed) &&
-        Objects.equals(this.magic, character.magic);
+    return Objects.equals(this.id, character.id)
+        && Objects.equals(this.characterType, character.characterType)
+        && Objects.equals(this.name, character.name)
+        && Objects.equals(this.groupOid, character.groupOid)
+        && Objects.equals(this.hasFruits, character.hasFruits)
+        && Objects.equals(this.fruits, character.fruits)
+        && Objects.equals(this.fruitLimit, character.fruitLimit)
+        && Objects.equals(this.groupGain, character.groupGain)
+        && Objects.equals(this.attack, character.attack)
+        && Objects.equals(this.defense, character.defense)
+        && Objects.equals(this.intelligence, character.intelligence)
+        && Objects.equals(this.blood, character.blood)
+        && Objects.equals(this.speed, character.speed)
+        && Objects.equals(this.magic, character.magic);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, characterType, name, groupOid, hasFruits, fruits, fruitLimit, groupGain, attack, defense, intelligence, blood, speed, magic);
+    return Objects.hash(
+        id,
+        characterType,
+        name,
+        groupOid,
+        hasFruits,
+        fruits,
+        fruitLimit,
+        groupGain,
+        attack,
+        defense,
+        intelligence,
+        blood,
+        speed,
+        magic);
   }
 
   @Override
@@ -416,8 +442,7 @@ public class Character  implements Serializable {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -426,4 +451,3 @@ public class Character  implements Serializable {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

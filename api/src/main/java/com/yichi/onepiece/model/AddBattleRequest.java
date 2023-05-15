@@ -1,27 +1,20 @@
 package com.yichi.onepiece.model;
 
-import java.net.URI;
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import java.util.UUID;
-import org.openapitools.jackson.nullable.JsonNullable;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
-import java.time.OffsetDateTime;
+import java.util.*;
+import java.util.Objects;
+import java.util.UUID;
+import javax.annotation.Generated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 
-
-import java.util.*;
-import javax.annotation.Generated;
-
-/**
- * AddBattleRequest
- */
-
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-02T23:12:16.773454300+08:00[Asia/Shanghai]")
-public class AddBattleRequest  implements Serializable {
+/** AddBattleRequest */
+@Generated(
+    value = "org.openapitools.codegen.languages.SpringCodegen",
+    date = "2023-05-03T15:23:47.500171+08:00[Asia/Shanghai]")
+public class AddBattleRequest implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -41,9 +34,11 @@ public class AddBattleRequest  implements Serializable {
 
   /**
    * Get userId
+   *
    * @return userId
-  */
-  @NotNull @Valid 
+   */
+  @NotNull
+  @Valid
   @Schema(name = "user_id", required = true)
   public UUID getUserId() {
     return userId;
@@ -60,9 +55,11 @@ public class AddBattleRequest  implements Serializable {
 
   /**
    * Get initiateCharacterId
+   *
    * @return initiateCharacterId
-  */
-  @NotNull @Valid 
+   */
+  @NotNull
+  @Valid
   @Schema(name = "initiate_character_id", required = true)
   public UUID getInitiateCharacterId() {
     return initiateCharacterId;
@@ -79,9 +76,11 @@ public class AddBattleRequest  implements Serializable {
 
   /**
    * Get receiverCharacterId
+   *
    * @return receiverCharacterId
-  */
-  @NotNull @Valid 
+   */
+  @NotNull
+  @Valid
   @Schema(name = "receiver_character_id", required = true)
   public UUID getReceiverCharacterId() {
     return receiverCharacterId;
@@ -100,9 +99,9 @@ public class AddBattleRequest  implements Serializable {
       return false;
     }
     AddBattleRequest addBattleRequest = (AddBattleRequest) o;
-    return Objects.equals(this.userId, addBattleRequest.userId) &&
-        Objects.equals(this.initiateCharacterId, addBattleRequest.initiateCharacterId) &&
-        Objects.equals(this.receiverCharacterId, addBattleRequest.receiverCharacterId);
+    return Objects.equals(this.userId, addBattleRequest.userId)
+        && Objects.equals(this.initiateCharacterId, addBattleRequest.initiateCharacterId)
+        && Objects.equals(this.receiverCharacterId, addBattleRequest.receiverCharacterId);
   }
 
   @Override
@@ -115,15 +114,18 @@ public class AddBattleRequest  implements Serializable {
     StringBuilder sb = new StringBuilder();
     sb.append("class AddBattleRequest {\n");
     sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
-    sb.append("    initiateCharacterId: ").append(toIndentedString(initiateCharacterId)).append("\n");
-    sb.append("    receiverCharacterId: ").append(toIndentedString(receiverCharacterId)).append("\n");
+    sb.append("    initiateCharacterId: ")
+        .append(toIndentedString(initiateCharacterId))
+        .append("\n");
+    sb.append("    receiverCharacterId: ")
+        .append(toIndentedString(receiverCharacterId))
+        .append("\n");
     sb.append("}");
     return sb.toString();
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -132,4 +134,3 @@ public class AddBattleRequest  implements Serializable {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

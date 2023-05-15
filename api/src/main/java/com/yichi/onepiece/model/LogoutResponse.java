@@ -1,26 +1,18 @@
 package com.yichi.onepiece.model;
 
-import java.net.URI;
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.io.Serializable;
-import java.time.OffsetDateTime;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-
-
+import java.io.Serializable;
 import java.util.*;
+import java.util.Objects;
 import javax.annotation.Generated;
+import javax.validation.constraints.*;
 
-/**
- * LogoutResponse
- */
-
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-02T23:12:16.773454300+08:00[Asia/Shanghai]")
-public class LogoutResponse  implements Serializable {
+/** LogoutResponse */
+@Generated(
+    value = "org.openapitools.codegen.languages.SpringCodegen",
+    date = "2023-05-03T15:23:47.500171+08:00[Asia/Shanghai]")
+public class LogoutResponse implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -37,9 +29,9 @@ public class LogoutResponse  implements Serializable {
 
   /**
    * Get userName
+   *
    * @return userName
-  */
-  
+   */
   @Schema(name = "user_name", required = false)
   public String getUserName() {
     return userName;
@@ -56,10 +48,13 @@ public class LogoutResponse  implements Serializable {
 
   /**
    * whether user has successfully logout.
+   *
    * @return logoutResult
-  */
-  
-  @Schema(name = "logout_result", description = "whether user has successfully logout.", required = false)
+   */
+  @Schema(
+      name = "logout_result",
+      description = "whether user has successfully logout.",
+      required = false)
   public String getLogoutResult() {
     return logoutResult;
   }
@@ -77,8 +72,8 @@ public class LogoutResponse  implements Serializable {
       return false;
     }
     LogoutResponse logoutResponse = (LogoutResponse) o;
-    return Objects.equals(this.userName, logoutResponse.userName) &&
-        Objects.equals(this.logoutResult, logoutResponse.logoutResult);
+    return Objects.equals(this.userName, logoutResponse.userName)
+        && Objects.equals(this.logoutResult, logoutResponse.logoutResult);
   }
 
   @Override
@@ -97,8 +92,7 @@ public class LogoutResponse  implements Serializable {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -107,4 +101,3 @@ public class LogoutResponse  implements Serializable {
     return o.toString().replace("\n", "\n    ");
   }
 }
-
