@@ -11,6 +11,7 @@ public class RolePermissionMap {
               UserRole.ADMIN,
 
 
+
                   PermissionDefinition.getAllPermissionEnums(),
               UserRole.NIKA,
               PermissionDefinition.getAllPermissionEnums(),
