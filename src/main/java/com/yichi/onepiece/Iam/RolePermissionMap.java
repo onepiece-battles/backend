@@ -10,6 +10,8 @@ public class RolePermissionMap {
           ImmutableMap.of(
               UserRole.ADMIN,
 
+
+
                   PermissionDefinition.getAllPermissionEnums(),
               UserRole.NIKA,
               PermissionDefinition.getAllPermissionEnums(),
