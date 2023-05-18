@@ -1,28 +1,19 @@
 package com.yichi.onepiece.model;
 
-import java.net.URI;
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.yichi.onepiece.model.I18nText;
-import com.yichi.onepiece.model.UserInfo;
-import org.openapitools.jackson.nullable.JsonNullable;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
-import java.time.OffsetDateTime;
+import java.util.*;
+import java.util.Objects;
+import javax.annotation.Generated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 
-
-import java.util.*;
-import javax.annotation.Generated;
-
-/**
- * LoginResponse
- */
-
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-02T23:12:16.773454300+08:00[Asia/Shanghai]")
-public class LoginResponse  implements Serializable {
+/** LoginResponse */
+@Generated(
+    value = "org.openapitools.codegen.languages.SpringCodegen",
+    date = "2023-05-03T15:23:47.500171+08:00[Asia/Shanghai]")
+public class LoginResponse implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -45,9 +36,10 @@ public class LoginResponse  implements Serializable {
 
   /**
    * Get userInfo
+   *
    * @return userInfo
-  */
-  @Valid 
+   */
+  @Valid
   @Schema(name = "user_info", required = false)
   public UserInfo getUserInfo() {
     return userInfo;
@@ -64,9 +56,10 @@ public class LoginResponse  implements Serializable {
 
   /**
    * Get verification
+   *
    * @return verification
-  */
-  @Valid 
+   */
+  @Valid
   @Schema(name = "verification", required = false)
   public I18nText getVerification() {
     return verification;
@@ -83,9 +76,9 @@ public class LoginResponse  implements Serializable {
 
   /**
    * Get accessToken
+   *
    * @return accessToken
-  */
-  
+   */
   @Schema(name = "access_token", required = false)
   public String getAccessToken() {
     return accessToken;
@@ -102,9 +95,9 @@ public class LoginResponse  implements Serializable {
 
   /**
    * Get refreshToken
+   *
    * @return refreshToken
-  */
-  
+   */
   @Schema(name = "refresh_token", required = false)
   public String getRefreshToken() {
     return refreshToken;
@@ -123,10 +116,10 @@ public class LoginResponse  implements Serializable {
       return false;
     }
     LoginResponse loginResponse = (LoginResponse) o;
-    return Objects.equals(this.userInfo, loginResponse.userInfo) &&
-        Objects.equals(this.verification, loginResponse.verification) &&
-        Objects.equals(this.accessToken, loginResponse.accessToken) &&
-        Objects.equals(this.refreshToken, loginResponse.refreshToken);
+    return Objects.equals(this.userInfo, loginResponse.userInfo)
+        && Objects.equals(this.verification, loginResponse.verification)
+        && Objects.equals(this.accessToken, loginResponse.accessToken)
+        && Objects.equals(this.refreshToken, loginResponse.refreshToken);
   }
 
   @Override
@@ -147,8 +140,7 @@ public class LoginResponse  implements Serializable {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -157,4 +149,3 @@ public class LoginResponse  implements Serializable {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

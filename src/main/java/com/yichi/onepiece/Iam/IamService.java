@@ -1,56 +1,48 @@
 package com.yichi.onepiece.Iam;
 
-import org.springframework.context.annotation.Scope;
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.UUID;
-
 @Component
-@Scope()
 public class IamService {
-    private static final ThreadLocal<IamCache> cache = new ThreadLocal<>();
+  private static final ThreadLocal<IamCache> cache = new ThreadLocal<>();
 
-    public UUID getCurrentUserId() {
-        IamCache cache = getCache();
-        if (cache.currentUserID != null) {
-            return cache.currentUserID;
-        }
-        if (SecurityContextHolder.getContext() != null) {
-            var authentication = SecurityContextHolder.getContext();
-            if (authentication instanceof AnonymousAuthenticationToken) {
-                cache.currentUserID = UUID.fromString(((AnonymousAuthenticationToken) authentication).getPrincipal().toString());
-                return cache.currentUserID;
-            }
-        }
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+  public UUID getCurrentUserId() {
+    IamCache cache = getCache();
+    if (cache.currentUserID != null) {
+      return cache.currentUserID;
     }
-
-    IamCache getCache() {
-        IamCache iamCache = cache.get();
-        if (iamCache == null) {
-            iamCache = new IamCache();
-            cache.set(iamCache);
-        }
-        return iamCache;
+    if (SecurityContextHolder.getContext() != null) {
+      var authentication = SecurityContextHolder.getContext();
+      if (authentication instanceof UsernamePasswordAuthenticationToken) {
+        cache.currentUserID =
+            UUID.fromString(
+                ((UsernamePasswordAuthenticationToken) authentication).getPrincipal().toString());
+        return cache.currentUserID;
+      }
     }
+    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+  }
 
-    void invalidateCache() {
-        cache.remove();
+  IamCache getCache() {
+    IamCache iamCache = cache.get();
+    if (iamCache == null) {
+      iamCache = new IamCache();
+      cache.set(iamCache);
     }
+    return iamCache;
+  }
 
-    static class IamCache {
-        UUID currentUserID;
-        UUID isNika;
-    }
+  void invalidateCache() {
+    cache.remove();
+  }
 
-    public enum Permission {
-        SELECT,
-        UPDATE,
-        DELETE
-    }
-
+  static class IamCache {
+    UUID currentUserID;
+    UUID isNika;
+  }
 }

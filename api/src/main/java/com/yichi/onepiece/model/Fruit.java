@@ -1,29 +1,21 @@
 package com.yichi.onepiece.model;
 
-import java.net.URI;
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.yichi.onepiece.model.FruitType;
-import java.util.UUID;
-import org.openapitools.jackson.nullable.JsonNullable;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
-import java.time.OffsetDateTime;
+import java.util.*;
+import java.util.Objects;
+import java.util.UUID;
+import javax.annotation.Generated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 
-
-import java.util.*;
-import javax.annotation.Generated;
-
-/**
- * all information about fruit
- */
-
+/** all information about fruit */
 @Schema(name = "Fruit", description = "all information about fruit")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-02T23:12:16.773454300+08:00[Asia/Shanghai]")
-public class Fruit  implements Serializable {
+@Generated(
+    value = "org.openapitools.codegen.languages.SpringCodegen",
+    date = "2023-05-03T15:23:47.500171+08:00[Asia/Shanghai]")
+public class Fruit implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -61,9 +53,10 @@ public class Fruit  implements Serializable {
 
   /**
    * Get id
+   *
    * @return id
-  */
-  @Valid 
+   */
+  @Valid
   @Schema(name = "id", required = false)
   public UUID getId() {
     return id;
@@ -80,9 +73,9 @@ public class Fruit  implements Serializable {
 
   /**
    * Get name
+   *
    * @return name
-  */
-  
+   */
   @Schema(name = "name", required = false)
   public String getName() {
     return name;
@@ -99,9 +92,10 @@ public class Fruit  implements Serializable {
 
   /**
    * Get ownerId
+   *
    * @return ownerId
-  */
-  @Valid 
+   */
+  @Valid
   @Schema(name = "owner_id", required = false)
   public UUID getOwnerId() {
     return ownerId;
@@ -118,9 +112,10 @@ public class Fruit  implements Serializable {
 
   /**
    * Get fruitType
+   *
    * @return fruitType
-  */
-  @Valid 
+   */
+  @Valid
   @Schema(name = "fruit_type", required = false)
   public FruitType getFruitType() {
     return fruitType;
@@ -137,9 +132,9 @@ public class Fruit  implements Serializable {
 
   /**
    * Get magicConsume
+   *
    * @return magicConsume
-  */
-  
+   */
   @Schema(name = "magic_consume", required = false)
   public Integer getMagicConsume() {
     return magicConsume;
@@ -156,9 +151,9 @@ public class Fruit  implements Serializable {
 
   /**
    * Get attackStrengthen
+   *
    * @return attackStrengthen
-  */
-  
+   */
   @Schema(name = "attack_strengthen", required = false)
   public Integer getAttackStrengthen() {
     return attackStrengthen;
@@ -175,9 +170,9 @@ public class Fruit  implements Serializable {
 
   /**
    * Get intelligenceStrengthen
+   *
    * @return intelligenceStrengthen
-  */
-  
+   */
   @Schema(name = "intelligence_strengthen", required = false)
   public Integer getIntelligenceStrengthen() {
     return intelligenceStrengthen;
@@ -194,9 +189,9 @@ public class Fruit  implements Serializable {
 
   /**
    * Get bloodStrengthen
+   *
    * @return bloodStrengthen
-  */
-  
+   */
   @Schema(name = "blood_strengthen", required = false)
   public Integer getBloodStrengthen() {
     return bloodStrengthen;
@@ -213,9 +208,9 @@ public class Fruit  implements Serializable {
 
   /**
    * Get speedStrengthen
+   *
    * @return speedStrengthen
-  */
-  
+   */
   @Schema(name = "speed_strengthen", required = false)
   public Integer getSpeedStrengthen() {
     return speedStrengthen;
@@ -234,20 +229,29 @@ public class Fruit  implements Serializable {
       return false;
     }
     Fruit fruit = (Fruit) o;
-    return Objects.equals(this.id, fruit.id) &&
-        Objects.equals(this.name, fruit.name) &&
-        Objects.equals(this.ownerId, fruit.ownerId) &&
-        Objects.equals(this.fruitType, fruit.fruitType) &&
-        Objects.equals(this.magicConsume, fruit.magicConsume) &&
-        Objects.equals(this.attackStrengthen, fruit.attackStrengthen) &&
-        Objects.equals(this.intelligenceStrengthen, fruit.intelligenceStrengthen) &&
-        Objects.equals(this.bloodStrengthen, fruit.bloodStrengthen) &&
-        Objects.equals(this.speedStrengthen, fruit.speedStrengthen);
+    return Objects.equals(this.id, fruit.id)
+        && Objects.equals(this.name, fruit.name)
+        && Objects.equals(this.ownerId, fruit.ownerId)
+        && Objects.equals(this.fruitType, fruit.fruitType)
+        && Objects.equals(this.magicConsume, fruit.magicConsume)
+        && Objects.equals(this.attackStrengthen, fruit.attackStrengthen)
+        && Objects.equals(this.intelligenceStrengthen, fruit.intelligenceStrengthen)
+        && Objects.equals(this.bloodStrengthen, fruit.bloodStrengthen)
+        && Objects.equals(this.speedStrengthen, fruit.speedStrengthen);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, ownerId, fruitType, magicConsume, attackStrengthen, intelligenceStrengthen, bloodStrengthen, speedStrengthen);
+    return Objects.hash(
+        id,
+        name,
+        ownerId,
+        fruitType,
+        magicConsume,
+        attackStrengthen,
+        intelligenceStrengthen,
+        bloodStrengthen,
+        speedStrengthen);
   }
 
   @Override
@@ -260,7 +264,9 @@ public class Fruit  implements Serializable {
     sb.append("    fruitType: ").append(toIndentedString(fruitType)).append("\n");
     sb.append("    magicConsume: ").append(toIndentedString(magicConsume)).append("\n");
     sb.append("    attackStrengthen: ").append(toIndentedString(attackStrengthen)).append("\n");
-    sb.append("    intelligenceStrengthen: ").append(toIndentedString(intelligenceStrengthen)).append("\n");
+    sb.append("    intelligenceStrengthen: ")
+        .append(toIndentedString(intelligenceStrengthen))
+        .append("\n");
     sb.append("    bloodStrengthen: ").append(toIndentedString(bloodStrengthen)).append("\n");
     sb.append("    speedStrengthen: ").append(toIndentedString(speedStrengthen)).append("\n");
     sb.append("}");
@@ -268,8 +274,7 @@ public class Fruit  implements Serializable {
   }
 
   /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
+   * Convert the given object to string with each line indented by 4 spaces (except the first line).
    */
   private String toIndentedString(Object o) {
     if (o == null) {
@@ -278,4 +283,3 @@ public class Fruit  implements Serializable {
     return o.toString().replace("\n", "\n    ");
   }
 }
-
