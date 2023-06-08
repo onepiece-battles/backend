@@ -1,4 +1,4 @@
 rootProject.name = 'OnePieceBattles'
-include 'entity-processor'
+//include 'entity-processor'
 include 'api'
 

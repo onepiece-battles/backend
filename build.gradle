@@ -26,17 +26,25 @@ ext {
     micrometer_registry_version = "1.9.3"
     json_web_token_version = "0.11.5"
     spring_security_version = "5.8.3"
+    onepiece_infra_version = "1.0.5"
 }
 
 repositories {
     mavenCentral()
+    maven {
+        credentials{
+            username = "PRIVATE-TOKEN"
+            password = gitLabPrivateToken
+        }
+        url = "https://gitlab.com/api/v4/projects/46406398/packages/maven"
+    }
     mavenLocal()
 }
 
 dependencies {
-    implementation project(":entity-processor")
     implementation project(":api")
-    annotationProcessor project(":entity-processor")
+    implementation "org.onepiece-battles:infra-support:$onepiece_infra_version"
+    annotationProcessor "org.onepiece-battles:infra-support:$onepiece_infra_version"
 
     // mapstruct
     implementation "org.mapstruct:mapstruct:$mapstruct_version"
