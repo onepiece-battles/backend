@@ -16,8 +16,7 @@ import org.testng.annotations.Test;
 @TestPropertySource(locations = "classpath:test-h2.properties")
 public class LoginDaoTests extends AbstractTestNGSpringContextTests {
 
-  @Autowired
-  UserDao loginDao;
+  @Autowired UserDao loginDao;
 
   @Test
   public void testInsertAndGet() {
@@ -25,7 +24,7 @@ public class LoginDaoTests extends AbstractTestNGSpringContextTests {
         UserEntityBuilder.newBuilder()
             .setEncryptedPassword("abc")
             .setAccountCondition(UserAccountCondition.SignIn)
-            .setUserName("yichi")
+            .setName("yichi")
             .setOrganization("tesla")
             .build();
     loginDao.insert(user);
