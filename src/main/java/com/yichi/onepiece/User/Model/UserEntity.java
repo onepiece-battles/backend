@@ -1,25 +1,28 @@
 package com.yichi.onepiece.User.Model;
 
 import com.yichi.infra.support.entity.Entity;
-
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 @Entity
 public interface UserEntity {
-    UUID getId();
+  UUID getId();
 
-    String getUserName();
+  String getName();
 
-    String getEmail();
+  String getEmail();
 
-    String getOrganization();
+  String getOrganization();
 
-    String getEncryptedPassword();
+  String getEncryptedPassword();
 
-    UserAccountCondition getAccountCondition();
+  UserAccountCondition getAccountCondition();
 
-    List<UserRole> getUserRoles();
+  List<UserRole> getUserRoles();
 
-    UserEntityBuilder toBuilder();
+  @Nullable
+  Byte[] getProfileImage();
+
+  UserEntityBuilder toBuilder();
 }

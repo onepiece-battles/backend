@@ -1,54 +1,126 @@
-create table user(
-      id BINARY(16) PRIMARY KEY,
-      user_name VARCHAR(255) NOT NULL,
-      organization TEXT NOT NULL,
-      encrypted_password VARCHAR(255) NOT NULL,
-      account_condition VARCHAR(40) NOT NULL
+-- THIS IS THE DB GOLDEN SCHEMA FOR UNIT TEST.
+-- user
+CREATE TABLE `user`(
+   `id` BINARY(16),
+   `name` VARCHAR(255),
+   `email` VARCHAR(255),
+   `encrypted_password` VARCHAR(100),
+   `account_condition` VARCHAR(100),
+   `profile_image` LONGBLOB
 );
+ALTER TABLE `user` ADD CONSTRAINT PRIMARY KEY(`id`);
 
-create table `character` (
-        id BINARY(16) PRIMARY KEY,
-        character_types TEXT NOT NULL,
-        profile_image LONGBLOB,
-        name VARCHAR(30) NOT NULL,
-        group_oid VARCHAR(30),
-        has_fruits TINYINT NOT NULL,
-        fruit_limit TINYINT NOT NULL,
-        fruits TEXT NOT NULL,
-        group_gain INT NOT NULL,
-        attack INT NOT NULL,
-        defense INT NOT NULL,
-        intelligence INT NOT NULL,
-        speed INT NOT NULL,
-        blood INT NOT NULL,
-        magic INT NOT NULL
+-- role
+CREATE TABLE `role` (
+    `id` binary(16),
+    `name` varchar(255)
 );
+ALTER TABLE `role` ADD CONSTRAINT PRIMARY KEY(`id`);
 
-create table fruit (
-       id BINARY(16) PRIMARY KEY,
-       name VARCHAR(255) NOT NULL,
-       owner_id BINARY(16),
-       fruit_type VARCHAR(40) NOT NULL,
-       magic_consume INT NOT NULL,
-       group_gain_strengthen INT NOT NULL,
-       attack_strengthen INT NOT NULL,
-       defense_strengthen INT NOT NULL,
-       intelligence_strengthen INT NOT NULL,
-       blood_strengthen INT NOT NULL
+-- resource
+CREATE TABLE `resource` (
+    `id` binary(16),
+    `name` varchar(255)
 );
-ALTER TABLE fruit ADD CONSTRAINT fk_fruit__owner_id
-    FOREIGN KEY(owner_id) REFERENCES `character`(id);
+ALTER TABLE `resource` ADD CONSTRAINT PRIMARY KEY(`id`);
 
-create table battle (
-        id BIGINT AUTO_INCREMENT PRIMARY KEY,
-        user_id BINARY(16) NOT NULL,
-        character_id_initiator BINARY(16) NOT NULL,
-        character_id_receiver BINARY(16) NOT NULL,
-        action_timestamp BIGINT NOT NULL COMMENT 'the timestamp when this fight is created'
+-- role_resource
+CREATE TABLE `role_resource` (
+     `id` binary(16),
+     `role_id` binary(16),
+     `resource_id` binary(16),
+     `add_permission` TINYINT,
+     `update_permission` TINYINT,
+     `read_permission` TINYINT,
+     `delete_permission` TINYINT
 );
-ALTER TABLE battle ADD CONSTRAINT fk_battle__user_id
-    FOREIGN KEY(user_id) REFERENCES user(id);
-ALTER TABLE battle ADD CONSTRAINT fk_battle__character_id_initiator
-    FOREIGN KEY(character_id_initiator) REFERENCES `character`(id);
-ALTER TABLE battle ADD CONSTRAINT fk_battle__character_id_receiver
-    FOREIGN KEY(character_id_receiver) REFERENCES `character`(id);
+ALTER TABLE `role_resource` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `role_resource` ADD CONSTRAINT `fk_role_resource_role_id__role_id`
+FOREIGN KEY(`role_id`) REFERENCES `role`(`id`);
+ALTER TABLE `role_resource` ADD CONSTRAINT `fk_role_resource_resource_id__resource_id`
+    FOREIGN KEY(`resource_id`) REFERENCES `resource`(`id`);
+
+-- user_role
+CREATE TABLE `user_role` (
+     `id` binary(16),
+     `user_id` binary(16),
+     `role_id` binary(16)
+);
+ALTER TABLE `user_role` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `user_role` ADD CONSTRAINT `fk_user_role_role_id__role_id`
+    FOREIGN KEY(`role_id`) REFERENCES `role`(`id`);
+ALTER TABLE `user_role` ADD CONSTRAINT `fk_user_role_user_id__user_id`
+    FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
+
+-- character
+CREATE TABLE `character`(
+    `id` BINARY(16) NOT NULL,
+    `character_type` VARCHAR(30) NOT NULL,
+    `profile_image` LONGBLOB,
+    `name` VARCHAR(30) NOT NULL,
+    `group_oid` VARCHAR(30),
+    `has_fruits` TINYINT NOT NULL,
+    `fruit_limit` TINYINT NOT NULL,
+    `fruits` TEXT NOT NULL,
+    `group_gain` INT NOT NULL,
+    `attack` INT NOT NULL,
+    `defense` INT NOT NULL,
+    `intelligence` INT NOT NULL,
+    `speed` INT NOT NULL,
+    `blood` INT NOT NULL,
+    `magic` INT NOT NULL,
+    `user_id` BINARY(16)
+);
+ALTER TABLE `character` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `character` ADD CONSTRAINT `fk_character__user_id`
+    FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
+
+-- battle
+CREATE TABLE `battle`(
+    `id` BINARY(16) NOT NULL,
+    `user_id` BINARY(16) NOT NULL,
+    `character_id_initiator` BINARY(16) NOT NULL,
+    `character_id_receiver` BINARY(16) NOT NULL,
+    `action_timestamp` BIGINT NOT NULL COMMENT 'the timestamp when this fight is created'
+);
+ALTER TABLE `battle` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__character_id_initiator`
+    FOREIGN KEY(`character_id_initiator`) REFERENCES `character`(`id`);
+ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__character_id_receiver`
+    FOREIGN KEY(`character_id_receiver`) REFERENCES `character`(`id`);
+ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__user_id`
+    FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
+
+
+-- fruit
+CREATE TABLE `fruit`(
+    `id` BINARY(16) NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `owner_id` BINARY(16),
+    `fruit_type` VARCHAR(40) NOT NULL,
+    `magic_consume` INT NOT NULL,
+    `group_gain_strengthen` INT NOT NULL,
+    `attack_strengthen` INT NOT NULL,
+    `defense_strengthen` INT NOT NULL,
+    `intelligence_strengthen` INT NOT NULL,
+    `blood_strengthen` INT NOT NULL,
+    `user_id` BINARY(16)
+);
+ALTER TABLE `fruit` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__owner_id`
+    FOREIGN KEY(`owner_id`) REFERENCES `character`(`id`);
+ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__user_id`
+    FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
+
+-- token
+CREATE TABLE `token`(
+    `id` BINARY(16) NOT NULL,
+    `token` VARCHAR(255) NOT NULL,
+    `token_type` VARCHAR(255) NOT NULL,
+    `revoked` TINYINT NOT NULL,
+    `expired` TINYINT NOT NULL,
+    `user_id` BINARY(16)
+);
+ALTER TABLE `token` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `token` ADD CONSTRAINT `fk_token__user_id`
+    FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
