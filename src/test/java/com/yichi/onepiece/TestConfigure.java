@@ -18,7 +18,7 @@ public class TestConfigure {
   // define data source
   @Bean
   @Primary
-  @Profile("h2test")
+  @Profile("test-h2")
   DataSource dataSource() {
     // Because Dao tests are running in parallel, there are some race conditions if all Dao tests
     // are
