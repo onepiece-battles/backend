@@ -72,7 +72,7 @@ public class DatabaseSchemaTests extends AbstractTransactionalTestNGSpringContex
     var migrationPaths =
         Arrays.stream(DB_MIGRATION_DIRs)
             .map(dir -> new File(TestUtils.getResourceFilePath(dir)))
-            .collect(Collectors.toList());
+            .toList();
     List<File> migrationScripts = new ArrayList<>();
     for (var dir : migrationPaths) {
       // Skip Repeatable migrations.
@@ -111,6 +111,9 @@ public class DatabaseSchemaTests extends AbstractTransactionalTestNGSpringContex
   }
 
   private String generateSqlSchema() {
+    var tables = schemaMapper.showTables(DB_SCHEMA);
+    var tableNames = tables.stream().map(TableEntity::getTableName).toList();
+    logger.info("table count {}, tables are: {}", tables.size(), tableNames.toString());
     String tableContent =
         schemaMapper.showTables(DB_SCHEMA).stream()
             .filter(table -> !"flyway_schema_history".equals(table.getTableName()))
@@ -224,8 +227,9 @@ public class DatabaseSchemaTests extends AbstractTransactionalTestNGSpringContex
             Pattern.compile(".*DROP\\s+CONSTRAINT.*", Pattern.CASE_INSENSITIVE + Pattern.DOTALL))
         //      Check ALTER TABLE xxx RENAME COLUMN xxx TO
         .as("RENAME COLUMN TO is not supported");
-//        .doesNotMatch(
-//            Pattern.compile(".*RENAME\\s+COLUMN.*TO.*", Pattern.CASE_INSENSITIVE + Pattern.DOTALL));
+    //        .doesNotMatch(
+    //            Pattern.compile(".*RENAME\\s+COLUMN.*TO.*", Pattern.CASE_INSENSITIVE +
+    // Pattern.DOTALL));
   }
 
   private String readGoldenSchema() throws IOException {

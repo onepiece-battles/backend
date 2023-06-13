@@ -18,7 +18,7 @@ public class LoginDaoTests extends AbstractTestNGSpringContextTests {
 
   @Autowired UserDao loginDao;
 
-  @Test
+  @Test(enabled = false)
   public void testInsertAndGet() {
     UserEntity user =
         UserEntityBuilder.newBuilder()

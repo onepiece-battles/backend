@@ -1,11 +1,114 @@
 -- THIS IS THE DB GOLDEN SCHEMA FOR UNIT TEST.
 
+-- battle
+CREATE TABLE `battle`(
+    `id` BINARY(16) NOT NULL,
+    `user_id` BINARY(16) NOT NULL,
+    `character_id_initiator` BINARY(16) NOT NULL,
+    `character_id_receiver` BINARY(16) NOT NULL,
+    `action_timestamp` BIGINT NOT NULL COMMENT 'the timestamp when this fight is created'
+);
+ALTER TABLE `battle` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__character_id_initiator`
+  FOREIGN KEY(`character_id_initiator`) REFERENCES `character`(`id`);
+ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__character_id_receiver`
+  FOREIGN KEY(`character_id_receiver`) REFERENCES `character`(`id`);
+ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__user_id`
+  FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
+
+-- character
+CREATE TABLE `character`(
+    `id` BINARY(16) NOT NULL,
+    `character_type` VARCHAR(30) NOT NULL,
+    `profile_image` LONGBLOB,
+    `name` VARCHAR(30) NOT NULL,
+    `group_oid` VARCHAR(30),
+    `has_fruits` TINYINT NOT NULL,
+    `fruit_limit` TINYINT NOT NULL,
+    `fruits` TEXT NOT NULL,
+    `group_gain` INT NOT NULL,
+    `attack` INT NOT NULL,
+    `defense` INT NOT NULL,
+    `intelligence` INT NOT NULL,
+    `speed` INT NOT NULL,
+    `blood` INT NOT NULL,
+    `magic` INT NOT NULL,
+    `user_id` BINARY(16)
+);
+ALTER TABLE `character` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `character` ADD CONSTRAINT `fk_character__user_id`
+  FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
+
+-- fruit
+CREATE TABLE `fruit`(
+    `id` BINARY(16) NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `owner_id` BINARY(16),
+    `fruit_type` VARCHAR(40) NOT NULL,
+    `magic_consume` INT NOT NULL,
+    `group_gain_strengthen` INT NOT NULL,
+    `attack_strengthen` INT NOT NULL,
+    `defense_strengthen` INT NOT NULL,
+    `intelligence_strengthen` INT NOT NULL,
+    `blood_strengthen` INT NOT NULL,
+    `user_id` BINARY(16)
+);
+ALTER TABLE `fruit` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__owner_id`
+  FOREIGN KEY(`owner_id`) REFERENCES `character`(`id`);
+ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__user_id`
+  FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
+
+-- resource
+CREATE TABLE `resource`(
+    `id` BINARY(16) NOT NULL,
+    `name` VARCHAR(255)
+);
+ALTER TABLE `resource` ADD CONSTRAINT PRIMARY KEY(`id`);
+
+-- role
+CREATE TABLE `role`(
+    `id` BINARY(16) NOT NULL,
+    `name` VARCHAR(255)
+);
+ALTER TABLE `role` ADD CONSTRAINT PRIMARY KEY(`id`);
+
+-- role_resource
+CREATE TABLE `role_resource`(
+    `id` BINARY(16) NOT NULL,
+    `role_id` BINARY(16),
+    `resource_id` BINARY(16),
+    `add_permission` TINYINT,
+    `update_permission` TINYINT,
+    `read_permission` TINYINT,
+    `delete_permission` TINYINT
+);
+ALTER TABLE `role_resource` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `role_resource` ADD CONSTRAINT `fk_role_resource_resource_id__resource_id`
+  FOREIGN KEY(`resource_id`) REFERENCES `resource`(`id`);
+ALTER TABLE `role_resource` ADD CONSTRAINT `fk_role_resource_role_id__role_id`
+  FOREIGN KEY(`role_id`) REFERENCES `role`(`id`);
+
 -- user
 CREATE TABLE `user`(
-    `id` BINARY(16),
+    `id` BINARY(16) NOT NULL,
     `name` VARCHAR(255),
     `email` VARCHAR(255),
+    `organization` VARCHAR(255),
     `encrypted_password` VARCHAR(100),
     `account_condition` VARCHAR(100),
-    `profile_image` LONGBLOB
+    `profile_image` BLOB
 );
+ALTER TABLE `user` ADD CONSTRAINT PRIMARY KEY(`id`);
+
+-- user_role
+CREATE TABLE `user_role`(
+    `id` BINARY(16) NOT NULL,
+    `user_id` BINARY(16),
+    `role_id` BINARY(16)
+);
+ALTER TABLE `user_role` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `user_role` ADD CONSTRAINT `fk_user_role_role_id__role_id`
+  FOREIGN KEY(`role_id`) REFERENCES `role`(`id`);
+ALTER TABLE `user_role` ADD CONSTRAINT `fk_user_role_user_id__user_id`
+  FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);

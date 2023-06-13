@@ -11,7 +11,7 @@ java.sourceCompatibility(JavaVersion.VERSION_17)
 ext {
     assertj_db_version = "2.0.2"
     apache_commons_version = "3.12.0"
-    flyway_version= "8.5.10"
+    flyway_version= "8.5.13"
     guava_version = "31.1-jre"
     jackson_dataformat_version = "2.13.3"
     h2_database_version = "1.4.200"

@@ -22,13 +22,15 @@ public class TestEnvFlywayConfig {
         Flyway.configure()
             .dataSource(dataSource)
             .locations("db/migration")
+            .encoding("utf-8")
             .validateOnMigrate(true)
             .baselineOnMigrate(true);
     var flyway = fluentConfiguration.load();
     try {
+      flyway.repair();
       flyway.migrate();
     } catch (FlywayException e) {
-      flyway.repair();
+      e.printStackTrace();
       logger.error("error when migrating schema");
     }
   }
