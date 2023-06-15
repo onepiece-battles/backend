@@ -37,7 +37,7 @@ ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__user_id`
 CREATE TABLE `character`(
     `id` BINARY(16) NOT NULL,
     `character_type` VARCHAR(30) NOT NULL,
-    `profile_image` LONGBLOB,
+    `profile_image` MEDIUMBLOB,
     `name` VARCHAR(30) NOT NULL,
     `group_oid` VARCHAR(30),
     `has_fruits` TINYINT NOT NULL,
@@ -77,7 +77,8 @@ CREATE TABLE `fruit`(
     `defense_strengthen` INT NOT NULL,
     `intelligence_strengthen` INT NOT NULL,
     `blood_strengthen` INT NOT NULL,
-    `user_id` BINARY(16)
+    `user_id` BINARY(16),
+    `profile_image` MEDIUMBLOB
 );
 ```
 
@@ -159,7 +160,7 @@ CREATE TABLE `user`(
     `organization` VARCHAR(255),
     `encrypted_password` VARCHAR(100),
     `account_condition` VARCHAR(100),
-    `profile_image` BLOB
+    `profile_image` MEDIUMBLOB
 );
 ```
 
