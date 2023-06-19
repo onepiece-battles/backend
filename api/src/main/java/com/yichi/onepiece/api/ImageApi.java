@@ -4,6 +4,7 @@
  */
 package com.yichi.onepiece.api;
 
+import com.yichi.onepiece.model.GetImageRequest;
 import com.yichi.onepiece.model.ImageType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Generated(
     value = "org.openapitools.codegen.languages.SpringCodegen",
-    date = "2023-06-19T21:18:43.064586200+08:00[Asia/Shanghai]")
+    date = "2023-06-20T00:07:20.673543200+08:00[Asia/Shanghai]")
 @Validated
 @Tag(name = "Image", description = "the Image API")
 public interface ImageApi {
@@ -32,7 +33,7 @@ public interface ImageApi {
    *
    * @param id (optional)
    * @param type (optional)
-   * @param profileImage (optional)
+   * @param image (optional)
    * @return image information (status code 200)
    */
   @Operation(
@@ -67,14 +68,14 @@ public interface ImageApi {
           @Valid
           @RequestPart(value = "type", required = false)
           ImageType type,
-      @Parameter(name = "profile_image", description = "", schema = @Schema(description = ""))
-          @RequestPart(value = "profile_image", required = false)
-          MultipartFile profile_image);
+      @Parameter(name = "image", description = "", schema = @Schema(description = ""))
+          @RequestPart(value = "image", required = false)
+          MultipartFile image);
 
   /**
    * POST /api/onepiece/image/get_by_target_id/{id}
    *
-   * @param id target id (required)
+   * @param getImageRequest request to get image (optional)
    * @return the target image (status code 200)
    */
   @Operation(
@@ -92,13 +93,14 @@ public interface ImageApi {
   @RequestMapping(
       method = RequestMethod.POST,
       value = "/api/onepiece/image/get_by_target_id/{id}",
-      produces = {"multipart/form-data"})
+      produces = {"multipart/form-data"},
+      consumes = {"application/json"})
   ResponseEntity<org.springframework.core.io.Resource> getImage(
       @Parameter(
-              name = "id",
-              description = "target id",
-              required = true,
+              name = "GetImageRequest",
+              description = "request to get image",
               schema = @Schema(description = ""))
-          @PathVariable("id")
-          UUID id);
+          @Valid
+          @RequestBody(required = false)
+          GetImageRequest getImageRequest);
 }

@@ -13,7 +13,7 @@ import javax.validation.constraints.*;
 /** AddImageRequest */
 @Generated(
     value = "org.openapitools.codegen.languages.SpringCodegen",
-    date = "2023-06-19T21:18:43.064586200+08:00[Asia/Shanghai]")
+    date = "2023-06-20T00:07:20.673543200+08:00[Asia/Shanghai]")
 public class AddImageRequest implements Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -24,8 +24,8 @@ public class AddImageRequest implements Serializable {
   @JsonProperty("type")
   private ImageType type;
 
-  @JsonProperty("profile_image")
-  private org.springframework.core.io.Resource profileImage;
+  @JsonProperty("image")
+  private org.springframework.core.io.Resource image;
 
   public AddImageRequest id(UUID id) {
     this.id = id;
@@ -67,24 +67,24 @@ public class AddImageRequest implements Serializable {
     this.type = type;
   }
 
-  public AddImageRequest profileImage(org.springframework.core.io.Resource profileImage) {
-    this.profileImage = profileImage;
+  public AddImageRequest image(org.springframework.core.io.Resource image) {
+    this.image = image;
     return this;
   }
 
   /**
-   * Get profileImage
+   * Get image
    *
-   * @return profileImage
+   * @return image
    */
   @Valid
-  @Schema(name = "profile_image", required = false)
-  public org.springframework.core.io.Resource getProfileImage() {
-    return profileImage;
+  @Schema(name = "image", required = false)
+  public org.springframework.core.io.Resource getImage() {
+    return image;
   }
 
-  public void setProfileImage(org.springframework.core.io.Resource profileImage) {
-    this.profileImage = profileImage;
+  public void setImage(org.springframework.core.io.Resource image) {
+    this.image = image;
   }
 
   @Override
@@ -98,12 +98,12 @@ public class AddImageRequest implements Serializable {
     AddImageRequest addImageRequest = (AddImageRequest) o;
     return Objects.equals(this.id, addImageRequest.id)
         && Objects.equals(this.type, addImageRequest.type)
-        && Objects.equals(this.profileImage, addImageRequest.profileImage);
+        && Objects.equals(this.image, addImageRequest.image);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, type, profileImage);
+    return Objects.hash(id, type, image);
   }
 
   @Override
@@ -112,7 +112,7 @@ public class AddImageRequest implements Serializable {
     sb.append("class AddImageRequest {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
-    sb.append("    profileImage: ").append(toIndentedString(profileImage)).append("\n");
+    sb.append("    image: ").append(toIndentedString(image)).append("\n");
     sb.append("}");
     return sb.toString();
   }

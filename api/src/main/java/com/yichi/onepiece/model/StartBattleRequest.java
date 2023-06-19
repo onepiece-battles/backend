@@ -13,7 +13,7 @@ import javax.validation.constraints.*;
 /** StartBattleRequest */
 @Generated(
     value = "org.openapitools.codegen.languages.SpringCodegen",
-    date = "2023-06-19T21:18:43.064586200+08:00[Asia/Shanghai]")
+    date = "2023-06-20T00:07:20.673543200+08:00[Asia/Shanghai]")
 public class StartBattleRequest implements Serializable {
 
   private static final long serialVersionUID = 1L;

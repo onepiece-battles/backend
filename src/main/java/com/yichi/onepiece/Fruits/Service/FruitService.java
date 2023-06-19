@@ -86,4 +86,12 @@ public class FruitService {
     fruitDao.update(updatedFruit);
     return ArrayUtils.toPrimitive(updatedFruit.getProfileImage());
   }
+
+  public byte[] getProfile(UUID fruitId) {
+    var fruit =
+        fruitDao
+            .findById(fruitId)
+            .orElseThrow(ExceptionUtils.notFound("fruit with id %s not found", fruitId));
+    return ArrayUtils.toPrimitive(fruit.getProfileImage());
+  }
 }

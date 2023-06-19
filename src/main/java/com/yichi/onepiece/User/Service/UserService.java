@@ -154,4 +154,12 @@ public class UserService {
     userDao.update(updatedUser);
     return ArrayUtils.toPrimitive(updatedUser.getProfileImage());
   }
+
+  public byte[] getProfile(UUID userId) {
+    var user =
+        userDao
+            .findById(userId)
+            .orElseThrow(ExceptionUtils.notFound("user with id %s not found", userId));
+    return ArrayUtils.toPrimitive(user.getProfileImage());
+  }
 }

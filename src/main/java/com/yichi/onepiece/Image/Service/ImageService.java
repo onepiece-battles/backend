@@ -21,18 +21,33 @@ public class ImageService {
     this.userService = userService;
   }
 
-  public byte[] uploadImage(UUID targetId, ImageType targetType, MultipartFile profile_image) {
+  public byte[] uploadImage(UUID targetId, ImageType targetType, MultipartFile profileImage) {
     switch (targetType) {
       case USER_IMAGE -> {
-        return userService.updateProfile(targetId, profile_image);
+        return userService.updateProfile(targetId, profileImage);
       }
       case FRUIT_IMAGE -> {
-        return fruitService.updateProfile(targetId, profile_image);
+        return fruitService.updateProfile(targetId, profileImage);
       }
       case CHARACTER_IMAGE -> {
-        return characterService.updateProfile(targetId, profile_image);
+        return characterService.updateProfile(targetId, profileImage);
       }
     }
     throw new RuntimeException("file upload with id failed");
+  }
+
+  public byte[] getImage(UUID resourceId, ImageType targetType) {
+    switch (targetType) {
+      case USER_IMAGE -> {
+        return userService.getProfile(resourceId);
+      }
+      case FRUIT_IMAGE -> {
+        return fruitService.getProfile(resourceId);
+      }
+      case CHARACTER_IMAGE -> {
+        return characterService.getProfile(resourceId);
+      }
+    }
+    throw new RuntimeException("file retrieval failed");
   }
 }
