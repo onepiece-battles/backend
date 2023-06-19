@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 /** types that defines how character fight in battles. */
 @Generated(
     value = "org.openapitools.codegen.languages.SpringCodegen",
-    date = "2023-06-18T01:09:52.923697700+08:00[Asia/Shanghai]")
+    date = "2023-06-19T21:18:43.064586200+08:00[Asia/Shanghai]")
 public enum CharacterType {
   KATANA("Katana"),
 

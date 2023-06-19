@@ -20,7 +20,7 @@ ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__user_id`
 CREATE TABLE `character`(
     `id` BINARY(16) NOT NULL,
     `character_type` VARCHAR(30) NOT NULL,
-    `profile_image` MEDIUMBLOB,
+    `profile_image` MEDIUMBLOB NOT NULL,
     `name` VARCHAR(30) NOT NULL,
     `group_oid` VARCHAR(30),
     `has_fruits` TINYINT NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE `fruit`(
     `intelligence_strengthen` INT NOT NULL,
     `blood_strengthen` INT NOT NULL,
     `user_id` BINARY(16),
-    `profile_image` MEDIUMBLOB
+    `profile_image` MEDIUMBLOB NOT NULL
 );
 ALTER TABLE `fruit` ADD CONSTRAINT PRIMARY KEY(`id`);
 ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__owner_id`
@@ -98,7 +98,7 @@ CREATE TABLE `user`(
     `organization` VARCHAR(255),
     `encrypted_password` VARCHAR(100),
     `account_condition` VARCHAR(100),
-    `profile_image` MEDIUMBLOB
+    `profile_image` MEDIUMBLOB NOT NULL
 );
 ALTER TABLE `user` ADD CONSTRAINT PRIMARY KEY(`id`);
 

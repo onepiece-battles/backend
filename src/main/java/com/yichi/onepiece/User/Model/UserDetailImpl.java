@@ -11,10 +11,7 @@ public class UserDetailImpl extends UserEntityImpl implements UserDetails {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return getUserRoles().stream()
-        .map(UserRole::name)
-        .map(SimpleGrantedAuthority::new)
-        .collect(Collectors.toList());
+    return getUserRoles().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
   }
 
   @Override
@@ -48,7 +45,7 @@ public class UserDetailImpl extends UserEntityImpl implements UserDetails {
   }
 
   @Override
-  public List<UserRole> getUserRoles() {
+  public List<String> getUserRoles() {
     return null;
   }
 }

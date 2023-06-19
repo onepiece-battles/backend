@@ -2,35 +2,37 @@ package com.yichi.onepiece.Fruits.Model;
 
 import com.yichi.infra.support.entity.Entity;
 import com.yichi.onepiece.model.FruitType;
-
-import javax.annotation.Nullable;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 @Entity
 public interface FruitEntity {
-    UUID getId();
+  UUID getId();
 
-    String getName();
+  String getName();
 
-    @Nullable
-    UUID getOwnerId();
+  @Nullable
+  Byte[] getProfileImage();
 
-    FruitType getFruitType();
+  @Nullable
+  UUID getOwnerId();
 
-    // Paramecia fruits consume positive magic, other types consume 0 magic.
-    Integer getMagicConsume();
+  FruitType getFruitType();
 
-    Double getGroupGainStrengthen();
+  // Paramecia fruits consume positive magic, other types consume 0 magic.
+  Integer getMagicConsume();
 
-    Double getAttackStrengthen();
+  Double getGroupGainStrengthen();
 
-    Double getDefenseStrengthen();
+  Double getAttackStrengthen();
 
-    Double getIntelligenceStrengthen();
+  Double getDefenseStrengthen();
 
-    Double getBloodStrengthen();
+  Double getIntelligenceStrengthen();
 
-    Double getSpeedStrengthen();
+  Double getBloodStrengthen();
 
-    FruitEntityBuilder toBuilder();
+  Double getSpeedStrengthen();
+
+  FruitEntityBuilder toBuilder();
 }

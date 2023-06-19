@@ -17,9 +17,12 @@ import com.yichi.onepiece.Utils.JwtHelper;
 import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.LoginResponse;
 import com.yichi.onepiece.model.LogoutResponse;
-import com.yichi.onepiece.model.UserInfo;
+import com.yichi.onepiece.model.User;
+import java.io.IOException;
 import java.util.UUID;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class UserService {
@@ -105,9 +108,9 @@ public class UserService {
         .accessToken(jwtToken)
         .refreshToken(jwtRefreshToken)
         .userInfo(
-            new UserInfo()
-                .userId(userLogin.getId())
-                .userName(userLogin.getName())
+            new User()
+                .id(userLogin.getId())
+                .name(userLogin.getName())
                 .organization(userLogin.getOrganization()));
   }
 
@@ -134,5 +137,21 @@ public class UserService {
               userId, userEntity.getAccountCondition())
           .get();
     }
+  }
+
+  public byte[] updateProfile(UUID userId, MultipartFile profile) {
+    Byte[] profileByte = new Byte[0];
+    try {
+      profileByte = ArrayUtils.toObject(profile.getInputStream().readAllBytes());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    var user =
+        userDao
+            .findById(userId)
+            .orElseThrow(ExceptionUtils.notFound("user with id %s not found", userId));
+    var updatedUser = user.toBuilder().setProfileImage(profileByte).build();
+    userDao.update(updatedUser);
+    return ArrayUtils.toPrimitive(updatedUser.getProfileImage());
   }
 }

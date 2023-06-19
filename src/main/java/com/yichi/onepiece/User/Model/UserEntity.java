@@ -19,7 +19,7 @@ public interface UserEntity {
 
   UserAccountCondition getAccountCondition();
 
-  List<UserRole> getUserRoles();
+  List<String> getUserRoles();
 
   @Nullable
   Byte[] getProfileImage();
