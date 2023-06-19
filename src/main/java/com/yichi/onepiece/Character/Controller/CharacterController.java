@@ -23,18 +23,6 @@ public class CharacterController implements CharacterApi {
     return ResponseEntity.ok(characterEntity);
   }
 
-  //    @Override
-  //    public ResponseEntity<Resource> updateProfile(UUID characterId, MultipartFile profileImage)
-  // {
-  //        var image = characterService.updateProfile(characterId, profileImage);
-  //        return ResponseEntity.ok(new ByteArrayResource(image));
-  //    }
-  //
-  //    @Override
-  //    public ResponseEntity<Resource> getProfile(UUID id) {
-  //        return ResponseEntity.ok(new ByteArrayResource(characterService.getProfile(id)));
-  //    }
-
   @Override
   public ResponseEntity<EatFruitResponse> eatFruit(EatFruitRequest eatFruitRequest) {
     return ResponseEntity.ok(
