@@ -12,13 +12,13 @@ import javax.validation.constraints.*;
 /** LoginResponse */
 @Generated(
     value = "org.openapitools.codegen.languages.SpringCodegen",
-    date = "2023-06-18T01:09:52.923697700+08:00[Asia/Shanghai]")
+    date = "2023-06-19T21:18:43.064586200+08:00[Asia/Shanghai]")
 public class LoginResponse implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
   @JsonProperty("user_info")
-  private UserInfo userInfo;
+  private User userInfo;
 
   @JsonProperty("verification")
   private I18nText verification;
@@ -29,7 +29,7 @@ public class LoginResponse implements Serializable {
   @JsonProperty("refresh_token")
   private String refreshToken;
 
-  public LoginResponse userInfo(UserInfo userInfo) {
+  public LoginResponse userInfo(User userInfo) {
     this.userInfo = userInfo;
     return this;
   }
@@ -41,11 +41,11 @@ public class LoginResponse implements Serializable {
    */
   @Valid
   @Schema(name = "user_info", required = false)
-  public UserInfo getUserInfo() {
+  public User getUserInfo() {
     return userInfo;
   }
 
-  public void setUserInfo(UserInfo userInfo) {
+  public void setUserInfo(User userInfo) {
     this.userInfo = userInfo;
   }
 

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Generated(
     value = "org.openapitools.codegen.languages.SpringCodegen",
-    date = "2023-06-18T01:09:52.923697700+08:00[Asia/Shanghai]")
+    date = "2023-06-19T21:18:43.064586200+08:00[Asia/Shanghai]")
 @Validated
 @Tag(name = "Battle", description = "the Battle API")
 public interface BattleApi {

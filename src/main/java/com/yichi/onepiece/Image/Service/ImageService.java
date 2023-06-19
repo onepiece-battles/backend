@@ -1,0 +1,38 @@
+package com.yichi.onepiece.Image.Service;
+
+import com.yichi.onepiece.Character.Service.CharacterService;
+import com.yichi.onepiece.Fruits.Service.FruitService;
+import com.yichi.onepiece.User.Service.UserService;
+import com.yichi.onepiece.model.ImageType;
+import java.util.UUID;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+@Service
+public class ImageService {
+  private final CharacterService characterService;
+  private final FruitService fruitService;
+  private final UserService userService;
+
+  public ImageService(
+      CharacterService characterService, FruitService fruitService, UserService userService) {
+    this.characterService = characterService;
+    this.fruitService = fruitService;
+    this.userService = userService;
+  }
+
+  public byte[] uploadImage(UUID targetId, ImageType targetType, MultipartFile profile_image) {
+    switch (targetType) {
+      case USER_IMAGE -> {
+        return userService.updateProfile(targetId, profile_image);
+      }
+      case FRUIT_IMAGE -> {
+        return fruitService.updateProfile(targetId, profile_image);
+      }
+      case CHARACTER_IMAGE -> {
+        return characterService.updateProfile(targetId, profile_image);
+      }
+    }
+    throw new RuntimeException("file upload with id failed");
+  }
+}
