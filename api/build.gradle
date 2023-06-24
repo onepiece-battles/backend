@@ -51,6 +51,10 @@ openApiGenerate {
 }
 
 compileJava.dependsOn tasks.openApiGenerate
+tasks.register("removeOutputFolder", Delete) {
+        delete files("$rootDir/api/src")
+}
+assemble.finalizedBy(removeOutputFolder)
 
 bootJar {
     enabled = false
