@@ -20,6 +20,7 @@ repositories {
 dependencies {
     implementation "javax.validation:validation-api:$javax_validation_api_version"
     implementation "javax.annotation:javax.annotation-api:$javax_annotation_api_version"
+    implementation 'javax.servlet:servlet-api:2.5'
     implementation "io.swagger.core.v3:swagger-annotations:$swagger_annotation"
     implementation "org.openapitools:jackson-databind-nullable:$jackson_databind_nullable_version"
     implementation "org.springframework:spring-context"
@@ -30,7 +31,7 @@ openApiGenerate {
     generatorName = "spring"
     library = "spring-boot"
     inputSpec = "$rootDir/onepiece-battles-api/api/openapi.yaml".toString()
-    outputDir = "$rootDir/api".toString()
+    outputDir = "$buildDir/generated/sources".toString()
     apiPackage = "com.yichi.onepiece.api".toString()
     modelPackage = "com.yichi.onepiece.model".toString()
     configOptions = [
@@ -39,8 +40,9 @@ openApiGenerate {
             useTags: true.toString(),
             interfaceOnly: true.toString(),
             skipDefaultInterface: true.toString(),
+            generateSupportingFiles: false.toString(),
             serializableModel: true.toString(),
-            serializationLibrary: "jackson".toString()
+            serializationLibrary: "jackson".toString(),
     ]
 
     globalProperties = [
@@ -50,11 +52,13 @@ openApiGenerate {
     ]
 }
 
-compileJava.dependsOn tasks.openApiGenerate
-tasks.register("removeOutputFolder", Delete) {
-        delete files("$rootDir/api/src")
+java {
+    sourceSets["main"].java {
+        srcDir("build/generated/sources/src/main/java")
+    }
 }
-assemble.finalizedBy(removeOutputFolder)
+
+compileJava.dependsOn tasks.openApiGenerate
 
 bootJar {
     enabled = false
