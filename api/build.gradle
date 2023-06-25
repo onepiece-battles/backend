@@ -35,10 +35,11 @@ openApiGenerate {
     modelPackage = "com.yichi.onepiece.model".toString()
     configOptions = [
             basePackage: "com.yichi.onepiece".toString(),
-            sourceFolder: "src/main/java".toString(),
+            sourceFolder: "/src/main/java".toString(),
             useTags: true.toString(),
             interfaceOnly: true.toString(),
             skipDefaultInterface: true.toString(),
+            generateSupportingFiles: false.toString(),
             serializableModel: true.toString(),
             serializationLibrary: "jackson".toString()
     ]
@@ -51,10 +52,15 @@ openApiGenerate {
 }
 
 compileJava.dependsOn tasks.openApiGenerate
-tasks.register("removeOutputFolder", Delete) {
-        delete files("$rootDir/api/src")
+tasks.register("moveFile", Copy) {
+    from layout.projectDirectory.dir("src")
+    into layout.buildDirectory.dir("src")
 }
-assemble.finalizedBy(removeOutputFolder)
+tasks.register("deleteFolder", Delete) {
+    delete layout.projectDirectory.dir("src")
+}
+assemble.finalizedBy(moveFile)
+moveFile.finalizedBy(deleteFolder)
 
 bootJar {
     enabled = false
