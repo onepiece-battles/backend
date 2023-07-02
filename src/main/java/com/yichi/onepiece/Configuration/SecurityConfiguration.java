@@ -25,18 +25,14 @@ public class SecurityConfiguration {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
     httpSecurity
-        .csrf()
-        .and()
+        // specify authentication provider
         .authenticationProvider(authenticationProvider)
+        // specify authentication
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-        .authorizeHttpRequests()
-        // Till here, all requests should be authenticated.
-        .anyRequest()
-        .authenticated()
-        .and()
-        .sessionManagement()
-        .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
+        // specify authorization
+        .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     return httpSecurity.build();
   }
 }
