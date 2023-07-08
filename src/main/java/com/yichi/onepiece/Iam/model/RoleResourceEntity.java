@@ -1,6 +1,7 @@
 package com.yichi.onepiece.Iam.model;
 
 import com.yichi.infra.support.entity.Entity;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -10,4 +11,6 @@ public interface RoleResourceEntity {
   UUID getRoleId();
 
   UUID getResourceId();
+
+  List<String> getPermissions();
 }

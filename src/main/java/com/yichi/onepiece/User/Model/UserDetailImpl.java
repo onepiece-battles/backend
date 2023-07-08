@@ -1,7 +1,6 @@
 package com.yichi.onepiece.User.Model;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -42,10 +41,5 @@ public class UserDetailImpl extends UserEntityImpl implements UserDetails {
   @Override
   public boolean isEnabled() {
     return true;
-  }
-
-  @Override
-  public List<String> getUserRoles() {
-    return null;
   }
 }
