@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 
 @Entity
 public interface FruitEntity {
+  String ENTITY_TYPE = "FRUIT";
+
   UUID getId();
 
   String getName();

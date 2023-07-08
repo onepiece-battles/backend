@@ -2,20 +2,21 @@ package com.yichi.onepiece.Battle.Model;
 
 import com.yichi.infra.support.entity.Entity;
 import com.yichi.onepiece.model.BattleType;
-
 import java.util.UUID;
 
 @Entity
 public interface BattleEntity {
-    UUID getId();
+  String ENTITY_TYPE = "BATTLE";
 
-    UUID getUserId();
+  UUID getId();
 
-    UUID getCharacterIdInitiator();
+  UUID getUserId();
 
-    UUID getCharacterIdReceiver();
+  UUID getCharacterIdInitiator();
 
-    BattleType getBattleType();
+  UUID getCharacterIdReceiver();
 
-    Long getActionTimestamp();
+  BattleType getBattleType();
+
+  Long getActionTimestamp();
 }

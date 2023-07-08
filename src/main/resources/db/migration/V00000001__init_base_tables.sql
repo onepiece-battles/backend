@@ -25,11 +25,7 @@ CREATE TABLE resource (
 CREATE TABLE role_resource (
      id BINARY(16) PRIMARY KEY,
      role_id BINARY(16),
-     resource_id BINARY(16),
-     add_permission TINYINT,
-     update_permission TINYINT,
-     read_permission TINYINT,
-     delete_permission TINYINT
+     resource_id BINARY(16)
 );
 ALTER TABLE role_resource ADD CONSTRAINT fk_role_resource_role_id__role_id
 FOREIGN KEY(role_id) REFERENCES role(id);

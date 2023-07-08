@@ -63,7 +63,8 @@ ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__user_id`
 -- resource
 CREATE TABLE `resource`(
     `id` BINARY(16) NOT NULL,
-    `name` VARCHAR(255)
+    `name` VARCHAR(255),
+    `permissions` TEXT NOT NULL
 );
 ALTER TABLE `resource` ADD CONSTRAINT PRIMARY KEY(`id`);
 
@@ -79,10 +80,7 @@ CREATE TABLE `role_resource`(
     `id` BINARY(16) NOT NULL,
     `role_id` BINARY(16),
     `resource_id` BINARY(16),
-    `add_permission` TINYINT,
-    `update_permission` TINYINT,
-    `read_permission` TINYINT,
-    `delete_permission` TINYINT
+    `permissions` TEXT NOT NULL
 );
 ALTER TABLE `role_resource` ADD CONSTRAINT PRIMARY KEY(`id`);
 ALTER TABLE `role_resource` ADD CONSTRAINT `fk_role_resource_resource_id__resource_id`
