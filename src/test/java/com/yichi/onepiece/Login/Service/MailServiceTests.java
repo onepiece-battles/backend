@@ -1,6 +1,6 @@
 package com.yichi.onepiece.Login.Service;
 
-import com.yichi.onepiece.Email.EmailClient;
+import com.yichi.onepiece.email.EmailClient;
 import jakarta.mail.MessagingException;
 import org.mockito.testng.MockitoTestNGListener;
 import org.springframework.beans.factory.annotation.Autowired;
