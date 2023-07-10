@@ -1,4 +1,4 @@
-package com.yichi.onepiece.fruits.model.Converter;
+package com.yichi.onepiece.fruits.model.converter;
 
 import com.yichi.infra.support.EntityBuilder;
 import com.yichi.onepiece.fruits.model.FruitEntity;

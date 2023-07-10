@@ -1,4 +1,4 @@
-package com.yichi.onepiece.character.model.Converter;
+package com.yichi.onepiece.character.model.converter;
 
 import com.yichi.infra.support.EntityBuilder;
 import com.yichi.onepiece.character.model.CharacterEntity;

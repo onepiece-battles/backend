@@ -2,7 +2,7 @@ package com.yichi.onepiece.character.service;
 
 import com.yichi.onepiece.character.model.CharacterDao;
 import com.yichi.onepiece.character.model.CharacterEntity;
-import com.yichi.onepiece.character.model.Converter.CharacterEntityConverter;
+import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruits.service.FruitService;
 import com.yichi.onepiece.model.*;
