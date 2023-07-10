@@ -1,6 +1,7 @@
 package com.yichi.onepiece.Iam;
 
 import com.yichi.onepiece.Exception.ExceptionUtils;
+import com.yichi.onepiece.Exception.PermissionDeniedException;
 import com.yichi.onepiece.Iam.model.*;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,7 +23,7 @@ public class IamService {
     this.resourceDao = resourceDao;
   }
 
-  public boolean checkPermissionOfCurrentAccount(
+  public void checkPermissionOfCurrentAccount(
       String resourceType, List<PermissionDefinition.PermissionEnum> permissionEnums) {
     var authorities =
         Arrays.stream(
@@ -35,36 +36,44 @@ public class IamService {
       throw ExceptionUtils.emptyAuthority(
           String.format("no authority found when checking the resource type %s", resourceType));
     }
-    if (authorities.get(0) instanceof SimpleGrantedAuthority) {
-      var roleNames = authorities.stream().map(GrantedAuthority::getAuthority).toList();
-      var roleEntities = roleDao.listRoleByRoleNames(roleNames);
-      var roleResourceEntities =
-          roleResourceDao.listRoleResourceByRoleIds(
-              roleEntities.stream().map(RoleEntity::getId).toList());
-      var resourceIds =
-          roleResourceEntities.stream().map(RoleResourceEntity::getResourceId).toList();
-      var resource =
-          resourceDao.batchFindById(resourceIds).stream()
-              .filter(resourceEntity -> resourceType.equals(resourceEntity.getName()))
-              .findFirst();
-      if (resource.isEmpty()) {
-        return false;
-      } else {
-        var resourceEntity = resource.get();
-        return new HashSet<>(
-                roleResourceEntities.stream()
-                    .filter(
-                        roleResourceEntity -> resourceEntity.getId().equals(resourceEntity.getId()))
-                    .flatMap(roleResourceEntity -> roleResourceEntity.getPermissions().stream())
-                    .toList())
-            .containsAll(
-                permissionEnums.stream()
-                    .map(PermissionDefinition.PermissionEnum::toString)
-                    .toList());
-      }
-    } else {
+    if (!(authorities.get(0) instanceof SimpleGrantedAuthority)) {
       throw ExceptionUtils.unexpectedAuthorityType(
           String.format("unexpected authority type %s", authorities.get(0).getClass()));
+    }
+    var roleNames = authorities.stream().map(GrantedAuthority::getAuthority).toList();
+    var permissionList =
+        permissionEnums.stream().map(PermissionDefinition.PermissionEnum::toString).toList();
+    checkPermission(resourceType, permissionList, roleNames);
+  }
+
+  public void checkPermission(
+      String resourceType, List<String> permissionEnums, List<String> roleNames) {
+    var roleEntities = roleDao.listRoleByRoleNames(roleNames);
+    var roleResourceEntities =
+        roleResourceDao.listRoleResourceByRoleIds(
+            roleEntities.stream().map(RoleEntity::getId).toList());
+    var resourceIds = roleResourceEntities.stream().map(RoleResourceEntity::getResourceId).toList();
+    var resource =
+        resourceDao.batchFindById(resourceIds).stream()
+            .filter(resourceEntity -> resourceType.equals(resourceEntity.getName()))
+            .findFirst();
+    if (resource.isEmpty()) {
+      throw new PermissionDeniedException(
+          String.format("Resource with type %s not found", resourceType));
+    } else {
+      var resourceEntity = resource.get();
+      var allPermissionsValidated =
+          new HashSet<>(
+                  roleResourceEntities.stream()
+                      .filter(
+                          roleResourceEntity ->
+                              resourceEntity.getId().equals(resourceEntity.getId()))
+                      .flatMap(roleResourceEntity -> roleResourceEntity.getPermissions().stream())
+                      .toList())
+              .containsAll(permissionEnums);
+      if (!allPermissionsValidated) {
+        throw new PermissionDeniedException("Not all permissions are allowed");
+      }
     }
   }
   //  private static final ThreadLocal<IamCache> cache = new ThreadLocal<>();

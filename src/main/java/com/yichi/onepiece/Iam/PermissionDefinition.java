@@ -19,7 +19,8 @@ public class PermissionDefinition {
   public enum PermissionEnum {
     // character
     CHARACTER_CREATE,
-    CHARACTER_READ,
+    CHARACTER_GET,
+    CHARACTER_LIST,
     CHARACTER_UPDATE,
     CHARACTER_DELETE,
 
@@ -31,7 +32,8 @@ public class PermissionDefinition {
 
     // battle
     BATTLE_CREATE,
-    BATTLE_READ,
+    BATTLE_GET,
+    BATTLE_LIST,
     BATTLE_UPDATE,
     BATTLE_DELETE,
   }
