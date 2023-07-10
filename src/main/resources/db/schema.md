@@ -101,7 +101,8 @@ ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__user_id`
 ```sql
 CREATE TABLE `resource`(
     `id` BINARY(16) NOT NULL,
-    `name` VARCHAR(255)
+    `name` VARCHAR(255),
+    `permissions` TEXT NOT NULL
 );
 ```
 
@@ -129,10 +130,7 @@ CREATE TABLE `role_resource`(
     `id` BINARY(16) NOT NULL,
     `role_id` BINARY(16),
     `resource_id` BINARY(16),
-    `add_permission` TINYINT,
-    `update_permission` TINYINT,
-    `read_permission` TINYINT,
-    `delete_permission` TINYINT
+    `permissions` TEXT NOT NULL
 );
 ```
 

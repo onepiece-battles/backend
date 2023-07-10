@@ -1,14 +1,14 @@
 package com.yichi.onepiece.Login.Service;
 
-import static com.yichi.onepiece.UFC.UserFacingConstantsKey.NO_USER_FOUND;
+import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.NO_USER_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.yichi.onepiece.BaseServiceTests;
-import com.yichi.onepiece.Iam.model.TokenDao;
-import com.yichi.onepiece.User.Model.UserDao;
-import com.yichi.onepiece.User.Service.UserService;
+import com.yichi.onepiece.iam.model.TokenDao;
 import com.yichi.onepiece.model.LogoutResponse;
+import com.yichi.onepiece.user.model.UserDao;
+import com.yichi.onepiece.user.service.UserService;
 import java.util.Optional;
 import java.util.UUID;
 import org.mockito.Mock;

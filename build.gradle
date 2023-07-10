@@ -1,12 +1,15 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '2.7.5'
-    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'org.springframework.boot' version '3.1.1'
+    id 'io.spring.dependency-management' version '1.1.0'
 }
 
 group "org.onepiece-battles"
 version "EAST_BLUE_SAGA"
-java.sourceCompatibility(JavaVersion.VERSION_17)
+
+java {
+    sourceCompatibility = '17'
+}
 
 ext {
     assertj_db_version = "2.0.2"
@@ -15,9 +18,6 @@ ext {
     guava_version = "31.1-jre"
     jackson_dataformat_version = "2.13.3"
     h2_database_version = "1.4.200"
-    mybatis_version = "3.5.9"
-    mybatis_spring_version = "2.0.6"
-    mybatis_spring_autoconfig_version = "2.2.2"
     mapstruct_version = "1.5.2.Final"
     testng_version = "7.1.0"
     mockito_version = "3.12.0"
@@ -25,8 +25,8 @@ ext {
     mysql_connector_version = "8.0.28"
     micrometer_registry_version = "1.9.3"
     json_web_token_version = "0.11.5"
-    spring_security_version = "5.8.3"
     onepiece_infra_version = "1.0.5"
+    mybatis_spring_starter_version = "3.0.2"
 }
 
 repositories {
@@ -35,8 +35,8 @@ repositories {
         credentials{
             username = "PRIVATE-TOKEN"
             password = gitLabPrivateToken
+            url = uri("https://gitlab.com/api/v4/projects/46406398/packages/maven")
         }
-        url = "https://gitlab.com/api/v4/projects/46406398/packages/maven"
     }
     mavenLocal()
 }
@@ -51,25 +51,23 @@ dependencies {
     implementation "org.mapstruct:mapstruct-processor:$mapstruct_version"
     annotationProcessor "org.mapstruct:mapstruct-processor:$mapstruct_version"
 
+    // spring web
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
     // spring security
-    implementation "org.springframework.security:spring-security-core:$spring_security_version"
-    implementation "org.springframework.security:spring-security-config:$spring_security_version"
-    implementation "org.springframework.security:spring-security-web:$spring_security_version"
+    implementation "org.springframework.boot:spring-boot-starter-security"
+
+    // jwt
     implementation "io.jsonwebtoken:jjwt-impl:$json_web_token_version"
     implementation "io.jsonwebtoken:jjwt-api:$json_web_token_version"
     implementation "io.jsonwebtoken:jjwt-jackson:$json_web_token_version"
-
 
     // database
     implementation "org.flywaydb:flyway-core:$flyway_version"
     implementation "org.flywaydb:flyway-mysql:$flyway_version"
     implementation "mysql:mysql-connector-java:$mysql_connector_version"
+    implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:$mybatis_spring_starter_version"
 
-    implementation "org.mybatis:mybatis:$mybatis_version"
-    implementation "org.mybatis:mybatis-spring:$mybatis_spring_version"
-    implementation "org.mybatis.spring.boot:mybatis-spring-boot-autoconfigure:$mybatis_spring_autoconfig_version"
-    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
 
     // special
     implementation "io.micrometer:micrometer-registry-prometheus:$micrometer_registry_version"
