@@ -1,4 +1,4 @@
-package com.yichi.onepiece.user.Model;
+package com.yichi.onepiece.user.model;
 
 import java.util.Collection;
 import java.util.stream.Collectors;

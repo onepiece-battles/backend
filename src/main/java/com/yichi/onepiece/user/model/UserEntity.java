@@ -1,4 +1,4 @@
-package com.yichi.onepiece.user.Model;
+package com.yichi.onepiece.user.model;
 
 import com.yichi.infra.support.entity.Entity;
 import java.util.List;

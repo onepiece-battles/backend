@@ -1,4 +1,4 @@
-package com.yichi.onepiece.user.Service;
+package com.yichi.onepiece.user.service;
 
 import static com.yichi.onepiece.constants.ConstantsContainer.SUCCESS;
 import static com.yichi.onepiece.constants.ConstantsContainer.VALID_EMAIL_PATTERN;
@@ -13,7 +13,7 @@ import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.LoginResponse;
 import com.yichi.onepiece.model.LogoutResponse;
 import com.yichi.onepiece.model.User;
-import com.yichi.onepiece.user.Model.*;
+import com.yichi.onepiece.user.model.*;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import com.yichi.onepiece.utils.EncryptHelper;

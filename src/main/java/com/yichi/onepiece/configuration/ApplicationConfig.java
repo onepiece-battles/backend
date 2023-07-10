@@ -1,6 +1,6 @@
 package com.yichi.onepiece.configuration;
 
-import com.yichi.onepiece.user.Model.UserDetailDao;
+import com.yichi.onepiece.user.model.UserDetailDao;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

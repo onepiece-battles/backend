@@ -1,4 +1,4 @@
-package com.yichi.onepiece.user.Model;
+package com.yichi.onepiece.user.model;
 
 public enum UserAccountCondition {
   SignIn,

@@ -1,10 +1,10 @@
-package com.yichi.onepiece.user.Controller;
+package com.yichi.onepiece.user.controller;
 
 import static com.yichi.onepiece.constants.ConstantsContainer.SUCCESS;
 
 import com.yichi.onepiece.api.UserApi;
 import com.yichi.onepiece.model.*;
-import com.yichi.onepiece.user.Service.UserService;
+import com.yichi.onepiece.user.service.UserService;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
