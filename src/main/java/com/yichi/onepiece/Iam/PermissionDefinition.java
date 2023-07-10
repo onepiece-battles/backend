@@ -12,7 +12,8 @@ public class PermissionDefinition {
   private static final String FRUIT_PREFIX = "FRUIT";
   private static final String BATTLE_PREFIX = "BATTLE";
   private static final String CREATE_SUFFIX = "CREATE";
-  private static final String READ_SUFFIX = "READ";
+  private static final String GET_SUFFIX = "GET";
+  private static final String LIST_SUFFIX = "LIST";
   private static final String UPDATE_SUFFIX = "UPDATE";
   private static final String DELETE_SUFFIX = "DELETE";
 
@@ -70,9 +71,15 @@ public class PermissionDefinition {
         .collect(Collectors.toList());
   }
 
-  public static List<PermissionEnum> getAllReadPermissions() {
+  public static List<PermissionEnum> getAllGetPermissions() {
     return Arrays.stream(PermissionEnum.values())
-        .filter(value -> value.toString().endsWith(READ_SUFFIX))
+        .filter(value -> value.toString().endsWith(GET_SUFFIX))
+        .collect(Collectors.toList());
+  }
+
+  public static List<PermissionEnum> getAllListPermissions() {
+    return Arrays.stream(PermissionEnum.values())
+        .filter(value -> value.toString().endsWith(LIST_SUFFIX))
         .collect(Collectors.toList());
   }
 
