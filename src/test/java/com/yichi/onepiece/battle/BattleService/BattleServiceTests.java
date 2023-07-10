@@ -2,16 +2,16 @@ package com.yichi.onepiece.battle.BattleService;
 
 import static org.mockito.Mockito.when;
 
-import com.yichi.onepiece.battle.Model.BattleDao;
-import com.yichi.onepiece.battle.Model.BattleEntity;
-import com.yichi.onepiece.battle.Model.BattleEntityBuilder;
-import com.yichi.onepiece.battle.Service.BattleService;
-import com.yichi.onepiece.character.Model.CharacterEntity;
-import com.yichi.onepiece.character.Model.CharacterEntityBuilder;
-import com.yichi.onepiece.character.Service.CharacterService;
-import com.yichi.onepiece.fruits.Model.FruitEntity;
-import com.yichi.onepiece.fruits.Model.FruitEntityBuilder;
-import com.yichi.onepiece.fruits.Service.FruitService;
+import com.yichi.onepiece.battle.model.BattleDao;
+import com.yichi.onepiece.battle.model.BattleEntity;
+import com.yichi.onepiece.battle.model.BattleEntityBuilder;
+import com.yichi.onepiece.battle.service.BattleService;
+import com.yichi.onepiece.character.model.CharacterEntity;
+import com.yichi.onepiece.character.model.CharacterEntityBuilder;
+import com.yichi.onepiece.character.service.CharacterService;
+import com.yichi.onepiece.fruits.model.FruitEntity;
+import com.yichi.onepiece.fruits.model.FruitEntityBuilder;
+import com.yichi.onepiece.fruits.service.FruitService;
 import com.yichi.onepiece.model.FruitInCharacter;
 import com.yichi.onepiece.model.FruitType;
 import java.util.List;
