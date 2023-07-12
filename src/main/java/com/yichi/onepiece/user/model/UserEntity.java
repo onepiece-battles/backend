@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 
 @Entity
 public interface UserEntity {
+  String ENTITY_TYPE = "USER";
+
   UUID getId();
 
   String getName();

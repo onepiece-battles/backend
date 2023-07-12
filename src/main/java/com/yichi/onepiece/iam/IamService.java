@@ -2,10 +2,13 @@ package com.yichi.onepiece.iam;
 
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.exception.PermissionDeniedException;
+import com.yichi.onepiece.iam.PermissionDefinition.PermissionEnum;
 import com.yichi.onepiece.iam.model.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,7 +27,7 @@ public class IamService {
   }
 
   public void checkPermissionOfCurrentAccount(
-      String resourceType, List<PermissionDefinition.PermissionEnum> permissionEnums) {
+      String resourceType, Set<PermissionEnum> permissionEnums) {
     var authorities =
         Arrays.stream(
                 SecurityContextHolder.getContext()
@@ -42,12 +45,14 @@ public class IamService {
     }
     var roleNames = authorities.stream().map(GrantedAuthority::getAuthority).toList();
     var permissionList =
-        permissionEnums.stream().map(PermissionDefinition.PermissionEnum::toString).toList();
+        permissionEnums.stream()
+            .map(PermissionDefinition.PermissionEnum::toString)
+            .collect(Collectors.toSet());
     checkPermission(resourceType, permissionList, roleNames);
   }
 
-  public void checkPermission(
-      String resourceType, List<String> permissionEnums, List<String> roleNames) {
+  private void checkPermission(
+      String resourceType, Set<String> permissionEnums, List<String> roleNames) {
     var roleEntities = roleDao.listRoleByRoleNames(roleNames);
     var roleResourceEntities =
         roleResourceDao.listRoleResourceByRoleIds(

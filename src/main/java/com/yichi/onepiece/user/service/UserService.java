@@ -155,7 +155,7 @@ public class UserService {
     return ArrayUtils.toPrimitive(user.getProfileImage());
   }
 
-  public void assignRoleToUser(UUID userId, Set<String> roles) {
+  public Set<String> assignRoleToUser(UUID userId, Set<String> roles) {
     var user =
         userDao
             .findById(userId)
@@ -167,6 +167,7 @@ public class UserService {
     if (!roleNameFullSet.containsAll(roles)) {
       roles.addAll(user.getUserRoles());
       userDao.update(user.toBuilder().setUserRoles(roles).build());
+      return roles;
     } else {
       throw ExceptionUtils.notFound(
               "Role name not found in db when assigning role to user %s", userId)
