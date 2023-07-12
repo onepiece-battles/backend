@@ -9,7 +9,7 @@ import com.yichi.onepiece.model.AddBattleRequest;
 import com.yichi.onepiece.model.Battle;
 import com.yichi.onepiece.model.StartBattleRequest;
 import com.yichi.onepiece.model.StartBattleResponse;
-import java.util.List;
+import java.util.Set;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
@@ -26,7 +26,7 @@ public class BattleController implements BattleApi {
   @Override
   public ResponseEntity<Battle> addBattle(AddBattleRequest addBattleRequest) {
     iamService.checkPermissionOfCurrentAccount(
-        BattleEntity.ENTITY_TYPE, List.of(PermissionEnum.BATTLE_CREATE, PermissionEnum.BATTLE_GET));
+        BattleEntity.ENTITY_TYPE, Set.of(PermissionEnum.BATTLE_CREATE, PermissionEnum.BATTLE_GET));
     var battle = battleService.addBattle(addBattleRequest);
     return ResponseEntity.ok(battle);
   }
@@ -34,7 +34,7 @@ public class BattleController implements BattleApi {
   @Override
   public ResponseEntity<StartBattleResponse> startBattle(StartBattleRequest startBattleRequest) {
     iamService.checkPermissionOfCurrentAccount(
-        BattleEntity.ENTITY_TYPE, List.of(PermissionEnum.BATTLE_UPDATE));
+        BattleEntity.ENTITY_TYPE, Set.of(PermissionEnum.BATTLE_UPDATE));
     var battle = battleService.startBattle(startBattleRequest.getBattleId());
     return ResponseEntity.ok(battle);
   }

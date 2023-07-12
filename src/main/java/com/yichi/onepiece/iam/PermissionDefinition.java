@@ -18,6 +18,8 @@ public class PermissionDefinition {
   private static final String DELETE_SUFFIX = "DELETE";
 
   public enum PermissionEnum {
+    // user
+    USER_ASSIGN_ROLE,
     // character
     CHARACTER_CREATE,
     CHARACTER_GET,

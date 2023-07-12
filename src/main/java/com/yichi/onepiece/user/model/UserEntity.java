@@ -1,12 +1,14 @@
 package com.yichi.onepiece.user.model;
 
 import com.yichi.infra.support.entity.Entity;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
 @Entity
 public interface UserEntity {
+  String ENTITY_TYPE = "USER";
+
   UUID getId();
 
   String getName();
@@ -19,7 +21,7 @@ public interface UserEntity {
 
   UserAccountCondition getAccountCondition();
 
-  List<String> getUserRoles();
+  Set<String> getUserRoles();
 
   @Nullable
   Byte[] getProfileImage();

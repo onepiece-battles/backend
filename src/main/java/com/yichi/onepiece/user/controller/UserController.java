@@ -3,9 +3,13 @@ package com.yichi.onepiece.user.controller;
 import static com.yichi.onepiece.constants.ConstantsContainer.SUCCESS;
 
 import com.yichi.onepiece.api.UserApi;
+import com.yichi.onepiece.iam.IamService;
+import com.yichi.onepiece.iam.PermissionDefinition.PermissionEnum;
 import com.yichi.onepiece.model.*;
+import com.yichi.onepiece.user.model.UserEntity;
 import com.yichi.onepiece.user.service.UserService;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
+import java.util.Set;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,13 +17,25 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 public class UserController implements UserApi {
-
   private final UserService userService;
+  private final IamService iamService;
   private final AuthenticationManager authenticationManager;
 
-  public UserController(UserService userService, AuthenticationManager authenticationManager) {
+  public UserController(
+      UserService userService, IamService iamService, AuthenticationManager authenticationManager) {
     this.userService = userService;
+    this.iamService = iamService;
     this.authenticationManager = authenticationManager;
+  }
+
+  @Override
+  public ResponseEntity<AssignRoleResponse> assignRole(AssignRoleRequest assignRoleRequest) {
+    iamService.checkPermissionOfCurrentAccount(
+        UserEntity.ENTITY_TYPE, Set.of(PermissionEnum.USER_ASSIGN_ROLE));
+    var roles =
+        userService.assignRoleToUser(assignRoleRequest.getUserId(), assignRoleRequest.getRoles());
+    return ResponseEntity.ok(
+        new AssignRoleResponse().roles(roles).userId(assignRoleRequest.getUserId()));
   }
 
   @Override
