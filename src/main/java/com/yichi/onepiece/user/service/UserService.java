@@ -131,19 +131,6 @@ public class UserService {
     return new LogoutResponse().logoutResult(SUCCESS).userName(user.getName());
   }
 
-  public void justifyUser(UUID userId) {
-    var userEntity =
-        userDao
-            .findById(userId)
-            .orElseThrow(ExceptionUtils.notFound("User with id: %s not found in database", userId));
-    if (!UserAccountCondition.SignIn.equals(userEntity.getAccountCondition())) {
-      throw ExceptionUtils.notFound(
-              "Account condition of user with id: %s invalid, account condition: %s",
-              userId, userEntity.getAccountCondition())
-          .get();
-    }
-  }
-
   public byte[] updateProfile(UUID userId, MultipartFile profile) {
     Byte[] profileByte = new Byte[0];
     try {
