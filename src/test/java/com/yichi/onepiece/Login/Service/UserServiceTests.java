@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.yichi.onepiece.BaseServiceTests;
+import com.yichi.onepiece.iam.model.RoleDao;
 import com.yichi.onepiece.iam.model.TokenDao;
 import com.yichi.onepiece.model.LogoutResponse;
 import com.yichi.onepiece.user.model.UserDao;
@@ -17,14 +18,13 @@ import org.testng.annotations.Test;
 
 public class UserServiceTests extends BaseServiceTests {
   private UserService userService;
-
   @Mock private UserDao userDao;
-
-  private TokenDao tokenDao;
+  @Mock private TokenDao tokenDao;
+  @Mock private RoleDao roleDao;
 
   @BeforeMethod
   public void setup() {
-    userService = new UserService(userDao, tokenDao);
+    userService = new UserService(userDao, tokenDao, roleDao);
   }
 
   @Test

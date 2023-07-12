@@ -5,10 +5,7 @@ import static com.yichi.onepiece.constants.ConstantsContainer.VALID_EMAIL_PATTER
 import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.*;
 
 import com.yichi.onepiece.exception.ExceptionUtils;
-import com.yichi.onepiece.iam.model.TokenDao;
-import com.yichi.onepiece.iam.model.TokenEntity;
-import com.yichi.onepiece.iam.model.TokenEntityBuilder;
-import com.yichi.onepiece.iam.model.TokenType;
+import com.yichi.onepiece.iam.model.*;
 import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.LoginResponse;
 import com.yichi.onepiece.model.LogoutResponse;
@@ -19,7 +16,10 @@ import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import com.yichi.onepiece.utils.EncryptHelper;
 import com.yichi.onepiece.utils.JwtHelper;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,9 +29,12 @@ public class UserService {
   private final UserDao userDao;
   private final TokenDao tokenDao;
 
-  public UserService(UserDao userDao, TokenDao tokenDao) {
+  private final RoleDao roleDao;
+
+  public UserService(UserDao userDao, TokenDao tokenDao, RoleDao roleDao) {
     this.userDao = userDao;
     this.tokenDao = tokenDao;
+    this.roleDao = roleDao;
   }
 
   /**
@@ -67,6 +70,8 @@ public class UserService {
     UserEntity user =
         UserEntityBuilder.newBuilder()
             .setName(userName)
+            // newly registered users are default to have role: "USER"
+            .setUserRoles(Set.of(UserRole.USER.toString()))
             .setAccountCondition(UserAccountCondition.Registered)
             .setEncryptedPassword(encryptedPassword)
             .setEmail(email)
@@ -161,5 +166,24 @@ public class UserService {
             .findById(userId)
             .orElseThrow(ExceptionUtils.notFound("user with id %s not found", userId));
     return ArrayUtils.toPrimitive(user.getProfileImage());
+  }
+
+  public void assignRoleToUser(UUID userId, Set<String> roles) {
+    var user =
+        userDao
+            .findById(userId)
+            .orElseThrow(ExceptionUtils.notFound("user with id %s not found", userId));
+    var roleNameFullSet =
+        roleDao.listAllRoles().stream()
+            .map(RoleEntity::getName)
+            .collect(Collectors.toCollection(HashSet::new));
+    if (!roleNameFullSet.containsAll(roles)) {
+      roles.addAll(user.getUserRoles());
+      userDao.update(user.toBuilder().setUserRoles(roles).build());
+    } else {
+      throw ExceptionUtils.notFound(
+              "Role name not found in db when assigning role to user %s", userId)
+          .get();
+    }
   }
 }

@@ -23,4 +23,7 @@ public interface RoleDao extends BaseDao<RoleEntity, UUID> {
     "</script>"
   })
   List<RoleEntity> listRoleByRoleNames(@Param("roleNames") Collection<String> roleNames);
+
+  @Select("SELECT * FROM role")
+  List<RoleEntity> listAllRoles();
 }
