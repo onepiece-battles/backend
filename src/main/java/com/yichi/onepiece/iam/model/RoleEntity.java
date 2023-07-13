@@ -5,6 +5,8 @@ import java.util.UUID;
 
 @Entity
 public interface RoleEntity {
+  String ENTITY_TYPE = "ROLE";
+
   UUID getId();
 
   String getName();

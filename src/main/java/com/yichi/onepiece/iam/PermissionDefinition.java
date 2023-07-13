@@ -20,6 +20,12 @@ public class PermissionDefinition {
   public enum PermissionEnum {
     // user
     USER_ASSIGN_ROLE,
+    // role
+    ROLE_CREATE,
+    ROLE_GET,
+    ROLE_LIST,
+    ROLE_UPDATE,
+    ROLE_DELETE,
     // character
     CHARACTER_CREATE,
     CHARACTER_GET,
