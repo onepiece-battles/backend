@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 public class RoleService {
   private final RoleDao roleDao;
   private final RoleResourceDao roleResourceDao;
-
   private final ResourceDao resourceDao;
 
   public RoleService(RoleDao roleDao, RoleResourceDao roleResourceDao, ResourceDao resourceDao) {
@@ -44,7 +43,7 @@ public class RoleService {
     for (ResourceEntity resourceEntity : resourceList) {
       validationMap.put(resourceEntity.getId(), resourceEntity.getPermissions());
     }
-    validateResourceAndPermission(validationMap, sourceResourcePermissionsEntryList);
+    validateResourceAndPermissions(validationMap, sourceResourcePermissionsEntryList);
     List<RoleResourceEntity> assignedEntityList = new ArrayList<>();
     for (ResourcePermissionsEntry resourcePermissionsEntry : sourceResourcePermissionsEntryList) {
       var roleResourceEntity =
@@ -75,7 +74,7 @@ public class RoleService {
         .resourcePermissionEntryList(resourcePermissionsEntryList);
   }
 
-  private void validateResourceAndPermission(
+  private void validateResourceAndPermissions(
       HashMap<UUID, Set<String>> validationMap,
       List<ResourcePermissionsEntry> resourcePermissionsEntryList) {
     for (ResourcePermissionsEntry resourcePermissionsEntry : resourcePermissionsEntryList) {
@@ -83,7 +82,7 @@ public class RoleService {
           .get(resourcePermissionsEntry.getResourceId())
           .containsAll(resourcePermissionsEntry.getPermissions())) {
         ExceptionUtils.notFound(
-                "Invalid permission exists when validating resource, id: ",
+                "Invalid permission exists when validating resource, id: %s",
                 resourcePermissionsEntry.getResourceId())
             .get();
       }
