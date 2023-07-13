@@ -23,4 +23,9 @@ public class ExceptionUtils {
   public static AuthorizationServiceException unexpectedAuthorityType(String baseMessage) {
     return new AuthorizationServiceException(baseMessage);
   }
+
+  public static PermissionEnumFormatException unexpectedPermissionEnumFormatException(
+      String baseMessage, Object... args) {
+    return new PermissionEnumFormatException(Strings.lenientFormat(baseMessage, args));
+  }
 }
