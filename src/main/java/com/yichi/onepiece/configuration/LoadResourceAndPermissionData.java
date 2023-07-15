@@ -4,6 +4,7 @@ import com.yichi.onepiece.iam.PermissionDefinition;
 import com.yichi.onepiece.iam.model.ResourceDao;
 import com.yichi.onepiece.iam.model.ResourceEntity;
 import com.yichi.onepiece.iam.model.ResourceEntityBuilder;
+import com.yichi.onepiece.iam.model.RoleDao;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,9 +15,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoadResourceAndPermissionData implements CommandLineRunner {
   private final ResourceDao resourceDao;
+  private final RoleDao roleDao;
 
-  public LoadResourceAndPermissionData(ResourceDao resourceDao) {
+  public LoadResourceAndPermissionData(ResourceDao resourceDao, RoleDao roleDao) {
     this.resourceDao = resourceDao;
+    this.roleDao = roleDao;
   }
 
   @Override
@@ -31,6 +34,7 @@ public class LoadResourceAndPermissionData implements CommandLineRunner {
               .build();
       resourceEntities.add(resource);
     }
+    resourceDao.deleteAllRecords();
     resourceDao.batchInsert(resourceEntities);
   }
 }
