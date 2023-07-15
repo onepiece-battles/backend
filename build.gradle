@@ -25,7 +25,7 @@ ext {
     mysql_connector_version = "8.0.28"
     micrometer_registry_version = "1.9.3"
     json_web_token_version = "0.11.5"
-    onepiece_infra_version = "1.1.2"
+    onepiece_infra_version = "1.1.5"
     mybatis_spring_starter_version = "3.0.2"
 }
 
