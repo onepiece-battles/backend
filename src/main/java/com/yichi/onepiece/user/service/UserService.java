@@ -16,9 +16,7 @@ import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import com.yichi.onepiece.utils.EncryptHelper;
 import com.yichi.onepiece.utils.JwtHelper;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Service;
@@ -30,17 +28,19 @@ public class UserService {
   private final TokenDao tokenDao;
 
   private final RoleDao roleDao;
+  private final UserRoleDao userRoleDao;
 
-  public UserService(UserDao userDao, TokenDao tokenDao, RoleDao roleDao) {
+  public UserService(UserDao userDao, TokenDao tokenDao, RoleDao roleDao, UserRoleDao userRoleDao) {
     this.userDao = userDao;
     this.tokenDao = tokenDao;
     this.roleDao = roleDao;
+    this.userRoleDao = userRoleDao;
   }
 
   /**
    * Request to register into system
    *
-   * @param userName username
+   * @param name username
    * @param password password
    * @param email email address
    * @param confirmedPassword confirmed password
@@ -48,12 +48,8 @@ public class UserService {
    * @return register verification: key of DUPLICATE_USER_NAME/PASSWORD_DIFFERENT/REGISTER_SUCCESS
    */
   public String register(
-      String userName,
-      String password,
-      String email,
-      String confirmedPassword,
-      String organization) {
-    if (!userDao.listByName(userName).isEmpty()) {
+      String name, String password, String email, String confirmedPassword, String organization) {
+    if (!userDao.listByName(name).isEmpty()) {
       return UserFacingConstantsKey.DUPLICATE_USER_NAME;
     }
     if (!userDao.listByEmailAddress(email).isEmpty()) {
@@ -69,20 +65,29 @@ public class UserService {
     var encryptedPassword = EncryptHelper.getMd5String(password);
     UserEntity user =
         UserEntityBuilder.newBuilder()
-            .setName(userName)
-            // newly registered users are default to have role: "USER"
-            .setUserRoles(Set.of(UserRole.USER.toString()))
+            .setName(name)
             .setAccountCondition(UserAccountCondition.Registered)
             .setEncryptedPassword(encryptedPassword)
             .setEmail(email)
             .setOrganization(organization)
             .build();
     userDao.insert(user);
+    // newly registered users are default to have role: "USER"
+    var defaultRoleEntity =
+        roleDao
+            .findByRoleName(UserRole.USER.toString())
+            .orElseThrow(
+                ExceptionUtils.notFound("role with name %s not found", UserRole.USER.toString()));
+    userRoleDao.insert(
+        UserRoleEntityBuilder.newBuilder()
+            .setUserId(user.getId())
+            .setRoleId(defaultRoleEntity.getId())
+            .build());
     return SUCCESS;
   }
 
-  public LoginResponse login(String userName) {
-    var users = userDao.listByName(userName);
+  public LoginResponse login(String name) {
+    var users = userDao.listByName(name);
     I18nText verification;
     if (users.isEmpty()) {
       verification = UserFacingConstants.getConstant(REGISTER_FIRST_BEFORE_LOGIN).getDisplayName();
@@ -156,17 +161,24 @@ public class UserService {
   }
 
   public Set<String> assignRoleToUser(UUID userId, Set<String> roles) {
-    var user =
-        userDao
-            .findById(userId)
-            .orElseThrow(ExceptionUtils.notFound("user with id %s not found", userId));
+    //    var user =
+    //        userDao
+    //            .findById(userId)
+    //            .orElseThrow(ExceptionUtils.notFound("user with id %s not found", userId));
+    var roleEntities = roleDao.listAllRoles();
     var roleNameFullSet =
-        roleDao.listAllRoles().stream()
+        roleEntities.stream()
             .map(RoleEntity::getName)
             .collect(Collectors.toCollection(HashSet::new));
-    if (!roleNameFullSet.containsAll(roles)) {
-      roles.addAll(user.getUserRoles());
-      userDao.update(user.toBuilder().setUserRoles(roles).build());
+    var roleIds = roleEntities.stream().map(RoleEntity::getId).collect(Collectors.toSet());
+    if (roleNameFullSet.containsAll(roles)) {
+      List<UserRoleEntity> userRoleEntities = new ArrayList<>();
+      for (var roleId : roleIds) {
+        var userRoleEntity =
+            UserRoleEntityBuilder.newBuilder().setUserId(userId).setRoleId(roleId).build();
+        userRoleEntities.add(userRoleEntity);
+      }
+      userRoleDao.batchInsert(userRoleEntities);
       return roles;
     } else {
       throw ExceptionUtils.notFound(
