@@ -1,7 +1,6 @@
 package com.yichi.onepiece.user.model;
 
 import com.yichi.infra.support.entity.Entity;
-import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
@@ -20,8 +19,6 @@ public interface UserEntity {
   String getEncryptedPassword();
 
   UserAccountCondition getAccountCondition();
-
-  Set<String> getUserRoles();
 
   @Nullable
   Byte[] getProfileImage();
