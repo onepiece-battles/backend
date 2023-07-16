@@ -11,7 +11,6 @@ import org.apache.ibatis.annotations.*;
 @Mapper
 public interface UserDetailDao extends BaseDao<UserEntity, UUID> {
 
-  @Results
   @Result(property = "userRoles", column = "id", one = @One(select = RoleDao.LIST_ROLES_BY_USER_ID))
   @Select("SELECT * FROM user_detail where username=#{username}")
   Optional<UserDetailImpl> getUserDetailByName(@Param("username") String username);
