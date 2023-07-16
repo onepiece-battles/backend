@@ -29,8 +29,6 @@ public class SecurityConfiguration {
         .authenticationProvider(authenticationProvider)
         // specify authentication
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-        // specify authorization
-        .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     return httpSecurity.build();
