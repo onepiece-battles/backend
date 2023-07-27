@@ -4,8 +4,10 @@ import static com.yichi.onepiece.constants.ConstantsContainer.SUCCESS;
 import static com.yichi.onepiece.constants.ConstantsContainer.VALID_EMAIL_PATTERN;
 import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.*;
 
+import com.yichi.onepiece.constants.ConstantsContainer;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.iam.model.*;
+import com.yichi.onepiece.image.service.ImageService2;
 import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.LoginResponse;
 import com.yichi.onepiece.model.LogoutResponse;
@@ -24,13 +26,20 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class UserService {
+  private final ImageService2 imageService2;
   private final UserDao userDao;
   private final TokenDao tokenDao;
 
   private final RoleDao roleDao;
   private final UserRoleDao userRoleDao;
 
-  public UserService(UserDao userDao, TokenDao tokenDao, RoleDao roleDao, UserRoleDao userRoleDao) {
+  public UserService(
+      ImageService2 imageService2,
+      UserDao userDao,
+      TokenDao tokenDao,
+      RoleDao roleDao,
+      UserRoleDao userRoleDao) {
+    this.imageService2 = imageService2;
     this.userDao = userDao;
     this.tokenDao = tokenDao;
     this.roleDao = roleDao;
@@ -61,7 +70,8 @@ public class UserService {
     if (!password.equals(confirmedPassword)) {
       return UserFacingConstantsKey.PASSWORD_CONFIRMATION;
     }
-
+    var defaultImage =
+        imageService2.loadImageFromDisk(ConstantsContainer.USER_DEFAULT_PROFILE_PATH, "PNG");
     var encryptedPassword = EncryptHelper.getMd5String(password);
     UserEntity user =
         UserEntityBuilder.newBuilder()
@@ -70,6 +80,7 @@ public class UserService {
             .setEncryptedPassword(encryptedPassword)
             .setEmail(email)
             .setOrganization(organization)
+            .setProfileImage(ArrayUtils.toObject(defaultImage))
             .build();
     userDao.insert(user);
     // newly registered users are default to have role: "USER"
@@ -161,10 +172,6 @@ public class UserService {
   }
 
   public Set<String> assignRoleToUser(UUID userId, Set<String> roles) {
-    //    var user =
-    //        userDao
-    //            .findById(userId)
-    //            .orElseThrow(ExceptionUtils.notFound("user with id %s not found", userId));
     var roleEntities = roleDao.listAllRoles();
     var roleNameFullSet =
         roleEntities.stream()
