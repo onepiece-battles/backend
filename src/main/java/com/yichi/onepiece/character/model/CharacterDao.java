@@ -11,9 +11,9 @@ import org.apache.ibatis.annotations.Select;
 @Dao
 @Mapper
 public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
-  @Select("SELECT * FROM character_entity LIMIT #{offset}, #{size}")
+  @Select("SELECT * FROM character LIMIT #{offset}, #{size}")
   List<CharacterEntity> listCharacters(@Param("offset") int offset, @Param("size") int size);
 
-  @Select("SELECT COUNT(id) FROM character_entity")
+  @Select("SELECT COUNT(id) FROM character")
   int countCharacter();
 }

@@ -4,6 +4,7 @@ import com.yichi.infra.support.mybatis.annotations.Dao;
 import com.yichi.infra.support.mybatis.dao.BaseDao;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -23,4 +24,8 @@ public interface RoleResourceDao extends BaseDao<RoleResourceEntity, UUID> {
     "</script>"
   })
   List<RoleResourceEntity> listRoleResourceByRoleIds(@Param("roleIds") Collection<UUID> roleIds);
+
+  @Select("SELECT * FROM role_resource WHERE role_id = #{role_id} AND resource_id = #{resource_id}")
+  Optional<RoleResourceEntity> findByRoleIdAndResourceId(
+      @Param("role_id") UUID roleId, @Param("resource_id") UUID resourceId);
 }
