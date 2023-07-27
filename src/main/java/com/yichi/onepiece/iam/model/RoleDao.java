@@ -16,19 +16,22 @@ public interface RoleDao extends BaseDao<RoleEntity, UUID> {
     "<script>",
     "SELECT *",
     "FROM role ",
-    "WHERE role.name in ",
-    "<foreach item='item' collection='roleNames' open='(' separator=',' close=')'>",
+    "WHERE role.name IN ",
+    "<foreach item='item' collection='names' open='(' separator=',' close=')'>",
     "  #{item}",
     "</foreach>",
     "</script>"
   })
-  List<RoleEntity> listRoleByRoleNames(@Param("roleNames") Collection<String> roleNames);
+  List<RoleEntity> listRoleByRoleNames(@Param("names") Collection<String> names);
 
   @Select("SELECT * FROM role")
   List<RoleEntity> listAllRoles();
 
-  @Select("SELECT * FROM role WHERE name = #{roleName}")
-  Optional<RoleEntity> findByRoleName(@Param("roleName") String roleName);
+  @Select("SELECT name FROM role")
+  Set<String> listAllRoleNames();
+
+  @Select("SELECT * FROM role WHERE role.name = #{name} LIMIT 1")
+  Optional<RoleEntity> findByRoleName(@Param("name") String name);
 
   @Select(
       "SELECT DISTINCT name FROM role where id in (SELECT role_id FROM user_role WHERE"

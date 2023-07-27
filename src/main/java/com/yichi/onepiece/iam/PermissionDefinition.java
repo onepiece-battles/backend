@@ -1,11 +1,10 @@
 package com.yichi.onepiece.iam;
 
 import com.yichi.onepiece.exception.ExceptionUtils;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.yichi.onepiece.user.model.UserRole;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,10 +68,62 @@ public class PermissionDefinition {
     BATTLE_DELETE,
   }
 
+  public static final EnumMap<UserRole, Set<PermissionEnum>> ROLE_TO_PERMISSION_MAP =
+      new EnumMap<>(
+          Map.ofEntries(
+              Map.entry(
+                  UserRole.VISITOR,
+                  getAllGetPermissions().stream()
+                      .filter(
+                          permissionEnum ->
+                              !Set.of(PermissionEnum.USER_GET, PermissionEnum.ROLE_GET)
+                                  .contains(permissionEnum))
+                      .collect(Collectors.toSet())),
+              Map.entry(
+                  UserRole.USER,
+                  Stream.concat(
+                          Stream.concat(
+                              Stream.of(PermissionEnum.USER_GET, PermissionEnum.USER_UPDATE),
+                              getAllCharacterPermissions().stream()),
+                          Stream.concat(
+                              getAllBattlePermissions().stream(),
+                              getAllFruitPermissions().stream()))
+                      .collect(Collectors.toSet())),
+              Map.entry(
+                  UserRole.NIKA,
+                  Arrays.stream(PermissionEnum.values()).collect(Collectors.toSet())),
+              Map.entry(
+                  UserRole.ADMIN,
+                  Stream.concat(
+                          Stream.concat(
+                              Stream.of(
+                                  PermissionEnum.USER_GET,
+                                  PermissionEnum.USER_UPDATE,
+                                  PermissionEnum.USER_LIST),
+                              getAllCharacterPermissions().stream()),
+                          Stream.concat(
+                              getAllBattlePermissions().stream(),
+                              getAllFruitPermissions().stream()))
+                      .collect(Collectors.toSet()))));
+
   public static Map<String, Set<String>> getResourcePermissionMap() {
     return Arrays.stream(ResourceEnum.values())
         .map(ResourceEnum::toString)
         .collect(Collectors.toMap(value -> value, PermissionDefinition::getPermissionByResource));
+  }
+
+  public static Map<String, Set<String>> getResourcePermissionMapByPermissionSet(
+      Set<PermissionEnum> permissions) {
+    Map<String, Set<String>> resourcePermissionMap = new HashMap<>();
+    for (var permission : permissions) {
+      String[] result = permission.toString().split("_");
+      var resourceValue = result[0];
+      var permissionValue = result[1];
+      var currentSet = resourcePermissionMap.getOrDefault(resourceValue, new HashSet<>());
+      currentSet.add(permissionValue);
+      resourcePermissionMap.put(resourceValue, currentSet);
+    }
+    return resourcePermissionMap;
   }
 
   private static Set<String> getPermissionByResource(String resource) {
@@ -95,55 +146,55 @@ public class PermissionDefinition {
     return Arrays.stream(PermissionEnum.values()).map(Enum::toString).collect(Collectors.toList());
   }
 
-  public static List<PermissionDefinition.PermissionEnum> getAllPermissionEnums() {
-    return Arrays.stream(PermissionEnum.values()).collect(Collectors.toList());
+  public static Set<PermissionEnum> getAllPermissionEnums() {
+    return Arrays.stream(PermissionEnum.values()).collect(Collectors.toSet());
   }
 
-  public static List<PermissionEnum> getAllCharacterPermissions() {
+  public static Set<PermissionEnum> getAllCharacterPermissions() {
     return Arrays.stream(PermissionEnum.values())
         .filter(value -> value.toString().startsWith(CHARACTER_PREFIX))
-        .collect(Collectors.toList());
+        .collect(Collectors.toSet());
   }
 
-  public static List<PermissionEnum> getAllFruitPermissions() {
+  public static Set<PermissionEnum> getAllFruitPermissions() {
     return Arrays.stream(PermissionEnum.values())
         .filter(value -> value.toString().startsWith(FRUIT_PREFIX))
-        .collect(Collectors.toList());
+        .collect(Collectors.toSet());
   }
 
-  public static List<PermissionEnum> getAllBattlePermissions() {
+  public static Set<PermissionEnum> getAllBattlePermissions() {
     return Arrays.stream(PermissionEnum.values())
         .filter(value -> value.toString().startsWith(BATTLE_PREFIX))
-        .collect(Collectors.toList());
+        .collect(Collectors.toSet());
   }
 
-  public static List<PermissionEnum> getAllCreatePermissions() {
+  public static Set<PermissionEnum> getAllCreatePermissions() {
     return Arrays.stream(PermissionEnum.values())
         .filter(value -> value.toString().endsWith(CREATE_SUFFIX))
-        .collect(Collectors.toList());
+        .collect(Collectors.toSet());
   }
 
-  public static List<PermissionEnum> getAllGetPermissions() {
+  public static Set<PermissionEnum> getAllGetPermissions() {
     return Arrays.stream(PermissionEnum.values())
         .filter(value -> value.toString().endsWith(GET_SUFFIX))
-        .collect(Collectors.toList());
+        .collect(Collectors.toSet());
   }
 
-  public static List<PermissionEnum> getAllListPermissions() {
+  public static Set<PermissionEnum> getAllListPermissions() {
     return Arrays.stream(PermissionEnum.values())
         .filter(value -> value.toString().endsWith(LIST_SUFFIX))
-        .collect(Collectors.toList());
+        .collect(Collectors.toSet());
   }
 
-  public static List<PermissionEnum> getAllUpdatePermissions() {
+  public static Set<PermissionEnum> getAllUpdatePermissions() {
     return Arrays.stream(PermissionEnum.values())
         .filter(value -> value.toString().endsWith(UPDATE_SUFFIX))
-        .collect(Collectors.toList());
+        .collect(Collectors.toSet());
   }
 
-  public static List<PermissionEnum> getAllDeletePermissions() {
+  public static Set<PermissionEnum> getAllDeletePermissions() {
     return Arrays.stream(PermissionEnum.values())
         .filter(value -> value.toString().endsWith(DELETE_SUFFIX))
-        .collect(Collectors.toList());
+        .collect(Collectors.toSet());
   }
 }
