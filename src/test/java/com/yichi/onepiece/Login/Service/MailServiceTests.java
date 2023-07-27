@@ -16,7 +16,6 @@ public class MailServiceTests extends AbstractTestNGSpringContextTests {
 
   @Test
   public void testSendEmail() throws MessagingException {
-    String sunnyPath = "src/test/resources/email_resources/sunny.png";
     String subject = "Test Email From OnePiece Battles";
     String toEmail = "zhangyichiwind@163.com";
     String body = "<h1>Welcome to OnePiece Battles!</h1>";

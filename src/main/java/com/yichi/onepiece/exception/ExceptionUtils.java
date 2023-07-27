@@ -28,4 +28,9 @@ public class ExceptionUtils {
       String baseMessage, Object... args) {
     return new PermissionEnumFormatException(Strings.lenientFormat(baseMessage, args));
   }
+
+  public static ImageFormatException unexpectedImageFormat(
+      String baseMessage, String imagePath, String imageFormat) {
+    return new ImageFormatException(Strings.lenientFormat(baseMessage, imagePath, imageFormat));
+  }
 }

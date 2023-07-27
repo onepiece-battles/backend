@@ -5,11 +5,14 @@ import com.yichi.onepiece.fruits.service.FruitService;
 import com.yichi.onepiece.model.ImageType;
 import com.yichi.onepiece.user.service.UserService;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ImageService {
+  private static final Logger logger = LoggerFactory.getLogger(ImageService.class);
   private final CharacterService characterService;
   private final FruitService fruitService;
   private final UserService userService;
