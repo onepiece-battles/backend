@@ -8,7 +8,6 @@ import com.yichi.onepiece.BaseServiceTests;
 import com.yichi.onepiece.iam.model.RoleDao;
 import com.yichi.onepiece.iam.model.TokenDao;
 import com.yichi.onepiece.iam.model.UserRoleDao;
-import com.yichi.onepiece.image.service.ImageService2;
 import com.yichi.onepiece.model.LogoutResponse;
 import com.yichi.onepiece.user.model.UserDao;
 import com.yichi.onepiece.user.service.UserService;
@@ -25,11 +24,9 @@ public class UserServiceTests extends BaseServiceTests {
   @Mock private RoleDao roleDao;
   @Mock private UserRoleDao userRoleDao;
 
-  @Mock private ImageService2 imageService;
-
   @BeforeMethod
   public void setup() {
-    userService = new UserService(imageService, userDao, tokenDao, roleDao, userRoleDao);
+    userService = new UserService(userDao, tokenDao, roleDao, userRoleDao);
   }
 
   @Test
