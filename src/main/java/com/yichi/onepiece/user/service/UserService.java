@@ -7,7 +7,7 @@ import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.*;
 import com.yichi.onepiece.constants.ConstantsContainer;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.iam.model.*;
-import com.yichi.onepiece.image.service.ImageService2;
+import com.yichi.onepiece.image.service.ImageUtil;
 import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.LoginResponse;
 import com.yichi.onepiece.model.LogoutResponse;
@@ -26,20 +26,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class UserService {
-  private final ImageService2 imageService2;
   private final UserDao userDao;
   private final TokenDao tokenDao;
 
   private final RoleDao roleDao;
   private final UserRoleDao userRoleDao;
 
-  public UserService(
-      ImageService2 imageService2,
-      UserDao userDao,
-      TokenDao tokenDao,
-      RoleDao roleDao,
-      UserRoleDao userRoleDao) {
-    this.imageService2 = imageService2;
+  public UserService(UserDao userDao, TokenDao tokenDao, RoleDao roleDao, UserRoleDao userRoleDao) {
     this.userDao = userDao;
     this.tokenDao = tokenDao;
     this.roleDao = roleDao;
@@ -71,7 +64,7 @@ public class UserService {
       return UserFacingConstantsKey.PASSWORD_CONFIRMATION;
     }
     var defaultImage =
-        imageService2.loadImageFromDisk(ConstantsContainer.USER_DEFAULT_PROFILE_PATH, "PNG");
+        ImageUtil.loadImageFromDisk(ConstantsContainer.USER_DEFAULT_PROFILE_PATH, "PNG");
     var encryptedPassword = EncryptHelper.getMd5String(password);
     UserEntity user =
         UserEntityBuilder.newBuilder()
