@@ -13,6 +13,8 @@ import org.apache.ibatis.annotations.Update;
 @Dao
 @Mapper
 public interface TokenDao extends BaseDao<TokenEntity, UUID> {
+  String LIST_TOKENS_BY_USER_ID = "com.yichi.onepiece.iam.model.TokenDao.listTokenByUserId";
+
   @Select("SELECT * FROM token WHERE id = #{userId}")
   List<TokenEntity> listTokenByUserId(@Param("userId") UUID userId);
 
@@ -20,5 +22,5 @@ public interface TokenDao extends BaseDao<TokenEntity, UUID> {
   Optional<TokenEntity> findByTokenValue(@Param("tokenValue") String tokenValue);
 
   @Update("UPDATE token t SET t.revoked = 'true', t.expired = 'true' where t.user_id = #{userId}")
-  void revokeAllUserTokensByUserId(@Param("userID") UUID userId);
+  void revokeAllUserTokensByUserId(@Param("userId") UUID userId);
 }
