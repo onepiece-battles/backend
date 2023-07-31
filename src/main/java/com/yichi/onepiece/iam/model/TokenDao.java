@@ -21,6 +21,6 @@ public interface TokenDao extends BaseDao<TokenEntity, UUID> {
   @Select("SELECT * FROM token WHERE token.token_value = #{tokenValue}")
   Optional<TokenEntity> findByTokenValue(@Param("tokenValue") String tokenValue);
 
-  @Update("UPDATE token t SET t.revoked = 'true', t.expired = 'true' where t.user_id = #{userId}")
+  @Update("UPDATE token t SET t.revoked = true, t.expired = true where t.user_id = #{userId}")
   void revokeAllUserTokensByUserId(@Param("userId") UUID userId);
 }

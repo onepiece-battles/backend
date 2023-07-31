@@ -111,22 +111,6 @@ public class UserService {
       return new LoginResponse().verification(verification);
     }
     var user = userDetail.get();
-    logger.info(user.toString());
-    if (UserAccountCondition.SignIn.equals(user.getAccountCondition())) {
-      return new LoginResponse()
-          .verification(null)
-          .user(
-              new User()
-                  .id(user.getId())
-                  .name(user.getName())
-                  .tokens(
-                      user.getTokens().stream()
-                          .map(TokenEntity::getTokenValue)
-                          .collect(Collectors.toList()))
-                  .userRoles(user.getUserRoles())
-                  .organization(user.getOrganization()));
-    }
-
     var jwtToken = JwtHelper.generateAccessToken(user);
     var jwtRefreshToken = JwtHelper.generateRefreshToken(user);
 
