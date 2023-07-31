@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -116,13 +115,14 @@ public class UserService {
     if (UserAccountCondition.SignIn.equals(user.getAccountCondition())) {
       return new LoginResponse()
           .verification(null)
-          .userInfo(
+          .user(
               new User()
                   .id(user.getId())
                   .name(user.getName())
-                  .profileImage(
-                      new ByteArrayResource(
-                          Objects.requireNonNull(ArrayUtils.toPrimitive(user.getProfileImage()))))
+                  .tokens(
+                      user.getTokens().stream()
+                          .map(TokenEntity::getTokenValue)
+                          .collect(Collectors.toList()))
                   .userRoles(user.getUserRoles())
                   .organization(user.getOrganization()));
     }
@@ -148,13 +148,14 @@ public class UserService {
         .verification(null)
         .accessToken(jwtToken)
         .refreshToken(jwtRefreshToken)
-        .userInfo(
+        .user(
             new User()
                 .id(user.getId())
                 .name(user.getName())
-                .profileImage(
-                    new ByteArrayResource(
-                        Objects.requireNonNull(ArrayUtils.toPrimitive(user.getProfileImage()))))
+                .tokens(
+                    user.getTokens().stream()
+                        .map(TokenEntity::getTokenValue)
+                        .collect(Collectors.toList()))
                 .userRoles(user.getUserRoles())
                 .organization(user.getOrganization()));
   }
