@@ -10,10 +10,12 @@ import com.yichi.onepiece.iam.model.TokenDao;
 import com.yichi.onepiece.iam.model.UserRoleDao;
 import com.yichi.onepiece.model.LogoutResponse;
 import com.yichi.onepiece.user.model.UserDao;
+import com.yichi.onepiece.user.model.UserDetailDao;
 import com.yichi.onepiece.user.service.UserService;
 import java.util.Optional;
 import java.util.UUID;
 import org.mockito.Mock;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -23,10 +25,13 @@ public class UserServiceTests extends BaseServiceTests {
   @Mock private TokenDao tokenDao;
   @Mock private RoleDao roleDao;
   @Mock private UserRoleDao userRoleDao;
+  @Mock private PasswordEncoder passwordEncoder;
+  @Mock private UserDetailDao userDetailDao;
 
   @BeforeMethod
   public void setup() {
-    userService = new UserService(userDao, tokenDao, roleDao, userRoleDao);
+    userService =
+        new UserService(userDao, userDetailDao, tokenDao, roleDao, userRoleDao, passwordEncoder);
   }
 
   @Test

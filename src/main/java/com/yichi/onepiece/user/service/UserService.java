@@ -15,28 +15,42 @@ import com.yichi.onepiece.model.User;
 import com.yichi.onepiece.user.model.*;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
-import com.yichi.onepiece.utils.EncryptHelper;
 import com.yichi.onepiece.utils.JwtHelper;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class UserService {
+  private final Logger logger = LoggerFactory.getLogger(UserService.class);
   private final UserDao userDao;
+  private final UserDetailDao userDetailDao;
   private final TokenDao tokenDao;
 
   private final RoleDao roleDao;
   private final UserRoleDao userRoleDao;
+  private final PasswordEncoder passwordEncoder;
 
-  public UserService(UserDao userDao, TokenDao tokenDao, RoleDao roleDao, UserRoleDao userRoleDao) {
+  public UserService(
+      UserDao userDao,
+      UserDetailDao userDetailDao,
+      TokenDao tokenDao,
+      RoleDao roleDao,
+      UserRoleDao userRoleDao,
+      PasswordEncoder passwordEncoder) {
     this.userDao = userDao;
+    this.userDetailDao = userDetailDao;
     this.tokenDao = tokenDao;
     this.roleDao = roleDao;
     this.userRoleDao = userRoleDao;
+    this.passwordEncoder = passwordEncoder;
   }
 
   /**
@@ -65,7 +79,7 @@ public class UserService {
     }
     var defaultImage =
         ImageUtil.loadImageFromDisk(ConstantsContainer.USER_DEFAULT_PROFILE_PATH, "PNG");
-    var encryptedPassword = EncryptHelper.getMd5String(password);
+    var encryptedPassword = passwordEncoder.encode(password);
     UserEntity user =
         UserEntityBuilder.newBuilder()
             .setName(name)
@@ -91,13 +105,27 @@ public class UserService {
   }
 
   public LoginResponse login(String name) {
-    var users = userDao.listByName(name);
+    var userDetail = userDetailDao.getUserDetailByName(name);
     I18nText verification;
-    if (users.isEmpty()) {
+    if (userDetail.isEmpty()) {
       verification = UserFacingConstants.getConstant(REGISTER_FIRST_BEFORE_LOGIN).getDisplayName();
       return new LoginResponse().verification(verification);
     }
-    var user = (UserDetailImpl) users.get(0);
+    var user = userDetail.get();
+    logger.info(user.toString());
+    if (UserAccountCondition.SignIn.equals(user.getAccountCondition())) {
+      return new LoginResponse()
+          .verification(null)
+          .userInfo(
+              new User()
+                  .id(user.getId())
+                  .name(user.getName())
+                  .profileImage(
+                      new ByteArrayResource(
+                          Objects.requireNonNull(ArrayUtils.toPrimitive(user.getProfileImage()))))
+                  .userRoles(user.getUserRoles())
+                  .organization(user.getOrganization()));
+    }
 
     var jwtToken = JwtHelper.generateAccessToken(user);
     var jwtRefreshToken = JwtHelper.generateRefreshToken(user);
@@ -114,18 +142,21 @@ public class UserService {
             .setRevoked(false)
             .build();
     tokenDao.insert(tokenEntity);
-
-    var userLogin = user.toBuilder().setAccountCondition(UserAccountCondition.SignIn).build();
-    userDao.update(userLogin);
+    user.setAccountCondition(UserAccountCondition.SignIn);
+    userDetailDao.update(user);
     return new LoginResponse()
         .verification(null)
         .accessToken(jwtToken)
         .refreshToken(jwtRefreshToken)
         .userInfo(
             new User()
-                .id(userLogin.getId())
-                .name(userLogin.getName())
-                .organization(userLogin.getOrganization()));
+                .id(user.getId())
+                .name(user.getName())
+                .profileImage(
+                    new ByteArrayResource(
+                        Objects.requireNonNull(ArrayUtils.toPrimitive(user.getProfileImage()))))
+                .userRoles(user.getUserRoles())
+                .organization(user.getOrganization()));
   }
 
   public LogoutResponse logout(UUID userId) {

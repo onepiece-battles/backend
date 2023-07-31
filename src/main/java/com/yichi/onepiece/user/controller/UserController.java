@@ -10,6 +10,8 @@ import com.yichi.onepiece.user.model.UserEntity;
 import com.yichi.onepiece.user.service.UserService;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 public class UserController implements UserApi {
+  private final Logger logger = LoggerFactory.getLogger(UserController.class);
   private final UserService userService;
   private final IamService iamService;
   private final AuthenticationManager authenticationManager;
@@ -40,10 +43,13 @@ public class UserController implements UserApi {
 
   @Override
   public ResponseEntity<LoginResponse> login(LoginRequest loginRequest) {
+    logger.info("user start login");
     var userName = loginRequest.getUserName();
     var password = loginRequest.getPassword();
+    logger.info("user name {} password {}", userName, password);
     // Authenticate username and password with registered information.
     authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, password));
+    logger.info("authenticate finished");
     var loginResponse = userService.login(userName);
     return ResponseEntity.ok(loginResponse);
   }

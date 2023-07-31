@@ -3,6 +3,7 @@ package com.yichi.onepiece.utils;
 import static com.yichi.onepiece.constants.JwtConstants.ACCESS_TOKEN_EXPIRATION_PERIOD;
 import static com.yichi.onepiece.constants.JwtConstants.REFRESH_TOKEN_EXPIRATION_PERIOD;
 
+import com.yichi.onepiece.user.model.UserEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -18,12 +19,12 @@ public class JwtHelper {
   private static final String SECRET_KEY =
       "REDACTED";
 
-  public static String generateAccessToken(UserDetails userDetails) {
-    return buildToken(userDetails, ACCESS_TOKEN_EXPIRATION_PERIOD);
+  public static String generateAccessToken(UserEntity user) {
+    return buildToken(user, ACCESS_TOKEN_EXPIRATION_PERIOD);
   }
 
-  public static String generateRefreshToken(UserDetails userDetails) {
-    return buildToken(userDetails, REFRESH_TOKEN_EXPIRATION_PERIOD);
+  public static String generateRefreshToken(UserEntity user) {
+    return buildToken(user, REFRESH_TOKEN_EXPIRATION_PERIOD);
   }
 
   public static boolean isTokenValid(String token, UserDetails userDetails) {
@@ -41,10 +42,10 @@ public class JwtHelper {
    * @param userDetails user detail information.
    * @return User access token.
    */
-  private static String buildToken(UserDetails userDetails, Integer expirationPeriod) {
+  private static String buildToken(UserEntity user, Integer expirationPeriod) {
     return Jwts.builder()
         .setClaims(new HashMap<>())
-        .setSubject(userDetails.getUsername())
+        .setSubject(user.getName())
         .setIssuedAt(new Date(System.currentTimeMillis()))
         .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_PERIOD))
         .signWith(getSignInKey(), SignatureAlgorithm.HS256)

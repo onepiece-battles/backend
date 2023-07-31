@@ -148,6 +148,28 @@ ALTER TABLE `role_resource` ADD CONSTRAINT `fk_role_resource_role_id__role_id`
   FOREIGN KEY(`role_id`) REFERENCES `role`(`id`);
 ```
 
+## token
+
+```sql
+CREATE TABLE `token`(
+    `id` BINARY(16) NOT NULL,
+    `token_value` VARCHAR(255) NOT NULL,
+    `token_type` VARCHAR(255) NOT NULL,
+    `revoked` TINYINT NOT NULL,
+    `expired` TINYINT NOT NULL,
+    `user_id` BINARY(16) NOT NULL
+);
+```
+
+```sql
+ALTER TABLE `token` ADD CONSTRAINT PRIMARY KEY(`id`);
+```
+
+```sql
+ALTER TABLE `token` ADD CONSTRAINT `fk_token_user_id__user_id`
+  FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
+```
+
 ## user
 
 ```sql
