@@ -3,8 +3,11 @@ package com.yichi.onepiece.character.service;
 import com.yichi.onepiece.character.model.CharacterDao;
 import com.yichi.onepiece.character.model.CharacterEntity;
 import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
+import com.yichi.onepiece.constants.ConstantsContainer;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruits.service.FruitService;
+import com.yichi.onepiece.iam.IamService;
+import com.yichi.onepiece.image.service.ImageUtil;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.model.Character;
 import java.io.IOException;
@@ -22,16 +25,28 @@ public class CharacterService {
 
   private final CharacterDao characterDao;
   private final FruitService fruitService;
+  private final IamService iamService;
 
-  public CharacterService(CharacterDao CharacterDao, FruitService fruitService) {
+  public CharacterService(
+      CharacterDao CharacterDao, FruitService fruitService, IamService iamService) {
     this.characterDao = CharacterDao;
     this.fruitService = fruitService;
+    this.iamService = iamService;
   }
 
   public Character addCharacter(AddCharacterRequest request) {
     var characterEntity = CharacterEntityConverter.INSTANCE.toCharacterEntity(request);
     // character does not eat any fruit by default.
-    characterEntity = characterEntity.toBuilder().setHasFruits(false).setFruits(List.of()).build();
+    characterEntity =
+        characterEntity.toBuilder()
+            .setUserId(iamService.getCurrentUserId())
+            .setProfileImage(
+                ArrayUtils.toObject(
+                    ImageUtil.loadImageFromDisk(
+                        ConstantsContainer.USER_DEFAULT_PROFILE_PATH, "PNG")))
+            .setHasFruits(false)
+            .setFruits(List.of())
+            .build();
     characterDao.insert(characterEntity);
     var insertedEntity =
         characterDao

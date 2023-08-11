@@ -13,6 +13,8 @@ public interface CharacterEntity {
 
   UUID getId();
 
+  UUID getUserId();
+
   CharacterType getCharacterType();
 
   @Nullable

@@ -5,11 +5,15 @@ import com.yichi.onepiece.iam.PermissionDefinition;
 import com.yichi.onepiece.iam.model.*;
 import com.yichi.onepiece.user.model.UserRole;
 import java.util.*;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PrepareResourceAndPermissionData implements CommandLineRunner {
+  Logger logger = LoggerFactory.getLogger(PrepareResourceAndPermissionData.class);
   private final ResourceDao resourceDao;
   private final RoleDao roleDao;
   private final RoleResourceDao roleResourceDao;
@@ -44,6 +48,8 @@ public class PrepareResourceAndPermissionData implements CommandLineRunner {
       resourceDao.batchInsert(resourceNewEntities);
     }
     for (var resourceUpdatedEntity : resourceUpdatedEntities) {
+      logger.info("the resource entity is");
+      logger.info(resourceUpdatedEntity.toString());
       resourceDao.update(resourceUpdatedEntity);
     }
     // initialize role data
@@ -83,7 +89,13 @@ public class PrepareResourceAndPermissionData implements CommandLineRunner {
             RoleResourceEntityBuilder.newBuilder()
                 .setResourceId(resourceId)
                 .setRoleId(roleId)
-                .permissions(entry.getValue())
+                .permissions(
+                    entry.getValue().stream()
+                        .map(
+                            permission -> {
+                              return entry.getKey().trim() + "_" + permission.trim();
+                            })
+                        .collect(Collectors.toSet()))
                 .build();
         if (roleResourceEntityOptional.isEmpty()) {
           insertEntities.add(newEntity);
