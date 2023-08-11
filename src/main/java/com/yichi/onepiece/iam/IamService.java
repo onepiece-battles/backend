@@ -4,11 +4,11 @@ import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.exception.PermissionDeniedException;
 import com.yichi.onepiece.iam.PermissionDefinition.PermissionEnum;
 import com.yichi.onepiece.iam.model.*;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.yichi.onepiece.user.model.UserDetailImpl;
+import java.util.*;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class IamService {
+  Logger logger = LoggerFactory.getLogger(IamService.class);
   private final RoleDao roleDao;
   private final RoleResourceDao roleResourceDao;
   private final ResourceDao resourceDao;
@@ -24,6 +25,12 @@ public class IamService {
     this.roleDao = roleDao;
     this.roleResourceDao = roleResourceDao;
     this.resourceDao = resourceDao;
+  }
+
+  public UUID getCurrentUserId() {
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    UserDetailImpl userDetail = (UserDetailImpl) authentication.getPrincipal();
+    return userDetail.getId();
   }
 
   public void checkPermissionOfCurrentAccount(
@@ -67,15 +74,17 @@ public class IamService {
           String.format("Resource with type %s not found", resourceType));
     } else {
       var resourceEntity = resource.get();
-      var allPermissionsValidated =
+      var userPermissions =
           new HashSet<>(
-                  roleResourceEntities.stream()
-                      .filter(
-                          roleResourceEntity ->
-                              resourceEntity.getId().equals(resourceEntity.getId()))
-                      .flatMap(roleResourceEntity -> roleResourceEntity.getPermissions().stream())
-                      .toList())
-              .containsAll(permissionEnums);
+              roleResourceEntities.stream()
+                  .filter(
+                      roleResourceEntity -> resourceEntity.getId().equals(resourceEntity.getId()))
+                  .flatMap(roleResourceEntity -> roleResourceEntity.getPermissions().stream())
+                  .toList());
+      var requiredPermission = permissionEnums;
+      logger.info("user permissions: {}", userPermissions);
+      logger.info("required permissions: {}", requiredPermission);
+      var allPermissionsValidated = userPermissions.containsAll(permissionEnums);
       if (!allPermissionsValidated) {
         throw new PermissionDeniedException("Not all permissions are allowed");
       }

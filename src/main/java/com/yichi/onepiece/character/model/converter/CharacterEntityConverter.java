@@ -21,6 +21,7 @@ public interface CharacterEntityConverter {
   @Mapping(target = "profileImage", ignore = true)
   @Mapping(target = "fruits", ignore = true)
   @Mapping(target = "hasFruits", ignore = true)
+  @Mapping(target = "userId", ignore = true)
   CharacterEntity toCharacterEntity(AddCharacterRequest addCharacterRequest);
 
   default Resource blobToResource(Byte[] profileByteArray) {

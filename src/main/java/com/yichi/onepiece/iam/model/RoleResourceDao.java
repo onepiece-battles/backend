@@ -13,13 +13,23 @@ import org.apache.ibatis.annotations.Select;
 @Dao
 @Mapper
 public interface RoleResourceDao extends BaseDao<RoleResourceEntity, UUID> {
+  //  @Select({
+  //    "<script>",
+  //    " SELECT *",
+  //    " FROM role_resource",
+  //    " WHERE role_resource.role_id IN ",
+  //    " <foreach item='item' collection='roleIds' open='(' separator=',' close=')'>",
+  //    "   #{item}",
+  //    " </foreach>",
+  //    "</script>"
+  //  })
   @Select({
     "<script>",
     "SELECT *",
-    "FROM role_resource ",
-    "WHERE role_resource.role_id in ",
-    "<foreach item='item' collection='roleIds' open='(' separator=',' close=')'>",
-    "  #{item}",
+    "FROM role_resource",
+    "WHERE role_resource.role_id IN ",
+    "<foreach item='id' collection='roleIds' open='(' separator=',' close=')'>",
+    "  #{id}",
     "</foreach>",
     "</script>"
   })

@@ -8,6 +8,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -20,6 +22,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+  Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
   private final TokenDao tokenDao;
 
@@ -36,7 +39,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       @NonNull HttpServletResponse response,
       @NonNull FilterChain filterChain)
       throws ServletException, IOException {
+    logger.info("start jwt auth");
     String authentication = request.getHeader(JwtConstants.HTTP_HEADER_AUTH);
+    logger.info("the authentication is: {}", authentication);
     if (authentication == null
         || !authentication.startsWith(JwtConstants.HTTP_HEADER_AUTH_SCHEME)) {
       filterChain.doFilter(request, response);
