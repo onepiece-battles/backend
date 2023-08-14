@@ -40,6 +40,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       @NonNull FilterChain filterChain)
       throws ServletException, IOException {
     logger.info("start jwt auth");
+    var headerNames = request.getHeaderNames();
+    while (headerNames.hasMoreElements()) {
+      var headerName = headerNames.nextElement();
+      logger.info("header name: {}", headerName);
+      var headerInformation = request.getHeader(headerName);
+      logger.info("header info: {}", headerInformation);
+    }
     String authentication = request.getHeader(JwtConstants.HTTP_HEADER_AUTH);
     logger.info("the authentication is: {}", authentication);
     if (authentication == null
