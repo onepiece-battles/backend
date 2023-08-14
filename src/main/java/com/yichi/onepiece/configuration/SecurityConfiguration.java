@@ -9,6 +9,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -26,6 +28,20 @@ public class SecurityConfiguration {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
     httpSecurity
+        // this configuration is mainly for local env test, because the frontend is started on
+        // localhost:8081, thus need to tell spring security to allow request(with authentication)
+        // from
+        // http://127.0.0.1:8081 to pass.
+        .cors(
+            httpSecurityCorsConfigurer -> {
+              CorsConfiguration configuration = new CorsConfiguration();
+              configuration.addAllowedOriginPattern("http://127.0.0.1:8081");
+              configuration.addAllowedMethod("*");
+              configuration.addAllowedHeader("*");
+              configuration.setAllowCredentials(true);
+              UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+              source.registerCorsConfiguration("/**", configuration);
+            })
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(
             authorize -> {
