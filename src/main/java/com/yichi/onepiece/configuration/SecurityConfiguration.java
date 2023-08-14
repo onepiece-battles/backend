@@ -30,10 +30,7 @@ public class SecurityConfiguration {
         .authorizeHttpRequests(
             authorize -> {
               authorize
-                  .requestMatchers(
-                      "/api/onepiece/user/**",
-                      "/api/onepiece/image/**",
-                      "/api/onepiece/character/**")
+                  .requestMatchers("/api/onepiece/user/**")
                   .permitAll()
                   .anyRequest()
                   .authenticated();
