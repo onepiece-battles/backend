@@ -48,8 +48,6 @@ public class PrepareResourceAndPermissionData implements CommandLineRunner {
       resourceDao.batchInsert(resourceNewEntities);
     }
     for (var resourceUpdatedEntity : resourceUpdatedEntities) {
-      logger.info("the resource entity is");
-      logger.info(resourceUpdatedEntity.toString());
       resourceDao.update(resourceUpdatedEntity);
     }
     // initialize role data

@@ -6,10 +6,11 @@ import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
 import com.yichi.onepiece.constants.ConstantsContainer;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruits.service.FruitService;
-import com.yichi.onepiece.iam.IamService;
+import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.image.service.ImageUtil;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.model.Character;
+import com.yichi.onepiece.user.UserHelper;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -39,7 +40,7 @@ public class CharacterService {
     // character does not eat any fruit by default.
     characterEntity =
         characterEntity.toBuilder()
-            .setUserId(iamService.getCurrentUserId())
+            .setUserId(UserHelper.getCurrentUserId())
             .setProfileImage(
                 ArrayUtils.toObject(
                     ImageUtil.loadImageFromDisk(

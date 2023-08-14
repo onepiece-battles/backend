@@ -3,8 +3,8 @@ package com.yichi.onepiece.user.controller;
 import static com.yichi.onepiece.constants.ConstantsContainer.SUCCESS;
 
 import com.yichi.onepiece.api.UserApi;
-import com.yichi.onepiece.iam.IamService;
 import com.yichi.onepiece.iam.PermissionDefinition.PermissionEnum;
+import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.user.model.UserEntity;
 import com.yichi.onepiece.user.service.UserService;
