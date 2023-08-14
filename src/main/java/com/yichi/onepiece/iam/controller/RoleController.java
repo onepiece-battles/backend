@@ -1,9 +1,9 @@
 package com.yichi.onepiece.iam.controller;
 
 import com.yichi.onepiece.api.RoleApi;
-import com.yichi.onepiece.iam.IamService;
 import com.yichi.onepiece.iam.PermissionDefinition.PermissionEnum;
 import com.yichi.onepiece.iam.model.RoleEntity;
+import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.iam.service.RoleService;
 import com.yichi.onepiece.model.AddRoleRequest;
 import com.yichi.onepiece.model.AddRoleResponse;

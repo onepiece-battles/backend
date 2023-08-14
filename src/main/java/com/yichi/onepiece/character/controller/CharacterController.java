@@ -3,8 +3,8 @@ package com.yichi.onepiece.character.controller;
 import com.yichi.onepiece.api.CharacterApi;
 import com.yichi.onepiece.character.model.CharacterEntity;
 import com.yichi.onepiece.character.service.CharacterService;
-import com.yichi.onepiece.iam.IamService;
 import com.yichi.onepiece.iam.PermissionDefinition.PermissionEnum;
+import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.model.Character;
 import java.util.Set;
@@ -28,7 +28,6 @@ public class CharacterController implements CharacterApi {
         CharacterEntity.ENTITY_TYPE,
         Set.of(PermissionEnum.CHARACTER_CREATE, PermissionEnum.CHARACTER_GET));
     var characterEntity = characterService.addCharacter(addCharacterRequest);
-    System.out.println(characterEntity);
     return ResponseEntity.ok(characterEntity);
   }
 
