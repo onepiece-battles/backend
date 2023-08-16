@@ -14,7 +14,6 @@ import com.yichi.onepiece.user.UserHelper;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -120,17 +119,19 @@ public class CharacterService {
     return response;
   }
 
-  public List<Character> listCharacters(ListCharacterRequest request) {
+  public ListCharacterResponse listCharacters(ListCharacterRequest request) {
     var totalSize = characterDao.countCharacter();
     // pageIndex is 1- based. offset is 0- based.
     var offset = (request.getPageIndex() - 1) * request.getPageSize();
     if (offset >= totalSize || offset < 0) {
-      return List.of();
+      return new ListCharacterResponse().characters(List.of()).totalSize(totalSize);
     }
 
-    return characterDao.listCharacters(offset, request.getPageSize()).stream()
-        .map(CharacterEntityConverter.INSTANCE::toCharacter)
-        .collect(Collectors.toList());
+    var characterList =
+        characterDao.listCharacters(offset, request.getPageSize()).stream()
+            .map(CharacterEntityConverter.INSTANCE::toCharacter)
+            .toList();
+    return new ListCharacterResponse().characters(characterList).totalSize(totalSize);
   }
 
   public CharacterEntity getCharacterEntityById(UUID characterId) {
