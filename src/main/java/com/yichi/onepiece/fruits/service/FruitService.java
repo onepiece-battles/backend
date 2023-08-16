@@ -4,14 +4,10 @@ import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruits.model.FruitDao;
 import com.yichi.onepiece.fruits.model.FruitEntity;
 import com.yichi.onepiece.fruits.model.converter.FruitConverter;
-import com.yichi.onepiece.model.AddFruitRequest;
-import com.yichi.onepiece.model.Fruit;
-import com.yichi.onepiece.model.ListFruitRequest;
-import com.yichi.onepiece.model.UpdateFruitRequest;
+import com.yichi.onepiece.model.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,16 +26,18 @@ public class FruitService {
     return FruitConverter.INSTANCE.toFruit(fruitEntity);
   }
 
-  public List<Fruit> listFruit(ListFruitRequest request) {
+  public ListFruitResponse listFruit(ListFruitRequest request) {
     var totalSize = fruitDao.countFruit();
     // pageIndex is 1- based. offset is 0- based.
     var offset = (request.getPageIndex() - 1) * request.getPageSize();
     if (offset >= totalSize || offset < 0) {
-      return List.of();
+      return new ListFruitResponse().fruits(List.of()).totalSize(totalSize);
     }
-    return fruitDao.listFruits(offset, request.getPageSize()).stream()
-        .map(FruitConverter.INSTANCE::toFruit)
-        .collect(Collectors.toList());
+    var fruits =
+        fruitDao.listFruits(offset, request.getPageSize()).stream()
+            .map(FruitConverter.INSTANCE::toFruit)
+            .toList();
+    return new ListFruitResponse().totalSize(totalSize).fruits(fruits);
   }
 
   public Fruit updateFruit(UpdateFruitRequest request) {

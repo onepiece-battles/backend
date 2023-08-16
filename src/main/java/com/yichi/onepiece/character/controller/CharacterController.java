@@ -8,11 +8,14 @@ import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.model.Character;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
 @Controller
 public class CharacterController implements CharacterApi {
+  Logger logger = LoggerFactory.getLogger(CharacterController.class);
 
   private final CharacterService characterService;
   private final IamService iamService;
@@ -45,8 +48,7 @@ public class CharacterController implements CharacterApi {
       ListCharacterRequest listCharacterRequest) {
     iamService.checkPermissionOfCurrentAccount(
         CharacterEntity.ENTITY_TYPE, Set.of(PermissionEnum.CHARACTER_LIST));
-    ListCharacterResponse response = new ListCharacterResponse();
-    response.setCharacters(characterService.listCharacters(listCharacterRequest));
+    ListCharacterResponse response = characterService.listCharacters(listCharacterRequest);
     return ResponseEntity.ok(response);
   }
 }

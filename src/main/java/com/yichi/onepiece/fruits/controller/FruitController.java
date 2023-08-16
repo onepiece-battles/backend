@@ -21,8 +21,7 @@ public class FruitController implements FruitApi {
 
   @Override
   public ResponseEntity<ListFruitResponse> listFruit(ListFruitRequest listFruitRequest) {
-    ListFruitResponse response = new ListFruitResponse();
-    response.setFruits(fruitService.listFruit(listFruitRequest));
+    ListFruitResponse response = (fruitService.listFruit(listFruitRequest));
     return ResponseEntity.ok(response);
   }
 
