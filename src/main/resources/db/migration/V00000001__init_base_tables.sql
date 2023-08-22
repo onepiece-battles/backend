@@ -4,6 +4,7 @@ CREATE TABLE user (
     `name` VARCHAR(255),
     email VARCHAR(255),
     organization VARCHAR(255),
+    login_role VARCHAR(255),
     encrypted_password VARCHAR(100),
     account_condition VARCHAR(100),
     profile_image BLOB

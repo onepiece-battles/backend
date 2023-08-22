@@ -13,8 +13,8 @@ import org.springframework.core.io.Resource;
 public interface UserConverter {
   UserConverter INSTANCE = Mappers.getMapper(UserConverter.class);
 
-  @Mapping(target = "userRoles", ignore = true)
   @Mapping(target = "tokens", ignore = true)
+  @Mapping(target = "loginRoleResource", ignore = true)
   User toUser(UserEntity userEntity);
 
   @Mapping(target = "encryptedPassword", ignore = true)
