@@ -38,4 +38,8 @@ public interface RoleResourceDao extends BaseDao<RoleResourceEntity, UUID> {
   @Select("SELECT * FROM role_resource WHERE role_id = #{role_id} AND resource_id = #{resource_id}")
   Optional<RoleResourceEntity> findByRoleIdAndResourceId(
       @Param("role_id") UUID roleId, @Param("resource_id") UUID resourceId);
+
+  @Select("SELECT resource.name FROM role inner join role_resource ON (role.id = role_resource.role_id) inner join "
+      + "resource on (role_resource.resource_id = resource.id) where role.name = #{roleName}")
+  List<String> getResourceNamesByRoleName(@Param("roleName") String roleName);
 }
