@@ -37,7 +37,6 @@ public class BattleService {
             .setBattleType(BattleType.SINGLE)
             .setCharacterIdInitiator(request.getInitiateCharacterId())
             .setCharacterIdReceiver(request.getReceiverCharacterId())
-            .setActionTimestamp(System.currentTimeMillis())
             .build();
 
     battleDao.insert(battleEntity);
@@ -49,7 +48,6 @@ public class BattleService {
         .battleId(insertedEntity.getId())
         .userId(insertedEntity.getUserId())
         .type(insertedEntity.getBattleType())
-        .actionTimestamp(insertedEntity.getActionTimestamp())
         .initiateCharacterId(insertedEntity.getCharacterIdInitiator())
         .receiverCharacterId(insertedEntity.getCharacterIdReceiver());
   }
