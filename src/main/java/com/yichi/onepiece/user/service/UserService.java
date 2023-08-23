@@ -11,7 +11,7 @@ import com.yichi.onepiece.image.service.ImageUtil;
 import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.LoginResponse;
 import com.yichi.onepiece.model.LogoutResponse;
-import com.yichi.onepiece.model.User;
+import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.model.*;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
@@ -32,7 +32,7 @@ public class UserService {
   private final UserDao userDao;
   private final UserDetailDao userDetailDao;
   private final TokenDao tokenDao;
-
+  private final RoleResourceDao roleResourceDao;
   private final RoleDao roleDao;
   private final UserRoleDao userRoleDao;
   private final PasswordEncoder passwordEncoder;
@@ -41,12 +41,14 @@ public class UserService {
       UserDao userDao,
       UserDetailDao userDetailDao,
       TokenDao tokenDao,
+      RoleResourceDao roleResourceDao,
       RoleDao roleDao,
       UserRoleDao userRoleDao,
       PasswordEncoder passwordEncoder) {
     this.userDao = userDao;
     this.userDetailDao = userDetailDao;
     this.tokenDao = tokenDao;
+    this.roleResourceDao = roleResourceDao;
     this.roleDao = roleDao;
     this.userRoleDao = userRoleDao;
     this.passwordEncoder = passwordEncoder;
@@ -85,6 +87,8 @@ public class UserService {
             .setAccountCondition(UserAccountCondition.Registered)
             .setEncryptedPassword(encryptedPassword)
             .setEmail(email)
+            // USER role is the default login role
+            .setLoginRole(UserRole.USER.toString())
             .setOrganization(organization)
             .setProfileImage(ArrayUtils.toObject(defaultImage))
             .build();
@@ -128,20 +132,20 @@ public class UserService {
     tokenDao.insert(tokenEntity);
     user.setAccountCondition(UserAccountCondition.SignIn);
     userDetailDao.update(user);
+    var loginUserResource = roleResourceDao.getResourceNamesByRoleName(user.getLoginRole());
+    var tokens =
+        tokenDao.listTokenByUserId(user.getId()).stream()
+            .map(TokenEntity::getTokenValue)
+            .collect(Collectors.toList());
     return new LoginResponse()
         .verification(null)
         .accessToken(jwtToken)
         .refreshToken(jwtRefreshToken)
         .user(
-            new User()
-                .id(user.getId())
-                .name(user.getName())
-                .tokens(
-                    user.getTokens().stream()
-                        .map(TokenEntity::getTokenValue)
-                        .collect(Collectors.toList()))
-                .userRoles(user.getUserRoles())
-                .organization(user.getOrganization()));
+            UserConverter.INSTANCE
+                .toUser(user)
+                .loginRoleResources(loginUserResource)
+                .tokens(tokens));
   }
 
   public LogoutResponse logout(UUID userId) {
@@ -201,5 +205,15 @@ public class UserService {
               "Role name not found in db when assigning role to user %s", userId)
           .get();
     }
+  }
+
+  public List<String> updateLoginRole(String role) {
+    var user = UserHelper.getCurrentUserDetail();
+    if (!user.getUserRoles().contains(role)) {
+      ExceptionUtils.notFound("user role %s not found when shifting role.", role).get();
+    }
+    user.setLoginRole(role);
+    userDao.update(user);
+    return roleResourceDao.getResourceNamesByRoleName(role);
   }
 }

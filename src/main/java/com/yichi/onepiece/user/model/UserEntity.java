@@ -16,6 +16,8 @@ public interface UserEntity {
 
   String getOrganization();
 
+  String getLoginRole();
+
   String getEncryptedPassword();
 
   UserAccountCondition getAccountCondition();

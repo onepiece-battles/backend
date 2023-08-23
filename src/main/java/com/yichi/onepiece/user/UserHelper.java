@@ -11,7 +11,7 @@ public class UserHelper {
     return userDetail.getId();
   }
 
-  public static UserDetailImpl getCurrentUser() {
+  public static UserDetailImpl getCurrentUserDetail() {
     var authentication = SecurityContextHolder.getContext().getAuthentication();
     return (UserDetailImpl) authentication.getPrincipal();
   }

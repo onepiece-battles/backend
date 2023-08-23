@@ -78,4 +78,11 @@ public class UserController implements UserApi {
                     ? null
                     : UserFacingConstants.getConstant(verificationKey).getDisplayName()));
   }
+
+  @Override
+  public ResponseEntity<UpdateLoginRoleResponse> updateRole(UpdateLoginRoleRequest request) {
+    var resourceList = userService.updateLoginRole(request.getRole());
+    return ResponseEntity.ok(
+        new UpdateLoginRoleResponse().currentRole(request.getRole()).resources(resourceList));
+  }
 }

@@ -48,10 +48,14 @@ public class ActionRecordService {
     if (id != null) {
       actionRecordEntityBuilder.setId(id);
     }
-    var user = UserHelper.getCurrentUser();
-
-    actionRecordEntityBuilder.setUserId(user.getId());
-    actionRecordEntityBuilder.setUserName(user.getUsername());
+    var user = UserHelper.getCurrentUserDetail();
+    var roleEntity = roleService.getRoleByName(user.getLoginRole());
+    actionRecordEntityBuilder
+        .setUserId(user.getId())
+        .setUserName(user.getUsername())
+        .setRoleId(roleEntity.getId())
+        .setRoleName(roleEntity.getName())
+        .setActionTimestamp(clock.millis());
     return actionRecordEntityBuilder.build();
   }
 }

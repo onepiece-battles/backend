@@ -39,7 +39,7 @@ public class JwtHelper {
   /**
    * Generate user access token by user detail information.
    *
-   * @param userDetails user detail information.
+   * @param user user detail information.
    * @return User access token.
    */
   private static String buildToken(UserEntity user, Integer expirationPeriod) {

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import com.yichi.onepiece.BaseServiceTests;
 import com.yichi.onepiece.iam.model.RoleDao;
+import com.yichi.onepiece.iam.model.RoleResourceDao;
 import com.yichi.onepiece.iam.model.TokenDao;
 import com.yichi.onepiece.iam.model.UserRoleDao;
 import com.yichi.onepiece.model.LogoutResponse;
@@ -27,11 +28,19 @@ public class UserServiceTests extends BaseServiceTests {
   @Mock private UserRoleDao userRoleDao;
   @Mock private PasswordEncoder passwordEncoder;
   @Mock private UserDetailDao userDetailDao;
+  @Mock private RoleResourceDao roleResourceDao;
 
   @BeforeMethod
   public void setup() {
     userService =
-        new UserService(userDao, userDetailDao, tokenDao, roleDao, userRoleDao, passwordEncoder);
+        new UserService(
+            userDao,
+            userDetailDao,
+            tokenDao,
+            roleResourceDao,
+            roleDao,
+            userRoleDao,
+            passwordEncoder);
   }
 
   @Test

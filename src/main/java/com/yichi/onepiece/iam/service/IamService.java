@@ -5,6 +5,7 @@ import com.yichi.onepiece.exception.PermissionDeniedException;
 import com.yichi.onepiece.iam.PermissionDefinition;
 import com.yichi.onepiece.iam.PermissionDefinition.PermissionEnum;
 import com.yichi.onepiece.iam.model.*;
+import com.yichi.onepiece.user.UserHelper;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -45,11 +46,15 @@ public class IamService {
           String.format("unexpected authority type %s", authorities.get(0).getClass()));
     }
     var roleNames = authorities.stream().map(GrantedAuthority::getAuthority).toList();
+    var loginRole = UserHelper.getCurrentUserDetail().getLoginRole();
+    if (!roleNames.contains(loginRole)) {
+      ExceptionUtils.notFound("role name %s not found", loginRole).get();
+    }
     var permissionList =
         permissionEnums.stream()
             .map(PermissionDefinition.PermissionEnum::toString)
             .collect(Collectors.toSet());
-    checkPermission(resourceType, permissionList, roleNames);
+    checkPermission(resourceType, permissionList, List.of(loginRole));
   }
 
   private void checkPermission(
