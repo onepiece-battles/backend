@@ -80,9 +80,9 @@ public class UserController implements UserApi {
   }
 
   @Override
-  public ResponseEntity<UpdateLoginRoleResponse> updateRole(
-      UpdateLoginRoleRequest request) {
+  public ResponseEntity<UpdateLoginRoleResponse> updateRole(UpdateLoginRoleRequest request) {
     var resourceList = userService.updateLoginRole(request.getRole());
-    return ResponseEntity.ok(new UpdateLoginRoleResponse().currentRole(request.getRole()).resources(resourceList));
+    return ResponseEntity.ok(
+        new UpdateLoginRoleResponse().currentRole(request.getRole()).resources(resourceList));
   }
 }

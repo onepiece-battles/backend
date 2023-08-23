@@ -41,7 +41,8 @@ public class UserService {
       UserDao userDao,
       UserDetailDao userDetailDao,
       TokenDao tokenDao,
-      RoleResourceDao roleResourceDao, RoleDao roleDao,
+      RoleResourceDao roleResourceDao,
+      RoleDao roleDao,
       UserRoleDao userRoleDao,
       PasswordEncoder passwordEncoder) {
     this.userDao = userDao;
@@ -132,13 +133,19 @@ public class UserService {
     user.setAccountCondition(UserAccountCondition.SignIn);
     userDetailDao.update(user);
     var loginUserResource = roleResourceDao.getResourceNamesByRoleName(user.getLoginRole());
+    var tokens =
+        tokenDao.listTokenByUserId(user.getId()).stream()
+            .map(TokenEntity::getTokenValue)
+            .collect(Collectors.toList());
     return new LoginResponse()
         .verification(null)
         .accessToken(jwtToken)
         .refreshToken(jwtRefreshToken)
         .user(
-            UserConverter.INSTANCE.toUser(user).loginRoleResource(loginUserResource)
-           );
+            UserConverter.INSTANCE
+                .toUser(user)
+                .loginRoleResources(loginUserResource)
+                .tokens(tokens));
   }
 
   public LogoutResponse logout(UUID userId) {

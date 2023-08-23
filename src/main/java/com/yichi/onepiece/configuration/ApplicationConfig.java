@@ -1,6 +1,8 @@
 package com.yichi.onepiece.configuration;
 
 import com.yichi.onepiece.user.model.UserDetailDao;
+import java.time.Clock;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +20,12 @@ public class ApplicationConfig {
 
   public ApplicationConfig(UserDetailDao userDetailDao) {
     this.userDetailDao = userDetailDao;
+  }
+
+  @Bean
+  @Qualifier("onepieceClock")
+  public Clock onepieceClock() {
+    return Clock.systemUTC();
   }
 
   /*

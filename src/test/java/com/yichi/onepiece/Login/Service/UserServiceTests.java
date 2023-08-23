@@ -33,7 +33,14 @@ public class UserServiceTests extends BaseServiceTests {
   @BeforeMethod
   public void setup() {
     userService =
-        new UserService(userDao, userDetailDao, tokenDao, roleResourceDao, roleDao, userRoleDao, passwordEncoder);
+        new UserService(
+            userDao,
+            userDetailDao,
+            tokenDao,
+            roleResourceDao,
+            roleDao,
+            userRoleDao,
+            passwordEncoder);
   }
 
   @Test

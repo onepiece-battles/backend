@@ -15,6 +15,7 @@ public interface UserEntity {
   String getEmail();
 
   String getOrganization();
+
   String getLoginRole();
 
   String getEncryptedPassword();

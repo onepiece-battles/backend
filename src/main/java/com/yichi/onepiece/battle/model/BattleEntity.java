@@ -18,5 +18,5 @@ public interface BattleEntity {
 
   BattleType getBattleType();
 
-  Long getActionTimestamp();
+  Long getActionRecordId();
 }

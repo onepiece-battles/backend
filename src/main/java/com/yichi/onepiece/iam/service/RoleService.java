@@ -27,6 +27,10 @@ public class RoleService {
     return new AddRoleResponse().roleList(roleList);
   }
 
+  public RoleEntity getRoleByName(String roleName) {
+    return roleDao.findByRoleName(roleName).orElseThrow();
+  }
+
   public AssignResourceToRoleResponse assignResourceToRole(AssignResourceToRoleRequest request) {
     var roleId = request.getRoleId();
     var roleEntity =
