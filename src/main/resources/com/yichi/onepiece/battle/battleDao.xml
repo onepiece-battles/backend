@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yichi.onepiece.battle.model.BattleDao">
+  <select id="list" resultMap="com.yichi.onepiece.battle.model.BattleEntity">
+    SELECT * FROM battle
+    <include refid="battleFilter">
+      <property name="battle" value="filter"/>
+    </include>
+    ORDER BY
+    <include refid="orderClause"/>
+    LIMIT #{offset}, #{size}
+  </select>
+
+  <!-- Construct where clause -->
+  <sql id="battleFilter">
+    WHERE
+    <if test="battle.type != null and battle.type != ''">
+      <bind name="keyLike" value="'%' + battle.type + '%"/>
+      AND `type` like #{keyLike}
+    </if>
+    <if test="battle.status != null and battle.status != ''">
+      <bind name="keyLike" value="'%' + battle.status + '%"/>
+      AND `status` like #{keyLike}
+    </if>
+  </sql>
+
+  <!-- Construct order by clause -->
+  <sql id="orderClause">
+    <choose>
+      <when test="sortList == null or sortList.isEmpty">
+        creation_record_id DESC
+      </when>
+      <otherwise>
+        <foreach item="item" collection="sortList" separator=",">
+          ${item.sortKey} ${item.sortOrder}
+        </foreach>
+      </otherwise>
+    </choose>
+  </sql>
+</mapper>

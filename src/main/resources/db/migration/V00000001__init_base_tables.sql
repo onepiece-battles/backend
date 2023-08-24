@@ -70,8 +70,8 @@ ALTER TABLE `character` ADD CONSTRAINT fk_character__user_id
 CREATE TABLE battle (
     id BINARY(16) NOT NULL PRIMARY KEY,
     user_id BINARY(16) NOT NULL,
-    character_id_initiator BINARY(16) NOT NULL,
-    character_id_receiver BINARY(16) NOT NULL
+    starter_id BINARY(16) NOT NULL,
+    receiver_id BINARY(16) NOT NULL
 );
 ALTER TABLE battle ADD CONSTRAINT fk_battle__character_id_initiator
     FOREIGN KEY(character_id_initiator) REFERENCES `character`(id);

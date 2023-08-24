@@ -2,6 +2,7 @@ package com.yichi.onepiece.battle.service;
 
 import com.yichi.onepiece.battle.core.Battlefield;
 import com.yichi.onepiece.battle.core.CharacterInBattle;
+import com.yichi.onepiece.battle.model.BattleConverter;
 import com.yichi.onepiece.battle.model.BattleDao;
 import com.yichi.onepiece.battle.model.BattleEntity;
 import com.yichi.onepiece.battle.model.BattleEntityBuilder;
@@ -10,6 +11,7 @@ import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -41,9 +43,10 @@ public class BattleService {
         BattleEntityBuilder.newBuilder()
             .setUserId(request.getUserId())
             // this service focus on
-            .setBattleType(BattleType.SINGLE)
-            .setCharacterIdInitiator(request.getInitiateCharacterId())
-            .setCharacterIdReceiver(request.getReceiverCharacterId())
+            .setType(BattleType.SINGLE)
+            .setStatus(BattleStatus.CREATED)
+            .setStarterId(request.getStarterId())
+            .setReceiverId(request.getReceiverId())
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
             .build();
@@ -54,28 +57,46 @@ public class BattleService {
             .findById(battleEntity.getId())
             .orElseThrow(ExceptionUtils.notFound("Battle entity not found"));
     return new Battle()
-        .battleId(insertedEntity.getId())
+        .id(insertedEntity.getId())
         .userId(insertedEntity.getUserId())
-        .type(insertedEntity.getBattleType())
-        .initiateCharacterId(insertedEntity.getCharacterIdInitiator())
-        .receiverCharacterId(insertedEntity.getCharacterIdReceiver());
+        .type(insertedEntity.getType())
+        .starterId(insertedEntity.getStarterId())
+        .receiverId(insertedEntity.getReceiverId());
   }
+
+  public ListBattleResponse list(ListBattleRequest request) {
+    var totalSize = battleDao.count();
+    var offset = (request.getPageIndex() - 1) * request.getPageSize();
+    if (offset >= totalSize || offset < 0) {
+      return new ListBattleResponse().battles(List.of()).totalSize(totalSize);
+    }
+    var battleList =  battleDao.list(
+        request.getFruitFilter(),
+        request.getSortKeys(),
+        offset,
+        request.getPageSize()).stream().map(BattleConverter.INSTANCE::toBattle).collect(Collectors.toList());
+    return new ListBattleResponse().battles(battleList).totalSize(totalSize);
+  }
+
 
   public StartBattleResponse startBattle(UUID battleId) {
     var battle =
         battleDao
             .findById(battleId)
             .orElseThrow(ExceptionUtils.notFound("Battle with id %s not found", battleId));
-    UUID battleInitId = battle.getCharacterIdInitiator();
-    UUID battleRecId = battle.getCharacterIdReceiver();
+    // update status
+    var battleStarted = battle.toBuilder().setStatus(BattleStatus.STARTED).build();
+    battleDao.update(battleStarted);
+    UUID starterId = battle.getStarterId();
+    UUID receiverId = battle.getReceiverId();
     // prepare start character
-    var startCharacter = characterService.getCharacterEntityById(battleInitId);
+    var startCharacter = characterService.getCharacterEntityById(starterId);
     var startFruits = startCharacter.getFruits();
     var startFruitEntities =
         fruitService.getFruitsByIds(
             startFruits.stream().map(FruitInCharacter::getFruitId).collect(Collectors.toList()));
     // prepare receive character
-    var receiveCharacter = characterService.getCharacterEntityById(battleRecId);
+    var receiveCharacter = characterService.getCharacterEntityById(receiverId);
     var receiveFruits = receiveCharacter.getFruits();
     var receiveFruitEntities =
         fruitService.getFruitsByIds(
