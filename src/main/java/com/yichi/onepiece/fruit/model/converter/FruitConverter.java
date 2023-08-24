@@ -1,7 +1,7 @@
-package com.yichi.onepiece.fruits.model.converter;
+package com.yichi.onepiece.fruit.model.converter;
 
 import com.yichi.infra.support.EntityBuilder;
-import com.yichi.onepiece.fruits.model.FruitEntity;
+import com.yichi.onepiece.fruit.model.FruitEntity;
 import com.yichi.onepiece.model.AddFruitRequest;
 import com.yichi.onepiece.model.Fruit;
 import com.yichi.onepiece.model.UpdateFruitRequest;

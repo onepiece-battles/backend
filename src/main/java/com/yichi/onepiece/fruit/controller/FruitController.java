@@ -1,7 +1,7 @@
-package com.yichi.onepiece.fruits.controller;
+package com.yichi.onepiece.fruit.controller;
 
 import com.yichi.onepiece.api.FruitApi;
-import com.yichi.onepiece.fruits.service.FruitService;
+import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.model.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

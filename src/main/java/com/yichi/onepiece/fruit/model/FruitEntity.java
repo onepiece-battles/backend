@@ -1,4 +1,4 @@
-package com.yichi.onepiece.fruits.model;
+package com.yichi.onepiece.fruit.model;
 
 import com.yichi.infra.support.entity.Entity;
 import com.yichi.onepiece.model.FruitType;
