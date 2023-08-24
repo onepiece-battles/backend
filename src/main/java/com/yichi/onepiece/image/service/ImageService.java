@@ -1,7 +1,7 @@
 package com.yichi.onepiece.image.service;
 
 import com.yichi.onepiece.character.service.CharacterService;
-import com.yichi.onepiece.fruits.service.FruitService;
+import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.model.ImageType;
 import com.yichi.onepiece.user.service.UserService;
 import java.util.UUID;

@@ -1,9 +1,9 @@
-package com.yichi.onepiece.fruits.service;
+package com.yichi.onepiece.fruit.service;
 
 import com.yichi.onepiece.exception.ExceptionUtils;
-import com.yichi.onepiece.fruits.model.FruitDao;
-import com.yichi.onepiece.fruits.model.FruitEntity;
-import com.yichi.onepiece.fruits.model.converter.FruitConverter;
+import com.yichi.onepiece.fruit.model.FruitDao;
+import com.yichi.onepiece.fruit.model.FruitEntity;
+import com.yichi.onepiece.fruit.model.converter.FruitConverter;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class FruitService {
       return new ListFruitResponse().fruits(List.of()).totalSize(totalSize);
     }
     var fruits =
-        fruitDao.listFruits(offset, request.getPageSize()).stream()
+        fruitDao.listFruits(request.getFruitFilter(), request.getSortKeys(),offset, request.getPageSize()).stream()
             .map(FruitConverter.INSTANCE::toFruit)
             .toList();
     return new ListFruitResponse().totalSize(totalSize).fruits(fruits);

@@ -1,7 +1,7 @@
 package com.yichi.onepiece.battle.core;
 
 import com.yichi.onepiece.character.model.CharacterEntity;
-import com.yichi.onepiece.fruits.model.FruitEntity;
+import com.yichi.onepiece.fruit.model.FruitEntity;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;

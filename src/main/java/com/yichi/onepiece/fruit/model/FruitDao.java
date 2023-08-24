@@ -1,7 +1,10 @@
-package com.yichi.onepiece.fruits.model;
+package com.yichi.onepiece.fruit.model;
 
 import com.yichi.infra.support.mybatis.annotations.Dao;
 import com.yichi.infra.support.mybatis.dao.BaseDao;
+import com.yichi.onepiece.model.FruitFilter;
+import com.yichi.onepiece.model.FruitSortableField;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import org.apache.ibatis.annotations.Mapper;
@@ -12,8 +15,8 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface FruitDao extends BaseDao<FruitEntity, UUID> {
 
-  @Select("SELECT * FROM fruit LIMIT #{offset}, #{size}")
-  List<FruitEntity> listFruits(@Param("offset") int offset, @Param("size") int size);
+  // details see fruitDao.xml
+  List<FruitEntity> listFruits(@Param("filter")FruitFilter fruitFilter, @Param("sortList") Collection<FruitSortableField> sortList,@Param("offset") int offset, @Param("size") int size);
 
   @Select("SELECT COUNT(id) FROM fruit")
   int countFruit();

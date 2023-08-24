@@ -7,7 +7,7 @@ import com.yichi.onepiece.battle.model.BattleEntity;
 import com.yichi.onepiece.battle.model.BattleEntityBuilder;
 import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.exception.ExceptionUtils;
-import com.yichi.onepiece.fruits.service.FruitService;
+import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import java.util.UUID;
