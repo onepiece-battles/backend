@@ -15,6 +15,7 @@ public interface UserConverter {
 
   @Mapping(target = "tokens", ignore = true)
   @Mapping(target = "loginRoleResources", ignore = true)
+  @Mapping(target = "userRoles", ignore = true)
   User toUser(UserEntity userEntity);
 
   @Mapping(target = "encryptedPassword", ignore = true)

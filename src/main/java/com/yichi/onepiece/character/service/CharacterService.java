@@ -8,6 +8,7 @@ import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruits.service.FruitService;
 import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.image.service.ImageUtil;
+import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.model.Character;
 import com.yichi.onepiece.user.UserHelper;
@@ -25,17 +26,20 @@ public class CharacterService {
 
   private final CharacterDao characterDao;
   private final FruitService fruitService;
-  private final IamService iamService;
+  private final ActionRecordService actionRecordService;
 
   public CharacterService(
-      CharacterDao CharacterDao, FruitService fruitService, IamService iamService) {
+      CharacterDao CharacterDao,
+      FruitService fruitService,
+      ActionRecordService actionRecordService) {
     this.characterDao = CharacterDao;
     this.fruitService = fruitService;
-    this.iamService = iamService;
+    this.actionRecordService = actionRecordService;
   }
 
   public Character addCharacter(AddCharacterRequest request) {
     var characterEntity = CharacterEntityConverter.INSTANCE.toCharacterEntity(request);
+    var actionRecord = actionRecordService.create();
     // character does not eat any fruit by default.
     characterEntity =
         characterEntity.toBuilder()
@@ -46,6 +50,8 @@ public class CharacterService {
                         ConstantsContainer.USER_DEFAULT_PROFILE_PATH, "PNG")))
             .setHasFruits(false)
             .setFruits(List.of())
+            .setCreationRecordId(actionRecord.getId())
+            .setModificationRecordId(actionRecord.getId())
             .build();
     characterDao.insert(characterEntity);
     var insertedEntity =
@@ -64,11 +70,16 @@ public class CharacterService {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    var modificationRecord = actionRecordService.create();
     var character =
         characterDao
             .findById(characterId)
             .orElseThrow(ExceptionUtils.notFound("character with id %s not found", characterId));
-    var updatedCharacter = character.toBuilder().setProfileImage(profileByte).build();
+    var updatedCharacter =
+        character.toBuilder()
+            .setModificationRecordId(modificationRecord.getId())
+            .setProfileImage(profileByte)
+            .build();
     characterDao.update(updatedCharacter);
     return ArrayUtils.toPrimitive(updatedCharacter.getProfileImage());
   }
@@ -92,8 +103,13 @@ public class CharacterService {
     EatFruitResponse response = new EatFruitResponse();
     if (fruits == null) {
       // this character hasn't taken any fruit yet
+      var modificationRecord = actionRecordService.create();
       var characterEntityUpdated =
-          characterEntity.toBuilder().setHasFruits(true).setFruits(List.of(newFruit)).build();
+          characterEntity.toBuilder()
+              .setModificationRecordId(modificationRecord.getId())
+              .setHasFruits(true)
+              .setFruits(List.of(newFruit))
+              .build();
       characterDao.update(characterEntityUpdated);
       fruitService.updateOwner(fruitId, characterId);
       response.setFruitMessage(EAT_FRUIT_SUCCESS);
@@ -108,8 +124,13 @@ public class CharacterService {
         response.setFruitMessage(NO_MORE_FRUIT);
         response.setCharacter(CharacterEntityConverter.INSTANCE.toCharacter(characterEntity));
       } else {
+        var modificationRecord = actionRecordService.create();
         fruits.add(newFruit);
-        var updatedCharacter = characterEntity.toBuilder().setFruits(fruits).build();
+        var updatedCharacter =
+            characterEntity.toBuilder()
+                .setModificationRecordId(modificationRecord.getId())
+                .setFruits(fruits)
+                .build();
         characterDao.update(updatedCharacter);
         fruitService.updateOwner(fruitId, characterId);
         response.setCharacter(CharacterEntityConverter.INSTANCE.toCharacter(updatedCharacter));

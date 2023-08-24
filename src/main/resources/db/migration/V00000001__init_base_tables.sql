@@ -71,8 +71,7 @@ CREATE TABLE battle (
     id BINARY(16) NOT NULL PRIMARY KEY,
     user_id BINARY(16) NOT NULL,
     character_id_initiator BINARY(16) NOT NULL,
-    character_id_receiver BINARY(16) NOT NULL,
-    action_timestamp BIGINT NOT NULL COMMENT 'the timestamp when this fight is created'
+    character_id_receiver BINARY(16) NOT NULL
 );
 ALTER TABLE battle ADD CONSTRAINT fk_battle__character_id_initiator
     FOREIGN KEY(character_id_initiator) REFERENCES `character`(id);
