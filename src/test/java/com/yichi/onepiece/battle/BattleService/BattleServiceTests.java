@@ -12,6 +12,7 @@ import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.fruits.model.FruitEntity;
 import com.yichi.onepiece.fruits.model.FruitEntityBuilder;
 import com.yichi.onepiece.fruits.service.FruitService;
+import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.FruitInCharacter;
 import com.yichi.onepiece.model.FruitType;
 import java.util.List;
@@ -28,12 +29,15 @@ public class BattleServiceTests {
   @Mock BattleDao mockBattleDao;
   @Mock FruitService mockFruitService;
   @Mock CharacterService mockCharacterService;
+  @Mock ActionRecordService actionRecordService;
 
   BattleService battleService;
 
   @BeforeMethod
   public void setUp() {
-    battleService = new BattleService(mockBattleDao, mockCharacterService, mockFruitService);
+    battleService =
+        new BattleService(
+            mockBattleDao, mockCharacterService, mockFruitService, actionRecordService);
   }
 
   @Test

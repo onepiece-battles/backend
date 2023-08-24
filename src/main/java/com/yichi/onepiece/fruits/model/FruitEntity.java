@@ -36,5 +36,9 @@ public interface FruitEntity {
 
   Double getSpeedStrengthen();
 
+  Long getCreationRecordId();
+
+  Long getModificationRecordId();
+
   FruitEntityBuilder toBuilder();
 }

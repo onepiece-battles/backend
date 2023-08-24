@@ -4,6 +4,7 @@ import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruits.model.FruitDao;
 import com.yichi.onepiece.fruits.model.FruitEntity;
 import com.yichi.onepiece.fruits.model.converter.FruitConverter;
+import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import java.io.IOException;
 import java.util.List;
@@ -15,13 +16,20 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FruitService {
   private final FruitDao fruitDao;
+  private final ActionRecordService actionRecordService;
 
-  public FruitService(FruitDao fruitDao) {
+  public FruitService(FruitDao fruitDao, ActionRecordService actionRecordService) {
     this.fruitDao = fruitDao;
+    this.actionRecordService = actionRecordService;
   }
 
   public Fruit addFruit(AddFruitRequest request) {
-    var fruitEntity = FruitConverter.INSTANCE.toFruitEntity(request);
+    var actionRecord = actionRecordService.create();
+    var fruitEntity =
+        FruitConverter.INSTANCE.toFruitEntity(request).toBuilder()
+            .setCreationRecordId(actionRecord.getId())
+            .setModificationRecordId(actionRecord.getId())
+            .build();
     fruitDao.insert(fruitEntity);
     return FruitConverter.INSTANCE.toFruit(fruitEntity);
   }
@@ -41,24 +49,39 @@ public class FruitService {
   }
 
   public Fruit updateFruit(UpdateFruitRequest request) {
+    var modificationRecord = actionRecordService.create();
     fruitDao
         .findById(request.getId())
         .orElseThrow(
             ExceptionUtils.notFound(
                 "Can not update fruit with id: %s, not found", request.getId()));
-    var fruitEntity = FruitConverter.INSTANCE.toFruitEntity(request);
+    var fruitEntity =
+        FruitConverter.INSTANCE.toFruitEntity(request).toBuilder()
+            .setModificationRecordId(modificationRecord.getId())
+            .build();
     fruitDao.update(fruitEntity);
-    var updatedFruit = fruitDao.findById(request.getId()).get();
+    var updatedFruit = fruitDao.findById(request.getId()).orElseThrow();
     return FruitConverter.INSTANCE.toFruit(updatedFruit);
   }
 
+  /**
+   * If fruit is eaten by someone or a new character, the owner of this fruit will be updated.
+   *
+   * @param fruitId id of fruit.
+   * @param ownId character id of current fruit owner.
+   */
   public void updateOwner(UUID fruitId, UUID ownId) {
+    var modificationRecord = actionRecordService.create();
     var fruitEntity =
         fruitDao
             .findById(fruitId)
             .orElseThrow(
                 ExceptionUtils.notFound("Can not update fruit with id: %s, not found", fruitId));
-    var updatedEntity = fruitEntity.toBuilder().setOwnerId(ownId).build();
+    var updatedEntity =
+        fruitEntity.toBuilder()
+            .setModificationRecordId(modificationRecord.getId())
+            .setOwnerId(ownId)
+            .build();
     fruitDao.update(updatedEntity);
   }
 
@@ -76,11 +99,16 @@ public class FruitService {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    var modificationRecord = actionRecordService.create();
     var fruit =
         fruitDao
             .findById(fruitId)
             .orElseThrow(ExceptionUtils.notFound("fruit with id %s not found", fruitId));
-    var updatedFruit = fruit.toBuilder().setProfileImage(profileByte).build();
+    var updatedFruit =
+        fruit.toBuilder()
+            .setModificationRecordId(modificationRecord.getId())
+            .setProfileImage(profileByte)
+            .build();
     fruitDao.update(updatedFruit);
     return ArrayUtils.toPrimitive(updatedFruit.getProfileImage());
   }

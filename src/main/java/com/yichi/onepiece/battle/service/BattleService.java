@@ -8,6 +8,7 @@ import com.yichi.onepiece.battle.model.BattleEntityBuilder;
 import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruits.service.FruitService;
+import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,15 +22,21 @@ public class BattleService {
   private final BattleDao battleDao;
   private final CharacterService characterService;
   private final FruitService fruitService;
+  private final ActionRecordService actionRecordService;
 
   public BattleService(
-      BattleDao battleDao, CharacterService characterService, FruitService fruitService) {
+      BattleDao battleDao,
+      CharacterService characterService,
+      FruitService fruitService,
+      ActionRecordService actionRecordService) {
     this.battleDao = battleDao;
     this.characterService = characterService;
     this.fruitService = fruitService;
+    this.actionRecordService = actionRecordService;
   }
 
   public Battle addBattle(AddBattleRequest request) {
+    var actionRecord = actionRecordService.create();
     BattleEntity battleEntity =
         BattleEntityBuilder.newBuilder()
             .setUserId(request.getUserId())
@@ -37,6 +44,8 @@ public class BattleService {
             .setBattleType(BattleType.SINGLE)
             .setCharacterIdInitiator(request.getInitiateCharacterId())
             .setCharacterIdReceiver(request.getReceiverCharacterId())
+            .setCreationRecordId(actionRecord.getId())
+            .setModificationRecordId(actionRecord.getId())
             .build();
 
     battleDao.insert(battleEntity);

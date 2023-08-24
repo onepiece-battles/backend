@@ -47,5 +47,9 @@ public interface CharacterEntity {
   // magic will be used if character has fruit in Paramecia type.
   Integer getMagic();
 
+  Long getCreationRecordId();
+
+  Long getModificationRecordId();
+
   CharacterEntityBuilder toBuilder();
 }

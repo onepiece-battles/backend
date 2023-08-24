@@ -7,13 +7,3 @@ create table action_lineage (
     role_name VARCHAR(255) COMMENT 'role name, eg: NIKA, ADMIN'
 );
 
-alter table `character` add column creation_record_id BIGINT;
-alter table `character` ADD CONSTRAINT fk_character_creation_record_id__action_lineage_id
-    FOREIGN KEY(creation_record_id) REFERENCES action_lineage(id);
-alter table `fruit` add column creation_record_id BIGINT;
-alter table `fruit` ADD CONSTRAINT fk_fruit_creation_record_id__action_lineage_id
-    FOREIGN KEY(creation_record_id) REFERENCES action_lineage(id);
-alter table `battle` add column creation_record_id BIGINT;
-alter table `battle` ADD CONSTRAINT fk_battle_creation_record_id__action_lineage_id
-    FOREIGN KEY(creation_record_id) REFERENCES action_lineage(id);
-alter table `battle` drop column action_timestamp;
