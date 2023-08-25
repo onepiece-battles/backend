@@ -110,11 +110,11 @@ public class Battlefield {
   }
 
   public boolean allAlive() {
-    return characterInit.getAlive() && characterReceive.getAlive();
+    return characterInit.isAlive() && characterReceive.isAlive();
   }
 
   public CharacterInBattle getWinner() {
-    if (characterInit.getAlive()) {
+    if (characterInit.isAlive()) {
       return characterInit;
     } else {
       return characterReceive;
@@ -122,7 +122,7 @@ public class Battlefield {
   }
 
   public CharacterInBattle getLoser() {
-    if (characterInit.getAlive()) {
+    if (characterInit.isAlive()) {
       return characterReceive;
     } else {
       return characterInit;
