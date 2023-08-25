@@ -5,7 +5,7 @@
   <select id="list" resultMap="com.yichi.onepiece.fruit.model.FruitEntity">
     SELECT * FROM fruit
     <include refid="fruitFilter">
-      <property name="filter" value="filter"/>
+      <property name="fruitFilter" value="fruitFilter"/>
     </include>
     ORDER BY
     <include refid="orderClause"/>
@@ -15,13 +15,13 @@
   <!-- Construct where clause -->
   <sql id="fruitFilter">
     WHERE
-    <if test="fruit.name != null and fruit.name != ''">
-      <bind name="keyLike" value="'%' + fruit.name + '%"/>
-      AND name like #{keyLike}
+    <if test="fruitFilter.name != null and fruitFilter.name != ''">
+      <bind name="keyLike" value="'%' + fruitFilter.name + '%"/>
+      AND `name` like #{keyLike}
     </if>
-    <if test="fruit.owner_id != null and fruit.owner_id != ''">
-      <bind name="keyLike" value="'%' + fruit.owner_id + '%"/>
-      AND owner_id like #{keyLike}
+    <if test="fruitFilter.ownerId != null and fruit.ownerId != ''">
+      <bind name="keyLike" value="'%' + fruit.ownerId + '%"/>
+      AND `owner_id` like #{keyLike}
     </if>
   </sql>
 
