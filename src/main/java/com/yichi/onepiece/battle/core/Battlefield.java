@@ -1,5 +1,7 @@
 package com.yichi.onepiece.battle.core;
 
+import com.yichi.onepiece.battle.model.BattleStatusDetailEntity;
+import com.yichi.onepiece.battle.model.BattleStatusDetailEntityBuilder;
 import com.yichi.onepiece.utils.RandomGenerator;
 import java.util.*;
 import org.slf4j.Logger;
@@ -24,13 +26,18 @@ public class Battlefield {
   private List<UUID> battleParticipantsIds;
   private Map<UUID, CharacterInBattle> idToCharacterMap;
   private Map<UUID, Boolean> characterReverseMap;
-
+  private final UUID battleId;
   private final CharacterInBattle characterInit;
   private final CharacterInBattle characterReceive;
 
-  public Battlefield(CharacterInBattle characterInit, CharacterInBattle characterReceive) {
+  private int battleStatusCount;
+  private int battleProcessCount;
+
+  public Battlefield(
+      CharacterInBattle characterInit, CharacterInBattle characterReceive, UUID battleId) {
     this.characterInit = characterInit;
     this.characterReceive = characterReceive;
+    this.battleId = battleId;
     initBattle();
   }
 
@@ -130,9 +137,20 @@ public class Battlefield {
   }
 
   public void processBattle() {
+    // TODO: 2023/8/25 check energy condition before next battle
     logger.info("--------------------new battle process start----------------------------");
+    battleStatusCount++;
+    battleProcessCount++;
     var attackSide = getAttackSide();
     var defense = getDefenseSide();
+    BattleStatusDetailEntity battleStatusDetailEntity =
+        BattleStatusDetailEntityBuilder.newBuilder()
+            .setBattleId(battleId)
+            .setBattleStatusRoundNumber(battleStatusCount)
+            .setAttackSide(attackSide.getName())
+            .setAttacker(attackSide.getCurrentCharacterEntity())
+            .setDefender(defense.getCurrentCharacterEntity())
+            .build();
     logger.info("attack side: {}, defense side: {}", attackSide.getName(), defense.getName());
     var attackEntity = attackSide.attack();
     if (!hideSuccess()) {

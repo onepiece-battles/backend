@@ -70,14 +70,14 @@ public class BattleService {
     if (offset >= totalSize || offset < 0) {
       return new ListBattleResponse().battles(List.of()).totalSize(totalSize);
     }
-    var battleList =  battleDao.list(
-        request.getFruitFilter(),
-        request.getSortKeys(),
-        offset,
-        request.getPageSize()).stream().map(BattleConverter.INSTANCE::toBattle).collect(Collectors.toList());
+    var battleList =
+        battleDao
+            .list(request.getFruitFilter(), request.getSortKeys(), offset, request.getPageSize())
+            .stream()
+            .map(BattleConverter.INSTANCE::toBattle)
+            .collect(Collectors.toList());
     return new ListBattleResponse().battles(battleList).totalSize(totalSize);
   }
-
 
   public StartBattleResponse startBattle(UUID battleId) {
     var battle =
@@ -104,7 +104,7 @@ public class BattleService {
     // create characterInBattle object and battlefield object
     var characterInBattleInit = new CharacterInBattle(startCharacter, startFruitEntities);
     var characterInBattleReceive = new CharacterInBattle(receiveCharacter, receiveFruitEntities);
-    var battlefield = new Battlefield(characterInBattleInit, characterInBattleReceive);
+    var battlefield = new Battlefield(characterInBattleInit, characterInBattleReceive, battleId);
 
     while (battlefield.allAlive()) {
       battlefield.checkReverse();
