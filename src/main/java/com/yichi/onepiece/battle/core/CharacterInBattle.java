@@ -1,6 +1,7 @@
 package com.yichi.onepiece.battle.core;
 
-import com.yichi.onepiece.battle.model.CurrentCharacter;
+import com.yichi.onepiece.battle.model.CurrentCharacterEntityBuilder;
+import com.yichi.onepiece.battle.model.CurrentCharacterEntityImpl;
 import com.yichi.onepiece.character.model.CharacterEntity;
 import com.yichi.onepiece.fruit.model.FruitEntity;
 import java.util.List;
@@ -10,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 public class CharacterInBattle {
   Logger logger = LoggerFactory.getLogger(CharacterInBattle.class);
-  private final static int INIT_ENERGY_PERCENTAGE = 100;
+  private static final int INIT_ENERGY_PERCENTAGE = 100;
   private final UUID characterId;
   private final String name;
   private int intelligence;
@@ -20,9 +21,7 @@ public class CharacterInBattle {
   private boolean reversed;
   private AttackEntity attackEntity;
   private final CharacterEntity baseEntity;
-  private CurrentCharacter currentCharacter = new CurrentCharacter();
-
-
+  private CurrentCharacterEntityImpl currentCharacterEntity;
 
   List<FruitEntity> fruitEntities;
 
@@ -61,12 +60,21 @@ public class CharacterInBattle {
     }
     this.intelligence = intelligence;
     this.magicConsume = magicConsume;
-    this.currentCharacter = new CurrentCharacter(blood,magic, INIT_ENERGY_PERCENTAGE,attack,speed,defense);
+    this.currentCharacterEntity =
+        (CurrentCharacterEntityImpl)
+            CurrentCharacterEntityBuilder.newBuilder()
+                .setAttack(attack)
+                .setBlood(blood)
+                .setDefense(defense)
+                .setMagic(magic)
+                .setEnergyPercentage(INIT_ENERGY_PERCENTAGE)
+                .setSpeed(speed)
+                .build();
   }
 
   private void initAttackEntity() {
     this.attackEntity =
-        AttackEntityBuilder.newBuilder().setAttack(currentCharacter.getAttack()).build();
+        AttackEntityBuilder.newBuilder().setAttack(currentCharacterEntity.getAttack()).build();
   }
 
   public boolean getReversed() {
@@ -78,15 +86,15 @@ public class CharacterInBattle {
   }
 
   public int getBlood() {
-    return currentCharacter.getBlood();
+    return currentCharacterEntity.getBlood();
   }
 
   public int getMagic() {
-    return currentCharacter.getMagic();
+    return currentCharacterEntity.getMagic();
   }
 
   public int getSpeed() {
-    return currentCharacter.getSpeed();
+    return currentCharacterEntity.getSpeed();
   }
 
   public String getName() {
@@ -110,42 +118,46 @@ public class CharacterInBattle {
   }
 
   public AttackEntity attack() {
-    if (currentCharacter.getMagic() < 0 && !reversed) {
+    if (currentCharacterEntity.getMagic() < 0 && !reversed) {
       reverseCharacter();
       reversed = true;
       logger.info("run out of magic, reverse {}", name);
     }
-    logger.info("{} attack with power {}", name, currentCharacter.getMagic());
+    logger.info("{} attack with power {}", name, currentCharacterEntity.getMagic());
     if (baseEntity.getHasFruits() && !reversed) {
-      currentCharacter.setMagic(currentCharacter.getMagic()-magicConsume);
+      currentCharacterEntity.setMagic(currentCharacterEntity.getMagic() - magicConsume);
     }
     return attackEntity;
   }
 
   public void defense(AttackEntity attackEntity) {
-    if (currentCharacter.getMagic() < 0 && !reversed) {
+    if (currentCharacterEntity.getMagic() < 0 && !reversed) {
       reverseCharacter();
       reversed = true;
       logger.info("run out of magic, reverse {}", name);
     }
-    int blood = currentCharacter.getBlood();
+    int blood = currentCharacterEntity.getBlood();
     if (blood <= 0) {
       this.defeated = true;
       return;
     }
-    int bloodLoss = Math.max(attackEntity.getAttack() - currentCharacter.getDefense(), 0);
-    currentCharacter.setBlood(blood - bloodLoss);
+    int bloodLoss = Math.max(attackEntity.getAttack() - currentCharacterEntity.getDefense(), 0);
+    currentCharacterEntity.setBlood(blood - bloodLoss);
     logger.info("{} defense with bloodLoss {}", name, bloodLoss);
+  }
+
+  public CurrentCharacterEntityImpl getCurrentCharacterEntity() {
+    return currentCharacterEntity;
   }
 
   private void reverseCharacter() {
     // blood strengthen can not be reversed.
     logger.info("{} is reversed, attack, defense, intelligence, speed are reset", name);
-    currentCharacter.setAttack(baseEntity.getAttack());
-    currentCharacter.setDefense(baseEntity.getDefense());
-    currentCharacter.setSpeed(baseEntity.getSpeed());
+    currentCharacterEntity.setAttack(baseEntity.getAttack());
+    currentCharacterEntity.setDefense(baseEntity.getDefense());
+    currentCharacterEntity.setSpeed(baseEntity.getSpeed());
     this.intelligence = baseEntity.getIntelligence();
     // refresh attackEntity
-    attackEntity = attackEntity.toBuilder().setAttack(currentCharacter.getAttack()).build();
+    attackEntity = attackEntity.toBuilder().setAttack(currentCharacterEntity.getAttack()).build();
   }
 }
