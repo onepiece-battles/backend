@@ -113,7 +113,7 @@ public class CharacterService {
       fruitService.updateOwner(fruitId, characterId);
       response.setFruitMessage(EAT_FRUIT_SUCCESS);
       response.setCharacter(
-          CharacterEntityConverter.INSTANCE.toCharacter(characterDao.findById(characterId).get()));
+          CharacterEntityConverter.INSTANCE.toCharacter(characterDao.findById(characterId).orElseThrow()));
     } else {
       int fruitLimit = characterEntity.getFruitLimit();
       if (fruits.size() > fruitLimit) {
@@ -148,7 +148,11 @@ public class CharacterService {
     }
 
     var characterList =
-        characterDao.listCharacters(offset, request.getPageSize()).stream()
+        characterDao.list(
+              request.getCharacterFilter(),
+                request.getSortKeys(),
+                offset,
+                request.getPageSize()).stream()
             .map(CharacterEntityConverter.INSTANCE::toCharacter)
             .toList();
     return new ListCharacterResponse().characters(characterList).totalSize(totalSize);

@@ -5,7 +5,7 @@
   <select id="list" resultMap="com.yichi.onepiece.battle.model.BattleEntity">
     SELECT * FROM battle
     <include refid="battleFilter">
-      <property name="battle" value="filter"/>
+      <property name="battleFilter" value="battleFilter"/>
     </include>
     ORDER BY
     <include refid="orderClause"/>
@@ -15,13 +15,19 @@
   <!-- Construct where clause -->
   <sql id="battleFilter">
     WHERE
-    <if test="battle.type != null and battle.type != ''">
-      <bind name="keyLike" value="'%' + battle.type + '%"/>
-      AND `type` like #{keyLike}
+    <if test="battleFilter.battleTypes != null and !battleFilter.battleTypes.isEmpty">
+      AND type IN
+      <foreach item="battleType" collection="battleFilter.battleTypes" open="("
+        separator="," close=")">
+        #{battleType}
+      </foreach>
     </if>
-    <if test="battle.status != null and battle.status != ''">
-      <bind name="keyLike" value="'%' + battle.status + '%"/>
-      AND `status` like #{keyLike}
+    <if test="battleFilter.battleStatuses != null and !battleFilter.battleStatuses.isEmpty">
+      AND `status` IN
+      <foreach item="battleStatus" collection="battleFilter.battleStatuses" open="("
+        separator="," close=")">
+        #{battleStatus}
+      </foreach>
     </if>
   </sql>
 
