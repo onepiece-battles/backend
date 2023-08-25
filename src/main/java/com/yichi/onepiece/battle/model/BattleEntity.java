@@ -1,6 +1,7 @@
 package com.yichi.onepiece.battle.model;
 
 import com.yichi.infra.support.entity.Entity;
+import com.yichi.onepiece.model.BattleStatus;
 import com.yichi.onepiece.model.BattleType;
 import java.util.UUID;
 
@@ -12,13 +13,17 @@ public interface BattleEntity {
 
   UUID getUserId();
 
-  UUID getCharacterIdInitiator();
+  UUID getStarterId();
 
-  UUID getCharacterIdReceiver();
-
-  BattleType getBattleType();
+  UUID getReceiverId();
 
   Long getCreationRecordId();
 
   Long getModificationRecordId();
+
+  BattleStatus getStatus();
+
+  BattleType getType();
+
+  BattleEntityBuilder toBuilder();
 }
