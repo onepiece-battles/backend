@@ -51,6 +51,10 @@ public class Battlefield {
     idToCharacterMap.put(characterInit.getCharacterId(), characterInit);
     idToCharacterMap.put(characterReceive.getCharacterId(), characterReceive);
     logger.info("create attack member list");
+    battleStatusDetailEntities = new ArrayList<>();
+    battleProcessDetailEntities = new ArrayList<>();
+    battleStatusCount = 0;
+    battleProcessCount = 0;
     battleParticipantsIds = new ArrayList<>(2);
     battleParticipantsIds.addAll(
         List.of(characterInit.getCharacterId(), characterReceive.getCharacterId()));
@@ -154,7 +158,7 @@ public class Battlefield {
   }
 
   public List<BattleProcessDetailEntity> getBattleProcessDetailEntities() {
-    return battleProcessDetailEntities;
+    return this.battleProcessDetailEntities;
   }
 
   public List<BattleStatusDetailEntity> getBattleStatusDetailEntities() {
@@ -183,6 +187,7 @@ public class Battlefield {
     battleProcessDetailEntityBuilder
         .setBattleId(battleId)
         .setAttackerEnergyLoss(1)
+        .setBattleProcessRoundNumber(battleProcessCount)
         .setAttackerMagicLoss(attackSide.getMagicConsume())
         .setAttackSkillType("");
 
