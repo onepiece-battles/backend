@@ -1,5 +1,7 @@
 package com.yichi.onepiece.battle.core;
 
+import com.yichi.onepiece.battle.model.BattleProcessDetailEntity;
+import com.yichi.onepiece.battle.model.BattleProcessDetailEntityBuilder;
 import com.yichi.onepiece.battle.model.BattleStatusDetailEntity;
 import com.yichi.onepiece.battle.model.BattleStatusDetailEntityBuilder;
 import com.yichi.onepiece.utils.RandomGenerator;
@@ -29,6 +31,8 @@ public class Battlefield {
   private final UUID battleId;
   private final CharacterInBattle characterInit;
   private final CharacterInBattle characterReceive;
+  private List<BattleStatusDetailEntity> battleStatusDetailEntities;
+  private List<BattleProcessDetailEntity> battleProcessDetailEntities;
 
   private int battleStatusCount;
   private int battleProcessCount;
@@ -136,6 +140,27 @@ public class Battlefield {
     }
   }
 
+  public void completeFinalStatus() {
+    battleStatusCount++;
+    BattleStatusDetailEntity battleStatusDetailEntity =
+        BattleStatusDetailEntityBuilder.newBuilder()
+            .setBattleId(battleId)
+            .setBattleStatusRoundNumber(battleStatusCount)
+            .setAttackSide("battle finished")
+            .setAttacker(characterInit.getCurrentCharacterEntity())
+            .setDefender(characterReceive.getCurrentCharacterEntity())
+            .build();
+    battleStatusDetailEntities.add(battleStatusDetailEntity);
+  }
+
+  public List<BattleProcessDetailEntity> getBattleProcessDetailEntities() {
+    return battleProcessDetailEntities;
+  }
+
+  public List<BattleStatusDetailEntity> getBattleStatusDetailEntities() {
+    return battleStatusDetailEntities;
+  }
+
   public void processBattle() {
     // TODO: 2023/8/25 check energy condition before next battle
     logger.info("--------------------new battle process start----------------------------");
@@ -151,13 +176,30 @@ public class Battlefield {
             .setAttacker(attackSide.getCurrentCharacterEntity())
             .setDefender(defense.getCurrentCharacterEntity())
             .build();
+    battleStatusDetailEntities.add(battleStatusDetailEntity);
     logger.info("attack side: {}, defense side: {}", attackSide.getName(), defense.getName());
+    BattleProcessDetailEntityBuilder battleProcessDetailEntityBuilder =
+        BattleProcessDetailEntityBuilder.newBuilder();
+    battleProcessDetailEntityBuilder
+        .setBattleId(battleId)
+        .setAttackerEnergyLoss(1)
+        .setAttackerMagicLoss(attackSide.getMagicConsume())
+        .setAttackSkillType("");
+
     var attackEntity = attackSide.attack();
     if (!hideSuccess()) {
-      defense.defense(attackEntity);
+      battleProcessDetailEntityBuilder.setAttackMissed(Boolean.FALSE);
+      // the order of return list is: blood loss, magic loss and energy loss.
+      var defenseResult = defense.defense(attackEntity);
+      battleProcessDetailEntityBuilder
+          .setDefenderBloodLoss(defenseResult.get(0))
+          .setDefenderMagicLoss(defenseResult.get(1))
+          .setDefenderEnergyLoss(defenseResult.get(2));
     } else {
+      battleProcessDetailEntityBuilder.setAttackMissed(Boolean.TRUE);
       logger.info("{} hide SUCCESS, not damage is casted", defense.getName());
     }
+    battleProcessDetailEntities.add(battleProcessDetailEntityBuilder.build());
     logger.info("---------------------new battle process end-----------------------------");
   }
 

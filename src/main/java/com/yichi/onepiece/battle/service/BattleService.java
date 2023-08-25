@@ -2,10 +2,7 @@ package com.yichi.onepiece.battle.service;
 
 import com.yichi.onepiece.battle.core.Battlefield;
 import com.yichi.onepiece.battle.core.CharacterInBattle;
-import com.yichi.onepiece.battle.model.BattleConverter;
-import com.yichi.onepiece.battle.model.BattleDao;
-import com.yichi.onepiece.battle.model.BattleEntity;
-import com.yichi.onepiece.battle.model.BattleEntityBuilder;
+import com.yichi.onepiece.battle.model.*;
 import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruit.service.FruitService;
@@ -25,16 +22,22 @@ public class BattleService {
   private final CharacterService characterService;
   private final FruitService fruitService;
   private final ActionRecordService actionRecordService;
+  private final BattleProcessDetailDao battleProcessDetailDao;
+  private final BattleStatusDetailDao battleStatusDetailDao;
 
   public BattleService(
       BattleDao battleDao,
       CharacterService characterService,
       FruitService fruitService,
-      ActionRecordService actionRecordService) {
+      ActionRecordService actionRecordService,
+      BattleProcessDetailDao battleProcessDetailDao,
+      BattleStatusDetailDao battleStatusDetailDao) {
     this.battleDao = battleDao;
     this.characterService = characterService;
     this.fruitService = fruitService;
     this.actionRecordService = actionRecordService;
+    this.battleProcessDetailDao = battleProcessDetailDao;
+    this.battleStatusDetailDao = battleStatusDetailDao;
   }
 
   public Battle addBattle(AddBattleRequest request) {
@@ -111,6 +114,9 @@ public class BattleService {
       battlefield.processBattle();
       battlefield.attackReset();
     }
+    battlefield.completeFinalStatus();
+    battleStatusDetailDao.batchInsert(battlefield.getBattleStatusDetailEntities());
+    battleProcessDetailDao.batchInsert(battlefield.getBattleProcessDetailEntities());
     logger.info("Battle finish");
     var winner = battlefield.getWinner();
     var loser = battlefield.getLoser();

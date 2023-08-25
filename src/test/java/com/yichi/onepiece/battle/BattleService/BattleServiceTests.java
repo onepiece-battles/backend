@@ -2,9 +2,7 @@ package com.yichi.onepiece.battle.BattleService;
 
 import static org.mockito.Mockito.when;
 
-import com.yichi.onepiece.battle.model.BattleDao;
-import com.yichi.onepiece.battle.model.BattleEntity;
-import com.yichi.onepiece.battle.model.BattleEntityBuilder;
+import com.yichi.onepiece.battle.model.*;
 import com.yichi.onepiece.battle.service.BattleService;
 import com.yichi.onepiece.character.model.CharacterEntity;
 import com.yichi.onepiece.character.model.CharacterEntityBuilder;
@@ -30,6 +28,9 @@ public class BattleServiceTests {
   @Mock FruitService mockFruitService;
   @Mock CharacterService mockCharacterService;
   @Mock ActionRecordService actionRecordService;
+  @Mock BattleProcessDetailDao battleProcessDetailDao;
+
+  @Mock BattleStatusDetailDao battleStatusDetailDao;
 
   BattleService battleService;
 
@@ -37,7 +38,12 @@ public class BattleServiceTests {
   public void setUp() {
     battleService =
         new BattleService(
-            mockBattleDao, mockCharacterService, mockFruitService, actionRecordService);
+            mockBattleDao,
+            mockCharacterService,
+            mockFruitService,
+            actionRecordService,
+            battleProcessDetailDao,
+            battleStatusDetailDao);
   }
 
   @Test
@@ -54,8 +60,8 @@ public class BattleServiceTests {
     BattleEntity battleEntity =
         BattleEntityBuilder.newBuilder()
             .setId(battleId)
-            .setCharacterIdInitiator(characterInitId)
-            .setCharacterIdReceiver(characterReceiveId)
+            .setStarterId(characterInitId)
+            .setReceiverId(characterReceiveId)
             .build();
     CharacterEntity characterInit =
         CharacterEntityBuilder.newBuilder()
