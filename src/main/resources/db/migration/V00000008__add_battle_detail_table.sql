@@ -6,6 +6,8 @@ create table battle_status_detail(
     attacker TEXT NOT NULL,
     defender TEXT NOT NULL
 );
+alter table battle_status_detail add constraint  fk_battle_status_detail__battle_id
+    foreign key(battle_id) references battle(id);
 
 create table battle_process_detail(
     id BINARY(16) PRIMARY KEY,
@@ -18,4 +20,6 @@ create table battle_process_detail(
     defender_energy_loss INT,
     defender_blood_loss VARCHAR(255) NOT NULL,
     attack_skill_type VARCHAR(255) NOT NULL
-)
+);
+alter table battle_process_detail add constraint  fk_battle_process_detail__battle_id
+    foreign key(battle_id) references battle(id);
