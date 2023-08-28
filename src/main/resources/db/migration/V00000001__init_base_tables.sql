@@ -74,9 +74,9 @@ CREATE TABLE battle (
     receiver_id BINARY(16) NOT NULL
 );
 ALTER TABLE battle ADD CONSTRAINT fk_battle__character_id_initiator
-    FOREIGN KEY(character_id_initiator) REFERENCES `character`(id);
+    FOREIGN KEY(starter_id) REFERENCES `character`(id);
 ALTER TABLE battle ADD CONSTRAINT fk_battle__character_id_receiver
-    FOREIGN KEY(character_id_receiver) REFERENCES `character`(id);
+    FOREIGN KEY(receiver_id) REFERENCES `character`(id);
 ALTER TABLE battle ADD CONSTRAINT fk_battle__user_id
     FOREIGN KEY(user_id) REFERENCES user(id);
 
