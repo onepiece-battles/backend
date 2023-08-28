@@ -15,11 +15,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class CharacterService {
+  Logger logger = LoggerFactory.getLogger(CharacterService.class);
   private static final String EAT_FRUIT_SUCCESS = "EAT FRUIT SUCCESS";
   private static final String NO_MORE_FRUIT = "NO MORE FRUIT CAN BE TAKEN";
 
@@ -113,7 +116,8 @@ public class CharacterService {
       fruitService.updateOwner(fruitId, characterId);
       response.setFruitMessage(EAT_FRUIT_SUCCESS);
       response.setCharacter(
-          CharacterEntityConverter.INSTANCE.toCharacter(characterDao.findById(characterId).orElseThrow()));
+          CharacterEntityConverter.INSTANCE.toCharacter(
+              characterDao.findById(characterId).orElseThrow()));
     } else {
       int fruitLimit = characterEntity.getFruitLimit();
       if (fruits.size() > fruitLimit) {
@@ -146,13 +150,11 @@ public class CharacterService {
     if (offset >= totalSize || offset < 0) {
       return new ListCharacterResponse().characters(List.of()).totalSize(totalSize);
     }
-
     var characterList =
-        characterDao.list(
-              request.getCharacterFilter(),
-                request.getSortKeys(),
-                offset,
-                request.getPageSize()).stream()
+        characterDao
+            .list(
+                request.getCharacterFilter(), request.getSortKeys(), offset, request.getPageSize())
+            .stream()
             .map(CharacterEntityConverter.INSTANCE::toCharacter)
             .toList();
     return new ListCharacterResponse().characters(characterList).totalSize(totalSize);
