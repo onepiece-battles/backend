@@ -130,4 +130,16 @@ public class BattleService {
 
     return new StartBattleResponse();
   }
+
+  public List<BattleStatusDetailEntity> listBattleStatusDetailByBattleId(UUID battleId) {
+    return battleStatusDetailDao.listByBattleId(battleId);
+  }
+
+  public List<BattleProcessDetailEntity> listBattleProcessDetailByBattleId(UUID battleId) {
+    return battleProcessDetailDao.listByBattleId(battleId);
+  }
+
+  public BattleEntity findBattleById(UUID battleId) {
+    return battleDao.findById(battleId).orElseThrow();
+  }
 }

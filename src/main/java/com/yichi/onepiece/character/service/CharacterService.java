@@ -165,4 +165,8 @@ public class CharacterService {
         .findById(characterId)
         .orElseThrow(ExceptionUtils.notFound("Character with id: %s not found", characterId));
   }
+
+  public CharacterEntity findByCharacterId(UUID characterId) {
+    return characterDao.findById(characterId).orElseThrow();
+  }
 }
