@@ -20,7 +20,6 @@ public interface UserConverter {
 
   @Mapping(target = "encryptedPassword", ignore = true)
   @Mapping(target = "accountCondition", ignore = true)
-  @Mapping(target = "profileImage", ignore = true)
   UserEntity toUserEntity(User user);
 
   default Resource blobToResource(Byte[] profileByteArray) {
