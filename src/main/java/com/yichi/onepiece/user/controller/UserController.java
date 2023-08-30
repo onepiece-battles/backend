@@ -42,6 +42,14 @@ public class UserController implements UserApi {
   }
 
   @Override
+  public ResponseEntity<User> getUser(GetUserRequest getUserRequest) {
+    iamService.checkPermissionOfCurrentAccount(
+        UserEntity.ENTITY_TYPE, Set.of(PermissionEnum.USER_GET));
+    var user = userService.getUserById(getUserRequest.getUserId());
+    return ResponseEntity.ok(user);
+  }
+
+  @Override
   public ResponseEntity<LoginResponse> login(LoginRequest loginRequest) {
     logger.info("user start login");
     var userName = loginRequest.getUserName();

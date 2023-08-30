@@ -11,6 +11,7 @@ import com.yichi.onepiece.image.service.ImageUtil;
 import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.LoginResponse;
 import com.yichi.onepiece.model.LogoutResponse;
+import com.yichi.onepiece.model.User;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.model.*;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
@@ -215,5 +216,11 @@ public class UserService {
     user.setLoginRole(role);
     userDao.update(user);
     return roleResourceDao.getResourceNamesByRoleName(role);
+  }
+
+  public User getUserById(UUID userId) {
+    var user = userDao.findById(userId).orElseThrow();
+    var resourceNames = roleResourceDao.getResourceNamesByRoleName(user.getLoginRole());
+    return UserConverter.INSTANCE.toUser(user).loginRoleResources(resourceNames);
   }
 }
