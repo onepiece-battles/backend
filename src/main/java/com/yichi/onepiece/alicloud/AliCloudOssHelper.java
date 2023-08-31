@@ -1,4 +1,4 @@
-package com.yichi.onepiece.utils;
+package com.yichi.onepiece.alicloud;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
