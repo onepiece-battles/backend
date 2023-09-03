@@ -12,6 +12,7 @@ import com.yichi.onepiece.iam.model.UserRoleDao;
 import com.yichi.onepiece.model.LogoutResponse;
 import com.yichi.onepiece.user.model.UserDao;
 import com.yichi.onepiece.user.model.UserDetailDao;
+import com.yichi.onepiece.user.model.UserResourceDao;
 import com.yichi.onepiece.user.service.UserService;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,6 +31,8 @@ public class UserServiceTests extends BaseServiceTests {
   @Mock private UserDetailDao userDetailDao;
   @Mock private RoleResourceDao roleResourceDao;
 
+  @Mock private UserResourceDao userResourceDao;
+
   @BeforeMethod
   public void setup() {
     userService =
@@ -40,7 +43,8 @@ public class UserServiceTests extends BaseServiceTests {
             roleResourceDao,
             roleDao,
             userRoleDao,
-            passwordEncoder);
+            passwordEncoder,
+            userResourceDao);
   }
 
   @Test

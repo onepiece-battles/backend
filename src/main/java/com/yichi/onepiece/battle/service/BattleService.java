@@ -8,6 +8,8 @@ import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
+import com.yichi.onepiece.user.UserHelper;
+import com.yichi.onepiece.user.service.UserService;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class BattleService {
+  private static final ResourceType RESOURCE_TYPE = ResourceType.CHARACTER;
   Logger logger = LoggerFactory.getLogger(BattleService.class);
   private final BattleDao battleDao;
   private final CharacterService characterService;
@@ -24,6 +27,7 @@ public class BattleService {
   private final ActionRecordService actionRecordService;
   private final BattleProcessDetailDao battleProcessDetailDao;
   private final BattleStatusDetailDao battleStatusDetailDao;
+  private final UserService userService;
 
   public BattleService(
       BattleDao battleDao,
@@ -31,13 +35,15 @@ public class BattleService {
       FruitService fruitService,
       ActionRecordService actionRecordService,
       BattleProcessDetailDao battleProcessDetailDao,
-      BattleStatusDetailDao battleStatusDetailDao) {
+      BattleStatusDetailDao battleStatusDetailDao,
+      UserService userService) {
     this.battleDao = battleDao;
     this.characterService = characterService;
     this.fruitService = fruitService;
     this.actionRecordService = actionRecordService;
     this.battleProcessDetailDao = battleProcessDetailDao;
     this.battleStatusDetailDao = battleStatusDetailDao;
+    this.userService = userService;
   }
 
   public Battle addBattle(AddBattleRequest request) {
@@ -73,9 +79,17 @@ public class BattleService {
     if (offset >= totalSize || offset < 0) {
       return new ListBattleResponse().battles(List.of()).totalSize(totalSize);
     }
+    var userId = UserHelper.getCurrentUserId();
+    var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
     var battleList =
         battleDao
-            .list(request.getFruitFilter(), request.getSortKeys(), offset, request.getPageSize())
+            .list(
+                request.getFruitFilter(),
+                request.getSortKeys(),
+                userId,
+                resourceIds,
+                offset,
+                request.getPageSize())
             .stream()
             .map(BattleConverter.INSTANCE::toBattle)
             .collect(Collectors.toList());

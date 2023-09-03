@@ -6,4 +6,4 @@ create table user_resource (
 );
 
 alter table user_resource add constraint fk_user_resource_user_id__user_id
-foreign key  `user_id` references user(id);
+foreign key  (user_id) references user(id);

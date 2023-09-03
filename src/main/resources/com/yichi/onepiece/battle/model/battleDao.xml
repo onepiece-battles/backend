@@ -14,7 +14,7 @@
 
   <!-- Construct where clause -->
   <sql id="battleFilter">
-    WHERE
+    WHERE (user_id = #{userId} or id IN #{externalResourceIds})
     <if test="battleFilter.battleTypes != null and !battleFilter.battleTypes.isEmpty">
       AND type IN
       <foreach item="battleType" collection="battleFilter.battleTypes" open="("

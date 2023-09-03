@@ -16,13 +16,13 @@ import org.apache.ibatis.annotations.Select;
 public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
   // see sql definition in character.xml
   List<CharacterEntity> list(
-      @Param("characterFilter")CharacterFilter characterFilter,
+      @Param("characterFilter") CharacterFilter characterFilter,
       @Param("sortList") Collection<CharacterSortableField> sortList,
       @Param("offset") int offset,
       @Param("size") int size,
       @Param("userId") UUID userId,
-      // external resource id means the ids of characters created by other users.
-      // this mainly a
+      // external resource ids means the ids of characters created by other users that are shared to
+      // current user.
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
 
   @Select("SELECT COUNT(id) FROM `character`")

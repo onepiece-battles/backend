@@ -43,7 +43,8 @@ public class BattleServiceTests {
             mockFruitService,
             actionRecordService,
             battleProcessDetailDao,
-            battleStatusDetailDao);
+            battleStatusDetailDao,
+            userService);
   }
 
   @Test

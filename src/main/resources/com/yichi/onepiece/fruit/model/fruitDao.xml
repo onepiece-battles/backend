@@ -14,7 +14,7 @@
 
   <!-- Construct where clause -->
   <sql id="fruitFilter">
-    WHERE
+    WHERE (user_id = #{userId} or id IN #{externalResourceIds})
     <if test="fruitFilter.name != null and fruitFilter.name != ''">
       <bind name="keyLike" value="'%' + fruitFilter.name + '%"/>
       AND `name` like #{keyLike}
