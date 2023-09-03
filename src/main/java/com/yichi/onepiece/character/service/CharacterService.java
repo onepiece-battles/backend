@@ -153,7 +153,7 @@ public class CharacterService {
     var characterList =
         characterDao
             .list(
-                request.getCharacterFilter(), request.getSortKeys(), offset, request.getPageSize())
+                request.getCharacterFilter(), request.getSortKeys(), offset, request.getPageSize(), UUID.randomUUID(), List.of())
             .stream()
             .map(CharacterEntityConverter.INSTANCE::toCharacter)
             .toList();
