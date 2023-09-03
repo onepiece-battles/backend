@@ -14,7 +14,7 @@
 
   <!-- Construct where clause -->
   <sql id="characterFilter">
-    WHERE 1=1
+    WHERE (user_id = #{userId} or id IN #{externalResourceIds})
     <if test="characterFilter.name != null and characterFilter.name != ''">
       <bind name="keyLike" value="'%' + characterFilter.name + '%'"/>
       AND `name` like #{keyLike}

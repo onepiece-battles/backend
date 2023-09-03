@@ -11,6 +11,7 @@ import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.model.Character;
 import com.yichi.onepiece.user.UserHelper;
+import com.yichi.onepiece.user.service.UserService;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -25,18 +26,22 @@ public class CharacterService {
   Logger logger = LoggerFactory.getLogger(CharacterService.class);
   private static final String EAT_FRUIT_SUCCESS = "EAT FRUIT SUCCESS";
   private static final String NO_MORE_FRUIT = "NO MORE FRUIT CAN BE TAKEN";
+  private static final ResourceType RESOURCE_TYPE = ResourceType.CHARACTER;
 
   private final CharacterDao characterDao;
   private final FruitService fruitService;
   private final ActionRecordService actionRecordService;
+  private final UserService userService;
 
   public CharacterService(
       CharacterDao CharacterDao,
       FruitService fruitService,
-      ActionRecordService actionRecordService) {
+      ActionRecordService actionRecordService,
+      UserService userService) {
     this.characterDao = CharacterDao;
     this.fruitService = fruitService;
     this.actionRecordService = actionRecordService;
+    this.userService = userService;
   }
 
   public Character addCharacter(AddCharacterRequest request) {
@@ -150,10 +155,17 @@ public class CharacterService {
     if (offset >= totalSize || offset < 0) {
       return new ListCharacterResponse().characters(List.of()).totalSize(totalSize);
     }
+    var userId = UserHelper.getCurrentUserId();
+    var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
     var characterList =
         characterDao
             .list(
-                request.getCharacterFilter(), request.getSortKeys(), offset, request.getPageSize(), UUID.randomUUID(), List.of())
+                request.getCharacterFilter(),
+                request.getSortKeys(),
+                offset,
+                request.getPageSize(),
+                userId,
+                resourceIds)
             .stream()
             .map(CharacterEntityConverter.INSTANCE::toCharacter)
             .toList();

@@ -16,8 +16,10 @@ import org.apache.ibatis.annotations.Select;
 public interface BattleDao extends BaseDao<BattleEntity, UUID> {
   // sql defined in battleDao.xml
   List<BattleEntity> list(
-      @Param("filter")BattleFilter battleFilter,
-      @Param("sortList")Collection<BattleSortableField> sortList,
+      @Param("filter") BattleFilter battleFilter,
+      @Param("sortList") Collection<BattleSortableField> sortList,
+      @Param("userId") UUID userId,
+      @Param("externalResourceIds") Collection<UUID> externalResourceIds,
       @Param("offset") int offset,
       @Param("size") int size);
 

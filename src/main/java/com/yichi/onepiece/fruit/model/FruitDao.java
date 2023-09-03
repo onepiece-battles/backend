@@ -16,7 +16,13 @@ import org.apache.ibatis.annotations.Select;
 public interface FruitDao extends BaseDao<FruitEntity, UUID> {
 
   // details see fruitDao.xml
-  List<FruitEntity> listFruits(@Param("filter")FruitFilter fruitFilter, @Param("sortList") Collection<FruitSortableField> sortList,@Param("offset") int offset, @Param("size") int size);
+  List<FruitEntity> listFruits(
+      @Param("filter") FruitFilter fruitFilter,
+      @Param("sortList") Collection<FruitSortableField> sortList,
+      @Param("userId") UUID userId,
+      @Param("externalResourceIds") Collection<UUID> externalResourceIds,
+      @Param("offset") int offset,
+      @Param("size") int size);
 
   @Select("SELECT COUNT(id) FROM fruit")
   int countFruit();

@@ -8,10 +8,7 @@ import com.yichi.onepiece.constants.ConstantsContainer;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.iam.model.*;
 import com.yichi.onepiece.image.service.ImageUtil;
-import com.yichi.onepiece.model.I18nText;
-import com.yichi.onepiece.model.LoginResponse;
-import com.yichi.onepiece.model.LogoutResponse;
-import com.yichi.onepiece.model.User;
+import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.model.*;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
@@ -37,6 +34,7 @@ public class UserService {
   private final RoleDao roleDao;
   private final UserRoleDao userRoleDao;
   private final PasswordEncoder passwordEncoder;
+  private final UserResourceDao userResourceDao;
 
   public UserService(
       UserDao userDao,
@@ -45,7 +43,8 @@ public class UserService {
       RoleResourceDao roleResourceDao,
       RoleDao roleDao,
       UserRoleDao userRoleDao,
-      PasswordEncoder passwordEncoder) {
+      PasswordEncoder passwordEncoder,
+      UserResourceDao userResourceDao) {
     this.userDao = userDao;
     this.userDetailDao = userDetailDao;
     this.tokenDao = tokenDao;
@@ -53,6 +52,7 @@ public class UserService {
     this.roleDao = roleDao;
     this.userRoleDao = userRoleDao;
     this.passwordEncoder = passwordEncoder;
+    this.userResourceDao = userResourceDao;
   }
 
   /**
@@ -222,5 +222,32 @@ public class UserService {
     var user = userDao.findById(userId).orElseThrow();
     var resourceNames = roleResourceDao.getResourceNamesByRoleName(user.getLoginRole());
     return UserConverter.INSTANCE.toUser(user).loginRoleResources(resourceNames);
+  }
+
+  public Boolean shareResource(ShareResourceRequest request) {
+    UUID sourceUserId = request.getSourceUserId();
+    UUID targetUserId = request.getTargetUserId();
+    var userResourceIds =
+        userResourceDao
+            .getByUserIdAndResourceType(targetUserId, request.getResourceType())
+            .orElseThrow(() -> new RuntimeException("More than one resource found"))
+            .getResourceIds();
+    userResourceIds.addAll(request.getResourceIds());
+    var userResource =
+        UserResourceEntityBuilder.newBuilder()
+            .setSourceUserId(sourceUserId)
+            .setUserId(targetUserId)
+            .setResourceType(request.getResourceType())
+            .setResourceIds(userResourceIds)
+            .build();
+    userResourceDao.insert(userResource);
+    return Boolean.TRUE;
+  }
+
+  public List<UUID> getResourceIdsByUserIdResourceType(UUID userId, ResourceType resourceType) {
+    return userResourceDao
+        .getByUserIdAndResourceType(userId, resourceType)
+        .orElseThrow(() -> new RuntimeException("More than one resource found"))
+        .getResourceIds();
   }
 }

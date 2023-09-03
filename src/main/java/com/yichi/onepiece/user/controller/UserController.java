@@ -88,6 +88,12 @@ public class UserController implements UserApi {
   }
 
   @Override
+  public ResponseEntity<ShareResourceResponse> shareResource(
+      ShareResourceRequest shareResourceRequest) {
+    return null;
+  }
+
+  @Override
   public ResponseEntity<UpdateLoginRoleResponse> updateRole(UpdateLoginRoleRequest request) {
     var resourceList = userService.updateLoginRole(request.getRole());
     return ResponseEntity.ok(

@@ -6,6 +6,8 @@ import com.yichi.onepiece.fruit.model.FruitEntity;
 import com.yichi.onepiece.fruit.model.converter.FruitConverter;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
+import com.yichi.onepiece.user.UserHelper;
+import com.yichi.onepiece.user.service.UserService;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -15,12 +17,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class FruitService {
+  private static final ResourceType RESOURCE_TYPE = ResourceType.FRUIT;
   private final FruitDao fruitDao;
   private final ActionRecordService actionRecordService;
+  private final UserService userService;
 
-  public FruitService(FruitDao fruitDao, ActionRecordService actionRecordService) {
+  public FruitService(
+      FruitDao fruitDao, ActionRecordService actionRecordService, UserService userService) {
     this.fruitDao = fruitDao;
     this.actionRecordService = actionRecordService;
+    this.userService = userService;
   }
 
   public Fruit addFruit(AddFruitRequest request) {
@@ -41,8 +47,18 @@ public class FruitService {
     if (offset >= totalSize || offset < 0) {
       return new ListFruitResponse().fruits(List.of()).totalSize(totalSize);
     }
+    var userId = UserHelper.getCurrentUserId();
+    var resourceList = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
     var fruits =
-        fruitDao.listFruits(request.getFruitFilter(), request.getSortKeys(),offset, request.getPageSize()).stream()
+        fruitDao
+            .listFruits(
+                request.getFruitFilter(),
+                request.getSortKeys(),
+                userId,
+                resourceList,
+                offset,
+                request.getPageSize())
+            .stream()
             .map(FruitConverter.INSTANCE::toFruit)
             .toList();
     return new ListFruitResponse().totalSize(totalSize).fruits(fruits);
