@@ -8,6 +8,8 @@ public class UserFacingConstantsKey {
   public static final String INVALID_EMAIL_ADDRESS = "INVALID_EMAIL_ADDRESS";
   public static final String WRONG_PASSWORD = "WRONG_PASSWORD";
   public static final String NO_USER_FOUND = "NO_USER_FOUND";
+  public static final String RESOURCE_SHARING_SUCCESS = "RESOURCE_SHARING_SUCCESS";
+  public static final String RESOURCE_SHARING_FAILED = "RESOURCE_SHARING_FAILED";
 
   public UserFacingConstantsKey() {}
 }

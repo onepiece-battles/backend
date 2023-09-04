@@ -90,7 +90,8 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<ShareResourceResponse> shareResource(
       ShareResourceRequest shareResourceRequest) {
-    return null;
+    var response = userService.shareResource(shareResourceRequest);
+    return ResponseEntity.ok(response);
   }
 
   @Override

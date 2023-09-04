@@ -1,47 +1,58 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.character.model.CharacterDao">
-  <select id="list" resultType="com.yichi.onepiece.character.model.CharacterEntity">
-    SELECT * FROM `character`
-    <include refid="characterFilter">
-      <property name="characterFilter" value="characterFilter"/>
-    </include>
-    ORDER BY
-    <include refid="orderClause"/>
-    LIMIT #{offset}, #{size}
-  </select>
+    <select id="list" resultType="com.yichi.onepiece.character.model.CharacterEntity">
+        SELECT * FROM `character`
+        WHERE
+        ( user_id = #{userId}
+        <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
+            OR
+            id IN
+            <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
+                #{externalResourceId}
+            </foreach>
+        </if>
+        )
+        AND (
+        <include refid="characterFilter">
+            <property name="characterFilter" value="characterFilter"/>
+        </include>
+        )
+        ORDER BY
+        <include refid="orderClause"/>
+        LIMIT #{offset}, #{size}
+    </select>
 
-  <!-- Construct where clause -->
-  <sql id="characterFilter">
-    WHERE (user_id = #{userId} or id IN #{externalResourceIds})
-    <if test="characterFilter.name != null and characterFilter.name != ''">
-      <bind name="keyLike" value="'%' + characterFilter.name + '%'"/>
-      AND `name` like #{keyLike}
-    </if>
-    <if test="characterFilter.hasFruit != null">
-      AND `has_fruit` = #{characterFilter.hasFruit}
-    </if>
-    <if test="characterFilter.characterTypes != null and !characterFilter.characterTypes.isEmpty">
-      AND `character_type` IN
-      <foreach item="characterType" collection="characterFilter.characterTypes" open="("
-        separator="," close=")">
-        #{characterType}
-      </foreach>
-    </if>
-  </sql>
+    <!-- Construct where clause -->
+    <sql id="characterFilter">
+        <if test="characterFilter.name != null and characterFilter.name != ''">
+            <bind name="keyLike" value="'%' + characterFilter.name + '%'"/>
+            AND `name` like #{keyLike}
+        </if>
+        <if test="characterFilter.hasFruit != null">
+            AND `has_fruit` = #{characterFilter.hasFruit}
+        </if>
+        <if test="characterFilter.characterTypes != null and !characterFilter.characterTypes.isEmpty">
+            AND `character_type` IN
+            <foreach item="characterType" collection="characterFilter.characterTypes" open="("
+                     separator="," close=")">
+                #{characterType}
+            </foreach>
+        </if>
+    </sql>
 
-  <!-- Construct order by clause -->
-  <sql id="orderClause">
-    <choose>
-      <when test="sortList == null or sortList.isEmpty">
-        creation_record_id DESC
-      </when>
-      <otherwise>
-        <foreach item="item" collection="sortList" separator=",">
-          ${item.sortKey} ${item.sortOrder}
-        </foreach>
-      </otherwise>
-    </choose>
-  </sql>
+    <!-- Construct order by clause -->
+    <sql id="orderClause">
+        <choose>
+            <when test="sortList == null or sortList.isEmpty">
+                creation_record_id DESC
+            </when>
+            <otherwise>
+                <foreach item="item" collection="sortList" separator=",">
+                    ${item.sortKey} ${item.sortOrder}
+                </foreach>
+            </otherwise>
+        </choose>
+    </sql>
 </mapper>

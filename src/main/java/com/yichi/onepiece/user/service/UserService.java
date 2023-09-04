@@ -224,14 +224,12 @@ public class UserService {
     return UserConverter.INSTANCE.toUser(user).loginRoleResources(resourceNames);
   }
 
-  public Boolean shareResource(ShareResourceRequest request) {
+  public ShareResourceResponse shareResource(ShareResourceRequest request) {
     UUID sourceUserId = request.getSourceUserId();
     UUID targetUserId = request.getTargetUserId();
     var userResourceIds =
-        userResourceDao
-            .getByUserIdAndResourceType(targetUserId, request.getResourceType())
-            .orElseThrow(() -> new RuntimeException("More than one resource found"))
-            .getResourceIds();
+        userResourceDao.getResourceIdsByUserIdAndResourceType(
+            targetUserId, request.getResourceType());
     userResourceIds.addAll(request.getResourceIds());
     var userResource =
         UserResourceEntityBuilder.newBuilder()
@@ -241,13 +239,13 @@ public class UserService {
             .setResourceIds(userResourceIds)
             .build();
     userResourceDao.insert(userResource);
-    return Boolean.TRUE;
+    ShareResourceResponse response = new ShareResourceResponse();
+    response.setSharingInformation(
+        UserFacingConstants.getConstant(RESOURCE_SHARING_SUCCESS).getDisplayName());
+    return response;
   }
 
   public List<UUID> getResourceIdsByUserIdResourceType(UUID userId, ResourceType resourceType) {
-    return userResourceDao
-        .getByUserIdAndResourceType(userId, resourceType)
-        .orElseThrow(() -> new RuntimeException("More than one resource found"))
-        .getResourceIds();
+    return userResourceDao.getResourceIdsByUserIdAndResourceType(userId, resourceType);
   }
 }
