@@ -29,3 +29,11 @@ user:
       displayName:
         en-US: "Sign out fail, no user found"
         zh-CN: "登录系统失败，找不到用户"
+    RESOURCE_SHARING_SUCCESS:
+      displayName:
+        en-US: "Resource sharing success"
+        zh-CN: "资源分享成功"
+    RESOURCE_SHARING_FAILED:
+      displayName:
+        en-US: "Resource sharing failed"
+        zh-CN: "资源分享失败"
