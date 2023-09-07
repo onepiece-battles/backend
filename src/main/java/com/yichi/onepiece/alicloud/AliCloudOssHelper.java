@@ -23,7 +23,9 @@ public class AliCloudOssHelper {
 
   static {
     try {
-      EnvironmentVariableCredentialsProvider provider = CredentialsProviderFactory.newEnvironmentVariableCredentialsProvider();
+      EnvironmentVariableCredentialsProvider provider =
+          CredentialsProviderFactory.newEnvironmentVariableCredentialsProvider();
+      logger.info(provider.toString());
       ossClient = new OSSClientBuilder().build(OSS_EXTERNAL_ENDPOINT, provider);
     } catch (ClientException ce) {
       logger.error("Caught an ClientException, which means the client encountered "
