@@ -1,4 +1,4 @@
-package com.yichi.onepiece.pdf_export.service;
+package com.yichi.onepiece.data_export.service;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -6,7 +6,7 @@ import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.yichi.onepiece.alicloud.AliCloudOssHelper;
+import com.yichi.onepiece.alicloud.AliCloudObjectStorage;
 import com.yichi.onepiece.battle.service.BattleService;
 import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.user.UserHelper;
@@ -17,12 +17,12 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PdfExportService {
+public class DataExportService {
   private final BattleService battleService;
   private final CharacterService characterService;
 
 
-  public PdfExportService(BattleService battleService, CharacterService characterService) {
+  public DataExportService(BattleService battleService, CharacterService characterService) {
     this.battleService = battleService;
     this.characterService = characterService;
   }
@@ -57,7 +57,8 @@ public class PdfExportService {
       doc.add(new Paragraph("paragraph 3"));
       doc.close();
       writer.close();
-      AliCloudOssHelper.put("battle", new ByteArrayInputStream(outputStream.toByteArray()));
+      String uri = AliCloudObjectStorage.putFileStream(new ByteArrayInputStream(outputStream.toByteArray()));
+
     } catch (Exception e) {
       e.printStackTrace();
     }
