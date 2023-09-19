@@ -10,9 +10,9 @@ public interface FileObjectEntity {
   String getFileName();
   @Nullable
   UUID getResourceId();
-  UUID getCreatedByUserId();
+  UUID getCreatorUserId();
   Long getCreationRecordId();
-  FileCategory getFileType();
+  FileCategory getFileCategory();
   String getHttpMimeType();
   String getOssUri();
 }
