@@ -18,4 +18,8 @@ public class FileObjectService {
   public FileObjectEntity get(UUID fileId) {
     return fileObjectDao.findById(fileId).orElseThrow();
   }
+
+  public void add(FileObjectEntity fileObjectEntity) {
+    fileObjectDao.insert(fileObjectEntity);
+  }
 }

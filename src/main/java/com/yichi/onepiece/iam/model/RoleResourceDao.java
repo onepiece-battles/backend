@@ -2,6 +2,7 @@ package com.yichi.onepiece.iam.model;
 
 import com.yichi.infra.support.mybatis.annotations.Dao;
 import com.yichi.infra.support.mybatis.dao.BaseDao;
+import com.yichi.onepiece.model.ResourceType;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -43,5 +44,5 @@ public interface RoleResourceDao extends BaseDao<RoleResourceEntity, UUID> {
       "SELECT resource.name FROM role inner join role_resource ON (role.id = role_resource.role_id)"
           + " inner join resource on (role_resource.resource_id = resource.id) where role.name ="
           + " #{roleName}")
-  List<String> getResourceNamesByRoleName(@Param("roleName") String roleName);
+  List<ResourceType> getResourceNamesByRoleName(@Param("roleName") String roleName);
 }
