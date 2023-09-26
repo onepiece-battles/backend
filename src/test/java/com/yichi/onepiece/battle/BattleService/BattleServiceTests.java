@@ -13,6 +13,7 @@ import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.FruitInCharacter;
 import com.yichi.onepiece.model.FruitType;
+import com.yichi.onepiece.user.service.UserService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,6 +32,8 @@ public class BattleServiceTests {
   @Mock BattleProcessDetailDao battleProcessDetailDao;
 
   @Mock BattleStatusDetailDao battleStatusDetailDao;
+  @Mock
+  UserService userService;
 
   BattleService battleService;
 
@@ -63,10 +66,12 @@ public class BattleServiceTests {
             .setId(battleId)
             .setStarterId(characterInitId)
             .setReceiverId(characterReceiveId)
+            .setIsSystemResource(false)
             .build();
     CharacterEntity characterInit =
         CharacterEntityBuilder.newBuilder()
             .setId(characterInitId)
+            .setIsSystemResource(false)
             .setFruitLimit(1)
             .setName("Luffy")
             .setAttack(950)
@@ -83,6 +88,7 @@ public class BattleServiceTests {
         CharacterEntityBuilder.newBuilder()
             .setId(characterReceiveId)
             .setFruitLimit(1)
+            .setIsSystemResource(false)
             .setName("Teach")
             .setAttack(700)
             .setDefense(800)
@@ -101,6 +107,7 @@ public class BattleServiceTests {
         FruitEntityBuilder.newBuilder()
             .setId(fruit1Id)
             .setName("Nika")
+            .setIsSystemResource(false)
             .setAttackStrengthen(1.2)
             .setDefenseStrengthen(1.5)
             .setIntelligenceStrengthen(1.0)
@@ -114,6 +121,7 @@ public class BattleServiceTests {
     FruitEntity fruit2 =
         FruitEntityBuilder.newBuilder()
             .setId(fruit2Id)
+            .setIsSystemResource(false)
             .setName("Black")
             .setAttackStrengthen(1.3)
             .setDefenseStrengthen(1.3)
@@ -128,6 +136,7 @@ public class BattleServiceTests {
     FruitEntity fruit3 =
         FruitEntityBuilder.newBuilder()
             .setId(fruit3Id)
+            .setIsSystemResource(false)
             .setName("Earthquake")
             .setAttackStrengthen(1.6)
             .setDefenseStrengthen(1.15)

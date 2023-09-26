@@ -47,6 +47,7 @@ public class CharacterService {
   public Character addCharacter(AddCharacterRequest request) {
     var characterEntity = CharacterEntityConverter.INSTANCE.toCharacterEntity(request);
     var actionRecord = actionRecordService.create();
+    var isSystemResource = UserHelper.hasAdminPermission();
     // character does not eat any fruit by default.
     characterEntity =
         characterEntity.toBuilder()
@@ -59,6 +60,7 @@ public class CharacterService {
             .setFruits(List.of())
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
+            .setIsSystemResource(isSystemResource)
             .build();
     characterDao.insert(characterEntity);
     var insertedEntity =

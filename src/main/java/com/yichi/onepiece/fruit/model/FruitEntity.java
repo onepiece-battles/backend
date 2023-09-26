@@ -12,6 +12,7 @@ public interface FruitEntity {
   UUID getId();
 
   String getName();
+  Boolean getIsSystemResource();
 
   @Nullable
   Byte[] getProfileImage();
