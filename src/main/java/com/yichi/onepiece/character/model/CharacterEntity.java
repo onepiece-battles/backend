@@ -25,6 +25,7 @@ public interface CharacterEntity {
   String getGroupOid();
 
   Boolean getHasFruits();
+  Boolean getIsSystemResource();
 
   // default to be 1, unless special characters.
   Integer getFruitLimit();

@@ -48,6 +48,7 @@ public class BattleService {
 
   public Battle addBattle(AddBattleRequest request) {
     var actionRecord = actionRecordService.create();
+    var isSystemResource = UserHelper.hasAdminPermission();
     BattleEntity battleEntity =
         BattleEntityBuilder.newBuilder()
             .setUserId(request.getUserId())
@@ -58,6 +59,7 @@ public class BattleService {
             .setReceiverId(request.getReceiverId())
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
+            .setIsSystemResource(isSystemResource)
             .build();
 
     battleDao.insert(battleEntity);
