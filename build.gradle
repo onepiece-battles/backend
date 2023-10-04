@@ -81,7 +81,10 @@ dependencies {
     implementation "org.springframework:spring-web"
     implementation "org.springframework:spring-webmvc"
 
+    // pdf
+    implementation 'com.itextpdf:itextpdf:5.5.13.3'
 
+    // common
     implementation "org.apache.commons:commons-lang3:$apache_commons_version"
     implementation "com.google.guava:guava:$guava_version"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jackson_dataformat_version"

@@ -23,6 +23,7 @@ public interface CharacterEntityConverter {
   @Mapping(target = "userId", ignore = true)
   @Mapping(target = "creationRecordId", ignore = true)
   @Mapping(target = "modificationRecordId", ignore = true)
+  @Mapping(target = "isSystemResource", ignore = true)
   CharacterEntity toCharacterEntity(AddCharacterRequest addCharacterRequest);
 
   default String blobToString(Byte[] profileByteArray) {

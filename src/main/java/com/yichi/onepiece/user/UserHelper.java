@@ -1,6 +1,8 @@
 package com.yichi.onepiece.user;
 
 import com.yichi.onepiece.user.model.UserDetailImpl;
+import com.yichi.onepiece.user.model.UserRole;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -14,5 +16,13 @@ public class UserHelper {
   public static UserDetailImpl getCurrentUserDetail() {
     var authentication = SecurityContextHolder.getContext().getAuthentication();
     return (UserDetailImpl) authentication.getPrincipal();
+  }
+
+  public static boolean hasNikaPermission() {
+    return getCurrentUserDetail().getLoginRole().equals(UserRole.NIKA.toString());
+  }
+
+  public static boolean hasAdminPermission() {
+    return List.of(UserRole.NIKA.toString(), UserRole.ADMIN.toString()).contains(getCurrentUserDetail().getLoginRole());
   }
 }

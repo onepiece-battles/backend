@@ -31,10 +31,12 @@ public class FruitService {
 
   public Fruit addFruit(AddFruitRequest request) {
     var actionRecord = actionRecordService.create();
+    var isSystemResource = UserHelper.hasAdminPermission();
     var fruitEntity =
         FruitConverter.INSTANCE.toFruitEntity(request).toBuilder()
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
+            .setIsSystemResource(isSystemResource)
             .build();
     fruitDao.insert(fruitEntity);
     return FruitConverter.INSTANCE.toFruit(fruitEntity);

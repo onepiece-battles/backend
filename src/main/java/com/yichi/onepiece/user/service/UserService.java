@@ -208,7 +208,7 @@ public class UserService {
     }
   }
 
-  public List<String> updateLoginRole(String role) {
+  public List<ResourceType> updateLoginRole(String role) {
     var user = UserHelper.getCurrentUserDetail();
     if (!user.getUserRoles().contains(role)) {
       ExceptionUtils.notFound("user role %s not found when shifting role.", role).get();
