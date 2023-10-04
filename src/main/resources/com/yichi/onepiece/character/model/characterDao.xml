@@ -14,11 +14,9 @@
             </foreach>
         </if>
         )
-        AND (
         <include refid="characterFilter">
             <property name="characterFilter" value="characterFilter"/>
         </include>
-        )
         ORDER BY
         <include refid="orderClause"/>
         LIMIT #{offset}, #{size}

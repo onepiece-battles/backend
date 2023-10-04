@@ -13,11 +13,9 @@
             </foreach>
         </if>
         )
-        AND (
         <include refid="battleFilter">
             <property name="battleFilter" value="battleFilter"/>
         </include>
-        )
         ORDER BY
         <include refid="orderClause"/>
         LIMIT #{offset}, #{size}
