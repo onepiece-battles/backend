@@ -3,8 +3,7 @@ package com.yichi.onepiece.image.controller;
 import com.yichi.onepiece.api.ImageApi;
 import com.yichi.onepiece.image.service.ImageService;
 import com.yichi.onepiece.model.GetImageRequest;
-import com.yichi.onepiece.model.ImageType;
-// import com.yichi.onepiece.model.MetaInfo;
+import com.yichi.onepiece.model.ResourceType;
 import java.util.UUID;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -21,8 +20,9 @@ public class ImageController implements ImageApi {
   }
 
   @Override
-  public ResponseEntity<Resource> addImage(UUID id, ImageType type, MultipartFile image) {
-    var resultImage = imageService.uploadImage(id, type, image);
+  public ResponseEntity<Resource> addImage(
+      UUID id, ResourceType resourceType, MultipartFile image) {
+    var resultImage = imageService.uploadImage(id, resourceType, image);
     return ResponseEntity.ok(new ByteArrayResource(resultImage));
   }
 
