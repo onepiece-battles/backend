@@ -46,6 +46,7 @@ dependencies {
     implementation project(":api")
     implementation "org.onepiece-battles:infra-support:$onepiece_infra_version"
     annotationProcessor "org.onepiece-battles:infra-support:$onepiece_infra_version"
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
     // generate pdf
     implementation "com.github.librepdf:openpdf:$open_pdf_version"
