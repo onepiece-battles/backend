@@ -8,12 +8,11 @@ import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
-import java.io.IOException;
+import com.yichi.onepiece.utils.EncryptHelper;
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class FruitService {
@@ -110,13 +109,8 @@ public class FruitService {
     return fruitDao.batchFindById(fruitIds);
   }
 
-  public byte[] updateProfile(UUID fruitId, MultipartFile profile) {
-    Byte[] profileByte = new Byte[0];
-    try {
-      profileByte = ArrayUtils.toObject(profile.getInputStream().readAllBytes());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+  public String updateProfile(UUID fruitId, String profile) {
+    Byte[] profileByte = ArrayUtils.toObject(EncryptHelper.base64Decode(profile));
     var modificationRecord = actionRecordService.create();
     var fruit =
         fruitDao
@@ -128,7 +122,7 @@ public class FruitService {
             .setProfileImage(profileByte)
             .build();
     fruitDao.update(updatedFruit);
-    return ArrayUtils.toPrimitive(updatedFruit.getProfileImage());
+    return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(updatedFruit.getProfileImage()));
   }
 
   public byte[] getProfile(UUID fruitId) {
