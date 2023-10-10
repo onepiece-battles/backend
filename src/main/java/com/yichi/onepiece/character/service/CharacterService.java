@@ -12,14 +12,13 @@ import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.model.Character;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
-import java.io.IOException;
+import com.yichi.onepiece.utils.EncryptHelper;
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class CharacterService {
@@ -72,13 +71,8 @@ public class CharacterService {
     return CharacterEntityConverter.INSTANCE.toCharacter(insertedEntity);
   }
 
-  public byte[] updateProfile(UUID characterId, MultipartFile profile) {
-    Byte[] profileByte = new Byte[0];
-    try {
-      profileByte = ArrayUtils.toObject(profile.getInputStream().readAllBytes());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+  public String updateProfile(UUID characterId, String profile) {
+    Byte[] profileByte = ArrayUtils.toObject(EncryptHelper.base64Decode(profile));
     var modificationRecord = actionRecordService.create();
     var character =
         characterDao
@@ -90,7 +84,7 @@ public class CharacterService {
             .setProfileImage(profileByte)
             .build();
     characterDao.update(updatedCharacter);
-    return ArrayUtils.toPrimitive(updatedCharacter.getProfileImage());
+    return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(updatedCharacter.getProfileImage()));
   }
 
   public byte[] getProfile(UUID characterId) {

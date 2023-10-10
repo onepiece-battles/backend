@@ -9,7 +9,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 public class ImageController implements ImageApi {
@@ -20,10 +19,9 @@ public class ImageController implements ImageApi {
   }
 
   @Override
-  public ResponseEntity<Resource> addImage(
-      UUID id, ResourceType resourceType, MultipartFile image) {
-    var resultImage = imageService.uploadImage(id, resourceType, image);
-    return ResponseEntity.ok(new ByteArrayResource(resultImage));
+  public ResponseEntity<String> addImage(UUID id, ResourceType resourceType, String image) {
+    var encodedImage = imageService.uploadImage(id, resourceType, image);
+    return ResponseEntity.ok(encodedImage);
   }
 
   @Override

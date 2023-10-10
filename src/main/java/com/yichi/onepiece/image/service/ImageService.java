@@ -6,7 +6,6 @@ import com.yichi.onepiece.model.ResourceType;
 import com.yichi.onepiece.user.service.UserService;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ImageService {
@@ -21,7 +20,7 @@ public class ImageService {
     this.userService = userService;
   }
 
-  public byte[] uploadImage(UUID targetId, ResourceType resourceType, MultipartFile profileImage) {
+  public String uploadImage(UUID targetId, ResourceType resourceType, String profileImage) {
     switch (resourceType) {
       case USER -> {
         return userService.updateProfile(targetId, profileImage);

@@ -13,8 +13,8 @@ import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.model.*;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
+import com.yichi.onepiece.utils.EncryptHelper;
 import com.yichi.onepiece.utils.JwtHelper;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class UserService {
@@ -161,20 +160,15 @@ public class UserService {
     return new LogoutResponse().logoutResult(SUCCESS).userName(user.getName());
   }
 
-  public byte[] updateProfile(UUID userId, MultipartFile profile) {
-    Byte[] profileByte = new Byte[0];
-    try {
-      profileByte = ArrayUtils.toObject(profile.getInputStream().readAllBytes());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+  public String updateProfile(UUID userId, String profile) {
+    Byte[] profileByte = ArrayUtils.toObject(EncryptHelper.base64Decode(profile));
     var user =
         userDao
             .findById(userId)
             .orElseThrow(ExceptionUtils.notFound("user with id %s not found", userId));
     var updatedUser = user.toBuilder().setProfileImage(profileByte).build();
     userDao.update(updatedUser);
-    return ArrayUtils.toPrimitive(updatedUser.getProfileImage());
+    return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(updatedUser.getProfileImage()));
   }
 
   public byte[] getProfile(UUID userId) {
