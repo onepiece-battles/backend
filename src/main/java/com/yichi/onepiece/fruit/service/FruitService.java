@@ -125,11 +125,11 @@ public class FruitService {
     return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(updatedFruit.getProfileImage()));
   }
 
-  public byte[] getProfile(UUID fruitId) {
+  public String getProfile(UUID fruitId) {
     var fruit =
         fruitDao
             .findById(fruitId)
             .orElseThrow(ExceptionUtils.notFound("fruit with id %s not found", fruitId));
-    return ArrayUtils.toPrimitive(fruit.getProfileImage());
+    return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(fruit.getProfileImage()));
   }
 }
