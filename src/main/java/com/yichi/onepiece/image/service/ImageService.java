@@ -35,7 +35,7 @@ public class ImageService {
     throw new RuntimeException("file upload with id failed");
   }
 
-  public byte[] getImage(UUID resourceId, ResourceType resourceType) {
+  public String getImage(UUID resourceId, ResourceType resourceType) {
     switch (resourceType) {
       case USER -> {
         return userService.getProfile(resourceId);

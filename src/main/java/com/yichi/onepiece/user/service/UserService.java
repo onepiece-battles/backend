@@ -171,12 +171,12 @@ public class UserService {
     return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(updatedUser.getProfileImage()));
   }
 
-  public byte[] getProfile(UUID userId) {
+  public String getProfile(UUID userId) {
     var user =
         userDao
             .findById(userId)
             .orElseThrow(ExceptionUtils.notFound("user with id %s not found", userId));
-    return ArrayUtils.toPrimitive(user.getProfileImage());
+    return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(user.getProfileImage()));
   }
 
   public Set<String> assignRoleToUser(UUID userId, Set<String> roles) {

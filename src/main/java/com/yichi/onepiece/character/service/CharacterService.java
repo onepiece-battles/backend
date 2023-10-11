@@ -87,12 +87,12 @@ public class CharacterService {
     return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(updatedCharacter.getProfileImage()));
   }
 
-  public byte[] getProfile(UUID characterId) {
+  public String getProfile(UUID characterId) {
     var character =
         characterDao
             .findById(characterId)
             .orElseThrow(ExceptionUtils.notFound("character with id %s not found", characterId));
-    return ArrayUtils.toPrimitive(character.getProfileImage());
+    return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(character.getProfileImage()));
   }
 
   public EatFruitResponse eatFruit(UUID characterId, UUID fruitId) {
