@@ -100,4 +100,15 @@ public class UserController implements UserApi {
     return ResponseEntity.ok(
         new UpdateLoginRoleResponse().currentRole(request.getRole()).resources(resourceList));
   }
+
+  @Override
+  public ResponseEntity<UpdateUserResponse> updateUser(UpdateUserRequest updateUserRequest) {
+    return null;
+  }
+
+  @Override
+  public ResponseEntity<VerifyEmailResponse> verifyUserEmail(
+      VerifyEmailRequest verifyEmailRequest) {
+    return null;
+  }
 }
