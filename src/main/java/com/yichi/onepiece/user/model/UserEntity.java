@@ -14,6 +14,10 @@ public interface UserEntity {
 
   String getEmail();
 
+  Boolean getEmailVerified();
+
+  String getLocale();
+
   String getOrganization();
 
   String getLoginRole();
