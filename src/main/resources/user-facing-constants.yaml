@@ -37,3 +37,11 @@ user:
       displayName:
         en-US: "Resource sharing failed"
         zh-CN: "资源分享失败"
+    EMAIL_SENT:
+      displayName:
+        en-US: "Verification email has been sent to your mail box, please check"
+        zh-CN: "验证邮件已经发到您的邮箱，请确认"
+    EMAIL_SENDING_FAILED:
+      displayName:
+        en-US: "Fail to send verification email, please check the email address"
+        zh-CN: "验证邮件发送失败，请重新确认邮箱地址"

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.yichi.onepiece.BaseServiceTests;
+import com.yichi.onepiece.email.EmailClient;
 import com.yichi.onepiece.iam.model.RoleDao;
 import com.yichi.onepiece.iam.model.RoleResourceDao;
 import com.yichi.onepiece.iam.model.TokenDao;
@@ -32,6 +33,7 @@ public class UserServiceTests extends BaseServiceTests {
   @Mock private RoleResourceDao roleResourceDao;
 
   @Mock private UserResourceDao userResourceDao;
+  @Mock private EmailClient emailClient;
 
   @BeforeMethod
   public void setup() {
@@ -44,7 +46,8 @@ public class UserServiceTests extends BaseServiceTests {
             roleDao,
             userRoleDao,
             passwordEncoder,
-            userResourceDao);
+            userResourceDao,
+            emailClient);
   }
 
   @Test

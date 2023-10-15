@@ -5,6 +5,7 @@ import static com.yichi.onepiece.constants.ConstantsContainer.VALID_EMAIL_PATTER
 import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.*;
 
 import com.yichi.onepiece.constants.ConstantsContainer;
+import com.yichi.onepiece.email.EmailClient;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.iam.model.*;
 import com.yichi.onepiece.image.service.ImageUtil;
@@ -34,6 +35,7 @@ public class UserService {
   private final UserRoleDao userRoleDao;
   private final PasswordEncoder passwordEncoder;
   private final UserResourceDao userResourceDao;
+  private final EmailClient emailClient;
 
   public UserService(
       UserDao userDao,
@@ -43,7 +45,8 @@ public class UserService {
       RoleDao roleDao,
       UserRoleDao userRoleDao,
       PasswordEncoder passwordEncoder,
-      UserResourceDao userResourceDao) {
+      UserResourceDao userResourceDao,
+      EmailClient emailClient) {
     this.userDao = userDao;
     this.userDetailDao = userDetailDao;
     this.tokenDao = tokenDao;
@@ -52,6 +55,7 @@ public class UserService {
     this.userRoleDao = userRoleDao;
     this.passwordEncoder = passwordEncoder;
     this.userResourceDao = userResourceDao;
+    this.emailClient = emailClient;
   }
 
   /**
@@ -65,7 +69,12 @@ public class UserService {
    * @return register verification: key of DUPLICATE_USER_NAME/PASSWORD_DIFFERENT/REGISTER_SUCCESS
    */
   public String register(
-      String name, String password, String email, String confirmedPassword, String organization) {
+      String name,
+      String password,
+      String email,
+      String confirmedPassword,
+      String organization,
+      OnepieceLocale onepieceLocale) {
     if (!userDao.listByName(name).isEmpty()) {
       return UserFacingConstantsKey.DUPLICATE_USER_NAME;
     }
@@ -87,6 +96,8 @@ public class UserService {
             .setAccountCondition(UserAccountCondition.Registered)
             .setEncryptedPassword(encryptedPassword)
             .setEmail(email)
+            .setEmailVerified(false)
+            .setLocale(onepieceLocale)
             // USER role is the default login role
             .setLoginRole(UserRole.USER.toString())
             .setOrganization(organization)
@@ -241,5 +252,30 @@ public class UserService {
 
   public List<UUID> getResourceIdsByUserIdResourceType(UUID userId, ResourceType resourceType) {
     return userResourceDao.getResourceIdsByUserIdAndResourceType(userId, resourceType);
+  }
+
+  public User updateUser(UpdateUserRequest request) {
+    var user = userDao.findById(request.getId()).orElseThrow();
+    var updatedUser =
+        user.toBuilder()
+            .setEmail(request.getEmail())
+            .setLocale(request.getLocale())
+            .setName(request.getName())
+            .build();
+    userDao.update(updatedUser);
+    return UserConverter.INSTANCE.toUser(userDao.findById(request.getId()).orElseThrow());
+  }
+
+  public I18nText verifyEmail(VerifyEmailRequest verifyEmailRequest) {
+    // todo(yichi): send email according to locale information.
+    try {
+      emailClient.sendMail(
+          verifyEmailRequest.getEmail(),
+          "This is the verification email, please click the link below to verify this email.",
+          "Email address verification");
+    } catch (Exception e) {
+      return UserFacingConstants.getConstant(EMAIL_SENDING_FAILED).getDisplayName();
+    }
+    return UserFacingConstants.getConstant(EMAIL_SENT).getDisplayName();
   }
 }

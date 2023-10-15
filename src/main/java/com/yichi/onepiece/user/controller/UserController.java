@@ -76,7 +76,8 @@ public class UserController implements UserApi {
             registerRequest.getPassword(),
             registerRequest.getEmail(),
             registerRequest.getConfirmedPassword(),
-            registerRequest.getOrganization());
+            registerRequest.getOrganization(),
+            registerRequest.getLocale());
     var registerSuccess = verificationKey.equals(SUCCESS);
     return ResponseEntity.ok(
         new RegisterResponse()
@@ -103,12 +104,15 @@ public class UserController implements UserApi {
 
   @Override
   public ResponseEntity<UpdateUserResponse> updateUser(UpdateUserRequest updateUserRequest) {
-    return null;
+    var user = userService.updateUser(updateUserRequest);
+    return ResponseEntity.ok(new UpdateUserResponse().user(user));
   }
 
   @Override
   public ResponseEntity<VerifyEmailResponse> verifyUserEmail(
       VerifyEmailRequest verifyEmailRequest) {
-    return null;
+    var response =
+        new VerifyEmailResponse().emailNotification(userService.verifyEmail(verifyEmailRequest));
+    return ResponseEntity.ok(response);
   }
 }
