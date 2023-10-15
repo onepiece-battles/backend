@@ -1,6 +1,7 @@
 package com.yichi.onepiece.user.model;
 
 import com.yichi.infra.support.entity.Entity;
+import com.yichi.onepiece.model.OnepieceLocale;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
@@ -16,7 +17,7 @@ public interface UserEntity {
 
   Boolean getEmailVerified();
 
-  String getLocale();
+  OnepieceLocale getLocale();
 
   String getOrganization();
 

@@ -10,6 +10,8 @@ public class UserFacingConstantsKey {
   public static final String NO_USER_FOUND = "NO_USER_FOUND";
   public static final String RESOURCE_SHARING_SUCCESS = "RESOURCE_SHARING_SUCCESS";
   public static final String RESOURCE_SHARING_FAILED = "RESOURCE_SHARING_FAILED";
+  public static final String EMAIL_SENT = "EMAIL_SENT";
+  public static final String EMAIL_SENDING_FAILED = "EMAIL_SENDING_FAILED";
 
   public UserFacingConstantsKey() {}
 }
