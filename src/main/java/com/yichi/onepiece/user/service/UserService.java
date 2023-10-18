@@ -145,9 +145,7 @@ public class UserService {
     userDetailDao.update(user);
     var loginUserResource = roleResourceDao.getResourceNamesByRoleName(user.getLoginRole());
     var tokens =
-        tokenDao.listTokenByUserId(user.getId()).stream()
-            .map(TokenEntity::getTokenValue)
-            .collect(Collectors.toList());
+        tokenDao.listTokenByUserId(user.getId()).stream().map(TokenEntity::getTokenValue).toList();
     return new LoginResponse()
         .verification(null)
         .accessToken(jwtToken)
@@ -263,7 +261,13 @@ public class UserService {
             .setName(request.getName())
             .build();
     userDao.update(updatedUser);
-    return UserConverter.INSTANCE.toUser(userDao.findById(request.getId()).orElseThrow());
+    var loginUserResource = roleResourceDao.getResourceNamesByRoleName(user.getLoginRole());
+    var tokens =
+        tokenDao.listTokenByUserId(user.getId()).stream().map(TokenEntity::getTokenValue).toList();
+    return UserConverter.INSTANCE
+        .toUser(userDao.findById(request.getId()).orElseThrow())
+        .loginRoleResources(loginUserResource)
+        .tokens(tokens);
   }
 
   public I18nText verifyEmail(VerifyEmailRequest verifyEmailRequest) {
