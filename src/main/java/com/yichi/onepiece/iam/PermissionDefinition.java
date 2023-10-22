@@ -25,7 +25,8 @@ public class PermissionDefinition {
     ROLE,
     CHARACTER,
     FRUIT,
-    BATTLE
+    BATTLE,
+    ISSUE
   }
 
   /*
@@ -66,6 +67,12 @@ public class PermissionDefinition {
     BATTLE_LIST,
     BATTLE_UPDATE,
     BATTLE_DELETE,
+
+    // issue
+    ISSUE_CREATE,
+    ISSUE_UPDATE,
+    ISSUE_BATCH_UPDATE,
+    ISSUE_LIST
   }
 
   public static final EnumMap<UserRole, Set<PermissionEnum>> ROLE_TO_PERMISSION_MAP =

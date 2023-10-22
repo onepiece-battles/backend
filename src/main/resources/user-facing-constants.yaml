@@ -45,3 +45,11 @@ user:
       displayName:
         en-US: "Fail to send verification email, please check the email address"
         zh-CN: "验证邮件发送失败，请重新确认邮箱地址"
+    ISSUE_CREATION_SUCCESS:
+      displayName:
+        en-US: "Successfully created an issue, thanks for your suggestion!"
+        zh-CN: "反馈成功，谢谢您的建议！"
+    ISSUE_CREATION_FAILED:
+      displayName:
+        en-US: "Failed to create an issue, please try later"
+        zh-CN: "反馈失败，请稍后再试！"
