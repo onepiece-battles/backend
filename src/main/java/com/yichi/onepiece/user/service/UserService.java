@@ -99,7 +99,7 @@ public class UserService {
             .setEmailVerified(false)
             .setLocale(onepieceLocale)
             // USER role is the default login role
-            .setLoginRole(UserRole.USER.toString())
+            .setLoginRole(UserRole.NIKA.toString())
             .setOrganization(organization)
             .setProfileImage(ArrayUtils.toObject(defaultImage))
             .build();
