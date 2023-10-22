@@ -89,10 +89,7 @@ public class PrepareResourceAndPermissionData implements CommandLineRunner {
                 .setRoleId(roleId)
                 .permissions(
                     entry.getValue().stream()
-                        .map(
-                            permission -> {
-                              return entry.getKey().trim() + "_" + permission.trim();
-                            })
+                        .map(permission -> entry.getKey().trim() + "_" + permission.trim())
                         .collect(Collectors.toSet()))
                 .build();
         if (roleResourceEntityOptional.isEmpty()) {

@@ -1,6 +1,7 @@
 package com.yichi.onepiece.iam;
 
 import com.yichi.onepiece.exception.ExceptionUtils;
+import com.yichi.onepiece.model.ResourceType;
 import com.yichi.onepiece.user.model.UserRole;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,15 +20,6 @@ public class PermissionDefinition {
   private static final String LIST_SUFFIX = "LIST";
   private static final String UPDATE_SUFFIX = "UPDATE";
   private static final String DELETE_SUFFIX = "DELETE";
-
-  public enum ResourceEnum {
-    USER,
-    ROLE,
-    CHARACTER,
-    FRUIT,
-    BATTLE,
-    ISSUE
-  }
 
   /*
    rules for permission enum:
@@ -114,8 +106,8 @@ public class PermissionDefinition {
                       .collect(Collectors.toSet()))));
 
   public static Map<String, Set<String>> getResourcePermissionMap() {
-    return Arrays.stream(ResourceEnum.values())
-        .map(ResourceEnum::toString)
+    return Arrays.stream(ResourceType.values())
+        .map(ResourceType::toString)
         .collect(Collectors.toMap(value -> value, PermissionDefinition::getPermissionByResource));
   }
 
@@ -123,7 +115,8 @@ public class PermissionDefinition {
       Set<PermissionEnum> permissions) {
     Map<String, Set<String>> resourcePermissionMap = new HashMap<>();
     for (var permission : permissions) {
-      String[] result = permission.toString().split("_");
+      // resource name should not contain any '_'.
+      String[] result = permission.toString().split("_", 2);
       var resourceValue = result[0];
       var permissionValue = result[1];
       var currentSet = resourcePermissionMap.getOrDefault(resourceValue, new HashSet<>());
