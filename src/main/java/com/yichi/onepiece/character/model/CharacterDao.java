@@ -14,7 +14,7 @@ import org.apache.ibatis.annotations.Select;
 @Dao
 @Mapper
 public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
-  // see sql definition in character.xml
+  // see sql definition in characterDao.xml
   List<CharacterEntity> list(
       @Param("characterFilter") CharacterFilter characterFilter,
       @Param("sortList") Collection<CharacterSortableField> sortList,

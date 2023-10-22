@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yichi.onepiece.issue.model.IssueDao">
+    <select id="list" resultType="com.yichi.onepiece.issue.model.IssueEntity">
+        SELECT * FROM `issue`
+        WHERE
+        0=0
+        <include refid="issueFilter">
+            <property name="issueFilter" value="issueFilter"/>
+        </include>
+        ORDER BY
+        <include refid="orderClause"/>
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <!-- Construct where clause -->
+    <sql id="issueFilter">
+        <if test="issueFilter.issueHeader != null and issueFilter.issueHeader != ''">
+            <bind name="keyLike" value="'%' + issueFilter.issueHeader + '%"/>
+            AND `issue_header` like #{keyLike}
+        </if>
+        <if test="issueFilter.issueTypes != null and !issueFilter.issueTypes.isEmpty">
+            AND `issue_type` IN
+            <foreach item="issueType" collection="issueFilter.issueTypes" open="("
+                     separator="," close=")">
+                #{issueType}
+            </foreach>
+        </if>
+        <if test="issueFilter.issueStatuses != null and !issueFilter.issueStatuses.isEmpty">
+            AND `issue_status` IN
+            <foreach item="issueStatus" collection="issueFilter.issueStatuses" open="("
+                     separator="," close=")">
+                #{issueStatus}
+            </foreach>
+        </if>
+    </sql>
+
+    <!-- Construct order by clause -->
+    <sql id="orderClause">
+        <choose>
+            <when test="sortList == null or sortList.isEmpty">
+                creation_timestamp DESC
+            </when>
+            <otherwise>
+                <foreach item="item" collection="sortList" separator=",">
+                    ${item.sortKey} ${item.sortOrder}
+                </foreach>
+            </otherwise>
+        </choose>
+    </sql>
+</mapper>
