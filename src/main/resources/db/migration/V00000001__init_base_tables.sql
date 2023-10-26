@@ -7,7 +7,8 @@ CREATE TABLE user (
     login_role VARCHAR(255) not null ,
     encrypted_password VARCHAR(100) not null ,
     account_condition VARCHAR(100) not null,
-    profile_image blob not null
+    profile_image blob not null,
+    unique key unique_name(name)
 );
 
 -- role
