@@ -1,19 +1,19 @@
 -- user
 CREATE TABLE user (
     id BINARY(16) PRIMARY KEY,
-    `name` VARCHAR(255),
-    email VARCHAR(255),
+    `name` VARCHAR(255) not null,
+    email VARCHAR(255) not null,
     organization VARCHAR(255),
-    login_role VARCHAR(255),
-    encrypted_password VARCHAR(100),
-    account_condition VARCHAR(100),
-    profile_image BLOB
+    login_role VARCHAR(255) not null ,
+    encrypted_password VARCHAR(100) not null ,
+    account_condition VARCHAR(100) not null,
+    profile_image blob not null
 );
 
 -- role
 CREATE TABLE role (
     id BINARY(16) PRIMARY KEY,
-    name VARCHAR(255)
+    name VARCHAR(255) not null
 );
 
 -- resource

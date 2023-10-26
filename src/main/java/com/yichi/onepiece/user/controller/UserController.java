@@ -109,6 +109,12 @@ public class UserController implements UserApi {
   }
 
   @Override
+  public ResponseEntity<VerifyByEmailCodeResponse> verifyByEmailCode(
+      VerifyByEmailCodeRequest verifyByEmailCodeRequest) {
+    return null;
+  }
+
+  @Override
   public ResponseEntity<VerifyEmailResponse> verifyUserEmail(
       VerifyEmailRequest verifyEmailRequest) {
     var response =
