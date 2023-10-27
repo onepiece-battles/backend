@@ -11,10 +11,12 @@ import com.yichi.onepiece.iam.model.RoleResourceDao;
 import com.yichi.onepiece.iam.model.TokenDao;
 import com.yichi.onepiece.iam.model.UserRoleDao;
 import com.yichi.onepiece.model.LogoutResponse;
+import com.yichi.onepiece.user.model.EmailVerificationDao;
 import com.yichi.onepiece.user.model.UserDao;
 import com.yichi.onepiece.user.model.UserDetailDao;
 import com.yichi.onepiece.user.model.UserResourceDao;
 import com.yichi.onepiece.user.service.UserService;
+import java.time.Clock;
 import java.util.Optional;
 import java.util.UUID;
 import org.mockito.Mock;
@@ -34,6 +36,8 @@ public class UserServiceTests extends BaseServiceTests {
 
   @Mock private UserResourceDao userResourceDao;
   @Mock private EmailClient emailClient;
+  @Mock private EmailVerificationDao emailVerificationDao;
+  @Mock private Clock clock;
 
   @BeforeMethod
   public void setup() {
@@ -47,7 +51,7 @@ public class UserServiceTests extends BaseServiceTests {
             userRoleDao,
             passwordEncoder,
             userResourceDao,
-            emailClient);
+            emailClient, emailVerificationDao, clock);
   }
 
   @Test

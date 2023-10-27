@@ -16,6 +16,8 @@ import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import com.yichi.onepiece.utils.EncryptHelper;
 import com.yichi.onepiece.utils.JwtHelper;
+import com.yichi.onepiece.utils.RandomGenerator;
+import java.time.Clock;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
@@ -37,6 +39,9 @@ public class UserService {
   private final UserResourceDao userResourceDao;
   private final EmailClient emailClient;
 
+  private final EmailVerificationDao emailVerificationDao;
+  private final Clock clock;
+
   public UserService(
       UserDao userDao,
       UserDetailDao userDetailDao,
@@ -46,7 +51,7 @@ public class UserService {
       UserRoleDao userRoleDao,
       PasswordEncoder passwordEncoder,
       UserResourceDao userResourceDao,
-      EmailClient emailClient) {
+      EmailClient emailClient, EmailVerificationDao emailVerificationDao, Clock clock) {
     this.userDao = userDao;
     this.userDetailDao = userDetailDao;
     this.tokenDao = tokenDao;
@@ -56,6 +61,8 @@ public class UserService {
     this.passwordEncoder = passwordEncoder;
     this.userResourceDao = userResourceDao;
     this.emailClient = emailClient;
+    this.emailVerificationDao = emailVerificationDao;
+    this.clock = clock;
   }
 
   /**
@@ -273,13 +280,40 @@ public class UserService {
   public I18nText verifyEmail(VerifyEmailRequest verifyEmailRequest) {
     // todo(yichi): send email according to locale information.
     try {
+      long creationTimestamp = clock.millis();
+      // 5 minutes later
+      long expirationTimestamp = creationTimestamp + 300000L;
+      String verificationCode = RandomGenerator.generateVerificationCode();
+      var emailVerificationEntity = EmailVerificationEntityBuilder.newBuilder()
+              .setEmail(verifyEmailRequest.getEmail())
+                  .setUserId(verifyEmailRequest.getId())
+                      .setEmailVerificationCode(verificationCode)
+                          .setCreationTimestamp(clock.millis())
+          .setExpirationTimestamp(expirationTimestamp)
+          .isUsed(false)
+                              .build();
+      emailVerificationDao.insert(emailVerificationEntity);
       emailClient.sendMail(
           verifyEmailRequest.getEmail(),
-          "This is the verification email, please click the link below to verify this email.",
+          "This is the verification email, The verification code is: "+verificationCode,
           "Email address verification");
     } catch (Exception e) {
       return UserFacingConstants.getConstant(EMAIL_SENDING_FAILED).getDisplayName();
     }
     return UserFacingConstants.getConstant(EMAIL_SENT).getDisplayName();
+  }
+
+  public VerifyByEmailCodeResponse verifyByCode(VerifyByEmailCodeRequest request) {
+    var emailVerificationEntity=
+        emailVerificationDao.getByEmailAndUserId(request.getEmail(), request.getUserId()).orElseThrow();
+    boolean verifyResult = emailVerificationEntity.getEmailVerificationCode().equals(request.getVerificationCode()) &&
+        !emailVerificationEntity.getIsUsed() && emailVerificationEntity.getExpirationTimestamp()>clock.millis();
+    // if verification code is correct, send mark user email as verified.
+    if(verifyResult) {
+      var user = userDao.findById(request.getUserId()).orElseThrow();
+      user.toBuilder().setEmailVerified(true);
+      userDao.update(user);
+    }
+    return new VerifyByEmailCodeResponse().verifyResult(verifyResult);
   }
 }
