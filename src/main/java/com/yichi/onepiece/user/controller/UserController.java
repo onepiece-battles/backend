@@ -111,12 +111,17 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<VerifyByEmailCodeResponse> verifyByEmailCode(
       VerifyByEmailCodeRequest verifyByEmailCodeRequest) {
-    return null;
+      iamService.checkPermissionOfCurrentAccount(
+      UserEntity.ENTITY_TYPE, Set.of(PermissionEnum.USER_GET, PermissionEnum.USER_UPDATE));
+      var response = userService.verifyByCode(verifyByEmailCodeRequest);
+      return ResponseEntity.ok(response);
   }
 
   @Override
   public ResponseEntity<VerifyEmailResponse> verifyUserEmail(
       VerifyEmailRequest verifyEmailRequest) {
+    iamService.checkPermissionOfCurrentAccount(
+        UserEntity.ENTITY_TYPE, Set.of(PermissionEnum.USER_GET));
     var response =
         new VerifyEmailResponse().emailNotification(userService.verifyEmail(verifyEmailRequest));
     return ResponseEntity.ok(response);
