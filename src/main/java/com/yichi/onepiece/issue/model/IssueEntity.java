@@ -1,6 +1,7 @@
 package com.yichi.onepiece.issue.model;
 
 import com.yichi.infra.support.entity.Entity;
+import com.yichi.onepiece.model.IssueStatus;
 import com.yichi.onepiece.model.IssueType;
 import java.util.UUID;
 
@@ -18,7 +19,7 @@ public interface IssueEntity {
 
   String getIssueDescription();
 
-  String getIssueStatus();
+  IssueStatus getIssueStatus();
 
   Long getCreationTimestamp();
 

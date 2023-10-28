@@ -25,13 +25,18 @@ public class IssueService {
   public void BatchUpdateIssue(BatchUpdateIssueRequest request) {
     request.getUpdatedIssues().stream()
         .map(IssueConverter.INSTANCE::toIssueEntity)
+            .map(value -> value.toBuilder()
+                    .setModificationTimestamp(clock.millis())
+                    .build())
         .forEach(issueDao::update);
   }
 
   public I18nText createIssue(CreateIssueRequest request) {
     var issueEntity = IssueConverter.INSTANCE.toIssueEntity(request);
     var time = clock.millis();
-    issueEntity.toBuilder()
+    issueEntity = issueEntity.toBuilder()
+            .setIssueType(request.getIssueType())
+            .setIssueStatus(request.getIssueStatus())
         .setCreationUserId(UserHelper.getCurrentUserId())
         .setCreationTimestamp(time)
         .setModificationTimestamp(time)
