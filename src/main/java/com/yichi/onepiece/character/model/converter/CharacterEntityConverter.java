@@ -4,6 +4,7 @@ import com.yichi.infra.support.EntityBuilder;
 import com.yichi.onepiece.character.model.CharacterEntity;
 import com.yichi.onepiece.model.AddCharacterRequest;
 import com.yichi.onepiece.model.Character;
+import com.yichi.onepiece.model.CharacterFullView;
 import com.yichi.onepiece.utils.EncryptHelper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.mapstruct.Mapper;

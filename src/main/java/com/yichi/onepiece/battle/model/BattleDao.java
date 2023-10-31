@@ -25,4 +25,7 @@ public interface BattleDao extends BaseDao<BattleEntity, UUID> {
 
   @Select("SELECT COUNT(id) FROM battle")
   int count();
+
+  @Select("select * from battle where #{characterId} in (battle.starter_id, battle.receiver_id)")
+  List<UUID> getBattleIdsByCharacterId(@Param("characterId") UUID characterId);
 }
