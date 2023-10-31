@@ -51,7 +51,9 @@ public class UserService {
       UserRoleDao userRoleDao,
       PasswordEncoder passwordEncoder,
       UserResourceDao userResourceDao,
-      EmailClient emailClient, EmailVerificationDao emailVerificationDao, Clock clock) {
+      EmailClient emailClient,
+      EmailVerificationDao emailVerificationDao,
+      Clock clock) {
     this.userDao = userDao;
     this.userDetailDao = userDetailDao;
     this.tokenDao = tokenDao;
@@ -153,6 +155,11 @@ public class UserService {
     var loginUserResource = roleResourceDao.getResourceNamesByRoleName(user.getLoginRole());
     var tokens =
         tokenDao.listTokenByUserId(user.getId()).stream().map(TokenEntity::getTokenValue).toList();
+    var roleIds = userRoleDao.getByUserId(user.getId());
+    var roleNames =
+        roleDao.batchFindById(roleIds).stream()
+            .map(RoleEntity::getName)
+            .collect(Collectors.toSet());
     return new LoginResponse()
         .verification(null)
         .accessToken(jwtToken)
@@ -161,6 +168,7 @@ public class UserService {
             UserConverter.INSTANCE
                 .toUser(user)
                 .loginRoleResources(loginUserResource)
+                .userRoles(roleNames)
                 .tokens(tokens));
   }
 
@@ -284,18 +292,19 @@ public class UserService {
       // 5 minutes later
       long expirationTimestamp = creationTimestamp + 300000L;
       String verificationCode = RandomGenerator.generateVerificationCode();
-      var emailVerificationEntity = EmailVerificationEntityBuilder.newBuilder()
+      var emailVerificationEntity =
+          EmailVerificationEntityBuilder.newBuilder()
               .setEmail(verifyEmailRequest.getEmail())
-                  .setUserId(verifyEmailRequest.getId())
-                      .setEmailVerificationCode(verificationCode)
-                          .setCreationTimestamp(clock.millis())
-          .setExpirationTimestamp(expirationTimestamp)
-          .isUsed(false)
-                              .build();
+              .setUserId(verifyEmailRequest.getId())
+              .setEmailVerificationCode(verificationCode)
+              .setCreationTimestamp(clock.millis())
+              .setExpirationTimestamp(expirationTimestamp)
+              .isUsed(false)
+              .build();
       emailVerificationDao.insert(emailVerificationEntity);
       emailClient.sendMail(
           verifyEmailRequest.getEmail(),
-          "This is the verification email, The verification code is: "+verificationCode,
+          "This is the verification email, The verification code is: " + verificationCode,
           "Email address verification");
     } catch (Exception e) {
       return UserFacingConstants.getConstant(EMAIL_SENDING_FAILED).getDisplayName();
@@ -304,12 +313,16 @@ public class UserService {
   }
 
   public VerifyByEmailCodeResponse verifyByCode(VerifyByEmailCodeRequest request) {
-    var emailVerificationEntity=
-        emailVerificationDao.getByEmailAndUserId(request.getEmail(), request.getUserId()).orElseThrow();
-    boolean verifyResult = emailVerificationEntity.getEmailVerificationCode().equals(request.getVerificationCode()) &&
-        !emailVerificationEntity.getIsUsed() && emailVerificationEntity.getExpirationTimestamp()>clock.millis();
+    var emailVerificationEntity =
+        emailVerificationDao
+            .getByEmailAndUserId(request.getEmail(), request.getUserId())
+            .orElseThrow();
+    boolean verifyResult =
+        emailVerificationEntity.getEmailVerificationCode().equals(request.getVerificationCode())
+            && !emailVerificationEntity.getIsUsed()
+            && emailVerificationEntity.getExpirationTimestamp() > clock.millis();
     // if verification code is correct, send mark user email as verified.
-    if(verifyResult) {
+    if (verifyResult) {
       var user = userDao.findById(request.getUserId()).orElseThrow();
       user.toBuilder().setEmailVerified(true);
       userDao.update(user);
