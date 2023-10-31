@@ -98,6 +98,12 @@ public class BattleService {
     return new ListBattleResponse().battles(battleList).totalSize(totalSize);
   }
 
+  public ListBattleByIdResponse batchFindById(ListBattleByIdsRequest request) {
+    var battleEntities =  battleDao.batchFindById(request.getBattleIds());
+    var battles = battleEntities.stream().map(BattleConverter.INSTANCE::toBattle).toList();
+    return new ListBattleByIdResponse().battles(battles);
+  }
+
   public StartBattleResponse startBattle(UUID battleId) {
     var battle =
         battleDao

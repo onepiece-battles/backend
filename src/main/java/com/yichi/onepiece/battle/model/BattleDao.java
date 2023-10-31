@@ -29,4 +29,6 @@ public interface BattleDao extends BaseDao<BattleEntity, UUID> {
   @Select("select * from battle where #{characterId} in (battle.starter_id, battle.receiver_id)"
       + "and #{userId} = battle.user_id")
   List<UUID> getBattleIdsByCharacterId(@Param("characterId") UUID characterId, @Param("userId") UUID userId);
+
+
 }
