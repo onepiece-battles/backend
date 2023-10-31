@@ -98,10 +98,6 @@ public class BattleService {
     return new ListBattleResponse().battles(battleList).totalSize(totalSize);
   }
 
-  public List<UUID> getBattleIdsByCharacterId(UUID characterId) {
-    return battleDao.getBattleIdsByCharacterId(characterId);
-  }
-
   public StartBattleResponse startBattle(UUID battleId) {
     var battle =
         battleDao
