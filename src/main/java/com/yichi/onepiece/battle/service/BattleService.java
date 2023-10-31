@@ -99,6 +99,9 @@ public class BattleService {
   }
 
   public ListBattleByIdResponse batchFindById(ListBattleByIdsRequest request) {
+    if (request.getBattleIds().isEmpty()) {
+      return new ListBattleByIdResponse().battles(List.of());
+    }
     var battleEntities =  battleDao.batchFindById(request.getBattleIds());
     var battles = battleEntities.stream().map(BattleConverter.INSTANCE::toBattle).toList();
     return new ListBattleByIdResponse().battles(battles);
