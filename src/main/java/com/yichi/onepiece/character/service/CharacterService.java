@@ -1,5 +1,6 @@
 package com.yichi.onepiece.character.service;
 
+import com.yichi.onepiece.battle.model.BattleDao;
 import com.yichi.onepiece.character.model.CharacterDao;
 import com.yichi.onepiece.character.model.CharacterEntity;
 import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
@@ -29,16 +30,19 @@ public class CharacterService {
 
   private final CharacterDao characterDao;
   private final FruitService fruitService;
+  // use dao temporarily for cycle dependency
+  private final BattleDao battleDao;
   private final ActionRecordService actionRecordService;
   private final UserService userService;
 
   public CharacterService(
       CharacterDao CharacterDao,
       FruitService fruitService,
-      ActionRecordService actionRecordService,
+      BattleDao battleDao, ActionRecordService actionRecordService,
       UserService userService) {
     this.characterDao = CharacterDao;
     this.fruitService = fruitService;
+    this.battleDao = battleDao;
     this.actionRecordService = actionRecordService;
     this.userService = userService;
   }
@@ -93,6 +97,12 @@ public class CharacterService {
             .findById(characterId)
             .orElseThrow(ExceptionUtils.notFound("character with id %s not found", characterId));
     return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(character.getProfileImage()));
+  }
+
+  public CharacterFullView getCharacter(UUID characterId) {
+    var characterEntity = characterDao.findById(characterId).orElseThrow();
+    var battleIds = battleDao.getBattleIdsByCharacterId(characterId, UserHelper.getCurrentUserId());
+    return new CharacterFullView().character(CharacterEntityConverter.INSTANCE.toCharacter(characterEntity)).battleIds(battleIds);
   }
 
   public EatFruitResponse eatFruit(UUID characterId, UUID fruitId) {
