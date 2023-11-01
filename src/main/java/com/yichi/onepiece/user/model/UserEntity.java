@@ -2,6 +2,7 @@ package com.yichi.onepiece.user.model;
 
 import com.yichi.infra.support.entity.Entity;
 import com.yichi.onepiece.model.OnepieceLocale;
+import com.yichi.onepiece.model.UserRole;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
@@ -21,7 +22,7 @@ public interface UserEntity {
 
   String getOrganization();
 
-  String getLoginRole();
+  UserRole getLoginRole();
 
   String getEncryptedPassword();
 

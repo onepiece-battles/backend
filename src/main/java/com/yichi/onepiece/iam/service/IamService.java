@@ -5,6 +5,7 @@ import com.yichi.onepiece.exception.PermissionDeniedException;
 import com.yichi.onepiece.iam.PermissionDefinition;
 import com.yichi.onepiece.iam.PermissionDefinition.PermissionEnum;
 import com.yichi.onepiece.iam.model.*;
+import com.yichi.onepiece.model.UserRole;
 import com.yichi.onepiece.user.UserHelper;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -58,7 +59,7 @@ public class IamService {
   }
 
   private void checkPermission(
-      String resourceType, Set<String> permissionEnums, List<String> roleNames) {
+      String resourceType, Set<String> permissionEnums, List<UserRole> roleNames) {
     var roleEntities = roleDao.listRoleByRoleNames(roleNames);
     var roleResourceEntities =
         roleResourceDao.listRoleResourceByRoleIds(

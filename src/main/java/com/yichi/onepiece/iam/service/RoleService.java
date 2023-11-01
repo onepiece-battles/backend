@@ -23,11 +23,11 @@ public class RoleService {
     var role = RoleEntityBuilder.newBuilder().setName(addRoleRequest.getRoleName()).build();
     roleDao.insert(role);
     var roleList =
-        roleDao.listAllRoles().stream().map(RoleEntity::getName).collect(Collectors.toSet());
-    return new AddRoleResponse().roleList(roleList);
+        roleDao.listAllRoles().stream().map(RoleEntity::getName).collect(Collectors.toList());
+    return new AddRoleResponse().userRoles(roleList);
   }
 
-  public RoleEntity getRoleByName(String roleName) {
+  public RoleEntity getRoleByName(UserRole roleName) {
     return roleDao.findByRoleName(roleName).orElseThrow();
   }
 

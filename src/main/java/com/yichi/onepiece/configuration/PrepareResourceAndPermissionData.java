@@ -3,7 +3,7 @@ package com.yichi.onepiece.configuration;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.iam.PermissionDefinition;
 import com.yichi.onepiece.iam.model.*;
-import com.yichi.onepiece.user.model.UserRole;
+import com.yichi.onepiece.model.UserRole;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -57,7 +57,7 @@ public class PrepareResourceAndPermissionData implements CommandLineRunner {
       if (existingRoleNames.contains(userRole.name())) {
         continue;
       }
-      RoleEntity roleEntity = RoleEntityBuilder.newBuilder().setName(userRole.toString()).build();
+      RoleEntity roleEntity = RoleEntityBuilder.newBuilder().setName(userRole).build();
       roleEntities.add(roleEntity);
     }
     if (!roleEntities.isEmpty()) {
@@ -68,7 +68,7 @@ public class PrepareResourceAndPermissionData implements CommandLineRunner {
       var permissionSet = PermissionDefinition.ROLE_TO_PERMISSION_MAP.get(role);
       var roleId =
           roleDao
-              .findByRoleName(role.toString())
+              .findByRoleName(role)
               .orElseThrow(ExceptionUtils.notFound("Role with name %s not found", role.toString()))
               .getId();
       Map<String, Set<String>> resourceNameToPermissionsMap =
@@ -90,7 +90,7 @@ public class PrepareResourceAndPermissionData implements CommandLineRunner {
                 .permissions(
                     entry.getValue().stream()
                         .map(permission -> entry.getKey().trim() + "_" + permission.trim())
-                        .collect(Collectors.toSet()))
+                        .collect(Collectors.toList()))
                 .build();
         if (roleResourceEntityOptional.isEmpty()) {
           insertEntities.add(newEntity);

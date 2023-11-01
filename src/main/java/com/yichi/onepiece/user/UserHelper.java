@@ -1,7 +1,7 @@
 package com.yichi.onepiece.user;
 
 import com.yichi.onepiece.user.model.UserDetailImpl;
-import com.yichi.onepiece.user.model.UserRole;
+import com.yichi.onepiece.model.UserRole;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.security.core.context.SecurityContextHolder;
