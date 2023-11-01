@@ -65,6 +65,7 @@ public class PrepareResourceAndPermissionData implements CommandLineRunner {
     }
     // assign resource and permissions to role
     for (var role : UserRole.values()) {
+      logger.info("Processing role: {}",role);
       var permissionSet = PermissionDefinition.ROLE_TO_PERMISSION_MAP.get(role);
       var roleId =
           roleDao
@@ -73,6 +74,7 @@ public class PrepareResourceAndPermissionData implements CommandLineRunner {
               .getId();
       Map<String, Set<String>> resourceNameToPermissionsMap =
           PermissionDefinition.getResourcePermissionMapByPermissionSet(permissionSet);
+      logger.info("resource name to permission map: {}",resourceNameToPermissionsMap);
       List<RoleResourceEntity> insertEntities = new ArrayList<>();
       for (Map.Entry<String, Set<String>> entry : resourceNameToPermissionsMap.entrySet()) {
         var resourceId =
