@@ -2,7 +2,7 @@ package com.yichi.onepiece.iam;
 
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.model.ResourceType;
-import com.yichi.onepiece.user.model.UserRole;
+import com.yichi.onepiece.model.UserRole;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -79,7 +79,7 @@ public class PermissionDefinition {
                                   .contains(permissionEnum))
                       .collect(Collectors.toSet())),
               Map.entry(
-                  UserRole.USER,
+                  UserRole.NORMAL,
                   Stream.concat(
                           Stream.concat(
                               Stream.of(PermissionEnum.USER_GET, PermissionEnum.USER_UPDATE),

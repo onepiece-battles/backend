@@ -59,6 +59,7 @@ public class UserController implements UserApi {
     authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, password));
     logger.info("authenticate finished");
     var loginResponse = userService.login(userName);
+    logger.info("print controller role names = {}", loginResponse.getUser());
     return ResponseEntity.ok(loginResponse);
   }
 

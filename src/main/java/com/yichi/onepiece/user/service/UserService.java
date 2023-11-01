@@ -10,6 +10,7 @@ import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.iam.model.*;
 import com.yichi.onepiece.image.service.ImageUtil;
 import com.yichi.onepiece.model.*;
+import com.yichi.onepiece.model.UserRole;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.model.*;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
@@ -108,22 +109,20 @@ public class UserService {
             .setEmailVerified(false)
             .setLocale(onepieceLocale)
             // USER role is the default login role
-            .setLoginRole(UserRole.NIKA.toString())
+            .setLoginRole(UserRole.NIKA)
             .setOrganization(organization)
             .setProfileImage(ArrayUtils.toObject(defaultImage))
             .build();
     userDao.insert(user);
-    // newly registered users are default to have role: "USER"
-    var defaultRoleEntity =
+    // newly registered users are default to have role: "NIKA", "NORMAL", "ADMIN" and "VISITOR"
+    var roleEntities =
         roleDao
-            .findByRoleName(UserRole.USER.toString())
-            .orElseThrow(
-                ExceptionUtils.notFound("role with name %s not found", UserRole.USER.toString()));
-    userRoleDao.insert(
+            .listRoleByRoleNames(Arrays.stream(UserRole.values()).toList());
+    roleEntities.forEach(roleEntity -> userRoleDao.insert(
         UserRoleEntityBuilder.newBuilder()
             .setUserId(user.getId())
-            .setRoleId(defaultRoleEntity.getId())
-            .build());
+            .setRoleId(roleEntity.getId())
+            .build()));
     return SUCCESS;
   }
 
@@ -159,7 +158,9 @@ public class UserService {
     var roleNames =
         roleDao.batchFindById(roleIds).stream()
             .map(RoleEntity::getName)
-            .collect(Collectors.toSet());
+            .collect(Collectors.toList());
+    logger.info("print role names");
+    logger.info(roleNames.toString());
     return new LoginResponse()
         .verification(null)
         .accessToken(jwtToken)
@@ -203,7 +204,7 @@ public class UserService {
     return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(user.getProfileImage()));
   }
 
-  public Set<String> assignRoleToUser(UUID userId, Set<String> roles) {
+  public List<UserRole> assignRoleToUser(UUID userId, List<UserRole> roles) {
     var roleEntities = roleDao.listAllRoles();
     var roleNameFullSet =
         roleEntities.stream()
@@ -226,7 +227,7 @@ public class UserService {
     }
   }
 
-  public List<ResourceType> updateLoginRole(String role) {
+  public List<ResourceType> updateLoginRole(UserRole role) {
     var user = UserHelper.getCurrentUserDetail();
     if (!user.getUserRoles().contains(role)) {
       ExceptionUtils.notFound("user role %s not found when shifting role.", role).get();

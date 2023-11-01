@@ -3,19 +3,19 @@ package com.yichi.onepiece.user.model;
 import com.yichi.onepiece.iam.model.TokenEntity;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class UserDetailImpl extends UserEntityImpl implements UserDetails {
-  private Set<String> userRoles;
+  // not using enum here is because the transform of GrantedAuthority to User.
+  private List<String> userRoles;
   private List<TokenEntity> tokens;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return getUserRoles().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    return getUserRoles().stream().map(value-> new SimpleGrantedAuthority(value.toString())).collect(Collectors.toList());
   }
 
   public List<TokenEntity> getTokens() {
@@ -26,11 +26,11 @@ public class UserDetailImpl extends UserEntityImpl implements UserDetails {
     this.tokens = tokens;
   }
 
-  public Set<String> getUserRoles() {
-    return userRoles;
+  public List<String> getUserRoles() {
+    return userRoles.stream().map(String::toString).collect(Collectors.toList());
   }
 
-  public void setUserRoles(Set<String> userRoles) {
+  public void setUserRoles(List<String> userRoles) {
     this.userRoles = userRoles;
   }
 

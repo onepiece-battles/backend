@@ -2,6 +2,7 @@ package com.yichi.onepiece.iam.model;
 
 import com.yichi.infra.support.mybatis.annotations.Dao;
 import com.yichi.infra.support.mybatis.dao.BaseDao;
+import com.yichi.onepiece.model.UserRole;
 import java.util.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -22,7 +23,7 @@ public interface RoleDao extends BaseDao<RoleEntity, UUID> {
     "</foreach>",
     "</script>"
   })
-  List<RoleEntity> listRoleByRoleNames(@Param("names") Collection<String> names);
+  List<RoleEntity> listRoleByRoleNames(@Param("names") Collection<UserRole> names);
 
   @Select("SELECT * FROM role")
   List<RoleEntity> listAllRoles();
@@ -31,7 +32,7 @@ public interface RoleDao extends BaseDao<RoleEntity, UUID> {
   Set<String> listAllRoleNames();
 
   @Select("SELECT * FROM role WHERE role.name = #{name} LIMIT 1")
-  Optional<RoleEntity> findByRoleName(@Param("name") String name);
+  Optional<RoleEntity> findByRoleName(@Param("name") UserRole name);
 
   @Select(
       "SELECT DISTINCT name FROM role where id in (SELECT role_id FROM user_role WHERE"
