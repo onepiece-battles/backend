@@ -72,10 +72,11 @@ public class PermissionDefinition {
           Map.ofEntries(
               Map.entry(
                   UserRole.VISITOR,
-                  getAllGetPermissions().stream()
+                  Stream.concat(getAllGetPermissions().stream(), getAllListPermissions().stream())
                       .filter(
                           permissionEnum ->
-                              !Set.of(PermissionEnum.USER_GET, PermissionEnum.ROLE_GET)
+                              !Set.of(PermissionEnum.USER_GET, PermissionEnum.ROLE_GET,
+                                      PermissionEnum.USER_LIST, PermissionEnum.ROLE_LIST)
                                   .contains(permissionEnum))
                       .collect(Collectors.toSet())),
               Map.entry(
