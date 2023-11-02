@@ -20,6 +20,7 @@ import java.time.Clock;
 import java.util.Optional;
 import java.util.UUID;
 import org.mockito.Mock;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -38,6 +39,7 @@ public class UserServiceTests extends BaseServiceTests {
   @Mock private EmailClient emailClient;
   @Mock private EmailVerificationDao emailVerificationDao;
   @Mock private Clock clock;
+  @Mock private AuthenticationManager authenticationManager;
 
   @BeforeMethod
   public void setup() {
@@ -45,13 +47,16 @@ public class UserServiceTests extends BaseServiceTests {
         new UserService(
             userDao,
             userDetailDao,
+            authenticationManager,
             tokenDao,
             roleResourceDao,
             roleDao,
             userRoleDao,
             passwordEncoder,
             userResourceDao,
-            emailClient, emailVerificationDao, clock);
+            emailClient,
+            emailVerificationDao,
+            clock);
   }
 
   @Test
