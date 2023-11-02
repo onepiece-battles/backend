@@ -13,8 +13,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -22,13 +20,10 @@ public class UserController implements UserApi {
   private final Logger logger = LoggerFactory.getLogger(UserController.class);
   private final UserService userService;
   private final IamService iamService;
-  private final AuthenticationManager authenticationManager;
 
-  public UserController(
-      UserService userService, IamService iamService, AuthenticationManager authenticationManager) {
+  public UserController(UserService userService, IamService iamService) {
     this.userService = userService;
     this.iamService = iamService;
-    this.authenticationManager = authenticationManager;
   }
 
   @Override
@@ -51,15 +46,7 @@ public class UserController implements UserApi {
 
   @Override
   public ResponseEntity<LoginResponse> login(LoginRequest loginRequest) {
-    logger.info("user start login");
-    var userName = loginRequest.getUserName();
-    var password = loginRequest.getPassword();
-    logger.info("user name {} password {}", userName, password);
-    // Authenticate username and password with registered information.
-    authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, password));
-    logger.info("authenticate finished");
-    var loginResponse = userService.login(userName);
-    logger.info("print controller role names = {}", loginResponse.getUser());
+    var loginResponse = userService.login(loginRequest);
     return ResponseEntity.ok(loginResponse);
   }
 
@@ -112,10 +99,10 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<VerifyByEmailCodeResponse> verifyByEmailCode(
       VerifyByEmailCodeRequest verifyByEmailCodeRequest) {
-      iamService.checkPermissionOfCurrentAccount(
-      UserEntity.ENTITY_TYPE, Set.of(PermissionEnum.USER_GET, PermissionEnum.USER_UPDATE));
-      var response = userService.verifyByCode(verifyByEmailCodeRequest);
-      return ResponseEntity.ok(response);
+    iamService.checkPermissionOfCurrentAccount(
+        UserEntity.ENTITY_TYPE, Set.of(PermissionEnum.USER_GET, PermissionEnum.USER_UPDATE));
+    var response = userService.verifyByCode(verifyByEmailCodeRequest);
+    return ResponseEntity.ok(response);
   }
 
   @Override

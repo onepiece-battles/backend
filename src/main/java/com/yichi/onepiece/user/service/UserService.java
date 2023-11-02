@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,7 @@ public class UserService {
   private final Logger logger = LoggerFactory.getLogger(UserService.class);
   private final UserDao userDao;
   private final UserDetailDao userDetailDao;
+  private final AuthenticationManager authenticationManager;
   private final TokenDao tokenDao;
   private final RoleResourceDao roleResourceDao;
   private final RoleDao roleDao;
@@ -46,6 +49,7 @@ public class UserService {
   public UserService(
       UserDao userDao,
       UserDetailDao userDetailDao,
+      AuthenticationManager authenticationManager,
       TokenDao tokenDao,
       RoleResourceDao roleResourceDao,
       RoleDao roleDao,
@@ -57,6 +61,7 @@ public class UserService {
       Clock clock) {
     this.userDao = userDao;
     this.userDetailDao = userDetailDao;
+    this.authenticationManager = authenticationManager;
     this.tokenDao = tokenDao;
     this.roleResourceDao = roleResourceDao;
     this.roleDao = roleDao;
@@ -115,24 +120,30 @@ public class UserService {
             .build();
     userDao.insert(user);
     // newly registered users are default to have role: "NIKA", "NORMAL", "ADMIN" and "VISITOR"
-    var roleEntities =
-        roleDao
-            .listRoleByRoleNames(Arrays.stream(UserRole.values()).toList());
-    roleEntities.forEach(roleEntity -> userRoleDao.insert(
-        UserRoleEntityBuilder.newBuilder()
-            .setUserId(user.getId())
-            .setRoleId(roleEntity.getId())
-            .build()));
+    var roleEntities = roleDao.listRoleByRoleNames(Arrays.stream(UserRole.values()).toList());
+    roleEntities.forEach(
+        roleEntity ->
+            userRoleDao.insert(
+                UserRoleEntityBuilder.newBuilder()
+                    .setUserId(user.getId())
+                    .setRoleId(roleEntity.getId())
+                    .build()));
     return SUCCESS;
   }
 
-  public LoginResponse login(String name) {
-    var userDetail = userDetailDao.getUserDetailByName(name);
+  public LoginResponse login(LoginRequest request) {
+    var userName = request.getUserName();
+    var password = request.getPassword();
+    var userDetail = userDetailDao.getUserDetailByName(userName);
     I18nText verification;
     if (userDetail.isEmpty()) {
       verification = UserFacingConstants.getConstant(REGISTER_FIRST_BEFORE_LOGIN).getDisplayName();
       return new LoginResponse().verification(verification);
     }
+    // Authenticate username and password with registered information.
+    authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, password));
+
+    // generate jwt token and refresh token for this login action
     var user = userDetail.get();
     var jwtToken = JwtHelper.generateAccessToken(user);
     var jwtRefreshToken = JwtHelper.generateRefreshToken(user);
@@ -159,8 +170,6 @@ public class UserService {
         roleDao.batchFindById(roleIds).stream()
             .map(RoleEntity::getName)
             .collect(Collectors.toList());
-    logger.info("print role names");
-    logger.info(roleNames.toString());
     return new LoginResponse()
         .verification(null)
         .accessToken(jwtToken)
