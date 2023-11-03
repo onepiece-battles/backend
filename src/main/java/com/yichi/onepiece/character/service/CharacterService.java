@@ -101,11 +101,8 @@ public class CharacterService {
 
   public CharacterFullView getCharacter(UUID characterId) {
     var characterEntity = characterDao.findById(characterId).orElseThrow();
-    logger.info("logging character full view");
-    logger.info(characterEntity.toString());
     var battleIds = battleDao.getBattleIdsByCharacterId(characterId, UserHelper.getCurrentUserId());
     var character = CharacterEntityConverter.INSTANCE.toCharacter(characterEntity);
-    logger.info(character.toString());
     return new CharacterFullView().character(character).battleIds(battleIds);
   }
 
