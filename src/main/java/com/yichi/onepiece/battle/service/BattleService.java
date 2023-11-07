@@ -94,9 +94,8 @@ public class BattleService {
                 offset,
                 request.getPageSize())
             .stream()
-            .map(BattleConverter.INSTANCE::toBattleFullView)
-            // add names to battle
-            .collect(Collectors.toList());
+            .map(BattleConverter.INSTANCE::toBattle)
+            .toList();
     return new ListBattleResponse().battles(battleList).totalSize(totalSize);
   }
 
@@ -110,7 +109,7 @@ public class BattleService {
     if (request.getBattleIds().isEmpty()) {
       return new ListBattleByIdResponse().battles(List.of());
     }
-    var battleEntities =  battleDao.batchFindById(request.getBattleIds());
+    var battleEntities = battleDao.batchFindById(request.getBattleIds());
     var battles = battleEntities.stream().map(BattleConverter.INSTANCE::toBattle).toList();
     return new ListBattleByIdResponse().battles(battles);
   }

@@ -5,16 +5,26 @@ import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
 import com.yichi.onepiece.model.Battle;
 import com.yichi.onepiece.model.BattleFullView;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(uses = {EntityBuilder.class, CharacterEntityConverter.class})
 public interface BattleConverter {
   BattleConverter INSTANCE = Mappers.getMapper(BattleConverter.class);
 
+  @Mapping(target = "starterName", ignore = true)
+  @Mapping(target = "receiverName", ignore = true)
+  @Mapping(target = "userName", ignore = true)
+  @Mapping(target = "creationTimestamp", ignore = true)
+  @Mapping(target = "modificationTimestamp", ignore = true)
   Battle toBattle(BattleEntity battleEntity);
 
-
-  BattleEntity toBattleEntity(Battle battle);
+  @Mapping(target = "starterName", source = "starter.name")
+  @Mapping(target = "receiverName", source = "receiver.name")
+  @Mapping(target = "userName", source = "user.name")
+  @Mapping(target = "creationTimestamp", source = "creationRecord.actionTimestamp")
+  @Mapping(target = "modificationTimestamp", source = "modificationRecord.actionTimestamp")
+  Battle toBattle(BattleFullViewEntity battleFullViewEntity);
 
   BattleFullView toBattleFullView(BattleFullViewEntity battleFullViewEntity);
 }
