@@ -25,6 +25,7 @@ public interface BattleEntity {
   BattleStatus getStatus();
 
   BattleType getType();
+  String getWinnerName();
 
   BattleEntityBuilder toBuilder();
 }

@@ -1,0 +1,1 @@
+alter table battle add column winner_name varchar(255);
