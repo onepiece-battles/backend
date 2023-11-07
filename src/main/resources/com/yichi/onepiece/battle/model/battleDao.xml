@@ -60,10 +60,14 @@
         <association column="receiver_id" property="receiver"
           select="com.yichi.onepiece.character.model.CharacterDao.findById"
         />
+        <association column="user_id" property="receiver"
+                     select="com.yichi.onepiece.user.model.UserDao.findById"
+        />
+        <association column="creation_record_id" property="creationTimestamp"
+                     select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
+        />
+        <association column="creation_record_id" property="modificationTimestamp"
+                     select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
+        />
     </resultMap>
-
-    <resultMap id="battleLite" type="com.yichi.onepiece.battle.model.BattleLite">
-
-    </resultMap>resultMap>
-
 </mapper>
