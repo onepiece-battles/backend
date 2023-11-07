@@ -6,16 +6,19 @@ import com.yichi.onepiece.model.BattleFilter;
 import com.yichi.onepiece.model.BattleSortableField;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
 
 @Dao
 @Mapper
 public interface BattleDao extends BaseDao<BattleEntity, UUID> {
   // sql defined in battleDao.xml
-  List<BattleEntity> list(
+  @ResultMap("battleFullView")
+  List<BattleFullViewEntity> list(
       @Param("filter") BattleFilter battleFilter,
       @Param("sortList") Collection<BattleSortableField> sortList,
       @Param("userId") UUID userId,
@@ -31,4 +34,10 @@ public interface BattleDao extends BaseDao<BattleEntity, UUID> {
   List<UUID> getBattleIdsByCharacterId(@Param("characterId") UUID characterId, @Param("userId") UUID userId);
 
 
+  // result map is defined in battleDao.xml
+  // starter_id is mapped to characterEntity who initiate this battle
+  // receiver_id is mapped to characterEntity who receive this battle
+  @Select("select * from battle where id = #{id}")
+  @ResultMap("battleFullView")
+  Optional<BattleFullViewEntity> getBattleFullViewEntity(@Param("id") UUID id);
 }

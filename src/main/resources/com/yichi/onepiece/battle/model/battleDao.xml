@@ -52,4 +52,18 @@
             </otherwise>
         </choose>
     </sql>
+
+    <resultMap id="battleFullView" type="com.yichi.onepiece.battle.model.BattleFullViewEntity">
+        <association column="starter_id" property="starter"
+          select="com.yichi.onepiece.character.model.CharacterDao.findById"
+        />
+        <association column="receiver_id" property="receiver"
+          select="com.yichi.onepiece.character.model.CharacterDao.findById"
+        />
+    </resultMap>
+
+    <resultMap id="battleLite" type="com.yichi.onepiece.battle.model.BattleLite">
+
+    </resultMap>resultMap>
+
 </mapper>
