@@ -14,6 +14,7 @@ import org.apache.ibatis.annotations.Select;
 @Dao
 @Mapper
 public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
+  String FIND_BY_ID = "com.yichi.onepiece.character.model.CharacterDao.findById";
   // see sql definition in characterDao.xml
   List<CharacterEntity> list(
       @Param("characterFilter") CharacterFilter characterFilter,

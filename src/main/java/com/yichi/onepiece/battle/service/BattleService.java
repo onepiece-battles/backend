@@ -8,6 +8,7 @@ import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
+import com.yichi.onepiece.model.BattleFullView;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
 import java.util.List;
@@ -93,9 +94,16 @@ public class BattleService {
                 offset,
                 request.getPageSize())
             .stream()
-            .map(BattleConverter.INSTANCE::toBattle)
+            .map(BattleConverter.INSTANCE::toBattleFullView)
+            // add names to battle
             .collect(Collectors.toList());
     return new ListBattleResponse().battles(battleList).totalSize(totalSize);
+  }
+
+  public BattleFullView getBattleFullView(GetBattleFullViewRequest request) {
+    UUID battleId = request.getBattleId();
+    var battleFullViewEntity = battleDao.getBattleFullViewEntity(battleId).orElseThrow();
+    return BattleConverter.INSTANCE.toBattleFullView(battleFullViewEntity);
   }
 
   public ListBattleByIdResponse batchFindById(ListBattleByIdsRequest request) {

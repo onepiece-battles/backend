@@ -7,6 +7,8 @@ import com.yichi.onepiece.iam.PermissionDefinition.PermissionEnum;
 import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.AddBattleRequest;
 import com.yichi.onepiece.model.Battle;
+import com.yichi.onepiece.model.BattleFullView;
+import com.yichi.onepiece.model.GetBattleFullViewRequest;
 import com.yichi.onepiece.model.ListBattleByIdResponse;
 import com.yichi.onepiece.model.ListBattleByIdsRequest;
 import com.yichi.onepiece.model.ListBattleRequest;
@@ -33,6 +35,14 @@ public class BattleController implements BattleApi {
         BattleEntity.ENTITY_TYPE, Set.of(PermissionEnum.BATTLE_CREATE, PermissionEnum.BATTLE_GET));
     var battle = battleService.addBattle(addBattleRequest);
     return ResponseEntity.ok(battle);
+  }
+
+  @Override
+  public ResponseEntity<BattleFullView> getBattleFullView(
+      GetBattleFullViewRequest getBattleFullViewRequest) {
+    iamService.checkPermissionOfCurrentAccount(
+        BattleEntity.ENTITY_TYPE, Set.of( PermissionEnum.BATTLE_GET));
+    return ResponseEntity.ok(battleService.getBattleFullView(getBattleFullViewRequest));
   }
 
   @Override
