@@ -16,6 +16,7 @@ public interface BattleEntity {
   UUID getStarterId();
 
   UUID getReceiverId();
+
   Boolean getIsSystemResource();
 
   Long getCreationRecordId();
@@ -25,6 +26,7 @@ public interface BattleEntity {
   BattleStatus getStatus();
 
   BattleType getType();
+
   String getWinnerName();
 
   BattleEntityBuilder toBuilder();
