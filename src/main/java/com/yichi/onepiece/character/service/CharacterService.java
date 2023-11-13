@@ -18,10 +18,11 @@ import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.model.Character;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
+import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
+import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import com.yichi.onepiece.utils.EncryptHelper;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,8 +132,8 @@ public class CharacterService {
     EatFruitResponse response = new EatFruitResponse();
     if (fruits.size() == fruitLimit) {
       // fruit count exceeds the maximum permitted count.
-      // todo(yichi): add i18n
-      return response.fruitMessage(new I18nText());
+      return response.fruitMessage(UserFacingConstants.getConstant(
+          UserFacingConstantsKey.FRUIT_COUNT_REACH_LIMIT).getDisplayName());
     }
 
     // this character can take more fruit
@@ -147,9 +148,7 @@ public class CharacterService {
       characterEntity.toBuilder().setHasFruits(true).setModificationRecordId(modificationRecord.getId()).build();
     }
     characterDao.update(characterEntity);
-    //todo(yichi): add i18n
-    response.setFruitMessage(new I18nText());
-    return response.fruitMessage(new I18nText());
+    return response.fruitMessage(UserFacingConstants.getConstant(UserFacingConstantsKey.FRUIT_EATEN_SUCCESS).getDisplayName());
   }
 
   public ListCharacterResponse listCharacters(ListCharacterRequest request) {

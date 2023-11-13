@@ -14,6 +14,8 @@ public class UserFacingConstantsKey {
   public static final String EMAIL_SENDING_FAILED = "EMAIL_SENDING_FAILED";
   public static final String ISSUE_CREATION_SUCCESS = "ISSUE_CREATION_SUCCESS";
   public static final String ISSUE_CREATION_FAILED = "ISSUE_CREATION_FAILED";
+  public static final String FRUIT_COUNT_REACH_LIMIT = "FRUIT_COUNT_REACH_LIMIT";
+  public static final String FRUIT_EATEN_SUCCESS = "FRUIT_EATEN_SUCCESS";
 
   public UserFacingConstantsKey() {}
 }
