@@ -87,7 +87,7 @@ public class BattleService {
     var battleList =
         battleDao
             .list(
-                request.getFruitFilter(),
+                request.getBattleFilter(),
                 request.getSortKeys(),
                 userId,
                 resourceIds,

@@ -119,7 +119,7 @@ public class CharacterService {
     if (fruits.size() == fruitLimit) {
       // fruit count exceeds the maximum permitted count.
       // todo(yichi): add i18n
-      return response.fruitMessage("");
+      return response.fruitMessage(new I18nText());
     }
 
     // this character can take more fruit
@@ -135,8 +135,8 @@ public class CharacterService {
     }
     characterDao.update(characterEntity);
     //todo(yichi): add i18n
-    response.setFruitMessage("");
-    return response.fruitMessage("");
+    response.setFruitMessage(new I18nText());
+    return response.fruitMessage(new I18nText());
   }
 
   public ListCharacterResponse listCharacters(ListCharacterRequest request) {
