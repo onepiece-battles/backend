@@ -1,6 +1,7 @@
 package com.yichi.onepiece.character.service;
 
 import com.yichi.onepiece.battle.model.BattleDao;
+import com.yichi.onepiece.character.helper.CharacterHelper;
 import com.yichi.onepiece.character.model.CharacterDao;
 import com.yichi.onepiece.character.model.CharacterEntity;
 import com.yichi.onepiece.character.model.CharacterToFruitDao;
@@ -35,18 +36,20 @@ public class CharacterService {
   private final CharacterToFruitDao characterToFruitDao;
   private final ActionRecordService actionRecordService;
   private final UserService userService;
+  private final CharacterHelper characterHelper;
 
   public CharacterService(
       CharacterDao CharacterDao,
       FruitService fruitService,
       BattleDao battleDao, CharacterToFruitDao characterToFruitDao, ActionRecordService actionRecordService,
-      UserService userService) {
+      UserService userService, CharacterHelper characterHelper) {
     this.characterDao = CharacterDao;
     this.fruitService = fruitService;
     this.battleDao = battleDao;
     this.characterToFruitDao = characterToFruitDao;
     this.actionRecordService = actionRecordService;
     this.userService = userService;
+    this.characterHelper = characterHelper;
   }
 
   public Character addCharacter(AddCharacterRequest request) {
@@ -73,7 +76,8 @@ public class CharacterService {
             .orElseThrow(
                 ExceptionUtils.notFound(
                     "Can not find inserted character with id %s", characterEntity.getId()));
-    return CharacterEntityConverter.INSTANCE.toCharacter(insertedEntity);
+    var fruitsInCharacter = characterHelper.getFruitInCharacterByCharacterId(characterEntity.getId());
+    return CharacterEntityConverter.INSTANCE.toCharacter(insertedEntity).fruits(fruitsInCharacter);
   }
 
   public String updateProfile(UUID characterId, String profile) {
@@ -159,6 +163,10 @@ public class CharacterService {
                 resourceIds)
             .stream()
             .map(CharacterEntityConverter.INSTANCE::toCharacter)
+            .map(character -> {
+              var fruitsInCharacter = characterHelper.getFruitInCharacterByCharacterId(character.getId());
+              return character.fruits(fruitsInCharacter);
+            })
             .toList();
     return new ListCharacterResponse().characters(characterList).totalSize(totalSize);
   }
