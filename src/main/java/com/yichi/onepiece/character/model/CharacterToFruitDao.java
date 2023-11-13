@@ -12,6 +12,6 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface CharacterToFruitDao extends BaseDao<CharacterToFruitEntity, UUID> {
 
-  @Select("select * from character_to_fruit where character_to_fruit.character_id = #{character_id}")
+  @Select("select * from character_to_fruit where character_to_fruit.character_id = #{characterId}")
   List<CharacterToFruitEntity> listByCharacterId(@Param("characterId") UUID characterId);
 }
