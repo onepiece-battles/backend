@@ -49,7 +49,7 @@ public class FruitService {
         characterHelper.listByFruitId(fruitEntity.getId()).stream()
             .map(CharacterEntity::getName)
             .toList();
-    return FruitConverter.INSTANCE.toFruit(fruitEntity).holders(characterNames);
+    return FruitConverter.INSTANCE.toFruit(fruitEntity).fruitHolders(characterNames);
   }
 
   public ListFruitResponse listFruit(ListFruitRequest request) {
@@ -78,7 +78,7 @@ public class FruitService {
                       characterHelper.listByFruitId(fruit.getId()).stream()
                           .map(CharacterEntity::getName)
                           .toList();
-                  return fruit.holders(characterNames);
+                  return fruit.fruitHolders(characterNames);
                 })
             .toList();
     return new ListFruitResponse().totalSize(totalSize).fruits(fruits);
@@ -101,7 +101,7 @@ public class FruitService {
         characterHelper.listByFruitId(fruitEntity.getId()).stream()
             .map(CharacterEntity::getName)
             .toList();
-    return FruitConverter.INSTANCE.toFruit(updatedFruit).holders(characterNames);
+    return FruitConverter.INSTANCE.toFruit(updatedFruit).fruitHolders(characterNames);
   }
 
   public List<FruitEntity> getFruitsByIds(List<UUID> fruitIds) {
