@@ -50,7 +50,7 @@ public class CharacterController implements CharacterApi {
         CharacterEntity.ENTITY_TYPE,
         Set.of(PermissionEnum.BATTLE_GET, PermissionEnum.CHARACTER_GET));
     var characterFullView =
-        characterService.getCharacter(getCharacterFullViewRequest.getCharacterId());
+        characterService.getCharacterFullView(getCharacterFullViewRequest.getCharacterId());
     return ResponseEntity.ok(characterFullView);
   }
 

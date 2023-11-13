@@ -1,5 +1,6 @@
 package com.yichi.onepiece.character.service;
 
+import com.yichi.onepiece.battle.model.BattleConverter;
 import com.yichi.onepiece.battle.model.BattleDao;
 import com.yichi.onepiece.character.helper.CharacterHelper;
 import com.yichi.onepiece.character.model.CharacterDao;
@@ -9,6 +10,7 @@ import com.yichi.onepiece.character.model.CharacterToFruitEntityBuilder;
 import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
 import com.yichi.onepiece.constants.ConstantsContainer;
 import com.yichi.onepiece.exception.ExceptionUtils;
+import com.yichi.onepiece.fruit.model.converter.FruitConverter;
 import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.image.service.ImageUtil;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
@@ -19,6 +21,7 @@ import com.yichi.onepiece.user.service.UserService;
 import com.yichi.onepiece.utils.EncryptHelper;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,11 +107,17 @@ public class CharacterService {
     return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(character.getProfileImage()));
   }
 
-  public CharacterFullView getCharacter(UUID characterId) {
+  public CharacterFullView getCharacterFullView(UUID characterId) {
     var characterEntity = characterDao.findById(characterId).orElseThrow();
-    var battleIds = battleDao.getBattleIdsByCharacterId(characterId, UserHelper.getCurrentUserId());
+    var battles = battleDao.getBattlesByCharacterId(characterId, UserHelper.getCurrentUserId())
+        .stream().map(
+            BattleConverter.INSTANCE::toBattle
+        ).toList();
+    var fruits = fruitService.listByCharacterId(characterId).stream().map(
+        FruitConverter.INSTANCE::toFruit
+    ).toList();
     var character = CharacterEntityConverter.INSTANCE.toCharacter(characterEntity);
-    return new CharacterFullView().character(character).battleIds(battleIds);
+    return new CharacterFullView().character(character).battles(battles).fruits(fruits);
   }
 
   public EatFruitResponse eatFruit(UUID characterId, UUID fruitId) {
