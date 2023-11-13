@@ -53,3 +53,11 @@ user:
       displayName:
         en-US: "Failed to create an issue, please try later"
         zh-CN: "反馈失败，请稍后再试！"
+    FRUIT_COUNT_REACH_LIMIT:
+      displayName:
+        en-US: "No more devil fruit can be taken by this character"
+        zh-CN: "此角色无法食用更多果实"
+    FRUIT_EATEN_SUCCESS:
+      displayName:
+        en-US: "Fruit has successfully eaten by this character"
+        zh-CN: "恶魔果实已经成功被食用"
