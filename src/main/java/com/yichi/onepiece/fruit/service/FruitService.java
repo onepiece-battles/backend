@@ -25,7 +25,9 @@ public class FruitService {
   private final UserService userService;
 
   public FruitService(
-      FruitDao fruitDao, ActionRecordService actionRecordService, CharacterHelper characterHelper,
+      FruitDao fruitDao,
+      ActionRecordService actionRecordService,
+      CharacterHelper characterHelper,
       UserService userService) {
     this.fruitDao = fruitDao;
     this.actionRecordService = actionRecordService;
@@ -43,8 +45,10 @@ public class FruitService {
             .setIsSystemResource(isSystemResource)
             .build();
     fruitDao.insert(fruitEntity);
-    var characterNames = characterHelper.listByFruitId(fruitEntity.getId()).stream()
-        .map(CharacterEntity::getName).toList();
+    var characterNames =
+        characterHelper.listByFruitId(fruitEntity.getId()).stream()
+            .map(CharacterEntity::getName)
+            .toList();
     return FruitConverter.INSTANCE.toFruit(fruitEntity).fruitHolders(characterNames);
   }
 
@@ -68,11 +72,14 @@ public class FruitService {
                 request.getPageSize())
             .stream()
             .map(FruitConverter.INSTANCE::toFruit)
-            .map(fruit -> {
-              var characterNames = characterHelper.listByFruitId(fruit.getId()).stream()
-                  .map(CharacterEntity::getName).toList();
-              return fruit.fruitHolders(characterNames);
-            })
+            .map(
+                fruit -> {
+                  var characterNames =
+                      characterHelper.listByFruitId(fruit.getId()).stream()
+                          .map(CharacterEntity::getName)
+                          .toList();
+                  return fruit.fruitHolders(characterNames);
+                })
             .toList();
     return new ListFruitResponse().totalSize(totalSize).fruits(fruits);
   }
@@ -90,8 +97,10 @@ public class FruitService {
             .build();
     fruitDao.update(fruitEntity);
     var updatedFruit = fruitDao.findById(request.getId()).orElseThrow();
-    var characterNames = characterHelper.listByFruitId(fruitEntity.getId()).stream()
-        .map(CharacterEntity::getName).toList();
+    var characterNames =
+        characterHelper.listByFruitId(fruitEntity.getId()).stream()
+            .map(CharacterEntity::getName)
+            .toList();
     return FruitConverter.INSTANCE.toFruit(updatedFruit).fruitHolders(characterNames);
   }
 
