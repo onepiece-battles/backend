@@ -28,9 +28,12 @@
             <bind name="keyLike" value="'%' + fruitFilter.name + '%"/>
             AND `name` like #{keyLike}
         </if>
-        <if test="fruitFilter.ownerId != null and fruit.ownerId != ''">
-            <bind name="keyLike" value="'%' + fruit.ownerId + '%"/>
-            AND `owner_id` like #{keyLike}
+        <if test="fruitFilter.types != null and !fruitFilter.types.isEmpty">
+            AND `fruit_type` IN
+            <foreach item="type" collection="fruitFilter.types" open="("
+              separator="," close=")">
+                #{type}
+            </foreach>
         </if>
     </sql>
 

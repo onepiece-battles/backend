@@ -125,19 +125,13 @@ public class BattleService {
     UUID receiverId = battle.getReceiverId();
     // prepare start character
     var startCharacter = characterService.getCharacterEntityById(starterId);
-    var startFruits = startCharacter.getFruits();
-    var startFruitEntities =
-        fruitService.getFruitsByIds(
-            startFruits.stream().map(FruitInCharacter::getFruitId).collect(Collectors.toList()));
+    var startFruits = fruitService.listByCharacterId(startCharacter.getId());
     // prepare receive character
     var receiveCharacter = characterService.getCharacterEntityById(receiverId);
-    var receiveFruits = receiveCharacter.getFruits();
-    var receiveFruitEntities =
-        fruitService.getFruitsByIds(
-            receiveFruits.stream().map(FruitInCharacter::getFruitId).collect(Collectors.toList()));
+    var receiveFruits = fruitService.listByCharacterId(receiveCharacter.getId());
     // create characterInBattle object and battlefield object
-    var characterInBattleInit = new CharacterInBattle(startCharacter, startFruitEntities);
-    var characterInBattleReceive = new CharacterInBattle(receiveCharacter, receiveFruitEntities);
+    var characterInBattleInit = new CharacterInBattle(startCharacter, startFruits);
+    var characterInBattleReceive = new CharacterInBattle(receiveCharacter, receiveFruits);
     var battlefield = new Battlefield(characterInBattleInit, characterInBattleReceive, battleId);
 
     while (battlefield.allAlive()) {

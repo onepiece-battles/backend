@@ -26,6 +26,7 @@ public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
       // current user.
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
 
+
   @Select("SELECT COUNT(id) FROM `character`")
   int countCharacter();
 }

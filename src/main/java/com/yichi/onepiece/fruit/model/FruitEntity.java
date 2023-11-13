@@ -17,9 +17,6 @@ public interface FruitEntity {
   @Nullable
   Byte[] getProfileImage();
 
-  @Nullable
-  UUID getOwnerId();
-
   FruitType getFruitType();
 
   // Paramecia fruits consume positive magic, other types consume 0 magic.

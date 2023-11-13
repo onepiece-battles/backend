@@ -3,6 +3,8 @@ package com.yichi.onepiece.character.service;
 import com.yichi.onepiece.battle.model.BattleDao;
 import com.yichi.onepiece.character.model.CharacterDao;
 import com.yichi.onepiece.character.model.CharacterEntity;
+import com.yichi.onepiece.character.model.CharacterToFruitDao;
+import com.yichi.onepiece.character.model.CharacterToFruitEntityBuilder;
 import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
 import com.yichi.onepiece.constants.ConstantsContainer;
 import com.yichi.onepiece.exception.ExceptionUtils;
@@ -24,25 +26,25 @@ import org.springframework.stereotype.Service;
 @Service
 public class CharacterService {
   Logger logger = LoggerFactory.getLogger(CharacterService.class);
-  private static final String EAT_FRUIT_SUCCESS = "EAT FRUIT SUCCESS";
-  private static final String NO_MORE_FRUIT = "NO MORE FRUIT CAN BE TAKEN";
   private static final ResourceType RESOURCE_TYPE = ResourceType.CHARACTER;
 
   private final CharacterDao characterDao;
   private final FruitService fruitService;
   // use dao temporarily for cycle dependency
   private final BattleDao battleDao;
+  private final CharacterToFruitDao characterToFruitDao;
   private final ActionRecordService actionRecordService;
   private final UserService userService;
 
   public CharacterService(
       CharacterDao CharacterDao,
       FruitService fruitService,
-      BattleDao battleDao, ActionRecordService actionRecordService,
+      BattleDao battleDao, CharacterToFruitDao characterToFruitDao, ActionRecordService actionRecordService,
       UserService userService) {
     this.characterDao = CharacterDao;
     this.fruitService = fruitService;
     this.battleDao = battleDao;
+    this.characterToFruitDao = characterToFruitDao;
     this.actionRecordService = actionRecordService;
     this.userService = userService;
   }
@@ -60,7 +62,6 @@ public class CharacterService {
                     ImageUtil.loadImageFromDisk(
                         ConstantsContainer.USER_DEFAULT_PROFILE_PATH, "PNG")))
             .setHasFruits(false)
-            .setFruits(List.of())
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
             .setIsSystemResource(isSystemResource)
@@ -112,47 +113,30 @@ public class CharacterService {
       throw new RuntimeException("can not add fruit to character that doesn't exist");
     }
     var characterEntity = characterEntityOptional.get();
-    var fruits = characterEntity.getFruits();
-    FruitInCharacter newFruit = new FruitInCharacter().fruitId(fruitId).wakeUp(false);
+    int fruitLimit = characterEntity.getFruitLimit();
+    var fruits = fruitService.listByCharacterId(characterId);
     EatFruitResponse response = new EatFruitResponse();
-    if (fruits == null) {
-      // this character hasn't taken any fruit yet
-      var modificationRecord = actionRecordService.create();
-      var characterEntityUpdated =
-          characterEntity.toBuilder()
-              .setModificationRecordId(modificationRecord.getId())
-              .setHasFruits(true)
-              .setFruits(List.of(newFruit))
-              .build();
-      characterDao.update(characterEntityUpdated);
-      fruitService.updateOwner(fruitId, characterId);
-      response.setFruitMessage(EAT_FRUIT_SUCCESS);
-      response.setCharacter(
-          CharacterEntityConverter.INSTANCE.toCharacter(
-              characterDao.findById(characterId).orElseThrow()));
-    } else {
-      int fruitLimit = characterEntity.getFruitLimit();
-      if (fruits.size() > fruitLimit) {
-        // fruit count exceeds the maximum permitted count.
-        throw new RuntimeException("fruit count condition error");
-      } else if (fruits.size() == fruitLimit) {
-        response.setFruitMessage(NO_MORE_FRUIT);
-        response.setCharacter(CharacterEntityConverter.INSTANCE.toCharacter(characterEntity));
-      } else {
-        var modificationRecord = actionRecordService.create();
-        fruits.add(newFruit);
-        var updatedCharacter =
-            characterEntity.toBuilder()
-                .setModificationRecordId(modificationRecord.getId())
-                .setFruits(fruits)
-                .build();
-        characterDao.update(updatedCharacter);
-        fruitService.updateOwner(fruitId, characterId);
-        response.setCharacter(CharacterEntityConverter.INSTANCE.toCharacter(updatedCharacter));
-        response.setFruitMessage(EAT_FRUIT_SUCCESS);
-      }
+    if (fruits.size() == fruitLimit) {
+      // fruit count exceeds the maximum permitted count.
+      // todo(yichi): add i18n
+      return response.fruitMessage("");
     }
-    return response;
+
+    // this character can take more fruit
+    var characterToFruitEntity = CharacterToFruitEntityBuilder.newBuilder()
+        .setCharacterId(characterId)
+        .setFruitId(fruitId)
+        .setWakeUp(false)
+        .build();
+    characterToFruitDao.insert(characterToFruitEntity);
+    if (!characterEntity.getHasFruits()) {
+      var modificationRecord = actionRecordService.create();
+      characterEntity.toBuilder().setHasFruits(true).setModificationRecordId(modificationRecord.getId()).build();
+    }
+    characterDao.update(characterEntity);
+    //todo(yichi): add i18n
+    response.setFruitMessage("");
+    return response.fruitMessage("");
   }
 
   public ListCharacterResponse listCharacters(ListCharacterRequest request) {

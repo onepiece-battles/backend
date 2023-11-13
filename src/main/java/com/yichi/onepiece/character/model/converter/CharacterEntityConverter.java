@@ -15,11 +15,11 @@ import org.mapstruct.factory.Mappers;
 public interface CharacterEntityConverter {
   CharacterEntityConverter INSTANCE = Mappers.getMapper(CharacterEntityConverter.class);
 
+  @Mapping(target = "fruits", ignore = true)
   Character toCharacter(CharacterEntity entity);
 
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "profileImage", ignore = true)
-  @Mapping(target = "fruits", ignore = true)
   @Mapping(target = "hasFruits", ignore = true)
   @Mapping(target = "userId", ignore = true)
   @Mapping(target = "creationRecordId", ignore = true)

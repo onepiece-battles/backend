@@ -24,6 +24,9 @@ public interface FruitDao extends BaseDao<FruitEntity, UUID> {
       @Param("offset") int offset,
       @Param("size") int size);
 
+  @Select("select fruit.* from fruit join character_to_fruit as cf on fruit.id = cf.fruit_id join character as c on c.id = cf.character_id where c.id = #{characterId}")
+  List<FruitEntity> listByCharacterId(@Param("characterId") UUID characterId);
+
   @Select("SELECT COUNT(id) FROM fruit")
   int countFruit();
 }

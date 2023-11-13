@@ -81,32 +81,15 @@ public class FruitService {
     return FruitConverter.INSTANCE.toFruit(updatedFruit);
   }
 
-  /**
-   * If fruit is eaten by someone or a new character, the owner of this fruit will be updated.
-   *
-   * @param fruitId id of fruit.
-   * @param ownId character id of current fruit owner.
-   */
-  public void updateOwner(UUID fruitId, UUID ownId) {
-    var modificationRecord = actionRecordService.create();
-    var fruitEntity =
-        fruitDao
-            .findById(fruitId)
-            .orElseThrow(
-                ExceptionUtils.notFound("Can not update fruit with id: %s, not found", fruitId));
-    var updatedEntity =
-        fruitEntity.toBuilder()
-            .setModificationRecordId(modificationRecord.getId())
-            .setOwnerId(ownId)
-            .build();
-    fruitDao.update(updatedEntity);
-  }
-
   public List<FruitEntity> getFruitsByIds(List<UUID> fruitIds) {
     if (fruitIds.isEmpty()) {
       return List.of();
     }
     return fruitDao.batchFindById(fruitIds);
+  }
+
+  public List<FruitEntity> listByCharacterId(UUID characterId) {
+    return fruitDao.listByCharacterId(characterId);
   }
 
   public String updateProfile(UUID fruitId, String profile) {
