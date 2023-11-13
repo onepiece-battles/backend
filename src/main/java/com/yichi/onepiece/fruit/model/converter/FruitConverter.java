@@ -17,7 +17,6 @@ public interface FruitConverter {
   FruitConverter INSTANCE = Mappers.getMapper(FruitConverter.class);
 
   @Mapping(target = "id", ignore = true)
-  @Mapping(target = "ownerId", ignore = true)
   @Mapping(target = "profileImage", ignore = true)
   @Mapping(target = "creationRecordId", ignore = true)
   @Mapping(target = "modificationRecordId", ignore = true)
@@ -30,6 +29,7 @@ public interface FruitConverter {
   @Mapping(target = "isSystemResource", ignore = true)
   FruitEntity toFruitEntity(UpdateFruitRequest request);
 
+  @Mapping(target = "fruitHolders", ignore = true)
   Fruit toFruit(FruitEntity entity);
 
   default Resource blobToResource(Byte[] profileByteArray) {

@@ -45,12 +45,10 @@ public class CharacterInBattle {
     int speed = baseEntity.getSpeed();
     int magic = baseEntity.getMagic();
     int magicConsume = 0;
-
     // add fruit strengthen if this character eats fruits.
-    if (baseEntity.getHasFruits() && baseEntity.getFruits() != null) {
+    if (baseEntity.getHasFruits() && !fruitEntities.isEmpty()) {
       magicConsume = fruitEntities.stream().mapToInt(FruitEntity::getMagicConsume).sum();
       for (FruitEntity fruit : fruitEntities) {
-        // todo: update fruit table schema
         blood = (int) (blood * fruit.getBloodStrengthen());
         attack = (int) (attack * fruit.getAttackStrengthen());
         intelligence = (int) (intelligence * fruit.getIntelligenceStrengthen());

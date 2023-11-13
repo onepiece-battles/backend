@@ -1,5 +1,7 @@
 package com.yichi.onepiece.fruit.service;
 
+import com.yichi.onepiece.character.helper.CharacterHelper;
+import com.yichi.onepiece.character.model.CharacterEntity;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruit.model.FruitDao;
 import com.yichi.onepiece.fruit.model.FruitEntity;
@@ -19,12 +21,15 @@ public class FruitService {
   private static final ResourceType RESOURCE_TYPE = ResourceType.FRUIT;
   private final FruitDao fruitDao;
   private final ActionRecordService actionRecordService;
+  private final CharacterHelper characterHelper;
   private final UserService userService;
 
   public FruitService(
-      FruitDao fruitDao, ActionRecordService actionRecordService, UserService userService) {
+      FruitDao fruitDao, ActionRecordService actionRecordService, CharacterHelper characterHelper,
+      UserService userService) {
     this.fruitDao = fruitDao;
     this.actionRecordService = actionRecordService;
+    this.characterHelper = characterHelper;
     this.userService = userService;
   }
 
@@ -38,7 +43,9 @@ public class FruitService {
             .setIsSystemResource(isSystemResource)
             .build();
     fruitDao.insert(fruitEntity);
-    return FruitConverter.INSTANCE.toFruit(fruitEntity);
+    var characterNames = characterHelper.listByFruitId(fruitEntity.getId()).stream()
+        .map(CharacterEntity::getName).toList();
+    return FruitConverter.INSTANCE.toFruit(fruitEntity).fruitHolders(characterNames);
   }
 
   public ListFruitResponse listFruit(ListFruitRequest request) {
@@ -61,6 +68,11 @@ public class FruitService {
                 request.getPageSize())
             .stream()
             .map(FruitConverter.INSTANCE::toFruit)
+            .map(fruit -> {
+              var characterNames = characterHelper.listByFruitId(fruit.getId()).stream()
+                  .map(CharacterEntity::getName).toList();
+              return fruit.fruitHolders(characterNames);
+            })
             .toList();
     return new ListFruitResponse().totalSize(totalSize).fruits(fruits);
   }
@@ -78,28 +90,9 @@ public class FruitService {
             .build();
     fruitDao.update(fruitEntity);
     var updatedFruit = fruitDao.findById(request.getId()).orElseThrow();
-    return FruitConverter.INSTANCE.toFruit(updatedFruit);
-  }
-
-  /**
-   * If fruit is eaten by someone or a new character, the owner of this fruit will be updated.
-   *
-   * @param fruitId id of fruit.
-   * @param ownId character id of current fruit owner.
-   */
-  public void updateOwner(UUID fruitId, UUID ownId) {
-    var modificationRecord = actionRecordService.create();
-    var fruitEntity =
-        fruitDao
-            .findById(fruitId)
-            .orElseThrow(
-                ExceptionUtils.notFound("Can not update fruit with id: %s, not found", fruitId));
-    var updatedEntity =
-        fruitEntity.toBuilder()
-            .setModificationRecordId(modificationRecord.getId())
-            .setOwnerId(ownId)
-            .build();
-    fruitDao.update(updatedEntity);
+    var characterNames = characterHelper.listByFruitId(fruitEntity.getId()).stream()
+        .map(CharacterEntity::getName).toList();
+    return FruitConverter.INSTANCE.toFruit(updatedFruit).fruitHolders(characterNames);
   }
 
   public List<FruitEntity> getFruitsByIds(List<UUID> fruitIds) {
@@ -107,6 +100,10 @@ public class FruitService {
       return List.of();
     }
     return fruitDao.batchFindById(fruitIds);
+  }
+
+  public List<FruitEntity> listByCharacterId(UUID characterId) {
+    return fruitDao.listByCharacterId(characterId);
   }
 
   public String updateProfile(UUID fruitId, String profile) {

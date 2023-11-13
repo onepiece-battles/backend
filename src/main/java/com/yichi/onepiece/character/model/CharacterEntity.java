@@ -30,8 +30,6 @@ public interface CharacterEntity {
   // default to be 1, unless special characters.
   Integer getFruitLimit();
 
-  List<FruitInCharacter> getFruits();
-
   // some characters are better when fighting in a group
   Integer getGroupGain();
 
