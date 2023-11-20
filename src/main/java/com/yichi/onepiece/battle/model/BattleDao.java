@@ -19,7 +19,7 @@ public interface BattleDao extends BaseDao<BattleEntity, UUID> {
   // sql defined in battleDao.xml
   @ResultMap("battleFullView")
   List<BattleFullViewEntity> list(
-      @Param("filter") BattleFilter battleFilter,
+      @Param("battleFilter") BattleFilter battleFilter,
       @Param("sortList") Collection<BattleSortableField> sortList,
       @Param("userId") UUID userId,
       @Param("externalResourceIds") Collection<UUID> externalResourceIds,
