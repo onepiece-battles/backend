@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.battle.model.BattleDao">
-    <select id="list" resultType="com.yichi.onepiece.battle.model.BattleEntity">
+    <select id="list" resultType="com.yichi.onepiece.battle.model.BattleFullViewEntity" resultMap="battleFullView">
         SELECT * FROM battle
         WHERE ( user_id = #{userId}
         <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
@@ -60,13 +60,13 @@
         <association column="receiver_id" property="receiver"
           select="com.yichi.onepiece.character.model.CharacterDao.findById"
         />
-        <association column="user_id" property="receiver"
+        <association column="user_id" property="user"
                      select="com.yichi.onepiece.user.model.UserDao.findById"
         />
-        <association column="creation_record_id" property="creationTimestamp"
+        <association column="creation_record_id" property="creationRecord"
                      select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
         />
-        <association column="creation_record_id" property="modificationTimestamp"
+        <association column="creation_record_id" property="modificationRecord"
                      select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
         />
     </resultMap>

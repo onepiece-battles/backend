@@ -27,7 +27,7 @@ public interface BattleEntity {
 
   BattleType getType();
 
-  String getWinnerName();
+  UUID getWinnerId();
 
   BattleEntityBuilder toBuilder();
 }

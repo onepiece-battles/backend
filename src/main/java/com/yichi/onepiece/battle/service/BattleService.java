@@ -13,7 +13,6 @@ import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -84,6 +83,14 @@ public class BattleService {
     }
     var userId = UserHelper.getCurrentUserId();
     var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
+//    logger.info("print battle entity {}",  battleDao
+//        .list(
+//            request.getBattleFilter(),
+//            request.getSortKeys(),
+//            userId,
+//            resourceIds,
+//            offset,
+//            request.getPageSize()).get(0).toString());
     var battleList =
         battleDao
             .list(
@@ -96,6 +103,7 @@ public class BattleService {
             .stream()
             .map(BattleConverter.INSTANCE::toBattle)
             .toList();
+//    logger.info("print battle {}", battleList.get(0).toString());
     return new ListBattleResponse().battles(battleList).totalSize(totalSize);
   }
 
@@ -145,7 +153,7 @@ public class BattleService {
     logger.info("Battle finish");
     var winner = battlefield.getWinner();
     var loser = battlefield.getLoser();
-    battleStarted.toBuilder().setWinnerName(winner.getName());
+    battleStarted.toBuilder().setWinnerId(winner.getCharacterId());
     battleDao.update(battleStarted);
     logger.info("Winner is {}", winner.getName());
     logger.info("Loser is {}", loser.getName());

@@ -17,7 +17,6 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface BattleDao extends BaseDao<BattleEntity, UUID> {
   // sql defined in battleDao.xml
-  @ResultMap("battleFullView")
   List<BattleFullViewEntity> list(
       @Param("battleFilter") BattleFilter battleFilter,
       @Param("sortList") Collection<BattleSortableField> sortList,
