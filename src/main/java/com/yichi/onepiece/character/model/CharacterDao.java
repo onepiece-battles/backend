@@ -26,7 +26,7 @@ public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
       // current user.
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
 
-  @Select("select character.* from fruit join character_to_fruit as cf on fruit.id = cf.fruit_id join character as c on c.id = cf.character_id where f.id = #{fruitId}")
+  @Select("select * from `character` as c inner join `character_to_fruit` as cf on c.id = cf.character_id inner join fruit as f on f.id = cf.fruit_id where f.id = #{fruitId}")
   List<CharacterEntity> listByFruitId(@Param("fruitId") UUID fruitId);
 
   @Select("SELECT COUNT(id) FROM `character`")

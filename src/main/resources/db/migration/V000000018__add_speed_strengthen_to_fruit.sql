@@ -1,0 +1,1 @@
+alter table fruit add column speed_strengthen int not null;

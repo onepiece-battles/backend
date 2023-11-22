@@ -10,6 +10,7 @@ public interface FruitEntity {
   String ENTITY_TYPE = "FRUIT";
 
   UUID getId();
+  UUID getUserId();
 
   String getName();
   Boolean getIsSystemResource();
