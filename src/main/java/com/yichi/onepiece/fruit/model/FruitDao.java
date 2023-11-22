@@ -17,7 +17,7 @@ public interface FruitDao extends BaseDao<FruitEntity, UUID> {
 
   // details see fruitDao.xml
   List<FruitEntity> listFruits(
-      @Param("filter") FruitFilter fruitFilter,
+      @Param("fruitFilter") FruitFilter fruitFilter,
       @Param("sortList") Collection<FruitSortableField> sortList,
       @Param("userId") UUID userId,
       @Param("externalResourceIds") Collection<UUID> externalResourceIds,
@@ -27,6 +27,6 @@ public interface FruitDao extends BaseDao<FruitEntity, UUID> {
   @Select("select fruit.* from fruit inner join character_to_fruit as cf on fruit.id = cf.fruit_id inner join `character` as c on c.id = cf.character_id where c.id = #{characterId}")
   List<FruitEntity> listByCharacterId(@Param("characterId") UUID characterId);
 
-  @Select("SELECT COUNT(id) FROM fruit")
-  int countFruit();
+  @Select("SELECT COUNT(id) FROM fruit where fruit.user_id = #{userId}")
+  int countFruit(@Param("userId") UUID userId);
 }

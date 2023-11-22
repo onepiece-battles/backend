@@ -21,21 +21,23 @@ public interface FruitConverter {
   @Mapping(target = "creationRecordId", ignore = true)
   @Mapping(target = "modificationRecordId", ignore = true)
   @Mapping(target = "isSystemResource", ignore = true)
+  @Mapping(target = "userId", ignore = true)
   FruitEntity toFruitEntity(AddFruitRequest request);
 
   @Mapping(target = "profileImage", ignore = true)
   @Mapping(target = "creationRecordId", ignore = true)
   @Mapping(target = "modificationRecordId", ignore = true)
   @Mapping(target = "isSystemResource", ignore = true)
+  @Mapping(target = "userId", ignore = true)
   FruitEntity toFruitEntity(UpdateFruitRequest request);
 
   @Mapping(target = "fruitHolders", ignore = true)
   Fruit toFruit(FruitEntity entity);
 
-  default Resource blobToResource(Byte[] profileByteArray) {
+  default byte[] blobToResource(Byte[] profileByteArray) {
     if (profileByteArray == null) {
       return null;
     }
-    return new ByteArrayResource(ArrayUtils.toPrimitive(profileByteArray));
+    return ArrayUtils.toPrimitive(profileByteArray);
   }
 }

@@ -2,9 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.fruit.model.FruitDao">
-    <select id="list" resultType="com.yichi.onepiece.fruit.model.FruitEntity">
+    <select id="listFruits" resultType="com.yichi.onepiece.fruit.model.FruitEntity">
         SELECT * FROM fruit
-        WHERE ( user_id = #{userId}
+        WHERE
+        ( user_id = #{userId}
         <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
             OR
             id IN
@@ -23,7 +24,6 @@
 
     <!-- Construct where clause -->
     <sql id="fruitFilter">
-        WHERE (user_id = #{userId} or id IN #{externalResourceIds})
         <if test="fruitFilter.name != null and fruitFilter.name != ''">
             <bind name="keyLike" value="'%' + fruitFilter.name + '%"/>
             AND `name` like #{keyLike}

@@ -2,10 +2,12 @@ package com.yichi.onepiece.fruit.service;
 
 import com.yichi.onepiece.character.helper.CharacterHelper;
 import com.yichi.onepiece.character.model.CharacterEntity;
+import com.yichi.onepiece.constants.ConstantsContainer;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruit.model.FruitDao;
 import com.yichi.onepiece.fruit.model.FruitEntity;
 import com.yichi.onepiece.fruit.model.converter.FruitConverter;
+import com.yichi.onepiece.image.service.ImageUtil;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.user.UserHelper;
@@ -14,10 +16,13 @@ import com.yichi.onepiece.utils.EncryptHelper;
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class FruitService {
+  private final Logger logger = LoggerFactory.getLogger(FruitService.class);
   private static final ResourceType RESOURCE_TYPE = ResourceType.FRUIT;
   private final FruitDao fruitDao;
   private final ActionRecordService actionRecordService;
@@ -43,7 +48,13 @@ public class FruitService {
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
             .setIsSystemResource(isSystemResource)
+            .setUserId(UserHelper.getCurrentUserId())
             .build();
+    if(fruitEntity.getProfileImage()==null) {
+      fruitEntity = fruitEntity.toBuilder().setProfileImage(
+          ArrayUtils.toObject(ImageUtil.loadImageFromDisk(ConstantsContainer.USER_DEFAULT_PROFILE_PATH, "PNG"))
+      ).build();
+    }
     fruitDao.insert(fruitEntity);
     var characterNames =
         characterHelper.listByFruitId(fruitEntity.getId()).stream()
@@ -53,14 +64,18 @@ public class FruitService {
   }
 
   public ListFruitResponse listFruit(ListFruitRequest request) {
-    var totalSize = fruitDao.countFruit();
+    var userId = UserHelper.getCurrentUserId();
+    // need to take external resource into consideration
+    var totalSize = fruitDao.countFruit(userId);
     // pageIndex is 1- based. offset is 0- based.
     var offset = (request.getPageIndex() - 1) * request.getPageSize();
     if (offset >= totalSize || offset < 0) {
       return new ListFruitResponse().fruits(List.of()).totalSize(totalSize);
     }
-    var userId = UserHelper.getCurrentUserId();
     var resourceList = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
+    logger.info("resource list is: {}", resourceList.toString());
+    logger.info("request is: {}", request);
+    logger.info("user id is: {}", userId);
     var fruits =
         fruitDao
             .listFruits(
@@ -72,15 +87,16 @@ public class FruitService {
                 request.getPageSize())
             .stream()
             .map(FruitConverter.INSTANCE::toFruit)
-            .map(
-                fruit -> {
-                  var characterNames =
-                      characterHelper.listByFruitId(fruit.getId()).stream()
-                          .map(CharacterEntity::getName)
-                          .toList();
-                  return fruit.fruitHolders(characterNames);
-                })
+//            .map(
+//                fruit -> {
+//                  var characterNames =
+//                      characterHelper.listByFruitId(fruit.getId()).stream()
+//                          .map(CharacterEntity::getName)
+//                          .toList();
+//                  return fruit.fruitHolders(characterNames);
+//                })
             .toList();
+    logger.info("fruits are: {}", fruits);
     return new ListFruitResponse().totalSize(totalSize).fruits(fruits);
   }
 
