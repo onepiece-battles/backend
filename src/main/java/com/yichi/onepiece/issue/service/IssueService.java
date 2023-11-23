@@ -9,10 +9,13 @@ import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import java.time.Clock;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class IssueService {
+  private final Logger logger = LoggerFactory.getLogger(IssueService.class);
 
   private final IssueDao issueDao;
   private final Clock clock;
