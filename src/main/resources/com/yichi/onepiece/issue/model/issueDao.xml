@@ -2,10 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.issue.model.IssueDao">
-    <select id="list" resultType="com.yichi.onepiece.issue.model.IssueEntity">
+    <select id="listIssues" resultType="com.yichi.onepiece.issue.model.IssueEntity">
         SELECT * FROM `issue`
         WHERE
-        0=0
+        true
         <include refid="issueFilter">
             <property name="issueFilter" value="issueFilter"/>
         </include>
