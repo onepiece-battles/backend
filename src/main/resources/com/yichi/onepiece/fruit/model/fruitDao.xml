@@ -42,7 +42,7 @@
     <!-- Construct where clause -->
     <sql id="fruitFilter">
         <if test="fruitFilter.name != null and fruitFilter.name != ''">
-            <bind name="keyLike" value="'%' + fruitFilter.name + '%"/>
+            <bind name="keyLike" value="'%' + fruitFilter.name + '%'"/>
             AND `name` like #{keyLike}
         </if>
         <if test="fruitFilter.types != null and !fruitFilter.types.isEmpty">

@@ -15,7 +15,7 @@
     </select>
 
     <select id="searchCount" resultType="int">
-        SELECT * FROM `issue`
+        SELECT COUNT(*) FROM `issue`
         WHERE
         true
         <include refid="issueFilter">
@@ -26,7 +26,7 @@
     <!-- Construct where clause -->
     <sql id="issueFilter">
         <if test="issueFilter.issueHeader != null and issueFilter.issueHeader != ''">
-            <bind name="keyLike" value="'%' + issueFilter.issueHeader + '%"/>
+            <bind name="keyLike" value="'%' + issueFilter.issueHeader + '%'"/>
             AND `issue_header` like #{keyLike}
         </if>
         <if test="issueFilter.issueTypes != null and !issueFilter.issueTypes.isEmpty">
