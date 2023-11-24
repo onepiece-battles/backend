@@ -15,6 +15,7 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
   String FIND_BY_ID = "com.yichi.onepiece.character.model.CharacterDao.findById";
+
   // see sql definition in characterDao.xml
   List<CharacterEntity> list(
       @Param("characterFilter") CharacterFilter characterFilter,
@@ -26,9 +27,13 @@ public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
       // current user.
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
 
-  @Select("select * from `character` as c inner join `character_to_fruit` as cf on c.id = cf.character_id inner join fruit as f on f.id = cf.fruit_id where f.id = #{fruitId}")
+  @Select(
+      "select * from `character` as c inner join `character_to_fruit` as cf on c.id ="
+          + " cf.character_id inner join fruit as f on f.id = cf.fruit_id where f.id = #{fruitId}")
   List<CharacterEntity> listByFruitId(@Param("fruitId") UUID fruitId);
 
-  @Select("SELECT COUNT(id) FROM `character`")
-  int countCharacter();
+  int searchCount(
+      @Param("characterFilter") CharacterFilter characterFilter,
+      @Param("userId") UUID userId,
+      @Param("externalResourceIds") Collection<UUID> externalResourceIds);
 }

@@ -45,8 +45,11 @@ public class CharacterService {
   public CharacterService(
       CharacterDao CharacterDao,
       FruitService fruitService,
-      BattleDao battleDao, CharacterToFruitDao characterToFruitDao, ActionRecordService actionRecordService,
-      UserService userService, CharacterHelper characterHelper) {
+      BattleDao battleDao,
+      CharacterToFruitDao characterToFruitDao,
+      ActionRecordService actionRecordService,
+      UserService userService,
+      CharacterHelper characterHelper) {
     this.characterDao = CharacterDao;
     this.fruitService = fruitService;
     this.battleDao = battleDao;
@@ -80,7 +83,8 @@ public class CharacterService {
             .orElseThrow(
                 ExceptionUtils.notFound(
                     "Can not find inserted character with id %s", characterEntity.getId()));
-    var fruitsInCharacter = characterHelper.getFruitInCharacterByCharacterId(characterEntity.getId());
+    var fruitsInCharacter =
+        characterHelper.getFruitInCharacterByCharacterId(characterEntity.getId());
     return CharacterEntityConverter.INSTANCE.toCharacter(insertedEntity).fruits(fruitsInCharacter);
   }
 
@@ -110,13 +114,14 @@ public class CharacterService {
 
   public CharacterFullView getCharacterFullView(UUID characterId) {
     var characterEntity = characterDao.findById(characterId).orElseThrow();
-    var battles = battleDao.getBattlesByCharacterId(characterId, UserHelper.getCurrentUserId())
-        .stream().map(
-            BattleConverter.INSTANCE::toBattle
-        ).toList();
-    var fruits = fruitService.listByCharacterId(characterId).stream().map(
-        FruitConverter.INSTANCE::toFruit
-    ).toList();
+    var battles =
+        battleDao.getBattlesByCharacterId(characterId, UserHelper.getCurrentUserId()).stream()
+            .map(BattleConverter.INSTANCE::toBattle)
+            .toList();
+    var fruits =
+        fruitService.listByCharacterId(characterId).stream()
+            .map(FruitConverter.INSTANCE::toFruit)
+            .toList();
     var character = CharacterEntityConverter.INSTANCE.toCharacter(characterEntity);
     return new CharacterFullView().character(character).battles(battles).fruits(fruits);
   }
@@ -132,34 +137,41 @@ public class CharacterService {
     EatFruitResponse response = new EatFruitResponse();
     if (fruits.size() == fruitLimit) {
       // fruit count exceeds the maximum permitted count.
-      return response.fruitMessage(UserFacingConstants.getConstant(
-          UserFacingConstantsKey.FRUIT_COUNT_REACH_LIMIT).getDisplayName());
+      return response.fruitMessage(
+          UserFacingConstants.getConstant(UserFacingConstantsKey.FRUIT_COUNT_REACH_LIMIT)
+              .getDisplayName());
     }
 
     // this character can take more fruit
-    var characterToFruitEntity = CharacterToFruitEntityBuilder.newBuilder()
-        .setCharacterId(characterId)
-        .setFruitId(fruitId)
-        .setWakeUp(false)
-        .build();
+    var characterToFruitEntity =
+        CharacterToFruitEntityBuilder.newBuilder()
+            .setCharacterId(characterId)
+            .setFruitId(fruitId)
+            .setWakeUp(false)
+            .build();
     characterToFruitDao.insert(characterToFruitEntity);
     if (!characterEntity.getHasFruits()) {
       var modificationRecord = actionRecordService.create();
-      characterEntity.toBuilder().setHasFruits(true).setModificationRecordId(modificationRecord.getId()).build();
+      characterEntity.toBuilder()
+          .setHasFruits(true)
+          .setModificationRecordId(modificationRecord.getId())
+          .build();
     }
     characterDao.update(characterEntity);
-    return response.fruitMessage(UserFacingConstants.getConstant(UserFacingConstantsKey.FRUIT_EATEN_SUCCESS).getDisplayName());
+    return response.fruitMessage(
+        UserFacingConstants.getConstant(UserFacingConstantsKey.FRUIT_EATEN_SUCCESS)
+            .getDisplayName());
   }
 
   public ListCharacterResponse listCharacters(ListCharacterRequest request) {
-    var totalSize = characterDao.countCharacter();
+    var userId = UserHelper.getCurrentUserId();
+    var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
+    var totalSize = characterDao.searchCount(request.getCharacterFilter(), userId, resourceIds);
     // pageIndex is 1- based. offset is 0- based.
     var offset = (request.getPageIndex() - 1) * request.getPageSize();
     if (offset >= totalSize || offset < 0) {
       return new ListCharacterResponse().characters(List.of()).totalSize(totalSize);
     }
-    var userId = UserHelper.getCurrentUserId();
-    var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
     var characterList =
         characterDao
             .list(
@@ -171,10 +183,12 @@ public class CharacterService {
                 resourceIds)
             .stream()
             .map(CharacterEntityConverter.INSTANCE::toCharacter)
-            .map(character -> {
-              var fruitsInCharacter = characterHelper.getFruitInCharacterByCharacterId(character.getId());
-              return character.fruits(fruitsInCharacter);
-            })
+            .map(
+                character -> {
+                  var fruitsInCharacter =
+                      characterHelper.getFruitInCharacterByCharacterId(character.getId());
+                  return character.fruits(fruitsInCharacter);
+                })
             .toList();
     return new ListCharacterResponse().characters(characterList).totalSize(totalSize);
   }

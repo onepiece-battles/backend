@@ -25,13 +25,16 @@ public interface BattleDao extends BaseDao<BattleEntity, UUID> {
       @Param("offset") int offset,
       @Param("size") int size);
 
-  @Select("SELECT COUNT(id) FROM battle")
-  int count();
+  int searchCount(
+      @Param("userId") UUID userId,
+      @Param("battleFilter") BattleFilter battleFilter,
+      @Param("externalResourceIds") Collection<UUID> externalResourceIds);
 
-  @Select("select * from battle where #{characterId} in (battle.starter_id, battle.receiver_id)"
-      + "and #{userId} = battle.user_id")
-  List<BattleEntity> getBattlesByCharacterId(@Param("characterId") UUID characterId, @Param("userId") UUID userId);
-
+  @Select(
+      "select * from battle where #{characterId} in (battle.starter_id, battle.receiver_id)"
+          + "and #{userId} = battle.user_id")
+  List<BattleEntity> getBattlesByCharacterId(
+      @Param("characterId") UUID characterId, @Param("userId") UUID userId);
 
   // result map is defined in battleDao.xml
   // starter_id is mapped to characterEntity who initiate this battle

@@ -49,7 +49,7 @@ public class IssueService {
   }
 
   public ListIssueResponse list(ListIssueRequest request) {
-    var totalSize = issueDao.countIssues();
+    var totalSize = issueDao.searchCount(request.getIssueFilter());
     // pageIndex is 1- based. offset is 0- based.
     var offset = (request.getPageIndex() - 1) * request.getPageSize();
     if (offset >= totalSize || offset < 0) {
@@ -58,10 +58,7 @@ public class IssueService {
     var issues =
         issueDao
             .listIssues(
-                request.getIssueFilter(),
-                request.getSortKeys(),
-                offset,
-                request.getPageSize())
+                request.getIssueFilter(), request.getSortKeys(), offset, request.getPageSize())
             .stream()
             .map(IssueConverter.INSTANCE::toIssue)
             .collect(Collectors.toList());

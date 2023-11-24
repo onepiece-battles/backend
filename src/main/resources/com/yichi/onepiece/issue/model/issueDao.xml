@@ -14,6 +14,15 @@
         LIMIT #{offset}, #{size}
     </select>
 
+    <select id="searchCount" resultType="int">
+        SELECT * FROM `issue`
+        WHERE
+        true
+        <include refid="issueFilter">
+            <property name="issueFilter" value="issueFilter"/>
+        </include>
+    </select>
+
     <!-- Construct where clause -->
     <sql id="issueFilter">
         <if test="issueFilter.issueHeader != null and issueFilter.issueHeader != ''">

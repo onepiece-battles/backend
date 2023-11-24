@@ -76,13 +76,14 @@ public class BattleService {
   }
 
   public ListBattleResponse list(ListBattleRequest request) {
-    var totalSize = battleDao.count();
+    var userId = UserHelper.getCurrentUserId();
+    var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
+    var totalSize = battleDao.searchCount(userId, request.getBattleFilter(), resourceIds);
     var offset = (request.getPageIndex() - 1) * request.getPageSize();
     if (offset >= totalSize || offset < 0) {
       return new ListBattleResponse().battles(List.of()).totalSize(totalSize);
     }
-    var userId = UserHelper.getCurrentUserId();
-    var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
+
     var battleList =
         battleDao
             .list(
