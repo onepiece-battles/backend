@@ -60,7 +60,7 @@ public class IssueService {
             .listIssues(
                 request.getIssueFilter(),
                 request.getSortKeys(),
-                request.getPageIndex(),
+                offset,
                 request.getPageSize())
             .stream()
             .map(IssueConverter.INSTANCE::toIssue)
