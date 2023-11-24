@@ -50,10 +50,14 @@ public class FruitService {
             .setIsSystemResource(isSystemResource)
             .setUserId(UserHelper.getCurrentUserId())
             .build();
-    if(fruitEntity.getProfileImage()==null) {
-      fruitEntity = fruitEntity.toBuilder().setProfileImage(
-          ArrayUtils.toObject(ImageUtil.loadImageFromDisk(ConstantsContainer.USER_DEFAULT_PROFILE_PATH, "PNG"))
-      ).build();
+    if (fruitEntity.getProfileImage() == null) {
+      fruitEntity =
+          fruitEntity.toBuilder()
+              .setProfileImage(
+                  ArrayUtils.toObject(
+                      ImageUtil.loadImageFromDisk(
+                          ConstantsContainer.USER_DEFAULT_PROFILE_PATH, "PNG")))
+              .build();
     }
     fruitDao.insert(fruitEntity);
     var characterNames =
@@ -65,14 +69,14 @@ public class FruitService {
 
   public ListFruitResponse listFruit(ListFruitRequest request) {
     var userId = UserHelper.getCurrentUserId();
+    var resourceList = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
     // need to take external resource into consideration
-    var totalSize = fruitDao.countFruit(userId);
+    var totalSize = fruitDao.searchCount(userId, request.getFruitFilter(), resourceList);
     // pageIndex is 1- based. offset is 0- based.
     var offset = (request.getPageIndex() - 1) * request.getPageSize();
     if (offset >= totalSize || offset < 0) {
       return new ListFruitResponse().fruits(List.of()).totalSize(totalSize);
     }
-    var resourceList = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
     logger.info("resource list is: {}", resourceList.toString());
     logger.info("request is: {}", request);
     logger.info("user id is: {}", userId);
@@ -87,14 +91,14 @@ public class FruitService {
                 request.getPageSize())
             .stream()
             .map(FruitConverter.INSTANCE::toFruit)
-//            .map(
-//                fruit -> {
-//                  var characterNames =
-//                      characterHelper.listByFruitId(fruit.getId()).stream()
-//                          .map(CharacterEntity::getName)
-//                          .toList();
-//                  return fruit.fruitHolders(characterNames);
-//                })
+            //            .map(
+            //                fruit -> {
+            //                  var characterNames =
+            //                      characterHelper.listByFruitId(fruit.getId()).stream()
+            //                          .map(CharacterEntity::getName)
+            //                          .toList();
+            //                  return fruit.fruitHolders(characterNames);
+            //                })
             .toList();
     logger.info("fruits are: {}", fruits);
     return new ListFruitResponse().totalSize(totalSize).fruits(fruits);

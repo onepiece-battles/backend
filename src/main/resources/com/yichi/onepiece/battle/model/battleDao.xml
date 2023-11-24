@@ -21,6 +21,22 @@
         LIMIT #{offset}, #{size}
     </select>
 
+    <select id="searchCount" resultType="int">
+        SELECT COUNT(*) FROM battle
+        WHERE ( user_id = #{userId}
+        <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
+            OR
+            id IN
+            <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
+                #{externalResourceId}
+            </foreach>
+        </if>
+        )
+        <include refid="battleFilter">
+            <property name="battleFilter" value="battleFilter"/>
+        </include>
+    </select>
+
     <!-- Construct where clause -->
     <sql id="battleFilter">
         <if test="battleFilter.battleTypes != null and !battleFilter.battleTypes.isEmpty">

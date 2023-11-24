@@ -8,14 +8,12 @@ import java.util.List;
 import java.util.UUID;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 
 @Mapper
 public interface IssueDao extends BaseDao<IssueEntity, UUID> {
 
   // sql defined in issueDao.xml
-  @Select("SELECT count(*) from issue")
-  int countIssues();
+  int searchCount(@Param("issueFilter") IssueFilter issueFilter);
 
   List<IssueEntity> listIssues(
       @Param("issueFilter") IssueFilter issueFilter,
