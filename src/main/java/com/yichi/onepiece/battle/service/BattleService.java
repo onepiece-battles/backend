@@ -83,14 +83,6 @@ public class BattleService {
     }
     var userId = UserHelper.getCurrentUserId();
     var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
-//    logger.info("print battle entity {}",  battleDao
-//        .list(
-//            request.getBattleFilter(),
-//            request.getSortKeys(),
-//            userId,
-//            resourceIds,
-//            offset,
-//            request.getPageSize()).get(0).toString());
     var battleList =
         battleDao
             .list(
@@ -103,7 +95,6 @@ public class BattleService {
             .stream()
             .map(BattleConverter.INSTANCE::toBattle)
             .toList();
-//    logger.info("print battle {}", battleList.get(0).toString());
     return new ListBattleResponse().battles(battleList).totalSize(totalSize);
   }
 
