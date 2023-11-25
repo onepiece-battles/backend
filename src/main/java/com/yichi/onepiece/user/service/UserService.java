@@ -141,7 +141,13 @@ public class UserService {
       return new LoginResponse().verification(verification);
     }
     // Authenticate username and password with registered information.
-    authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, password));
+    try {
+      authenticationManager.authenticate(
+          new UsernamePasswordAuthenticationToken(userName, password));
+    } catch (Exception e) {
+      verification = UserFacingConstants.getConstant(WRONG_PASSWORD).getDisplayName();
+      return new LoginResponse().verification(verification);
+    }
 
     // generate jwt token and refresh token for this login action
     var user = userDetail.get();
