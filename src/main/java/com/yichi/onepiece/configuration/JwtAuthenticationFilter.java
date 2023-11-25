@@ -40,7 +40,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       @NonNull FilterChain filterChain)
       throws ServletException, IOException {
     String authentication = request.getHeader(JwtConstants.HTTP_HEADER_AUTH);
-    logger.info("current authentication is: {}", authentication);
     if (authentication == null
         || !authentication.startsWith(JwtConstants.HTTP_HEADER_AUTH_SCHEME)) {
       filterChain.doFilter(request, response);
