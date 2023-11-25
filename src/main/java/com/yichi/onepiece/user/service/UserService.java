@@ -238,7 +238,7 @@ public class UserService {
 
   public List<ResourceType> updateLoginRole(UserRole role) {
     var user = UserHelper.getCurrentUserDetail();
-    if (!user.getUserRoles().contains(role)) {
+    if (!user.getUserRoles().contains(role.toString())) {
       ExceptionUtils.notFound("user role %s not found when shifting role.", role).get();
     }
     user.setLoginRole(role);
@@ -289,9 +289,12 @@ public class UserService {
     var loginUserResource = roleResourceDao.getResourceNamesByRoleName(user.getLoginRole());
     var tokens =
         tokenDao.listTokenByUserId(user.getId()).stream().map(TokenEntity::getTokenValue).toList();
+    var roleIds = userRoleDao.getByUserId(user.getId());
+    var roleNames = roleDao.batchFindById(roleIds).stream().map(RoleEntity::getName).toList();
     return UserConverter.INSTANCE
         .toUser(userDao.findById(request.getId()).orElseThrow())
         .loginRoleResources(loginUserResource)
+        .userRoles(roleNames)
         .tokens(tokens);
   }
 
