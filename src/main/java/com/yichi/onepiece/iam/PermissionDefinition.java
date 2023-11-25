@@ -49,7 +49,7 @@ public class PermissionDefinition {
 
     // fruit
     FRUIT_CREATE,
-    FRUIT_READ,
+    FRUIT_GET,
     FRUIT_UPDATE,
     FRUIT_DELETE,
 
@@ -62,6 +62,7 @@ public class PermissionDefinition {
 
     // issue
     ISSUE_CREATE,
+    ISSUE_GET,
     ISSUE_UPDATE,
     ISSUE_BATCH_UPDATE,
     ISSUE_LIST
@@ -75,8 +76,13 @@ public class PermissionDefinition {
                   Stream.concat(getAllGetPermissions().stream(), getAllListPermissions().stream())
                       .filter(
                           permissionEnum ->
-                              !Set.of(PermissionEnum.USER_GET, PermissionEnum.ROLE_GET,
-                                      PermissionEnum.USER_LIST, PermissionEnum.ROLE_LIST)
+                              !Set.of(
+                                      PermissionEnum.USER_GET,
+                                      PermissionEnum.ROLE_GET,
+                                      PermissionEnum.USER_LIST,
+                                      PermissionEnum.ROLE_LIST,
+                                      PermissionEnum.ISSUE_LIST,
+                                      PermissionEnum.ISSUE_GET)
                                   .contains(permissionEnum))
                       .collect(Collectors.toSet())),
               Map.entry(
