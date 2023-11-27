@@ -48,6 +48,9 @@
         <if test="characterFilter.hasFruit != null">
             AND `has_fruit` = #{characterFilter.hasFruit}
         </if>
+        <if test="characterFilter.onlySystem != null">
+            AND `is_system_resource` = #{characterFilter.onlySystem}
+        </if>
         <if test="characterFilter.characterTypes != null and !characterFilter.characterTypes.isEmpty">
             AND `character_type` IN
             <foreach item="characterType" collection="characterFilter.characterTypes" open="("

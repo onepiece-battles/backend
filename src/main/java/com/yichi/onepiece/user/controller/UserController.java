@@ -45,6 +45,11 @@ public class UserController implements UserApi {
   }
 
   @Override
+  public ResponseEntity<ListUsersResponse> listUsers(ListUsersRequest listUsersRequest) {
+    return null;
+  }
+
+  @Override
   public ResponseEntity<LoginResponse> login(LoginRequest loginRequest) {
     var loginResponse = userService.login(loginRequest);
     return ResponseEntity.ok(loginResponse);
