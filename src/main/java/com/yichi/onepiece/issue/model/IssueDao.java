@@ -12,7 +12,7 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface IssueDao extends BaseDao<IssueEntity, UUID> {
 
-  // sql defined in issueDao.xml
+  // sql defined in userDao.xml
   int searchCount(@Param("issueFilter") IssueFilter issueFilter);
 
   List<IssueEntity> listIssues(

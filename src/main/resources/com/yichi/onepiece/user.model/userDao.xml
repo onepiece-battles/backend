@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yichi.onepiece.user.model.UserDao">
+    <select id="listUsers" resultType="com.yichi.onepiece.issue.model.UserEntity">
+        SELECT * FROM `user`
+        WHERE
+        true
+        <include refid="userFilter">
+            <property name="userFilter" value="userFilter"/>
+        </include>
+        ORDER BY
+        <include refid="orderClause"/>
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="searchCount" resultType="int">
+        SELECT COUNT(*) FROM `user`
+        WHERE
+        true
+        <include refid="userFilter">
+            <property name="userFilter" value="userFilter"/>
+        </include>
+    </select>
+
+    <!-- Construct where clause -->
+    <sql id="userFilter">
+        <if test="userFilter.name != null and userFilter.name != ''">
+            <bind name="keyLike" value="'%' + userFilter.name + '%'"/>
+            AND `name` like #{keyLike}
+        </if>
+        <if test="userFilter.email != null and userFilter.email != ''">
+            <bind name="keyLike" value="'%' + userFilter.email + '%'"/>
+            AND `email` like #{keyLike}
+        </if>
+        <if test="userFilter.userRoles != null and !userFilter.userRoles.isEmpty">
+            AND `login_role` IN
+            <foreach item="loginRole" collection="userFilter.userRoles" open="("
+                     separator="," close=")">
+                #{loginRole}
+            </foreach>
+        </if>
+    </sql>
+
+    <!-- Construct order by clause -->
+    <sql id="orderClause">
+        <choose>
+            <when test="sortList == null or sortList.isEmpty">
+                creation_timestamp DESC
+            </when>
+            <otherwise>
+                <foreach item="item" collection="sortList" separator=",">
+                    ${item.sortKey} ${item.sortOrder}
+                </foreach>
+            </otherwise>
+        </choose>
+    </sql>
+</mapper>

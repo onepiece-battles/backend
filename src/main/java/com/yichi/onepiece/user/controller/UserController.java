@@ -46,7 +46,10 @@ public class UserController implements UserApi {
 
   @Override
   public ResponseEntity<ListUsersResponse> listUsers(ListUsersRequest listUsersRequest) {
-    return null;
+    iamService.checkPermissionOfCurrentAccount(
+        UserEntity.ENTITY_TYPE, Set.of(PermissionEnum.USER_LIST));
+    var response = userService.list(listUsersRequest);
+    return ResponseEntity.ok(response);
   }
 
   @Override
