@@ -200,6 +200,19 @@ public class UserService {
     return new LogoutResponse().logoutResult(SUCCESS).userName(user.getName());
   }
 
+  public ListUsersResponse list(ListUsersRequest request) {
+    var totalSize = userDao.searchCount(request.getUserFilter());
+    // pageIndex is 1- based. offset is 0- based.
+    var offset = (request.getPageIndex() - 1) * request.getPageSize();
+    if (offset >= totalSize || offset < 0) {
+      return new ListUsersResponse().users(List.of()).totalSize(totalSize);
+    }
+    var users = userDao.listUsers(request.getUserFilter(), request.getSortKeys(), offset,
+            request.getPageSize())
+        .stream().map(UserConverter.INSTANCE::toUser).toList();
+    return new ListUsersResponse().users(users).totalSize(totalSize);
+  }
+
   public String updateProfile(UUID userId, String profile) {
     Byte[] profileByte = ArrayUtils.toObject(EncryptHelper.base64Decode(profile));
     var user =
