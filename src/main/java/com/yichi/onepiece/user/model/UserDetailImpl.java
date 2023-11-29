@@ -114,7 +114,9 @@ public class UserDetailImpl extends UserEntityImpl implements UserDetails {
     sb.append("  emailVerified: ").append(toIndentedString(getEmailVerified())).append("\n");
     sb.append("  locale: ").append(toIndentedString(getLocale())).append("\n");
     sb.append("  creationRecordId: ").append(toIndentedString(getCreationRecordId())).append("\n");
-    sb.append("  modificationRecordId: ").append(toIndentedString(getModificationRecordId())).append("\n");
+    sb.append("  modificationRecordId: ")
+        .append(toIndentedString(getModificationRecordId()))
+        .append("\n");
     sb.append("  loginRole: ").append(toIndentedString(getLoginRole())).append("\n");
     sb.append("  profileImage: ").append(toIndentedString(getProfileImage())).append("\n");
     sb.append("  userRoles: ").append(toIndentedString(getUserRoles())).append("\n");

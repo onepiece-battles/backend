@@ -221,9 +221,9 @@ public class UserService {
     if (offset >= totalSize || offset < 0) {
       return new ListUsersResponse().users(List.of()).totalSize(totalSize);
     }
-    var tempUsers =   userDao
-            .listUsers(
-                    request.getUserFilter(), request.getSortKeys(), offset, request.getPageSize());
+    var tempUsers =
+        userDao.listUsers(
+            request.getUserFilter(), request.getSortKeys(), offset, request.getPageSize());
     logger.info("temp users are: {}", tempUsers);
     var users =
         userDao

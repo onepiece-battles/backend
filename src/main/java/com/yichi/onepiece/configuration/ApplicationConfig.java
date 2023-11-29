@@ -1,7 +1,6 @@
 package com.yichi.onepiece.configuration;
 
 import com.yichi.onepiece.user.model.UserDao;
-import com.yichi.onepiece.user.model.UserDetailDao;
 import java.time.Clock;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -35,7 +34,7 @@ public class ApplicationConfig {
   @Bean
   public UserDetailsService getUserDetailService() {
     return username ->
-            userDao
+        userDao
             .getUserDetailByName(username)
             .orElseThrow(() -> new UsernameNotFoundException("User detail not found"));
   }

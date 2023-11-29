@@ -11,7 +11,6 @@ import com.yichi.onepiece.fruit.model.FruitEntity;
 import com.yichi.onepiece.fruit.model.FruitEntityBuilder;
 import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
-import com.yichi.onepiece.model.FruitInCharacter;
 import com.yichi.onepiece.model.FruitType;
 import com.yichi.onepiece.user.service.UserService;
 import java.util.List;
@@ -32,8 +31,7 @@ public class BattleServiceTests {
   @Mock BattleProcessDetailDao battleProcessDetailDao;
 
   @Mock BattleStatusDetailDao battleStatusDetailDao;
-  @Mock
-  UserService userService;
+  @Mock UserService userService;
 
   BattleService battleService;
 
