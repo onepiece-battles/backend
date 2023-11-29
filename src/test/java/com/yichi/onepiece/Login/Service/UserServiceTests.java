@@ -54,6 +54,7 @@ public class UserServiceTests extends BaseServiceTests {
             userRoleDao,
             passwordEncoder,
             userResourceDao,
+            actionRecordService,
             emailClient,
             emailVerificationDao,
             clock);

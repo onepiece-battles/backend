@@ -1,0 +1,1 @@
+alter table `user` rename column account_condition to account_status;

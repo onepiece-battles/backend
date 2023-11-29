@@ -19,4 +19,6 @@ public interface ActionRecordEntity {
   UUID getRoleId();
 
   UserRole getRoleName();
+
+  ActionRecordEntityBuilder toBuilder();
 }

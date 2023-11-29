@@ -9,6 +9,7 @@ import com.yichi.onepiece.email.EmailClient;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.iam.model.*;
 import com.yichi.onepiece.image.service.ImageUtil;
+import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.model.UserRole;
 import com.yichi.onepiece.user.UserHelper;
@@ -41,6 +42,7 @@ public class UserService {
   private final UserRoleDao userRoleDao;
   private final PasswordEncoder passwordEncoder;
   private final UserResourceDao userResourceDao;
+  private final ActionRecordService actionRecordService;
   private final EmailClient emailClient;
 
   private final EmailVerificationDao emailVerificationDao;
@@ -56,6 +58,7 @@ public class UserService {
       UserRoleDao userRoleDao,
       PasswordEncoder passwordEncoder,
       UserResourceDao userResourceDao,
+      ActionRecordService actionRecordService,
       EmailClient emailClient,
       EmailVerificationDao emailVerificationDao,
       Clock clock) {
@@ -68,6 +71,7 @@ public class UserService {
     this.userRoleDao = userRoleDao;
     this.passwordEncoder = passwordEncoder;
     this.userResourceDao = userResourceDao;
+    this.actionRecordService = actionRecordService;
     this.emailClient = emailClient;
     this.emailVerificationDao = emailVerificationDao;
     this.clock = clock;
@@ -108,7 +112,7 @@ public class UserService {
     UserEntity user =
         UserEntityBuilder.newBuilder()
             .setName(name)
-            .setAccountCondition(UserAccountCondition.Registered)
+            .setAccountStatus(AccountStatus.LOGGED_OUT)
             .setEncryptedPassword(encryptedPassword)
             .setEmail(email)
             .setEmailVerified(false)
@@ -119,7 +123,16 @@ public class UserService {
             .setProfileImage(ArrayUtils.toObject(defaultImage))
             .build();
     userDao.insert(user);
+    logger.info("user registered: {}", user.toString());
+    var actionRecord = actionRecordService.createWithUser(user);
+    var updatedUser =
+        user.toBuilder()
+            .setCreationRecordId(actionRecord.getId())
+            .setModificationRecordId(actionRecord.getId())
+            .build();
+    userDao.update(updatedUser);
     // newly registered users are default to have role: "NIKA", "NORMAL", "ADMIN" and "VISITOR"
+    // will be changed in the future
     var roleEntities = roleDao.listRoleByRoleNames(Arrays.stream(UserRole.values()).toList());
     roleEntities.forEach(
         roleEntity ->
@@ -166,7 +179,7 @@ public class UserService {
             .setRevoked(false)
             .build();
     tokenDao.insert(tokenEntity);
-    user.setAccountCondition(UserAccountCondition.SignIn);
+    user.setAccountStatus(AccountStatus.LOGGED_IN);
     userDetailDao.update(user);
     var loginUserResource = roleResourceDao.getResourceNamesByRoleName(user.getLoginRole());
     var tokens =
@@ -195,7 +208,7 @@ public class UserService {
     }
 
     var user = userOptional.get();
-    var signedOutUser = user.toBuilder().setAccountCondition(UserAccountCondition.SignOut).build();
+    var signedOutUser = user.toBuilder().setAccountStatus(AccountStatus.LOGGED_OUT).build();
     userDao.update(signedOutUser);
     return new LogoutResponse().logoutResult(SUCCESS).userName(user.getName());
   }
@@ -207,9 +220,13 @@ public class UserService {
     if (offset >= totalSize || offset < 0) {
       return new ListUsersResponse().users(List.of()).totalSize(totalSize);
     }
-    var users = userDao.listUsers(request.getUserFilter(), request.getSortKeys(), offset,
-            request.getPageSize())
-        .stream().map(UserConverter.INSTANCE::toUser).toList();
+    var users =
+        userDao
+            .listUsers(
+                request.getUserFilter(), request.getSortKeys(), offset, request.getPageSize())
+            .stream()
+            .map(UserConverter.INSTANCE::toUser)
+            .toList();
     return new ListUsersResponse().users(users).totalSize(totalSize);
   }
 
@@ -266,9 +283,8 @@ public class UserService {
   }
 
   public User getUserById(UUID userId) {
-    var user = userDao.findById(userId).orElseThrow();
-    var resourceNames = roleResourceDao.getResourceNamesByRoleName(user.getLoginRole());
-    return UserConverter.INSTANCE.toUser(user).loginRoleResources(resourceNames);
+    var user = userDao.getById(userId).orElseThrow();
+    return UserConverter.INSTANCE.toUser(user);
   }
 
   public ShareResourceResponse shareResource(ShareResourceRequest request) {
@@ -311,8 +327,7 @@ public class UserService {
     var roleIds = userRoleDao.getByUserId(user.getId());
     var roleNames = roleDao.batchFindById(roleIds).stream().map(RoleEntity::getName).toList();
     return UserConverter.INSTANCE
-        .toUser(userDao.findById(request.getId()).orElseThrow())
-        .loginRoleResources(loginUserResource)
+        .toUser(userDao.getById(request.getId()).orElseThrow())
         .userRoles(roleNames)
         .tokens(tokens);
   }

@@ -5,6 +5,7 @@ import com.yichi.onepiece.lineage.model.ActionRecordDao;
 import com.yichi.onepiece.lineage.model.ActionRecordEntity;
 import com.yichi.onepiece.lineage.model.ActionRecordEntityBuilder;
 import com.yichi.onepiece.user.UserHelper;
+import com.yichi.onepiece.user.model.UserEntity;
 import io.micrometer.core.annotation.Timed;
 import java.time.Clock;
 import javax.annotation.Nullable;
@@ -35,6 +36,20 @@ public class ActionRecordService {
     ActionRecordEntity entity = makeRecord(null);
     actionRecordDao.insert(entity);
     return entity;
+  }
+
+  public ActionRecordEntity createWithUser(UserEntity userEntity) {
+    var roleEntity = roleService.getRoleByName(userEntity.getLoginRole());
+    ActionRecordEntity actionRecordEntity =
+        ActionRecordEntityBuilder.newBuilder()
+            .setUserId(userEntity.getId())
+            .setUserName(userEntity.getName())
+            .setRoleId(roleEntity.getId())
+            .setRoleName(roleEntity.getName())
+            .setActionTimestamp(clock.millis())
+            .build();
+    actionRecordDao.insert(actionRecordEntity);
+    return actionRecordEntity;
   }
 
   public ActionRecordEntity update(Long id) {

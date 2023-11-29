@@ -1,8 +1,10 @@
 package com.yichi.onepiece.user.model;
 
 import com.yichi.infra.support.EntityBuilder;
+import com.yichi.onepiece.iam.model.TokenEntity;
 import com.yichi.onepiece.model.User;
 import com.yichi.onepiece.utils.EncryptHelper;
+import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -12,14 +14,21 @@ import org.mapstruct.factory.Mappers;
 public interface UserConverter {
   UserConverter INSTANCE = Mappers.getMapper(UserConverter.class);
 
-  @Mapping(target = "tokens", ignore = true)
-  @Mapping(target = "loginRoleResources", ignore = true)
-  @Mapping(target = "userRoles", ignore = true)
-  User toUser(UserEntity userEntity);
+  //  @Mapping(target = "tokens", ignore = true)
+  //  @Mapping(target = "loginRoleResources", ignore = true)
+  //  @Mapping(target = "userRoles", ignore = true)
+  //  @Mapping(target = "creationTimestamp", source = "creationRecord.actionTimestamp")
+  //  @Mapping(target = "modificationTimestamp", source = "modificationRecord.actionTimestamp")
+  //  User toUser(UserEntity userEntity);
 
+  @Mapping(target = "creationRecordId", ignore = true)
+  @Mapping(target = "modificationRecordId", ignore = true)
   @Mapping(target = "encryptedPassword", ignore = true)
-  @Mapping(target = "accountCondition", ignore = true)
   UserEntity toUserEntity(User user);
+
+  @Mapping(target = "creationTimestamp", source = "creationRecord.actionTimestamp")
+  @Mapping(target = "modificationTimestamp", source = "modificationRecord.actionTimestamp")
+  User toUser(UserDetailImpl userDetail);
 
   default String blobToString(Byte[] profileByteArray) {
     if (profileByteArray == null) {
@@ -33,5 +42,9 @@ public interface UserConverter {
       return null;
     }
     return ArrayUtils.toObject(EncryptHelper.base64Decode(profileEncodedValue));
+  }
+
+  default List<String> tokenEntityToToken(List<TokenEntity> tokenEntityList) {
+    return tokenEntityList.stream().map(TokenEntity::getTokenValue).toList();
   }
 }
