@@ -34,7 +34,7 @@ public class UserDetailImpl extends UserEntityImpl implements UserDetails {
   }
 
   public List<String> getUserRoles() {
-    return userRoles.stream().map(String::toString).collect(Collectors.toList());
+    return userRoles;
   }
 
   public UserEntityImpl setUserRoles(List<String> userRoles) {
@@ -110,7 +110,12 @@ public class UserDetailImpl extends UserEntityImpl implements UserDetails {
     sb.append("  encryptedPassword: ")
         .append(toIndentedString(getEncryptedPassword()))
         .append("\n");
-    sb.append("  accountCondition: ").append(toIndentedString(getAccountStatus())).append("\n");
+    sb.append("  accountStatus: ").append(toIndentedString(getAccountStatus())).append("\n");
+    sb.append("  emailVerified: ").append(toIndentedString(getEmailVerified())).append("\n");
+    sb.append("  locale: ").append(toIndentedString(getLocale())).append("\n");
+    sb.append("  creationRecordId: ").append(toIndentedString(getCreationRecordId())).append("\n");
+    sb.append("  modificationRecordId: ").append(toIndentedString(getModificationRecordId())).append("\n");
+    sb.append("  loginRole: ").append(toIndentedString(getLoginRole())).append("\n");
     sb.append("  profileImage: ").append(toIndentedString(getProfileImage())).append("\n");
     sb.append("  userRoles: ").append(toIndentedString(getUserRoles())).append("\n");
     sb.append("  tokens: ").append(toIndentedString(getTokens())).append("\n");

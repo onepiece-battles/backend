@@ -147,7 +147,8 @@ public class UserService {
   public LoginResponse login(LoginRequest request) {
     var userName = request.getUserName();
     var password = request.getPassword();
-    var userDetail = userDetailDao.getUserDetailByName(userName);
+    var userDetail = userDao.getUserDetailByName(userName);
+    logger.info("user detail is {}", userDetail.toString());
     I18nText verification;
     if (userDetail.isEmpty()) {
       verification = UserFacingConstants.getConstant(REGISTER_FIRST_BEFORE_LOGIN).getDisplayName();
@@ -220,6 +221,10 @@ public class UserService {
     if (offset >= totalSize || offset < 0) {
       return new ListUsersResponse().users(List.of()).totalSize(totalSize);
     }
+    var tempUsers =   userDao
+            .listUsers(
+                    request.getUserFilter(), request.getSortKeys(), offset, request.getPageSize());
+    logger.info("temp users are: {}", tempUsers);
     var users =
         userDao
             .listUsers(
@@ -227,6 +232,7 @@ public class UserService {
             .stream()
             .map(UserConverter.INSTANCE::toUser)
             .toList();
+    logger.info("users list {}", users.toString());
     return new ListUsersResponse().users(users).totalSize(totalSize);
   }
 

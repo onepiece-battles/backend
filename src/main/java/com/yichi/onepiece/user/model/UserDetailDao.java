@@ -39,7 +39,8 @@ public interface UserDetailDao extends BaseDao<UserEntity, UUID> {
             many = @Many(select = RoleResourceDao.getResourceByRole)),
         @Result(property = "id", column = "id"),
         @Result(property = "creationRecordId", column = "creation_record_id"),
-        @Result(property = "modificationRecordId", column = "modification_record_id")
+        @Result(property = "modificationRecordId", column = "modification_record_id"),
+              @Result(property = "loginRole", column = "login_role")
       })
   @Select("SELECT * FROM user WHERE name=#{username}")
   Optional<UserDetailImpl> getUserDetailByName(@Param("username") String username);

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.user.model.UserDao">
-    <select id="listUsers" resultType="com.yichi.onepiece.issue.model.UserEntity">
+    <select id="listUsers" resultType="com.yichi.onepiece.user.model.UserEntity">
         SELECT * FROM `user`
         WHERE
         true
@@ -46,7 +46,7 @@
     <sql id="orderClause">
         <choose>
             <when test="sortList == null or sortList.isEmpty">
-                creation_timestamp DESC
+                creation_record_id DESC
             </when>
             <otherwise>
                 <foreach item="item" collection="sortList" separator=",">
