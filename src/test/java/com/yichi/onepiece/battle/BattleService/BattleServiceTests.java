@@ -11,7 +11,6 @@ import com.yichi.onepiece.fruit.model.FruitEntity;
 import com.yichi.onepiece.fruit.model.FruitEntityBuilder;
 import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
-import com.yichi.onepiece.model.FruitInCharacter;
 import com.yichi.onepiece.model.FruitType;
 import com.yichi.onepiece.user.service.UserService;
 import java.util.List;
@@ -32,8 +31,7 @@ public class BattleServiceTests {
   @Mock BattleProcessDetailDao battleProcessDetailDao;
 
   @Mock BattleStatusDetailDao battleStatusDetailDao;
-  @Mock
-  UserService userService;
+  @Mock UserService userService;
 
   BattleService battleService;
 
@@ -78,7 +76,6 @@ public class BattleServiceTests {
             .setDefense(750)
             .setBlood(11000)
             .setMagic(100)
-            .fruits(List.of(new FruitInCharacter().fruitId(fruit1Id)))
             .setHasFruits(true)
             .setSpeed(160)
             .setIntelligence(220)
@@ -94,10 +91,6 @@ public class BattleServiceTests {
             .setDefense(800)
             .setBlood(8000)
             .setMagic(10000)
-            .fruits(
-                List.of(
-                    new FruitInCharacter().fruitId(fruit2Id),
-                    new FruitInCharacter().fruitId(fruit3Id)))
             .setHasFruits(true)
             .setSpeed(160)
             .setIntelligence(220)
@@ -115,7 +108,6 @@ public class BattleServiceTests {
             .setMagicConsume(1)
             .setSpeedStrengthen(1.2)
             .setFruitType(FruitType.PARAMECIA)
-            .setOwnerId(characterInitId)
             .build();
 
     FruitEntity fruit2 =
@@ -130,7 +122,6 @@ public class BattleServiceTests {
             .setMagicConsume(2)
             .setSpeedStrengthen(1.0)
             .setFruitType(FruitType.PARAMECIA)
-            .setOwnerId(characterReceiveId)
             .build();
 
     FruitEntity fruit3 =
@@ -145,7 +136,6 @@ public class BattleServiceTests {
             .setMagicConsume(3)
             .setSpeedStrengthen(1.0)
             .setFruitType(FruitType.PARAMECIA)
-            .setOwnerId(characterReceiveId)
             .build();
     when(mockBattleDao.findById(battleId)).thenReturn(Optional.of(battleEntity));
     when(mockCharacterService.getCharacterEntityById(characterInitId)).thenReturn(characterInit);

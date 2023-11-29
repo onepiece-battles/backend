@@ -1,6 +1,7 @@
 package com.yichi.onepiece.user.model;
 
 import com.yichi.infra.support.entity.Entity;
+import com.yichi.onepiece.model.AccountStatus;
 import com.yichi.onepiece.model.OnepieceLocale;
 import com.yichi.onepiece.model.UserRole;
 import java.util.UUID;
@@ -20,13 +21,17 @@ public interface UserEntity {
 
   OnepieceLocale getLocale();
 
+  Long getCreationRecordId();
+
+  Long getModificationRecordId();
+
   String getOrganization();
 
   UserRole getLoginRole();
 
   String getEncryptedPassword();
 
-  UserAccountCondition getAccountCondition();
+  AccountStatus getAccountStatus();
 
   @Nullable
   Byte[] getProfileImage();

@@ -1,6 +1,6 @@
 package com.yichi.onepiece.configuration;
 
-import com.yichi.onepiece.user.model.UserDetailDao;
+import com.yichi.onepiece.user.model.UserDao;
 import java.time.Clock;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -16,10 +16,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class ApplicationConfig {
-  private final UserDetailDao userDetailDao;
+  private final UserDao userDao;
 
-  public ApplicationConfig(UserDetailDao userDetailDao) {
-    this.userDetailDao = userDetailDao;
+  public ApplicationConfig(UserDao userDao) {
+    this.userDao = userDao;
   }
 
   @Bean
@@ -34,7 +34,7 @@ public class ApplicationConfig {
   @Bean
   public UserDetailsService getUserDetailService() {
     return username ->
-        userDetailDao
+        userDao
             .getUserDetailByName(username)
             .orElseThrow(() -> new UsernameNotFoundException("User detail not found"));
   }

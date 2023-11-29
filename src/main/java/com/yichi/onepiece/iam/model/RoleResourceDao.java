@@ -15,16 +15,9 @@ import org.apache.ibatis.annotations.Select;
 @Dao
 @Mapper
 public interface RoleResourceDao extends BaseDao<RoleResourceEntity, UUID> {
-  //  @Select({
-  //    "<script>",
-  //    " SELECT *",
-  //    " FROM role_resource",
-  //    " WHERE role_resource.role_id IN ",
-  //    " <foreach item='item' collection='roleIds' open='(' separator=',' close=')'>",
-  //    "   #{item}",
-  //    " </foreach>",
-  //    "</script>"
-  //  })
+  String getResourceByRole =
+      "com.yichi.onepiece.iam.model.RoleResourceDao.getResourceNamesByRoleName";
+
   @Select({
     "<script>",
     "SELECT *",
