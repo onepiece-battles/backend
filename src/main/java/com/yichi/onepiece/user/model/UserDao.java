@@ -18,34 +18,34 @@ import org.apache.ibatis.annotations.*;
 @Mapper
 public interface UserDao extends BaseDao<UserEntity, UUID> {
 
-  @Results(
-      id = "UserDetailView",
-      value = {
-        @Result(
-            property = "creationRecord",
-            column = "creation_record_id",
-            one = @One(select = ActionRecordDao.FIND_BY_ID)),
-        @Result(
-            property = "modificationRecord",
-            column = "modification_record_id",
-            one = @One(select = ActionRecordDao.FIND_BY_ID)),
-        @Result(
-            property = "userRoles",
-            column = "id",
-            many = @Many(select = RoleDao.LIST_ROLES_BY_USER_ID)),
-        @Result(
-            property = "tokens",
-            column = "id",
-            many = @Many(select = TokenDao.LIST_TOKENS_BY_USER_ID)),
-        @Result(
-            property = "loginRoleResources",
-            column = "login_role",
-            many = @Many(select = RoleResourceDao.getResourceByRole)),
-        @Result(property = "id", column = "id"),
-        @Result(property = "creationRecordId", column = "creation_record_id"),
-        @Result(property = "modificationRecordId", column = "modification_record_id"),
-        @Result(property = "loginRole", column = "login_role")
-      })
+  //  @Results(
+  //      id = "UserDetailView",
+  //      value = {
+  //        @Result(
+  //            property = "creationRecord",
+  //            column = "creation_record_id",
+  //            one = @One(select = ActionRecordDao.FIND_BY_ID)),
+  //        @Result(
+  //            property = "modificationRecord",
+  //            column = "modification_record_id",
+  //            one = @One(select = ActionRecordDao.FIND_BY_ID)),
+  //        @Result(
+  //            property = "userRoles",
+  //            column = "id",
+  //            many = @Many(select = RoleDao.LIST_ROLES_BY_USER_ID)),
+  //        @Result(
+  //            property = "tokens",
+  //            column = "id",
+  //            many = @Many(select = TokenDao.LIST_TOKENS_BY_USER_ID)),
+  //        @Result(
+  //            property = "loginRoleResources",
+  //            column = "login_role",
+  //            many = @Many(select = RoleResourceDao.getResourceByRole)),
+  //        @Result(property = "id", column = "id"),
+  //        @Result(property = "creationRecordId", column = "creation_record_id"),
+  //        @Result(property = "modificationRecordId", column = "modification_record_id"),
+  //        @Result(property = "loginRole", column = "login_role")
+  //      })
   List<UserDetailImpl> listUsers(
       @Param("userFilter") UserFilter userFilter,
       @Param("sortList") Collection<UserSortableField> sortList,

@@ -10,7 +10,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class UserDetailImpl extends UserEntityImpl implements UserDetails {
+public class UserDetailImpl extends UserEntityImpl
+    implements UserEntity, UserDetails, com.yichi.infra.support.entity.EntityImpl {
   // not using enum here is because the transform of GrantedAuthority to User.
   private List<String> userRoles;
   private List<TokenEntity> tokens;

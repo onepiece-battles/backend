@@ -85,7 +85,7 @@
         <association column="creation_record_id" property="creationRecord"
                      select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
         />
-        <association column="creation_record_id" property="modificationRecord"
+        <association column="modification_record_id" property="modificationRecord"
                      select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
         />
     </resultMap>
