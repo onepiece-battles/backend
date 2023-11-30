@@ -77,9 +77,6 @@ public class FruitService {
     if (offset >= totalSize || offset < 0) {
       return new ListFruitResponse().fruits(List.of()).totalSize(totalSize);
     }
-    logger.info("resource list is: {}", resourceList.toString());
-    logger.info("request is: {}", request);
-    logger.info("user id is: {}", userId);
     var fruits =
         fruitDao
             .listFruits(
@@ -91,14 +88,6 @@ public class FruitService {
                 request.getPageSize())
             .stream()
             .map(FruitConverter.INSTANCE::toFruit)
-            //            .map(
-            //                fruit -> {
-            //                  var characterNames =
-            //                      characterHelper.listByFruitId(fruit.getId()).stream()
-            //                          .map(CharacterEntity::getName)
-            //                          .toList();
-            //                  return fruit.fruitHolders(characterNames);
-            //                })
             .toList();
     logger.info("fruits are: {}", fruits);
     return new ListFruitResponse().totalSize(totalSize).fruits(fruits);

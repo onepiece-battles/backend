@@ -45,6 +45,9 @@ public interface UserConverter {
   }
 
   default List<String> tokenEntityToToken(List<TokenEntity> tokenEntityList) {
+    if (tokenEntityList == null) {
+      return List.of();
+    }
     return tokenEntityList.stream().map(TokenEntity::getTokenValue).toList();
   }
 }
