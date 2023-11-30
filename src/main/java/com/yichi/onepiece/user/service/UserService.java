@@ -148,7 +148,6 @@ public class UserService {
     var userName = request.getUserName();
     var password = request.getPassword();
     var userDetail = userDao.getUserDetailByName(userName);
-    logger.info("user detail is {}", userDetail.toString());
     I18nText verification;
     if (userDetail.isEmpty()) {
       verification = UserFacingConstants.getConstant(REGISTER_FIRST_BEFORE_LOGIN).getDisplayName();
