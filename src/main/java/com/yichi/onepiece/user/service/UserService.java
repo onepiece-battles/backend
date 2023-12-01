@@ -231,7 +231,6 @@ public class UserService {
             .stream()
             .map(UserConverter.INSTANCE::toUser)
             .toList();
-    logger.info("users list {}", users.toString());
     return new ListUsersResponse().users(users).totalSize(totalSize);
   }
 

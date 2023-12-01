@@ -89,7 +89,6 @@ public class FruitService {
             .stream()
             .map(FruitConverter.INSTANCE::toFruit)
             .toList();
-    logger.info("fruits are: {}", fruits);
     return new ListFruitResponse().totalSize(totalSize).fruits(fruits);
   }
 
