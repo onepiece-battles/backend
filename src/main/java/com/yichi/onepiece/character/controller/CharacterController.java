@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StopWatch;
 
 @Controller
 public class CharacterController implements CharacterApi {
@@ -49,17 +50,26 @@ public class CharacterController implements CharacterApi {
     iamService.checkPermissionOfCurrentAccount(
         CharacterEntity.ENTITY_TYPE,
         Set.of(PermissionEnum.BATTLE_GET, PermissionEnum.CHARACTER_GET));
+    StopWatch watch = new StopWatch();
+    watch.start();
     var characterFullView =
         characterService.getCharacterFullView(getCharacterFullViewRequest.getCharacterId());
+    watch.stop();
+    logger.info("get character takes: {}", watch.getTotalTimeSeconds());
     return ResponseEntity.ok(characterFullView);
   }
 
   @Override
   public ResponseEntity<ListCharacterResponse> listCharacters(
       ListCharacterRequest listCharacterRequest) {
+    logger.info("list character api");
     iamService.checkPermissionOfCurrentAccount(
         CharacterEntity.ENTITY_TYPE, Set.of(PermissionEnum.CHARACTER_LIST));
+    StopWatch watch = new StopWatch();
+    watch.start();
     ListCharacterResponse response = characterService.listCharacters(listCharacterRequest);
+    watch.stop();
+    logger.info("list character takes: {}", watch.getTotalTimeSeconds());
     return ResponseEntity.ok(response);
   }
 }

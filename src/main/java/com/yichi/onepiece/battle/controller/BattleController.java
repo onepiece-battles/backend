@@ -16,11 +16,16 @@ import com.yichi.onepiece.model.ListBattleResponse;
 import com.yichi.onepiece.model.StartBattleRequest;
 import com.yichi.onepiece.model.StartBattleResponse;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StopWatch;
 
 @Controller
 public class BattleController implements BattleApi {
+  Logger logger = LoggerFactory.getLogger(BattleController.class);
+
   private final BattleService battleService;
   private final IamService iamService;
 
@@ -41,22 +46,37 @@ public class BattleController implements BattleApi {
   public ResponseEntity<BattleFullView> getBattleFullView(
       GetBattleFullViewRequest getBattleFullViewRequest) {
     iamService.checkPermissionOfCurrentAccount(
-        BattleEntity.ENTITY_TYPE, Set.of( PermissionEnum.BATTLE_GET));
-    return ResponseEntity.ok(battleService.getBattleFullView(getBattleFullViewRequest));
+        BattleEntity.ENTITY_TYPE, Set.of(PermissionEnum.BATTLE_GET));
+    StopWatch watch = new StopWatch();
+    watch.start();
+    var response = battleService.getBattleFullView(getBattleFullViewRequest);
+    watch.stop();
+    logger.info("get battle takes: {}", watch.getTotalTimeSeconds());
+    return ResponseEntity.ok(response);
   }
 
   @Override
   public ResponseEntity<ListBattleByIdResponse> listBattleByIds(
       ListBattleByIdsRequest listBattleByIdsRequest) {
+    StopWatch watch = new StopWatch();
+    watch.start();
     iamService.checkPermissionOfCurrentAccount(
         BattleEntity.ENTITY_TYPE, Set.of(PermissionEnum.BATTLE_LIST));
-    return ResponseEntity.ok(battleService.batchFindById(listBattleByIdsRequest));
+    var response = battleService.batchFindById(listBattleByIdsRequest);
+    watch.stop();
+    logger.info("list battle by ids takes: {}", watch.getTotalTimeSeconds());
+    return ResponseEntity.ok(response);
   }
 
   @Override
   public ResponseEntity<ListBattleResponse> listBattles(ListBattleRequest listBattleRequest) {
-    iamService.checkPermissionOfCurrentAccount(BattleEntity.ENTITY_TYPE, Set.of(PermissionEnum.BATTLE_LIST));
+    StopWatch watch = new StopWatch();
+    watch.start();
+    iamService.checkPermissionOfCurrentAccount(
+        BattleEntity.ENTITY_TYPE, Set.of(PermissionEnum.BATTLE_LIST));
     var response = battleService.list(listBattleRequest);
+    watch.stop();
+    logger.info("list battle takes: {}", watch.getTotalTimeSeconds());
     return ResponseEntity.ok(response);
   }
 
