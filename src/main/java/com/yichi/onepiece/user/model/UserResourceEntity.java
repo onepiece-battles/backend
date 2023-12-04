@@ -16,6 +16,5 @@ public interface UserResourceEntity {
 
   ResourceType getResourceType();
 
-  @Column(json = true)
-  List<UUID> getResourceIds();
+  UUID getResourceIds();
 }

@@ -43,7 +43,7 @@ public class CharacterInBattle {
     int defense = baseEntity.getDefense();
     int intelligence = baseEntity.getIntelligence();
     int speed = baseEntity.getSpeed();
-    int magic = baseEntity.getMagic();
+    int magic = baseEntity.getEnergy();
     int magicConsume = 0;
     // add fruit strengthen if this character eats fruits.
     if (baseEntity.getHasFruits() && !fruitEntities.isEmpty()) {

@@ -9,7 +9,6 @@ public interface BattleProcessDetailEntity {
   UUID getBattleId();
   Integer getBattleProcessRoundNumber();
   Boolean getAttackMissed();
-  Integer getAttackerMagicLoss();
   Integer getAttackerEnergyLoss();
   Integer getDefenderBloodLoss();
   Integer getDefenderEnergyLoss();

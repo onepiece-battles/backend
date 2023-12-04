@@ -1,6 +1,7 @@
 package com.yichi.onepiece.iam;
 
 import com.yichi.onepiece.exception.ExceptionUtils;
+import com.yichi.onepiece.model.Permission;
 import com.yichi.onepiece.model.ResourceType;
 import com.yichi.onepiece.model.UserRole;
 import java.util.*;
@@ -21,96 +22,22 @@ public class PermissionDefinition {
   private static final String UPDATE_SUFFIX = "UPDATE";
   private static final String DELETE_SUFFIX = "DELETE";
 
-  /*
-   rules for permission enum:
-   [RESOURCE ENUM]_[SPECIFIC_PERMISSION]
-   Note: resource name should not contain any '_', because '_' is used to divide resource and permission
-  */
-  public enum PermissionEnum {
-    // user
-    USER_ASSIGN_ROLE,
-    USER_CREATE,
-    USER_LIST,
-    USER_GET,
-    USER_UPDATE,
-    USER_DELETE,
-    // role
-    ROLE_CREATE,
-    ROLE_GET,
-    ROLE_LIST,
-    ROLE_UPDATE,
-    ROLE_DELETE,
-    // character
-    CHARACTER_CREATE,
-    CHARACTER_GET,
-    CHARACTER_LIST,
-    CHARACTER_UPDATE,
-    CHARACTER_DELETE,
 
-    // fruit
-    FRUIT_CREATE,
-    FRUIT_GET,
-    FRUIT_UPDATE,
-    FRUIT_DELETE,
 
-    // battle
-    BATTLE_CREATE,
-    BATTLE_GET,
-    BATTLE_LIST,
-    BATTLE_UPDATE,
-    BATTLE_DELETE,
-
-    // issue
-    ISSUE_CREATE,
-    ISSUE_GET,
-    ISSUE_UPDATE,
-    ISSUE_BATCH_UPDATE,
-    ISSUE_LIST
-  }
-
-  public static final EnumMap<UserRole, Set<PermissionEnum>> ROLE_TO_PERMISSION_MAP =
-      new EnumMap<>(
+  // resource permission full map
+  public static final EnumMap<ResourceType, Set<Permission>> resourcePermissionMap = new EnumMap<>(
           Map.ofEntries(
-              Map.entry(
-                  UserRole.VISITOR,
-                  Stream.concat(getAllGetPermissions().stream(), getAllListPermissions().stream())
-                      .filter(
-                          permissionEnum ->
-                              !Set.of(
-                                      PermissionEnum.USER_GET,
-                                      PermissionEnum.ROLE_GET,
-                                      PermissionEnum.USER_LIST,
-                                      PermissionEnum.ROLE_LIST,
-                                      PermissionEnum.ISSUE_LIST,
-                                      PermissionEnum.ISSUE_GET)
-                                  .contains(permissionEnum))
-                      .collect(Collectors.toSet())),
-              Map.entry(
-                  UserRole.NORMAL,
-                  Stream.concat(
-                          Stream.concat(
-                              Stream.of(PermissionEnum.USER_GET, PermissionEnum.USER_UPDATE),
-                              getAllCharacterPermissions().stream()),
-                          Stream.concat(
-                              getAllBattlePermissions().stream(),
-                              getAllFruitPermissions().stream()))
-                      .collect(Collectors.toSet())),
-              Map.entry(
-                  UserRole.NIKA,
-                  Arrays.stream(PermissionEnum.values()).collect(Collectors.toSet())),
-              Map.entry(
-                  UserRole.ADMIN,
-                  Stream.concat(
-                          Stream.concat(
-                              Stream.of(
-                                  PermissionEnum.USER_GET,
-                                  PermissionEnum.USER_UPDATE,
-                                  PermissionEnum.USER_LIST),
-                              getAllCharacterPermissions().stream()),
-                          Stream.concat(
-                              getAllBattlePermissions().stream(),
-                              getAllFruitPermissions().stream()))
-                      .collect(Collectors.toSet()))));
+                  Map.entry(ResourceType.USER, Arrays.stream(Permission.values()).collect(Collectors.toSet())),
+                  Map.entry(ResourceType.CHARACTER, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet())),
+                  Map.entry(ResourceType.BATTLE, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet())),
+                  Map.entry(ResourceType.FRUIT, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet())),
+                  Map.entry(ResourceType.ISSUE, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet())),
+                  Map.entry(ResourceType.ROLE, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet()))
+          )
+  );
+
+  // resource permission initial map
+
 
   public static Map<String, Set<String>> getResourcePermissionMap() {
     return Arrays.stream(ResourceType.values())

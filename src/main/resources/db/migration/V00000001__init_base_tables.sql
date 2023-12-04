@@ -9,7 +9,7 @@ CREATE TABLE `user`(
     `login_role` VARCHAR(255) NOT NULL,
     `encrypted_password` VARCHAR(100) NOT NULL,
     `account_status` VARCHAR(100) NOT NULL,
-    `profile_image` MEDIUMBLOB NOT NULL,
+    `profile_image` MEDIUMBLOB,
     `locale` VARCHAR(225) NOT NULL,
     `email_verified` TINYINT NOT NULL,
     `creation_record_id` BIGINT,
@@ -134,8 +134,8 @@ CREATE TABLE `character`(
     `age` INT,
     `height` DOUBLE,
     `birth_place` VARCHAR(100),
-    `date_of_birth` VARCHAR(30),
-    `haki`  TEXT,
+    `date_of_birth` DATE,
+    `hakis`  TEXT,
     `bounty` INT,
     # battle information
     `attack` INT NOT NULL,
@@ -169,16 +169,15 @@ CREATE TABLE `fruit`(
     `role_id` BINARY(16),
     `name` VARCHAR(255) NOT NULL,
     `fruit_type` VARCHAR(40) NOT NULL,
-    `magic_consume` INT NOT NULL,
+    `energy_consume` INT NOT NULL,
     `group_gain_strengthen` INT NOT NULL,
     `attack_strengthen` INT NOT NULL,
     `defense_strengthen` INT NOT NULL,
     `intelligence_strengthen` INT NOT NULL,
     `blood_strengthen` INT NOT NULL,
-    `profile_image` MEDIUMBLOB NOT NULL,
+    `profile_image` MEDIUMBLOB,
     `creation_record_id` BIGINT NOT NULL,
     `modification_record_id` BIGINT NOT NULL,
-    `is_system_resource` BOOLEAN NOT NULL,
     `speed_strengthen` INT NOT NULL
 );
 ALTER TABLE `fruit` ADD CONSTRAINT PRIMARY KEY(`id`);
@@ -229,7 +228,6 @@ CREATE TABLE `battle`(
     `modification_record_id` BIGINT NOT NULL,
     `type` VARCHAR(255) NOT NULL,
     `status` VARCHAR(255) NOT NULL,
-    `is_system_resource` BOOLEAN NOT NULL,
     `winner_id` BINARY(16)
 );
 ALTER TABLE `battle` ADD CONSTRAINT PRIMARY KEY(`id`);
@@ -255,8 +253,7 @@ CREATE TABLE `battle_process_detail`(
     `battle_process_round_number` BIGINT NOT NULL,
     `attack_missed` BINARY NOT NULL,
     `attacker_magic_loss` INT NOT NULL,
-    `attacker_energy_loss` INT,
-    `defender_magic_loss` INT NOT NULL,
+    `attacker_energy_loss` INT NOT NULL,
     `defender_energy_loss` INT,
     `defender_blood_loss` VARCHAR(255) NOT NULL,
     `attack_skill_type` VARCHAR(255) NOT NULL

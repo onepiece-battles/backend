@@ -2,7 +2,9 @@ package com.yichi.onepiece.character.model;
 
 import com.yichi.infra.support.entity.Entity;
 import com.yichi.onepiece.model.CharacterType;
-import com.yichi.onepiece.model.FruitInCharacter;
+import com.yichi.onepiece.model.Haki;
+
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -14,21 +16,21 @@ public interface CharacterEntity {
   UUID getId();
 
   UUID getUserId();
+  UUID getRoleId();
+  String getName();
 
-  CharacterType getCharacterType();
+  List<CharacterType> getCharacterTypes();
 
   @Nullable
   Byte[] getProfileImage();
-
-  String getName();
-
-  String getGroupOid();
-
-  Boolean getHasFruits();
-  Boolean getIsSystemResource();
-
+  UUID getGroupId();
   // default to be 1, unless special characters.
-  Integer getFruitLimit();
+  Integer getMaximumFruitCount();
+  Integer getAge();
+  Double getHeight();
+  Date getDateOfBirth();
+  List<Haki> getHakis();
+  Integer getBounty();
 
   // some characters are better when fighting in a group
   Integer getGroupGain();
@@ -44,7 +46,7 @@ public interface CharacterEntity {
   Integer getSpeed();
 
   // magic will be used if character has fruit in Paramecia type.
-  Integer getMagic();
+  Integer getEnergy();
 
   Long getCreationRecordId();
 

@@ -132,7 +132,7 @@ public class CharacterService {
       throw new RuntimeException("can not add fruit to character that doesn't exist");
     }
     var characterEntity = characterEntityOptional.get();
-    int fruitLimit = characterEntity.getFruitLimit();
+    int fruitLimit = characterEntity.getMaximumFruitCount();
     var fruits = fruitService.listByCharacterId(characterId);
     EatFruitResponse response = new EatFruitResponse();
     if (fruits.size() == fruitLimit) {
