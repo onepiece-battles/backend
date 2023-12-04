@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class PrepareResourceAndPermissionData implements CommandLineRunner {
   Logger logger = LoggerFactory.getLogger(PrepareResourceAndPermissionData.class);
   private final ResourceDao resourceDao;
