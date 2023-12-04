@@ -28,7 +28,9 @@ CREATE TABLE `battle`(
     `creation_record_id` BIGINT NOT NULL,
     `modification_record_id` BIGINT NOT NULL,
     `type` VARCHAR(255) NOT NULL,
-    `status` VARCHAR(255) NOT NULL
+    `status` VARCHAR(255) NOT NULL,
+    `is_system_resource` BOOLEAN NOT NULL,
+    `winner_id` BINARY(16)
 );
 ```
 
@@ -44,6 +46,11 @@ ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__character_id_initiator`
 ```sql
 ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__character_id_receiver`
   FOREIGN KEY(`receiver_id`) REFERENCES `character`(`id`);
+```
+
+```sql
+ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__character_id_winner`
+  FOREIGN KEY(`winner_id`) REFERENCES `character`(`id`);
 ```
 
 ```sql
@@ -120,7 +127,6 @@ CREATE TABLE `character`(
     `group_oid` VARCHAR(30),
     `has_fruits` TINYINT NOT NULL,
     `fruit_limit` TINYINT NOT NULL,
-    `fruits` TEXT NOT NULL,
     `group_gain` INT NOT NULL,
     `attack` INT NOT NULL,
     `defense` INT NOT NULL,
@@ -130,7 +136,8 @@ CREATE TABLE `character`(
     `magic` INT NOT NULL,
     `user_id` BINARY(16),
     `creation_record_id` BIGINT NOT NULL,
-    `modification_record_id` BIGINT NOT NULL
+    `modification_record_id` BIGINT NOT NULL,
+    `is_system_resource` BOOLEAN NOT NULL
 );
 ```
 
@@ -153,13 +160,89 @@ ALTER TABLE `character` ADD CONSTRAINT `fk_character_modification_record_id__act
   FOREIGN KEY(`modification_record_id`) REFERENCES `action_lineage`(`id`);
 ```
 
+## character_to_fruit
+
+```sql
+CREATE TABLE `character_to_fruit`(
+    `id` BINARY(16) NOT NULL,
+    `character_id` BINARY(16) NOT NULL,
+    `fruit_id` BINARY(16) NOT NULL,
+    `wake_up` BOOLEAN NOT NULL
+);
+```
+
+```sql
+ALTER TABLE `character_to_fruit` ADD CONSTRAINT PRIMARY KEY(`id`);
+```
+
+```sql
+ALTER TABLE `character_to_fruit` ADD CONSTRAINT `fk_character_to_fruit__character_id`
+  FOREIGN KEY(`character_id`) REFERENCES `character`(`id`);
+```
+
+```sql
+ALTER TABLE `character_to_fruit` ADD CONSTRAINT `fk_character_to_fruit__fruit_id`
+  FOREIGN KEY(`fruit_id`) REFERENCES `fruit`(`id`);
+```
+
+## email_verification
+
+```sql
+CREATE TABLE `email_verification`(
+    `id` BINARY(16) NOT NULL,
+    `user_id` BINARY(16) NOT NULL,
+    `email` VARCHAR(255) NOT NULL,
+    `email_verification_code` VARCHAR(255) NOT NULL,
+    `is_used` BOOLEAN NOT NULL,
+    `creation_timestamp` BIGINT NOT NULL,
+    `expiration_timestamp` BIGINT NOT NULL
+);
+```
+
+```sql
+ALTER TABLE `email_verification` ADD CONSTRAINT PRIMARY KEY(`id`);
+```
+
+```sql
+ALTER TABLE `email_verification` ADD CONSTRAINT `fk_email_verification_user_id__user_id`
+  FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
+```
+
+## file_object
+
+```sql
+CREATE TABLE `file_object`(
+    `id` BINARY(16) NOT NULL,
+    `file_name` VARCHAR(255) NOT NULL,
+    `resource_id` BINARY(16),
+    `creator_user_id` BINARY(16),
+    `creation_record_id` BIGINT NOT NULL,
+    `file_category` VARCHAR(255) NOT NULL,
+    `http_mime_type` VARCHAR(255) NOT NULL,
+    `oss_uri` VARCHAR(255) NOT NULL
+);
+```
+
+```sql
+ALTER TABLE `file_object` ADD CONSTRAINT PRIMARY KEY(`id`);
+```
+
+```sql
+ALTER TABLE `file_object` ADD CONSTRAINT `fk_file_creation_record_id__action_lineage_id`
+  FOREIGN KEY(`creation_record_id`) REFERENCES `action_lineage`(`id`);
+```
+
+```sql
+ALTER TABLE `file_object` ADD CONSTRAINT `fk_file_creator_user_id__user_id`
+  FOREIGN KEY(`creator_user_id`) REFERENCES `user`(`id`);
+```
+
 ## fruit
 
 ```sql
 CREATE TABLE `fruit`(
     `id` BINARY(16) NOT NULL,
     `name` VARCHAR(255) NOT NULL,
-    `owner_id` BINARY(16),
     `fruit_type` VARCHAR(40) NOT NULL,
     `magic_consume` INT NOT NULL,
     `group_gain_strengthen` INT NOT NULL,
@@ -170,17 +253,14 @@ CREATE TABLE `fruit`(
     `user_id` BINARY(16),
     `profile_image` MEDIUMBLOB NOT NULL,
     `creation_record_id` BIGINT NOT NULL,
-    `modification_record_id` BIGINT NOT NULL
+    `modification_record_id` BIGINT NOT NULL,
+    `is_system_resource` BOOLEAN NOT NULL,
+    `speed_strengthen` INT NOT NULL
 );
 ```
 
 ```sql
 ALTER TABLE `fruit` ADD CONSTRAINT PRIMARY KEY(`id`);
-```
-
-```sql
-ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__owner_id`
-  FOREIGN KEY(`owner_id`) REFERENCES `character`(`id`);
 ```
 
 ```sql
@@ -196,6 +276,30 @@ ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit_creation_record_id__action_lineage_
 ```sql
 ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit_modification_record_id__action_lineage_id`
   FOREIGN KEY(`modification_record_id`) REFERENCES `action_lineage`(`id`);
+```
+
+## issue
+
+```sql
+CREATE TABLE `issue`(
+    `id` BIGINT NOT NULL,
+    `creation_user_id` BIGINT NOT NULL,
+    `issue_type` VARCHAR(255) NOT NULL,
+    `issue_header` VARCHAR(255) NOT NULL,
+    `issue_description` VARCHAR(255) NOT NULL,
+    `issue_status` VARCHAR(255) NOT NULL,
+    `creation_timestamp` BIGINT NOT NULL,
+    `modification_timestamp` BIGINT NOT NULL
+);
+```
+
+```sql
+ALTER TABLE `issue` ADD CONSTRAINT PRIMARY KEY(`id`);
+```
+
+```sql
+ALTER TABLE `issue` ADD CONSTRAINT `fk_issue__creation_user_id`
+  FOREIGN KEY(`creation_user_id`) REFERENCES `user`(`id`);
 ```
 
 ## resource
@@ -217,7 +321,7 @@ ALTER TABLE `resource` ADD CONSTRAINT PRIMARY KEY(`id`);
 ```sql
 CREATE TABLE `role`(
     `id` BINARY(16) NOT NULL,
-    `name` VARCHAR(255)
+    `name` VARCHAR(255) NOT NULL
 );
 ```
 
@@ -277,18 +381,53 @@ ALTER TABLE `token` ADD CONSTRAINT `fk_token_user_id__user_id`
 ```sql
 CREATE TABLE `user`(
     `id` BINARY(16) NOT NULL,
-    `name` VARCHAR(255),
-    `email` VARCHAR(255),
+    `name` VARCHAR(255) NOT NULL,
+    `email` VARCHAR(255) NOT NULL,
     `organization` VARCHAR(255),
-    `login_role` VARCHAR(255),
-    `encrypted_password` VARCHAR(100),
-    `account_condition` VARCHAR(100),
-    `profile_image` MEDIUMBLOB NOT NULL
+    `login_role` VARCHAR(255) NOT NULL,
+    `encrypted_password` VARCHAR(100) NOT NULL,
+    `account_status` VARCHAR(100) NOT NULL,
+    `profile_image` MEDIUMBLOB NOT NULL,
+    `locale` VARCHAR(225) NOT NULL,
+    `email_verified` TINYINT NOT NULL,
+    `creation_record_id` BIGINT,
+    `modification_record_id` BIGINT
 );
 ```
 
 ```sql
 ALTER TABLE `user` ADD CONSTRAINT PRIMARY KEY(`id`);
+```
+
+```sql
+ALTER TABLE `user` ADD CONSTRAINT `unique_name`
+  UNIQUE(`name`);
+```
+
+## user_resource
+
+```sql
+CREATE TABLE `user_resource`(
+    `id` BINARY(16) NOT NULL,
+    `user_id` BINARY(16),
+    `source_user_id` BINARY(16),
+    `resource_type` VARCHAR(255),
+    `resource_id` BINARY(16)
+);
+```
+
+```sql
+ALTER TABLE `user_resource` ADD CONSTRAINT PRIMARY KEY(`id`);
+```
+
+```sql
+ALTER TABLE `user_resource` ADD CONSTRAINT `fk_user_resource__source_user_id`
+  FOREIGN KEY(`source_user_id`) REFERENCES `user`(`id`);
+```
+
+```sql
+ALTER TABLE `user_resource` ADD CONSTRAINT `fk_user_resource__user_id`
+  FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
 ```
 
 ## user_role

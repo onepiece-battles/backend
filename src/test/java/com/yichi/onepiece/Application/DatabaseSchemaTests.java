@@ -38,7 +38,7 @@ public class DatabaseSchemaTests extends AbstractTransactionalTestNGSpringContex
   private static final String LATEST_VERSION = "db/LATEST_VERSION";
   // matches the file name "V00000001__xxx.sql"
   private static final Pattern MIGRATION_SQL_NAME_PATTERN =
-      Pattern.compile("\\bV([0-9]+)__\\w+\\.sql\\b");
+      Pattern.compile("\\bV(\\d+)__\\w+\\.sql\\b");
   private static final String DB_SCHEMA = "PUBLIC";
 
   @Autowired private SchemaMapper schemaMapper;
