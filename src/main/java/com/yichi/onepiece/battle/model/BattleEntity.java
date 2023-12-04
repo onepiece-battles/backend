@@ -17,8 +17,6 @@ public interface BattleEntity {
 
   UUID getReceiverId();
 
-  Boolean getIsSystemResource();
-
   Long getCreationRecordId();
 
   Long getModificationRecordId();

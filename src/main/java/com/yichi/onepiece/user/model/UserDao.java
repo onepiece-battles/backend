@@ -3,7 +3,6 @@ package com.yichi.onepiece.user.model;
 import com.yichi.infra.support.mybatis.annotations.Dao;
 import com.yichi.infra.support.mybatis.dao.BaseDao;
 import com.yichi.onepiece.iam.model.RoleDao;
-import com.yichi.onepiece.iam.model.RoleResourceDao;
 import com.yichi.onepiece.iam.model.TokenDao;
 import com.yichi.onepiece.lineage.model.ActionRecordDao;
 import com.yichi.onepiece.model.UserFilter;

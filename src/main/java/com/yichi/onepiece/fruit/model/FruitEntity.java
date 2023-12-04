@@ -11,17 +11,15 @@ public interface FruitEntity {
 
   UUID getId();
   UUID getUserId();
-
+  UUID getRoleId();
   String getName();
-  Boolean getIsSystemResource();
-
   @Nullable
   Byte[] getProfileImage();
 
   FruitType getFruitType();
 
   // Paramecia fruits consume positive magic, other types consume 0 magic.
-  Integer getMagicConsume();
+  Integer getEnergyConsume();
 
   Double getGroupGainStrengthen();
 
