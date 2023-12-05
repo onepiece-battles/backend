@@ -6,8 +6,6 @@ import com.yichi.infra.support.entity.Entity;
 public interface CurrentCharacterEntity {
   Integer getBlood();
 
-  Integer getMagic();
-
   Integer getEnergyPercentage();
 
   Integer getAttack();

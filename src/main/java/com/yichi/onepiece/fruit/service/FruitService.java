@@ -46,8 +46,6 @@ public class FruitService {
     var fruitEntity =
         FruitConverter.INSTANCE.toFruitEntity(request).toBuilder()
             .setCreationRecordId(actionRecord.getId())
-            .setModificationRecordId(actionRecord.getId())
-            .setIsSystemResource(isSystemResource)
             .setUserId(UserHelper.getCurrentUserId())
             .build();
     if (fruitEntity.getProfileImage() == null) {

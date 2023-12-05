@@ -32,10 +32,6 @@ public interface UserDetailDao extends BaseDao<UserEntity, UUID> {
             property = "tokens",
             column = "id",
             many = @Many(select = TokenDao.LIST_TOKENS_BY_USER_ID)),
-        @Result(
-            property = "loginRoleResources",
-            column = "login_role",
-            many = @Many(select = RoleResourceDao.getResourceByRole)),
         @Result(property = "id", column = "id"),
         @Result(property = "creationRecordId", column = "creation_record_id"),
         @Result(property = "modificationRecordId", column = "modification_record_id"),

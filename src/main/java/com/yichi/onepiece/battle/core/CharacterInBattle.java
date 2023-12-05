@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 public class CharacterInBattle {
   Logger logger = LoggerFactory.getLogger(CharacterInBattle.class);
   private static final int INIT_ENERGY_PERCENTAGE = 100;
+  private static final int MINIMUM_FRUIT_ENERGY = 15;
   private final UUID characterId;
   private final String name;
   private int intelligence;
@@ -43,11 +44,10 @@ public class CharacterInBattle {
     int defense = baseEntity.getDefense();
     int intelligence = baseEntity.getIntelligence();
     int speed = baseEntity.getSpeed();
-    int magic = baseEntity.getEnergy();
-    int magicConsume = 0;
+    int energyConsume = 0;
     // add fruit strengthen if this character eats fruits.
-    if (baseEntity.getHasFruits() && !fruitEntities.isEmpty()) {
-      magicConsume = fruitEntities.stream().mapToInt(FruitEntity::getMagicConsume).sum();
+    if (!fruitEntities.isEmpty()) {
+      energyConsume = fruitEntities.stream().mapToInt(FruitEntity::getEnergyConsume).sum();
       for (FruitEntity fruit : fruitEntities) {
         blood = (int) (blood * fruit.getBloodStrengthen());
         attack = (int) (attack * fruit.getAttackStrengthen());
@@ -57,14 +57,13 @@ public class CharacterInBattle {
       }
     }
     this.intelligence = intelligence;
-    this.magicConsume = magicConsume;
+    this.magicConsume = energyConsume;
     this.currentCharacterEntity =
         (CurrentCharacterEntityImpl)
             CurrentCharacterEntityBuilder.newBuilder()
                 .setAttack(attack)
                 .setBlood(blood)
                 .setDefense(defense)
-                .setMagic(magic)
                 .setEnergyPercentage(INIT_ENERGY_PERCENTAGE)
                 .setSpeed(speed)
                 .build();
@@ -85,10 +84,6 @@ public class CharacterInBattle {
 
   public int getBlood() {
     return currentCharacterEntity.getBlood();
-  }
-
-  public int getMagic() {
-    return currentCharacterEntity.getMagic();
   }
 
   public int getSpeed() {
@@ -120,21 +115,18 @@ public class CharacterInBattle {
   }
 
   public AttackEntity attack() {
-    if (currentCharacterEntity.getMagic() < 0 && !reversed) {
+    if (currentCharacterEntity.getEnergyPercentage() < MINIMUM_FRUIT_ENERGY && !reversed) {
       reverseCharacter();
       reversed = true;
       logger.info("run out of magic, reverse {}", name);
     }
-    logger.info("{} attack with power {}", name, currentCharacterEntity.getMagic());
-    if (baseEntity.getHasFruits() && !reversed) {
-      currentCharacterEntity.setMagic(currentCharacterEntity.getMagic() - magicConsume);
-    }
+    logger.info("{} attack with power {}", name, currentCharacterEntity.getEnergyPercentage());
     return attackEntity;
   }
 
   // the order of return list is: blood loss, magic loss and energy loss.
   public List<Integer> defense(AttackEntity attackEntity) {
-    if (currentCharacterEntity.getMagic() < 0 && !reversed) {
+    if (!reversed) {
       reverseCharacter();
       reversed = true;
       logger.info("run out of magic, reverse {}", name);

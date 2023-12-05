@@ -188,7 +188,7 @@ public class Battlefield {
         .setBattleId(battleId)
         .setAttackerEnergyLoss(1)
         .setBattleProcessRoundNumber(battleProcessCount)
-        .setAttackerMagicLoss(attackSide.getMagicConsume())
+        .setAttackerEnergyLoss(attackSide.getMagicConsume())
         .setAttackSkillType("");
 
     var attackEntity = attackSide.attack();

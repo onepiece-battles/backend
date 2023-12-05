@@ -3,20 +3,20 @@ package com.yichi.onepiece.iam.service;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.iam.model.*;
 import com.yichi.onepiece.model.*;
-import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RoleService {
   private final RoleDao roleDao;
-  private final RoleResourceDao roleResourceDao;
-  private final ResourceDao resourceDao;
+  private final ResourcePermissionDao resourcePermissionDao;
+  private final RoleToResourcePermissionDao roleToResourcePermissionDao;
 
-  public RoleService(RoleDao roleDao, RoleResourceDao roleResourceDao, ResourceDao resourceDao) {
+  public RoleService(RoleDao roleDao, ResourcePermissionDao resourcePermissionDao,
+      RoleToResourcePermissionDao roleToResourcePermissionDao) {
     this.roleDao = roleDao;
-    this.roleResourceDao = roleResourceDao;
-    this.resourceDao = resourceDao;
+    this.resourcePermissionDao = resourcePermissionDao;
+    this.roleToResourcePermissionDao = roleToResourcePermissionDao;
   }
 
   public AddRoleResponse addRole(AddRoleRequest addRoleRequest) {
@@ -33,63 +33,23 @@ public class RoleService {
 
   public AssignResourcePermissionsToRoleResponse assignResourceToRole(AssignResourcePermissionsToRoleRequest request) {
     var roleId = request.getRoleId();
-    var roleEntity =
+    // check role existence
         roleDao
             .findById(roleId)
             .orElseThrow(ExceptionUtils.notFound("Role with id %s not found", roleId));
-    var resourceIds =
-        request.getResourcePermissionEntryList().stream()
-            .map(ResourcePermissionsEntry::getResourceId)
-            .toList();
-    var resourceList = resourceDao.batchFindById(resourceIds);
-    var sourceResourcePermissionsEntryList = request.getResourcePermissionEntryList();
-    HashMap<UUID, Set<String>> validationMap = new HashMap<>();
-    for (ResourceEntity resourceEntity : resourceList) {
-      validationMap.put(resourceEntity.getId(), resourceEntity.getPermissions());
-    }
-    validateResourceAndPermissions(validationMap, sourceResourcePermissionsEntryList);
-    List<RoleResourceEntity> assignedEntityList = new ArrayList<>();
-    for (ResourcePermissionsEntry resourcePermissionsEntry : sourceResourcePermissionsEntryList) {
-      var roleResourceEntity =
-          RoleResourceEntityBuilder.newBuilder()
-              .setResourceId(resourcePermissionsEntry.getResourceId())
-              .setRoleId(request.getRoleId())
-              .setPermissions(resourcePermissionsEntry.getPermissions())
-              .build();
-      assignedEntityList.add(roleResourceEntity);
-    }
-    roleResourceDao.batchInsert(assignedEntityList);
-    var roleResourceEntities =
-        roleResourceDao.listRoleResourceByRoleIds(List.of(request.getRoleId()));
-    var resourcePermissionsEntryList =
-        roleResourceEntities.stream()
-            .map(
-                roleResourceEntity -> {
-                  ResourcePermissionsEntry resourcePermissionsEntry =
-                      new ResourcePermissionsEntry();
-                  resourcePermissionsEntry.setResourceId(roleResourceEntity.getResourceId());
-                  resourcePermissionsEntry.setPermissions(roleResourceEntity.getPermissions());
-                  return resourcePermissionsEntry;
-                })
-            .toList();
-    return new AssignResourceToRoleResponse()
-        .roleId(roleId)
-        .roleName(roleEntity.getName())
-        .resourcePermissionEntryList(resourcePermissionsEntryList);
-  }
-
-  private void validateResourceAndPermissions(
-      HashMap<UUID, Set<String>> validationMap,
-      List<ResourcePermissionsEntry> resourcePermissionsEntryList) {
-    for (ResourcePermissionsEntry resourcePermissionsEntry : resourcePermissionsEntryList) {
-      if (!validationMap
-          .get(resourcePermissionsEntry.getResourceId())
-          .containsAll(resourcePermissionsEntry.getPermissions())) {
-        ExceptionUtils.notFound(
-                "Invalid permission exists when validating resource, id: %s",
-                resourcePermissionsEntry.getResourceId())
-            .get();
-      }
-    }
+    var resource = request.getResourceType();
+    var permissions = request.getPermissions();
+    var roleToResourcePermissionEntities = resourcePermissionDao.
+        listAll().stream().filter(
+        resourcePermissionEntity ->
+            resourcePermissionEntity.getResourceType()==resource
+                && permissions.contains(resourcePermissionEntity.getPermission())
+    ).map(ResourcePermissionEntity::getId).map(id-> RoleToResourcePermissionEntityBuilder.newBuilder()
+        .setRoleId(roleId)
+        .setResourcePermissionId(id)
+        .build())
+        .toList();
+    roleToResourcePermissionDao.batchInsert(roleToResourcePermissionEntities);
+    return new AssignResourcePermissionsToRoleResponse().result(new I18nText().enUS("success").zhCN("成功"));
   }
 }

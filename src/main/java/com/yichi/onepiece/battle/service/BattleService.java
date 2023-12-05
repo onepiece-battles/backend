@@ -48,7 +48,6 @@ public class BattleService {
 
   public Battle addBattle(AddBattleRequest request) {
     var actionRecord = actionRecordService.create();
-    var isSystemResource = UserHelper.hasAdminPermission();
     BattleEntity battleEntity =
         BattleEntityBuilder.newBuilder()
             .setUserId(request.getUserId())
@@ -60,7 +59,6 @@ public class BattleService {
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
             .build();
-
     battleDao.insert(battleEntity);
     var insertedEntity =
         battleDao
@@ -82,7 +80,6 @@ public class BattleService {
     if (offset >= totalSize || offset < 0) {
       return new ListBattleResponse().battles(List.of()).totalSize(totalSize);
     }
-
     var battleList =
         battleDao
             .list(
@@ -150,9 +147,9 @@ public class BattleService {
     logger.info("Loser is {}", loser.getName());
     logger.info("------------------------------------------------");
     logger.info("winner information");
-    logger.info("winner blood: {}, winner magic: {}", winner.getBlood(), winner.getMagic());
+    logger.info("winner blood: {}", winner.getBlood());
     logger.info("loser information");
-    logger.info("loser blood: {}, loser magic: {}", loser.getBlood(), loser.getMagic());
+    logger.info("loser blood: {}", loser.getBlood());
     return new StartBattleResponse().battleId(battleId).result(new BattleResult());
   }
 
