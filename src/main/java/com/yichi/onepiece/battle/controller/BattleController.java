@@ -1,9 +1,7 @@
 package com.yichi.onepiece.battle.controller;
 
 import com.yichi.onepiece.api.BattleApi;
-import com.yichi.onepiece.battle.model.BattleEntity;
 import com.yichi.onepiece.battle.service.BattleService;
-import com.yichi.onepiece.iam.PermissionDefinition.PermissionEnum;
 import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.AddBattleRequest;
 import com.yichi.onepiece.model.Battle;
@@ -13,6 +11,8 @@ import com.yichi.onepiece.model.ListBattleByIdResponse;
 import com.yichi.onepiece.model.ListBattleByIdsRequest;
 import com.yichi.onepiece.model.ListBattleRequest;
 import com.yichi.onepiece.model.ListBattleResponse;
+import com.yichi.onepiece.model.Permission;
+import com.yichi.onepiece.model.ResourceType;
 import com.yichi.onepiece.model.StartBattleRequest;
 import com.yichi.onepiece.model.StartBattleResponse;
 import java.util.Set;
@@ -37,7 +37,7 @@ public class BattleController implements BattleApi {
   @Override
   public ResponseEntity<Battle> addBattle(AddBattleRequest addBattleRequest) {
     iamService.checkPermissionOfCurrentAccount(
-        BattleEntity.ENTITY_TYPE, Set.of(PermissionEnum.BATTLE_CREATE, PermissionEnum.BATTLE_GET));
+        ResourceType.BATTLE, Set.of(Permission.CREATE, Permission.GET));
     var battle = battleService.addBattle(addBattleRequest);
     return ResponseEntity.ok(battle);
   }
@@ -46,7 +46,7 @@ public class BattleController implements BattleApi {
   public ResponseEntity<BattleFullView> getBattleFullView(
       GetBattleFullViewRequest getBattleFullViewRequest) {
     iamService.checkPermissionOfCurrentAccount(
-        BattleEntity.ENTITY_TYPE, Set.of(PermissionEnum.BATTLE_GET));
+        ResourceType.BATTLE, Set.of(Permission.GET));
     StopWatch watch = new StopWatch();
     watch.start();
     var response = battleService.getBattleFullView(getBattleFullViewRequest);
@@ -61,7 +61,7 @@ public class BattleController implements BattleApi {
     StopWatch watch = new StopWatch();
     watch.start();
     iamService.checkPermissionOfCurrentAccount(
-        BattleEntity.ENTITY_TYPE, Set.of(PermissionEnum.BATTLE_LIST));
+        ResourceType.BATTLE, Set.of(Permission.LIST));
     var response = battleService.batchFindById(listBattleByIdsRequest);
     watch.stop();
     logger.info("list battle by ids takes: {}", watch.getTotalTimeSeconds());
@@ -73,7 +73,7 @@ public class BattleController implements BattleApi {
     StopWatch watch = new StopWatch();
     watch.start();
     iamService.checkPermissionOfCurrentAccount(
-        BattleEntity.ENTITY_TYPE, Set.of(PermissionEnum.BATTLE_LIST));
+        ResourceType.BATTLE, Set.of(Permission.LIST));
     var response = battleService.list(listBattleRequest);
     watch.stop();
     logger.info("list battle takes: {}", watch.getTotalTimeSeconds());
@@ -83,7 +83,7 @@ public class BattleController implements BattleApi {
   @Override
   public ResponseEntity<StartBattleResponse> startBattle(StartBattleRequest startBattleRequest) {
     iamService.checkPermissionOfCurrentAccount(
-        BattleEntity.ENTITY_TYPE, Set.of(PermissionEnum.BATTLE_UPDATE));
+        ResourceType.BATTLE, Set.of(Permission.UPDATE));
     var battle = battleService.startBattle(startBattleRequest.getBattleId());
     return ResponseEntity.ok(battle);
   }

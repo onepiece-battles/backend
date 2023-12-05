@@ -32,7 +32,13 @@ public class PrepareResourceAndPermissionData implements CommandLineRunner {
     // todo(yichi): handle delete occasions
     // initialize resource and permission data
     List<ResourcePermissionEntity> resourcePermissionDbEntities = resourcePermissionDao.listAll();
-    var dbRpList = resourcePermissionDbEntities.stream().map(rp-> String.format("%s%s%s", rp.getResourceType(), RESOURCE_PERMISSION_SPLITTER, rp.getPermission())).toList();
+    var dbRpList = resourcePermissionDbEntities.stream()
+        .map(rp->
+            String.format(
+                "%s%s%s", rp.getResourceType(),
+                RESOURCE_PERMISSION_SPLITTER,
+                rp.getPermission()))
+        .toList();
     var resourcePermissionList = PermissionDefinition.resourcePermissionList;
     var newRPEntities = resourcePermissionList.stream().map(
         resourceTypePermissionPair -> ResourcePermissionEntityBuilder.newBuilder()

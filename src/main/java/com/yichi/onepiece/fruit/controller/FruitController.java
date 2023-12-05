@@ -2,31 +2,43 @@ package com.yichi.onepiece.fruit.controller;
 
 import com.yichi.onepiece.api.FruitApi;
 import com.yichi.onepiece.fruit.service.FruitService;
+import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.*;
+import java.util.Set;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
 @Controller
 public class FruitController implements FruitApi {
   private final FruitService fruitService;
+  private final IamService iamService;
 
-  public FruitController(FruitService fruitService) {
+  public FruitController(FruitService fruitService, IamService iamService) {
     this.fruitService = fruitService;
+    this.iamService = iamService;
   }
 
   @Override
   public ResponseEntity<Fruit> addFruit(AddFruitRequest addFruitRequest) {
+    iamService.checkPermissionOfCurrentAccount(
+        ResourceType.FRUIT,
+        Set.of( Permission.CREATE, Permission.GET));
     return ResponseEntity.ok(fruitService.addFruit(addFruitRequest));
   }
 
   @Override
   public ResponseEntity<ListFruitResponse> listFruit(ListFruitRequest listFruitRequest) {
+    iamService.checkPermissionOfCurrentAccount(
+        ResourceType.FRUIT, Set.of(Permission.LIST));
     ListFruitResponse response = (fruitService.listFruit(listFruitRequest));
     return ResponseEntity.ok(response);
   }
 
   @Override
   public ResponseEntity<Fruit> updateFruit(UpdateFruitRequest updateFruitRequest) {
+    iamService.checkPermissionOfCurrentAccount(
+        ResourceType.FRUIT,
+        Set.of(Permission.UPDATE, Permission.GET));
     return ResponseEntity.ok(fruitService.updateFruit(updateFruitRequest));
   }
 }
