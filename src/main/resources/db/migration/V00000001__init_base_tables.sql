@@ -132,7 +132,7 @@ CREATE TABLE `character`(
     `group_id` BINARY(16),
     `maximum_fruit_count` TINYINT NOT NULL,
     `age` INT,
-    `height` DOUBLE,
+    `height` INT,
     `birth_place` VARCHAR(100),
     `date_of_birth` DATE,
     `hakis`  TEXT,
