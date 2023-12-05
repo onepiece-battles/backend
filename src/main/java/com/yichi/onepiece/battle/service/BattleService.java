@@ -59,7 +59,6 @@ public class BattleService {
             .setReceiverId(request.getReceiverId())
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
-            .setIsSystemResource(isSystemResource)
             .build();
 
     battleDao.insert(battleEntity);
