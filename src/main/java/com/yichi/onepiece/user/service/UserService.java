@@ -34,10 +34,11 @@ import org.springframework.stereotype.Service;
 public class UserService {
   private final Logger logger = LoggerFactory.getLogger(UserService.class);
   private final UserDao userDao;
+  private final RoleToResourcePermissionDao roleToResourcePermissionDao;
+  private final ResourcePermissionDao resourcePermissionDao;
   private final UserDetailDao userDetailDao;
   private final AuthenticationManager authenticationManager;
   private final TokenDao tokenDao;
-  private final RoleResourceDao roleResourceDao;
   private final RoleDao roleDao;
   private final UserRoleDao userRoleDao;
   private final PasswordEncoder passwordEncoder;
@@ -50,10 +51,10 @@ public class UserService {
 
   public UserService(
       UserDao userDao,
-      UserDetailDao userDetailDao,
+      RoleToResourcePermissionDao roleToResourcePermissionDao,
+      ResourcePermissionDao resourcePermissionDao, UserDetailDao userDetailDao,
       AuthenticationManager authenticationManager,
       TokenDao tokenDao,
-      RoleResourceDao roleResourceDao,
       RoleDao roleDao,
       UserRoleDao userRoleDao,
       PasswordEncoder passwordEncoder,
@@ -63,10 +64,11 @@ public class UserService {
       EmailVerificationDao emailVerificationDao,
       Clock clock) {
     this.userDao = userDao;
+    this.roleToResourcePermissionDao = roleToResourcePermissionDao;
+    this.resourcePermissionDao = resourcePermissionDao;
     this.userDetailDao = userDetailDao;
     this.authenticationManager = authenticationManager;
     this.tokenDao = tokenDao;
-    this.roleResourceDao = roleResourceDao;
     this.roleDao = roleDao;
     this.userRoleDao = userRoleDao;
     this.passwordEncoder = passwordEncoder;
@@ -181,7 +183,7 @@ public class UserService {
     tokenDao.insert(tokenEntity);
     user.setAccountStatus(AccountStatus.LOGGED_IN);
     userDetailDao.update(user);
-    var loginUserResource = roleResourceDao.getResourceNamesByRoleName(user.getLoginRole());
+    var resources = getResourceTypeByRole(user.getLoginRole());
     var tokens =
         tokenDao.listTokenByUserId(user.getId()).stream().map(TokenEntity::getTokenValue).toList();
     var roleIds = userRoleDao.getByUserId(user.getId());
@@ -196,9 +198,17 @@ public class UserService {
         .user(
             UserConverter.INSTANCE
                 .toUser(user)
-                .loginRoleResources(loginUserResource)
+                .loginRoleResources(resources)
                 .userRoles(roleNames)
                 .tokens(tokens));
+  }
+
+  private List<ResourceType> getResourceTypeByRole(UserRole userRole) {
+    var roleId = roleDao.findByRoleName(userRole).orElseThrow().getId();
+    var resourcePermissionIds = roleToResourcePermissionDao.listByRoleId(roleId).stream().map(
+        RoleToResourcePermissionEntity::getResourcePermissionId).toList();
+    return resourcePermissionDao.batchFindById(resourcePermissionIds).stream().map(
+        ResourcePermissionEntity::getResourceType).toList();
   }
 
   public LogoutResponse logout(UUID userId) {
@@ -279,7 +289,7 @@ public class UserService {
     }
     user.setLoginRole(role);
     userDao.update(user);
-    return roleResourceDao.getResourceNamesByRoleName(role);
+    return getResourceTypeByRole(role);
   }
 
   public User getUserById(UUID userId) {
@@ -294,14 +304,14 @@ public class UserService {
         userResourceDao.getResourceIdsByUserIdAndResourceType(
             targetUserId, request.getResourceType());
     userResourceIds.addAll(request.getResourceIds());
-    var userResource =
-        UserResourceEntityBuilder.newBuilder()
-            .setSourceUserId(sourceUserId)
+    var userResourceEntities = userResourceIds.stream().map(
+        id-> UserResourceEntityBuilder.newBuilder()
             .setUserId(targetUserId)
+            .setSourceUserId(sourceUserId)
             .setResourceType(request.getResourceType())
-            .setResourceIds(userResourceIds)
-            .build();
-    userResourceDao.insert(userResource);
+            .setResourceId(id).build()
+    ).toList();
+    userResourceDao.batchInsert(userResourceEntities);
     ShareResourceResponse response = new ShareResourceResponse();
     response.setSharingInformation(
         UserFacingConstants.getConstant(RESOURCE_SHARING_SUCCESS).getDisplayName());
@@ -321,13 +331,14 @@ public class UserService {
             .setName(request.getName())
             .build();
     userDao.update(updatedUser);
-    var loginUserResource = roleResourceDao.getResourceNamesByRoleName(user.getLoginRole());
+    var loginUserResource = getResourceTypeByRole(user.getLoginRole());
     var tokens =
         tokenDao.listTokenByUserId(user.getId()).stream().map(TokenEntity::getTokenValue).toList();
     var roleIds = userRoleDao.getByUserId(user.getId());
     var roleNames = roleDao.batchFindById(roleIds).stream().map(RoleEntity::getName).toList();
     return UserConverter.INSTANCE
         .toUser(userDao.getById(request.getId()).orElseThrow())
+        .loginRoleResources(loginUserResource)
         .userRoles(roleNames)
         .tokens(tokens);
   }

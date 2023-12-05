@@ -62,7 +62,6 @@ public class CharacterService {
   public Character addCharacter(AddCharacterRequest request) {
     var characterEntity = CharacterEntityConverter.INSTANCE.toCharacterEntity(request);
     var actionRecord = actionRecordService.create();
-    var isSystemResource = UserHelper.hasAdminPermission();
     // character does not eat any fruit by default.
     characterEntity =
         characterEntity.toBuilder()
@@ -71,10 +70,8 @@ public class CharacterService {
                 ArrayUtils.toObject(
                     ImageUtil.loadImageFromDisk(
                         ConstantsContainer.USER_DEFAULT_PROFILE_PATH, "PNG")))
-            .setHasFruits(false)
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
-            .setIsSystemResource(isSystemResource)
             .build();
     characterDao.insert(characterEntity);
     var insertedEntity =
@@ -150,14 +147,6 @@ public class CharacterService {
             .setWakeUp(false)
             .build();
     characterToFruitDao.insert(characterToFruitEntity);
-    if (!characterEntity.getHasFruits()) {
-      var modificationRecord = actionRecordService.create();
-      characterEntity.toBuilder()
-          .setHasFruits(true)
-          .setModificationRecordId(modificationRecord.getId())
-          .build();
-    }
-    characterDao.update(characterEntity);
     return response.fruitMessage(
         UserFacingConstants.getConstant(UserFacingConstantsKey.FRUIT_EATEN_SUCCESS)
             .getDisplayName());

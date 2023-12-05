@@ -19,7 +19,11 @@ public interface RoleToResourcePermissionDao extends BaseDao<RoleToResourcePermi
   void clearRoleToResourcePermission();
 
   @Select("select * from ro_to_resource_permission where role_id = #{roleId} and resource_permission_id = #{resourcePermissionId}")
-  List<ResourcePermissionEntity> checkPermission(
+  List<RoleToResourcePermissionEntity> checkPermission(
       @Param("roleId") UUID roleId,
       @Param("resourcePermissionId") UUID resourcePermissionId);
+
+  @Select("select * from ro_to_resource_permission where role_id = #{roleId}")
+  List<RoleToResourcePermissionEntity> listByRoleId(
+      @Param("roleId") UUID roleId);
 }

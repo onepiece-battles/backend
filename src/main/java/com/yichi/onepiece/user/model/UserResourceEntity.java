@@ -16,5 +16,5 @@ public interface UserResourceEntity {
 
   ResourceType getResourceType();
 
-  UUID getResourceIds();
+  UUID getResourceId();
 }
