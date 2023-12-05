@@ -3,7 +3,6 @@ package com.yichi.onepiece.character.model;
 import com.yichi.infra.support.entity.Entity;
 import com.yichi.onepiece.model.CharacterType;
 import com.yichi.onepiece.model.Haki;
-
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -16,20 +15,31 @@ public interface CharacterEntity {
   UUID getId();
 
   UUID getUserId();
+
   UUID getRoleId();
+
   String getName();
 
   List<CharacterType> getCharacterTypes();
 
   @Nullable
   Byte[] getProfileImage();
+
   UUID getGroupId();
+
   // default to be 1, unless special characters.
   Integer getMaximumFruitCount();
+
   Integer getAge();
+
   Double getHeight();
+
   Date getDateOfBirth();
+
+  String getBirthPlace();
+
   List<Haki> getHakis();
+
   Integer getBounty();
 
   // some characters are better when fighting in a group

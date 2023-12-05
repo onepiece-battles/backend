@@ -40,7 +40,7 @@ public class FruitService {
     this.userService = userService;
   }
 
-  public Fruit addFruit(AddFruitRequest request) {
+  public Fruit addFruit(CreateFruitRequest request) {
     var actionRecord = actionRecordService.create();
     var isSystemResource = UserHelper.hasAdminPermission();
     var fruitEntity =

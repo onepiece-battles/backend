@@ -19,17 +19,15 @@ public class FruitController implements FruitApi {
   }
 
   @Override
-  public ResponseEntity<Fruit> addFruit(AddFruitRequest addFruitRequest) {
+  public ResponseEntity<Fruit> addFruit(CreateFruitRequest addFruitRequest) {
     iamService.checkPermissionOfCurrentAccount(
-        ResourceType.FRUIT,
-        Set.of( Permission.CREATE, Permission.GET));
+        ResourceType.FRUIT, Set.of(Permission.CREATE, Permission.GET));
     return ResponseEntity.ok(fruitService.addFruit(addFruitRequest));
   }
 
   @Override
   public ResponseEntity<ListFruitResponse> listFruit(ListFruitRequest listFruitRequest) {
-    iamService.checkPermissionOfCurrentAccount(
-        ResourceType.FRUIT, Set.of(Permission.LIST));
+    iamService.checkPermissionOfCurrentAccount(ResourceType.FRUIT, Set.of(Permission.LIST));
     ListFruitResponse response = (fruitService.listFruit(listFruitRequest));
     return ResponseEntity.ok(response);
   }
@@ -37,8 +35,7 @@ public class FruitController implements FruitApi {
   @Override
   public ResponseEntity<Fruit> updateFruit(UpdateFruitRequest updateFruitRequest) {
     iamService.checkPermissionOfCurrentAccount(
-        ResourceType.FRUIT,
-        Set.of(Permission.UPDATE, Permission.GET));
+        ResourceType.FRUIT, Set.of(Permission.UPDATE, Permission.GET));
     return ResponseEntity.ok(fruitService.updateFruit(updateFruitRequest));
   }
 }
