@@ -2,13 +2,12 @@ package com.yichi.onepiece.iam.service;
 
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.exception.PermissionDeniedException;
-import com.yichi.onepiece.iam.PermissionDefinition;
-import com.yichi.onepiece.iam.PermissionDefinition.PermissionEnum;
 import com.yichi.onepiece.iam.model.*;
+import com.yichi.onepiece.model.Permission;
+import com.yichi.onepiece.model.ResourceType;
 import com.yichi.onepiece.model.UserRole;
 import com.yichi.onepiece.user.UserHelper;
 import java.util.*;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,17 +19,18 @@ import org.springframework.stereotype.Component;
 public class IamService {
   Logger logger = LoggerFactory.getLogger(IamService.class);
   private final RoleDao roleDao;
-  private final RoleResourceDao roleResourceDao;
-  private final ResourceDao resourceDao;
+  private final ResourcePermissionDao resourcePermissionDao;
+  private final RoleToResourcePermissionDao roleToResourcePermissionDao;
 
-  public IamService(RoleDao roleDao, RoleResourceDao roleResourceDao, ResourceDao resourceDao) {
+  public IamService(RoleDao roleDao, ResourcePermissionDao resourcePermissionDao,
+      RoleToResourcePermissionDao roleToResourcePermissionDao) {
     this.roleDao = roleDao;
-    this.roleResourceDao = roleResourceDao;
-    this.resourceDao = resourceDao;
+    this.resourcePermissionDao = resourcePermissionDao;
+    this.roleToResourcePermissionDao = roleToResourcePermissionDao;
   }
 
   public void checkPermissionOfCurrentAccount(
-      String resourceType, Set<PermissionEnum> permissionEnums) {
+      ResourceType resourceType, Set<Permission> permissions) {
     var authorities =
         Arrays.stream(
                 SecurityContextHolder.getContext()
@@ -48,43 +48,21 @@ public class IamService {
     }
     var roleNames = authorities.stream().map(GrantedAuthority::getAuthority).toList();
     var loginRole = UserHelper.getCurrentUserDetail().getLoginRole();
-    if (!roleNames.contains(loginRole)) {
+    if (!roleNames.contains(loginRole.name())) {
       ExceptionUtils.notFound("role name %s not found", loginRole).get();
     }
-    var permissionList =
-        permissionEnums.stream()
-            .map(PermissionDefinition.PermissionEnum::toString)
-            .collect(Collectors.toSet());
-    checkPermission(resourceType, permissionList, List.of(loginRole));
+    for(var permission: permissions) {
+      checkPermission(resourceType, permission, loginRole);
+    }
   }
 
   private void checkPermission(
-      String resourceType, Set<String> permissionEnums, List<UserRole> roleNames) {
-    var roleEntities = roleDao.listRoleByRoleNames(roleNames);
-    var roleResourceEntities =
-        roleResourceDao.listRoleResourceByRoleIds(
-            roleEntities.stream().map(RoleEntity::getId).toList());
-    var resourceIds = roleResourceEntities.stream().map(RoleResourceEntity::getResourceId).toList();
-    var resource =
-        resourceDao.batchFindById(resourceIds).stream()
-            .filter(resourceEntity -> resourceType.equals(resourceEntity.getName()))
-            .findFirst();
-    if (resource.isEmpty()) {
-      throw new PermissionDeniedException(
-          String.format("Resource with type %s not found", resourceType));
-    } else {
-      var resourceEntity = resource.get();
-      var userPermissions =
-          new HashSet<>(
-              roleResourceEntities.stream()
-                  .filter(
-                      roleResourceEntity -> resourceEntity.getId().equals(resourceEntity.getId()))
-                  .flatMap(roleResourceEntity -> roleResourceEntity.getPermissions().stream())
-                  .toList());
-      var allPermissionsValidated = userPermissions.containsAll(permissionEnums);
-      if (!allPermissionsValidated) {
-        throw new PermissionDeniedException("Not all permissions are allowed");
-      }
+      ResourceType resourceType, Permission permission, UserRole userRole) {
+    var role = roleDao.findByRoleName(userRole).orElseThrow();
+    var resourcePermission = resourcePermissionDao.findByResourceAndPermission(resourceType, permission).orElseThrow();
+    var result = roleToResourcePermissionDao.checkPermission(role.getId(), resourcePermission.getId());
+    if(result.isEmpty()) {
+      throw new PermissionDeniedException("Access Denied");
     }
   }
 }

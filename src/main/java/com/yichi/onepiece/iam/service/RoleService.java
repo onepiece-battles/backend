@@ -31,7 +31,7 @@ public class RoleService {
     return roleDao.findByRoleName(roleName).orElseThrow();
   }
 
-  public AssignResourceToRoleResponse assignResourceToRole(AssignResourceToRoleRequest request) {
+  public AssignResourcePermissionsToRoleResponse assignResourceToRole(AssignResourcePermissionsToRoleRequest request) {
     var roleId = request.getRoleId();
     var roleEntity =
         roleDao

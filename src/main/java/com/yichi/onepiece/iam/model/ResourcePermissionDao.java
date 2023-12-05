@@ -6,6 +6,7 @@ import com.yichi.onepiece.model.Permission;
 import com.yichi.onepiece.model.ResourceType;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -22,6 +23,6 @@ public interface ResourcePermissionDao extends BaseDao<ResourcePermissionEntity,
   List<ResourcePermissionEntity> listAll();
 
   @Select("select * from resource_permission where resource_type = #{resourceType} and permission = #{permission}")
-  List<ResourcePermissionEntity> listByResourceAndPermission(
+  Optional<ResourcePermissionEntity> findByResourceAndPermission(
       @Param("resourceType") ResourceType resourceType, @Param("permission") Permission permission);
 }

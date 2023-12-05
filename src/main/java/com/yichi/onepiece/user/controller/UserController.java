@@ -3,10 +3,8 @@ package com.yichi.onepiece.user.controller;
 import static com.yichi.onepiece.constants.ConstantsContainer.SUCCESS;
 
 import com.yichi.onepiece.api.UserApi;
-import com.yichi.onepiece.iam.PermissionDefinition.PermissionEnum;
 import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.*;
-import com.yichi.onepiece.user.model.UserEntity;
 import com.yichi.onepiece.user.service.UserService;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import java.util.Set;
@@ -29,7 +27,7 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<AssignRoleResponse> assignRole(AssignRoleRequest assignRoleRequest) {
     iamService.checkPermissionOfCurrentAccount(
-        UserEntity.ENTITY_TYPE, Set.of(PermissionEnum.USER_ASSIGN_ROLE));
+        ResourceType.USER, Set.of(Permission.UPDATE));
     var roles =
         userService.assignRoleToUser(assignRoleRequest.getUserId(), assignRoleRequest.getRoles());
     return ResponseEntity.ok(
@@ -39,7 +37,7 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<User> getUser(GetUserRequest getUserRequest) {
     iamService.checkPermissionOfCurrentAccount(
-        UserEntity.ENTITY_TYPE, Set.of(PermissionEnum.USER_GET));
+        ResourceType.USER, Set.of(Permission.GET));
     var user = userService.getUserById(getUserRequest.getUserId());
     return ResponseEntity.ok(user);
   }
@@ -47,7 +45,7 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<ListUsersResponse> listUsers(ListUsersRequest listUsersRequest) {
     iamService.checkPermissionOfCurrentAccount(
-        UserEntity.ENTITY_TYPE, Set.of(PermissionEnum.USER_LIST));
+        ResourceType.USER, Set.of(Permission.LIST));
     var response = userService.list(listUsersRequest);
     return ResponseEntity.ok(response);
   }
@@ -60,6 +58,8 @@ public class UserController implements UserApi {
 
   @Override
   public ResponseEntity<LogoutResponse> logout(LogoutRequest logoutRequest) {
+    iamService.checkPermissionOfCurrentAccount(
+        ResourceType.USER, Set.of(Permission.UPDATE));
     var response = userService.logout(logoutRequest.getUserId());
     return ResponseEntity.ok(response);
   }
@@ -87,12 +87,16 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<ShareResourceResponse> shareResource(
       ShareResourceRequest shareResourceRequest) {
+    iamService.checkPermissionOfCurrentAccount(
+        ResourceType.USER, Set.of(Permission.UPDATE));
     var response = userService.shareResource(shareResourceRequest);
     return ResponseEntity.ok(response);
   }
 
   @Override
   public ResponseEntity<UpdateLoginRoleResponse> updateRole(UpdateLoginRoleRequest request) {
+    iamService.checkPermissionOfCurrentAccount(
+        ResourceType.USER, Set.of(Permission.UPDATE));
     var resourceList = userService.updateLoginRole(request.getRole());
     return ResponseEntity.ok(
         new UpdateLoginRoleResponse().currentRole(request.getRole()).resources(resourceList));
@@ -100,6 +104,8 @@ public class UserController implements UserApi {
 
   @Override
   public ResponseEntity<UpdateUserResponse> updateUser(UpdateUserRequest updateUserRequest) {
+    iamService.checkPermissionOfCurrentAccount(
+        ResourceType.USER, Set.of(Permission.UPDATE));
     var user = userService.updateUser(updateUserRequest);
     return ResponseEntity.ok(new UpdateUserResponse().user(user));
   }
@@ -108,7 +114,7 @@ public class UserController implements UserApi {
   public ResponseEntity<VerifyByEmailCodeResponse> verifyByEmailCode(
       VerifyByEmailCodeRequest verifyByEmailCodeRequest) {
     iamService.checkPermissionOfCurrentAccount(
-        UserEntity.ENTITY_TYPE, Set.of(PermissionEnum.USER_GET, PermissionEnum.USER_UPDATE));
+        ResourceType.USER, Set.of(Permission.UPDATE));
     var response = userService.verifyByCode(verifyByEmailCodeRequest);
     return ResponseEntity.ok(response);
   }
@@ -117,7 +123,7 @@ public class UserController implements UserApi {
   public ResponseEntity<VerifyEmailResponse> verifyUserEmail(
       VerifyEmailRequest verifyEmailRequest) {
     iamService.checkPermissionOfCurrentAccount(
-        UserEntity.ENTITY_TYPE, Set.of(PermissionEnum.USER_GET));
+        ResourceType.USER, Set.of(Permission.UPDATE));
     var response =
         new VerifyEmailResponse().emailNotification(userService.verifyEmail(verifyEmailRequest));
     return ResponseEntity.ok(response);

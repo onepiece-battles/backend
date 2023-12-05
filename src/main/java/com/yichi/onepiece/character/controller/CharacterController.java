@@ -1,9 +1,7 @@
 package com.yichi.onepiece.character.controller;
 
 import com.yichi.onepiece.api.CharacterApi;
-import com.yichi.onepiece.character.model.CharacterEntity;
 import com.yichi.onepiece.character.service.CharacterService;
-import com.yichi.onepiece.iam.PermissionDefinition.PermissionEnum;
 import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.model.Character;
@@ -29,8 +27,8 @@ public class CharacterController implements CharacterApi {
   @Override
   public ResponseEntity<Character> addCharacter(AddCharacterRequest addCharacterRequest) {
     iamService.checkPermissionOfCurrentAccount(
-        CharacterEntity.ENTITY_TYPE,
-        Set.of(PermissionEnum.CHARACTER_CREATE, PermissionEnum.CHARACTER_GET));
+        ResourceType.CHARACTER,
+        Set.of(Permission.CREATE, Permission.GET));
     var characterEntity = characterService.addCharacter(addCharacterRequest);
     return ResponseEntity.ok(characterEntity);
   }
@@ -38,8 +36,8 @@ public class CharacterController implements CharacterApi {
   @Override
   public ResponseEntity<EatFruitResponse> eatFruit(EatFruitRequest eatFruitRequest) {
     iamService.checkPermissionOfCurrentAccount(
-        CharacterEntity.ENTITY_TYPE,
-        Set.of(PermissionEnum.CHARACTER_UPDATE, PermissionEnum.CHARACTER_GET));
+        ResourceType.CHARACTER,
+        Set.of(Permission.UPDATE, Permission.GET));
     return ResponseEntity.ok(
         characterService.eatFruit(eatFruitRequest.getCharacterId(), eatFruitRequest.getFruitId()));
   }
@@ -48,8 +46,14 @@ public class CharacterController implements CharacterApi {
   public ResponseEntity<CharacterFullView> getCharacterFullView(
       GetCharacterFullViewRequest getCharacterFullViewRequest) {
     iamService.checkPermissionOfCurrentAccount(
-        CharacterEntity.ENTITY_TYPE,
-        Set.of(PermissionEnum.BATTLE_GET, PermissionEnum.CHARACTER_GET));
+        ResourceType.CHARACTER,
+        Set.of( Permission.GET));
+    iamService.checkPermissionOfCurrentAccount(
+        ResourceType.BATTLE,
+        Set.of( Permission.GET));
+    iamService.checkPermissionOfCurrentAccount(
+        ResourceType.FRUIT,
+        Set.of( Permission.GET));
     StopWatch watch = new StopWatch();
     watch.start();
     var characterFullView =
@@ -64,7 +68,8 @@ public class CharacterController implements CharacterApi {
       ListCharacterRequest listCharacterRequest) {
     logger.info("list character api");
     iamService.checkPermissionOfCurrentAccount(
-        CharacterEntity.ENTITY_TYPE, Set.of(PermissionEnum.CHARACTER_LIST));
+        ResourceType.CHARACTER,
+        Set.of( Permission.LIST));
     StopWatch watch = new StopWatch();
     watch.start();
     ListCharacterResponse response = characterService.listCharacters(listCharacterRequest);

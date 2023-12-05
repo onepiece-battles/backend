@@ -1,9 +1,7 @@
 package com.yichi.onepiece.issue.controller;
 
 import com.yichi.onepiece.api.IssueApi;
-import com.yichi.onepiece.iam.PermissionDefinition;
 import com.yichi.onepiece.iam.service.IamService;
-import com.yichi.onepiece.issue.model.IssueEntity;
 import com.yichi.onepiece.issue.service.IssueService;
 import com.yichi.onepiece.model.*;
 import java.util.Set;
@@ -24,10 +22,10 @@ public class IssueController implements IssueApi {
   @Override
   public ResponseEntity<Void> batchUpdateIssue(BatchUpdateIssueRequest request) {
     iamService.checkPermissionOfCurrentAccount(
-        IssueEntity.ENTITY_TYPE,
+        ResourceType.ISSUE,
         Set.of(
-            PermissionDefinition.PermissionEnum.ISSUE_BATCH_UPDATE,
-            PermissionDefinition.PermissionEnum.ISSUE_UPDATE));
+            Permission.BATCH_UPDATE,
+            Permission.UPDATE));
     issueService.BatchUpdateIssue(request);
     return ResponseEntity.ok(null);
   }
@@ -35,7 +33,9 @@ public class IssueController implements IssueApi {
   @Override
   public ResponseEntity<CreateIssueResponse> createIssue(CreateIssueRequest request) {
     iamService.checkPermissionOfCurrentAccount(
-        IssueEntity.ENTITY_TYPE, Set.of(PermissionDefinition.PermissionEnum.ISSUE_CREATE));
+        ResourceType.ISSUE,
+        Set.of(
+            Permission.CREATE));
     var i18n = issueService.createIssue(request);
     return ResponseEntity.ok(new CreateIssueResponse().issueCreationResult(i18n));
   }
@@ -43,7 +43,7 @@ public class IssueController implements IssueApi {
   @Override
   public ResponseEntity<ListIssueResponse> listIssue(ListIssueRequest request) {
     iamService.checkPermissionOfCurrentAccount(
-        IssueEntity.ENTITY_TYPE, Set.of(PermissionDefinition.PermissionEnum.ISSUE_LIST));
+        ResourceType.ISSUE, Set.of(Permission.LIST));
     var response = issueService.list(request);
     return ResponseEntity.ok(response);
   }
