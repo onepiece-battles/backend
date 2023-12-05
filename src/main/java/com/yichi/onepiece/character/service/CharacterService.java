@@ -59,7 +59,7 @@ public class CharacterService {
     this.characterHelper = characterHelper;
   }
 
-  public Character addCharacter(AddCharacterRequest request) {
+  public Character addCharacter(CreateCharacterRequest request) {
     var characterEntity = CharacterEntityConverter.INSTANCE.toCharacterEntity(request);
     var actionRecord = actionRecordService.create();
     // character does not eat any fruit by default.
@@ -82,7 +82,9 @@ public class CharacterService {
                     "Can not find inserted character with id %s", characterEntity.getId()));
     var fruitsInCharacter =
         characterHelper.getFruitInCharacterByCharacterId(characterEntity.getId());
-    return CharacterEntityConverter.INSTANCE.toCharacter(insertedEntity).fruits(fruitsInCharacter);
+    return CharacterEntityConverter.INSTANCE
+        .toCharacter(insertedEntity)
+        .fruitInCharacter(fruitsInCharacter);
   }
 
   public String updateProfile(UUID characterId, String profile) {
@@ -176,7 +178,7 @@ public class CharacterService {
                 character -> {
                   var fruitsInCharacter =
                       characterHelper.getFruitInCharacterByCharacterId(character.getId());
-                  return character.fruits(fruitsInCharacter);
+                  return character.fruitInCharacter(fruitsInCharacter);
                 })
             .toList();
     return new ListCharacterResponse().characters(characterList).totalSize(totalSize);
