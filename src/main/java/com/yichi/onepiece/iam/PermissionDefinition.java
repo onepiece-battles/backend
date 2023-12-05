@@ -6,13 +6,13 @@ import com.yichi.onepiece.model.ResourceType;
 import com.yichi.onepiece.model.UserRole;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PermissionDefinition {
   public static final Logger logger = LoggerFactory.getLogger(PermissionDefinition.class);
-  private static final String RESOURCE_PERMISSION_SPLITTER = "_";
+  public static final String RESOURCE_PERMISSION_SPLITTER = "__";
   private static final String CHARACTER_PREFIX = "CHARACTER";
   private static final String FRUIT_PREFIX = "FRUIT";
   private static final String BATTLE_PREFIX = "BATTLE";
@@ -27,6 +27,7 @@ public class PermissionDefinition {
   // resource permission full map
   public static final EnumMap<ResourceType, Set<Permission>> resourcePermissionMap = new EnumMap<>(
           Map.ofEntries(
+                  //todo(yichi): login action should be removed out of user resource
                   Map.entry(ResourceType.USER, Arrays.stream(Permission.values()).collect(Collectors.toSet())),
                   Map.entry(ResourceType.CHARACTER, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet())),
                   Map.entry(ResourceType.BATTLE, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet())),
@@ -36,99 +37,44 @@ public class PermissionDefinition {
           )
   );
 
-  // resource permission initial map
+  public static final List<Pair<ResourceType, Permission>> resourcePermissionList = resourcePermissionMap.entrySet().stream().map(entry->{
+    var values = entry.getValue();
+    return values.stream().map(permission -> Pair.of(entry.getKey(), permission)).collect(
+        Collectors.toList());
+  }).flatMap(Collection::stream).collect(Collectors.toList());
 
+  public static final List<String> resourcePermissionCombinedList = resourcePermissionList.stream().map(rp-> String.format("%s%s%s", rp.getKey(),RESOURCE_PERMISSION_SPLITTER, rp.getValue())).collect(
+      Collectors.toList());
 
-  public static Map<String, Set<String>> getResourcePermissionMap() {
-    return Arrays.stream(ResourceType.values())
-        .map(ResourceType::toString)
-        .collect(Collectors.toMap(value -> value, PermissionDefinition::getPermissionByResource));
-  }
-
-  public static Map<String, Set<String>> getResourcePermissionMapByPermissionSet(
-      Set<PermissionEnum> permissions) {
-    Map<String, Set<String>> resourcePermissionMap = new HashMap<>();
-    for (var permission : permissions) {
-      // resource name should not contain any '_'.
-      String[] result = permission.toString().split("_", 2);
-      var resourceValue = result[0];
-      var permissionValue = result[1];
-      var currentSet = resourcePermissionMap.getOrDefault(resourceValue, new HashSet<>());
-      currentSet.add(permissionValue);
-      resourcePermissionMap.put(resourceValue, currentSet);
+  public static List<Pair<ResourceType, Permission>> getPermissionsByRole(UserRole userRole) {
+    if (userRole == UserRole.NIKA){
+      return getNikaPermissions();
+    } else if(userRole == UserRole.ADMIN) {
+      return getAdminPermissions();
+    } else if(userRole == UserRole.NORMAL) {
+      return getNormalUserPermissions();
+    } else if(userRole == UserRole.VISITOR) {
+      return getVisitorUserPermissions();
     }
-    return resourcePermissionMap;
+    return List.of();
   }
 
-  private static Set<String> getPermissionByResource(String resource) {
-    return Arrays.stream(PermissionEnum.values())
-        .map(PermissionEnum::toString)
-        .filter(permission -> permission.startsWith(resource))
-        .map(
-            selectedPermission -> {
-              if (!selectedPermission.contains(RESOURCE_PERMISSION_SPLITTER)) {
-                throw ExceptionUtils.unexpectedPermissionEnumFormatException(
-                    "Unexpected permission enum: %s", selectedPermission);
-              }
-              var resultList = selectedPermission.split(RESOURCE_PERMISSION_SPLITTER, 2);
-              return resultList[1];
-            })
-        .collect(Collectors.toSet());
+  // role resource permission initial map
+  private static List<Pair<ResourceType, Permission>> getNikaPermissions() {
+    return resourcePermissionList;
   }
 
-  public static List<String> getAllPermissions() {
-    return Arrays.stream(PermissionEnum.values()).map(Enum::toString).collect(Collectors.toList());
+  private static List<Pair<ResourceType, Permission>> getAdminPermissions() {
+    return resourcePermissionList.stream().filter(pair ->
+      pair.getKey()!=ResourceType.ROLE &&pair.getValue()!=Permission.DELETE &&pair.getValue()!=Permission.ASSIGN_ROLE
+    ).toList();
   }
 
-  public static Set<PermissionEnum> getAllPermissionEnums() {
-    return Arrays.stream(PermissionEnum.values()).collect(Collectors.toSet());
+  private static List<Pair<ResourceType, Permission>> getNormalUserPermissions() {
+    return getAdminPermissions().stream().filter(rp-> rp.getKey()!=ResourceType.ISSUE).toList();
   }
 
-  public static Set<PermissionEnum> getAllCharacterPermissions() {
-    return Arrays.stream(PermissionEnum.values())
-        .filter(value -> value.toString().startsWith(CHARACTER_PREFIX))
-        .collect(Collectors.toSet());
-  }
-
-  public static Set<PermissionEnum> getAllFruitPermissions() {
-    return Arrays.stream(PermissionEnum.values())
-        .filter(value -> value.toString().startsWith(FRUIT_PREFIX))
-        .collect(Collectors.toSet());
-  }
-
-  public static Set<PermissionEnum> getAllBattlePermissions() {
-    return Arrays.stream(PermissionEnum.values())
-        .filter(value -> value.toString().startsWith(BATTLE_PREFIX))
-        .collect(Collectors.toSet());
-  }
-
-  public static Set<PermissionEnum> getAllCreatePermissions() {
-    return Arrays.stream(PermissionEnum.values())
-        .filter(value -> value.toString().endsWith(CREATE_SUFFIX))
-        .collect(Collectors.toSet());
-  }
-
-  public static Set<PermissionEnum> getAllGetPermissions() {
-    return Arrays.stream(PermissionEnum.values())
-        .filter(value -> value.toString().endsWith(GET_SUFFIX))
-        .collect(Collectors.toSet());
-  }
-
-  public static Set<PermissionEnum> getAllListPermissions() {
-    return Arrays.stream(PermissionEnum.values())
-        .filter(value -> value.toString().endsWith(LIST_SUFFIX))
-        .collect(Collectors.toSet());
-  }
-
-  public static Set<PermissionEnum> getAllUpdatePermissions() {
-    return Arrays.stream(PermissionEnum.values())
-        .filter(value -> value.toString().endsWith(UPDATE_SUFFIX))
-        .collect(Collectors.toSet());
-  }
-
-  public static Set<PermissionEnum> getAllDeletePermissions() {
-    return Arrays.stream(PermissionEnum.values())
-        .filter(value -> value.toString().endsWith(DELETE_SUFFIX))
-        .collect(Collectors.toSet());
+  private static List<Pair<ResourceType, Permission>> getVisitorUserPermissions() {
+    return getNormalUserPermissions().stream().filter(rp-> rp.getValue()!=Permission.UPDATE&&rp.getValue()!=Permission.BATCH_UPDATE).toList();
   }
 }

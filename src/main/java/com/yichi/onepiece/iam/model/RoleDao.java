@@ -29,7 +29,7 @@ public interface RoleDao extends BaseDao<RoleEntity, UUID> {
   List<RoleEntity> listAllRoles();
 
   @Select("SELECT name FROM role")
-  Set<String> listAllRoleNames();
+  Set<UserRole> listAllRoleNames();
 
   @Select("SELECT * FROM role WHERE role.name = #{name} LIMIT 1")
   Optional<RoleEntity> findByRoleName(@Param("name") UserRole name);

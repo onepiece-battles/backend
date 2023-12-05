@@ -1,60 +1,53 @@
 package com.yichi.onepiece.configuration;
 
-import com.yichi.onepiece.exception.ExceptionUtils;
+import static com.yichi.onepiece.iam.PermissionDefinition.RESOURCE_PERMISSION_SPLITTER;
+
 import com.yichi.onepiece.iam.PermissionDefinition;
 import com.yichi.onepiece.iam.model.*;
 import com.yichi.onepiece.model.UserRole;
 import java.util.*;
-import java.util.stream.Collectors;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 public class PrepareResourceAndPermissionData implements CommandLineRunner {
-  Logger logger = LoggerFactory.getLogger(PrepareResourceAndPermissionData.class);
-  private final ResourceDao resourceDao;
-  private final RoleDao roleDao;
-  private final RoleResourceDao roleResourceDao;
 
-  public PrepareResourceAndPermissionData(
-      ResourceDao resourceDao, RoleDao roleDao, RoleResourceDao roleResourceDao) {
-    this.resourceDao = resourceDao;
+  Logger logger = LoggerFactory.getLogger(PrepareResourceAndPermissionData.class);
+  private final ResourcePermissionDao resourcePermissionDao;
+  private final RoleToResourcePermissionDao roleToResourcePermissionDao;
+  private final RoleDao roleDao;
+
+  public PrepareResourceAndPermissionData(ResourcePermissionDao resourcePermissionDao,
+      RoleToResourcePermissionDao roleToResourcePermissionDao, RoleDao roleDao) {
+    this.resourcePermissionDao = resourcePermissionDao;
+    this.roleToResourcePermissionDao = roleToResourcePermissionDao;
     this.roleDao = roleDao;
-    this.roleResourceDao = roleResourceDao;
   }
 
   @Override
   public void run(String... args) {
+    // todo(yichi): handle delete occasions
     // initialize resource and permission data
-    List<ResourceEntity> resourceNewEntities = new ArrayList<>();
-    List<ResourceEntity> resourceUpdatedEntities = new ArrayList<>();
-    var resourcePermissionsMap = PermissionDefinition.getResourcePermissionMap();
-    var resourceNames = resourceDao.listAllResourceNames();
-    for (Map.Entry<String, Set<String>> entry : resourcePermissionsMap.entrySet()) {
-      var resource =
-          ResourceEntityBuilder.newBuilder()
-              .setName(entry.getKey())
-              .setPermissions(entry.getValue())
-              .build();
-      if (resourceNames.contains(entry.getKey())) {
-        resourceUpdatedEntities.add(resource);
-      } else {
-        resourceNewEntities.add(resource);
-      }
-    }
-    if (!resourceNewEntities.isEmpty()) {
-      resourceDao.batchInsert(resourceNewEntities);
-    }
-    for (var resourceUpdatedEntity : resourceUpdatedEntities) {
-      resourceDao.update(resourceUpdatedEntity);
-    }
+    List<ResourcePermissionEntity> resourcePermissionDbEntities = resourcePermissionDao.listAll();
+    var dbRpList = resourcePermissionDbEntities.stream().map(rp-> String.format("%s%s%s", rp.getResourceType(), RESOURCE_PERMISSION_SPLITTER, rp.getPermission())).toList();
+    var resourcePermissionList = PermissionDefinition.resourcePermissionList;
+    var newRPEntities = resourcePermissionList.stream().map(
+        resourceTypePermissionPair -> ResourcePermissionEntityBuilder.newBuilder()
+            .setResourceType(resourceTypePermissionPair.getLeft())
+            .setPermission(resourceTypePermissionPair.getRight()).build()
+    ).filter(rp->
+        !dbRpList.contains(
+            String.format("%s%s%s", rp.getResourceType(), RESOURCE_PERMISSION_SPLITTER, rp.getPermission()))).toList();
+    resourcePermissionDao.batchInsert(newRPEntities);
+
     // initialize role data
     var existingRoleNames = roleDao.listAllRoleNames();
     List<RoleEntity> roleEntities = new ArrayList<>();
     for (UserRole userRole : UserRole.values()) {
-      if (existingRoleNames.contains(userRole.name())) {
+      if (existingRoleNames.contains(userRole)) {
         continue;
       }
       RoleEntity roleEntity = RoleEntityBuilder.newBuilder().setName(userRole).build();
@@ -63,46 +56,33 @@ public class PrepareResourceAndPermissionData implements CommandLineRunner {
     if (!roleEntities.isEmpty()) {
       roleDao.batchInsert(roleEntities);
     }
-    // assign resource and permissions to role
-    for (var role : UserRole.values()) {
-      logger.info("Processing role: {}",role);
-      var permissionSet = PermissionDefinition.ROLE_TO_PERMISSION_MAP.get(role);
-      var roleId =
-          roleDao
-              .findByRoleName(role)
-              .orElseThrow(ExceptionUtils.notFound("Role with name %s not found", role.toString()))
-              .getId();
-      Map<String, Set<String>> resourceNameToPermissionsMap =
-          PermissionDefinition.getResourcePermissionMapByPermissionSet(permissionSet);
-      logger.info("resource name to permission map: {}",resourceNameToPermissionsMap);
-      List<RoleResourceEntity> insertEntities = new ArrayList<>();
-      for (Map.Entry<String, Set<String>> entry : resourceNameToPermissionsMap.entrySet()) {
-        var resourceId =
-            resourceDao
-                .getResourceByName(entry.getKey())
-                .orElseThrow(
-                    ExceptionUtils.notFound("resource with name %s not found", entry.getKey()))
-                .getId();
-        var roleResourceEntityOptional =
-            roleResourceDao.findByRoleIdAndResourceId(roleId, resourceId);
-        var newEntity =
-            RoleResourceEntityBuilder.newBuilder()
-                .setResourceId(resourceId)
-                .setRoleId(roleId)
-                .permissions(
-                    entry.getValue().stream()
-                        .map(permission -> entry.getKey().trim() + "_" + permission.trim())
-                        .collect(Collectors.toList()))
-                .build();
-        if (roleResourceEntityOptional.isEmpty()) {
-          insertEntities.add(newEntity);
-        } else {
-          roleResourceDao.update(newEntity);
-        }
-      }
-      if (!insertEntities.isEmpty()) {
-        roleResourceDao.batchInsert(insertEntities);
-      }
+
+    // delete all rows in  row_to_resource_permission_table
+    roleToResourcePermissionDao.clearRoleToResourcePermission();
+
+    // add new row_to_resource_permission_table
+    var updatedRoles = roleDao.listAllRoles();
+    var updatedResourcePermissions = resourcePermissionDao.listAll();
+    logger.info("roles: {}", updatedRoles.toString());
+    logger.info("resource_permissions: {}", updatedResourcePermissions.toString());
+    for(var role : updatedRoles) {
+      initRoleToResourcePermissionTable(role, updatedResourcePermissions);
     }
+  }
+
+  private void initRoleToResourcePermissionTable(
+      RoleEntity roleEntity,
+      List<ResourcePermissionEntity> currentAllResourcePermissions) {
+    var roleId = roleEntity.getId();
+    var roleToResourcePermissionEntities =
+        currentAllResourcePermissions
+            .stream()
+            .filter(rp-> PermissionDefinition.getPermissionsByRole(roleEntity.getName())
+                .contains(Pair.of(rp.getResourceType(), rp.getPermission()))).map(
+            ResourcePermissionEntity::getId)
+            .map(id-> RoleToResourcePermissionEntityBuilder.newBuilder().setRoleId(roleId)
+                .setResourcePermissionId(id).build()).toList();
+    if(roleToResourcePermissionEntities.isEmpty()) return;
+    roleToResourcePermissionDao.batchInsert(roleToResourcePermissionEntities);
   }
 }
