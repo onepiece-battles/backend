@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.battle.model.BattleDao">
-    <select id="list" resultType="com.yichi.onepiece.battle.model.BattleFullViewEntity" resultMap="battleFullView">
-        SELECT * FROM battle
+    <select id="list" resultType="com.yichi.onepiece.battle.model.BattleListView">
+        SELECT * FROM view_battle_list_view
         WHERE ( user_id = #{userId}
         <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
             OR
@@ -72,7 +72,7 @@
         </choose>
     </sql>
 
-    <resultMap id="battleFullView" type="com.yichi.onepiece.battle.model.BattleFullViewEntity">
+    <resultMap id="battleFullView" type="com.yichi.onepiece.battle.model.BattleFullView">
         <association column="starter_id" property="starter"
           select="com.yichi.onepiece.character.model.CharacterDao.findById"
         />
