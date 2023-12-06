@@ -17,7 +17,7 @@ public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
   String FIND_BY_ID = "com.yichi.onepiece.character.model.CharacterDao.findById";
 
   // see sql definition in characterDao.xml
-  List<CharacterEntity> list(
+  List<CharacterListView> list(
       @Param("characterFilter") CharacterFilter characterFilter,
       @Param("sortList") Collection<CharacterSortableField> sortList,
       @Param("offset") int offset,

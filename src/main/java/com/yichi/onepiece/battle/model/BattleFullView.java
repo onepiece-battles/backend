@@ -6,7 +6,7 @@ import com.yichi.onepiece.lineage.model.ActionRecordEntity;
 import com.yichi.onepiece.user.model.UserEntity;
 
 @Entity
-public interface BattleFullViewEntity extends BattleEntity {
+public interface BattleFullView extends BattleEntity {
   CharacterEntity getStarter();
 
   CharacterEntity getReceiver();

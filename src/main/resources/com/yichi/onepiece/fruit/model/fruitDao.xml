@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.fruit.model.FruitDao">
-    <select id="listFruits" resultType="com.yichi.onepiece.fruit.model.FruitEntity">
-        SELECT * FROM fruit
+    <select id="listFruits" resultType="com.yichi.onepiece.fruit.model.FruitListView">
+        SELECT * FROM `view_fruit_list_view`
         WHERE
         ( user_id = #{userId}
         <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">

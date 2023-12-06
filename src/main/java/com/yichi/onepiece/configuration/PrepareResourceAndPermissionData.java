@@ -69,8 +69,6 @@ public class PrepareResourceAndPermissionData implements CommandLineRunner {
     // add new row_to_resource_permission_table
     var updatedRoles = roleDao.listAllRoles();
     var updatedResourcePermissions = resourcePermissionDao.listAll();
-    logger.info("roles: {}", updatedRoles.toString());
-    logger.info("resource_permissions: {}", updatedResourcePermissions.toString());
     for(var role : updatedRoles) {
       initRoleToResourcePermissionTable(role, updatedResourcePermissions);
     }

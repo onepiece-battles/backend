@@ -129,7 +129,6 @@ CREATE TABLE `character`(
     `name` VARCHAR(30) NOT NULL,
     `character_types` TEXT,
     `profile_image` MEDIUMBLOB,
-    `group_id` BINARY(16),
     `maximum_fruit_count` TINYINT NOT NULL,
     `age` INT,
     `height` INT,
@@ -154,8 +153,6 @@ ALTER TABLE `character` ADD CONSTRAINT `fk_character__user_id`
   FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
 ALTER TABLE `character` ADD CONSTRAINT `fk_character__role_id`
     FOREIGN KEY(`role_id`) REFERENCES `role`(`id`);
-ALTER TABLE `character` ADD CONSTRAINT `fk_character__group_id`
-    FOREIGN KEY(`group_id`) REFERENCES `group`(`id`);
 ALTER TABLE `character` ADD CONSTRAINT `fk_character__creation_record_id`
   FOREIGN KEY(`creation_record_id`) REFERENCES `action_lineage`(`id`);
 ALTER TABLE `character` ADD CONSTRAINT `fk_character__modification_record_id`
@@ -321,3 +318,59 @@ ALTER TABLE `file_object` ADD CONSTRAINT `fk_file_object__creation_record_id`
   FOREIGN KEY(`creation_record_id`) REFERENCES `action_lineage`(`id`);
 ALTER TABLE `file_object` ADD CONSTRAINT `fk_file_creator_user_id__user_id`
   FOREIGN KEY(`creator_id`) REFERENCES `user`(`id`);
+
+-- battle_list_view
+CREATE VIEW `view_battle_list_view`
+AS
+SELECT
+   `battle`.id,
+   `battle`.user_id,
+   `battle`.starter_id,
+   `battle`.receiver_id,
+   `battle`.winner_id,
+   `battle`.type,
+   `battle`.status,
+   `role`.name as role_name,
+   `user`.name as creator,
+   `creation_record`.action_timestamp as creation_timestamp,
+   `modification_record`.action_timestamp as modification_timestamp,
+   `starter`.name as starter_name,
+   `starter`.profile_image as starter_image,
+   `receiver`.name as receiver_name,
+   `receiver`.profile_image as receiver_image
+FROM `battle` JOIN `character` AS `starter` on battle.starter_id = starter.id
+JOIN `character` AS `receiver` on battle.receiver_id = receiver.id
+JOIN `action_lineage` as creation_record on creation_record.id = battle.creation_record_id
+JOIN `action_lineage` as modification_record on modification_record.id = battle.modification_record_id
+JOIN `role` on battle.role_id = `role`.id
+JOIN `user` on battle.user_id = `user`.id;
+
+-- character_list_view
+CREATE VIEW `view_character_list_view`
+AS
+SELECT
+    `character`.*,
+    `creation_record`.action_timestamp as creation_timestamp,
+    `modification_record`.action_timestamp as modification_timestamp,
+    `role`.name as role_name,
+    `user`.name as creator
+FROM `character`
+JOIN `action_lineage` as creation_record on creation_record.id = `character`.creation_record_id
+JOIN `action_lineage` as modification_record on modification_record.id = `character`.modification_record_id
+JOIN `role` on `character`.role_id = `role`.id
+JOIN `user` on `character`.user_id = `user`.id;
+
+-- fruit_list_view
+CREATE VIEW `view_fruit_list_view`
+AS
+SELECT
+    `fruit`.*,
+    `creation_record`.action_timestamp as creation_timestamp,
+    `modification_record`.action_timestamp as modification_timestamp,
+    `role`.name as role_name,
+    `user`.name as creator
+FROM `fruit`
+JOIN `action_lineage` as creation_record on creation_record.id = `fruit`.creation_record_id
+JOIN `action_lineage` as modification_record on modification_record.id = `fruit`.modification_record_id
+JOIN `role` on `fruit`.role_id = `role`.id
+JOIN `user` on `fruit`.user_id = `user`.id;

@@ -17,7 +17,7 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface BattleDao extends BaseDao<BattleEntity, UUID> {
   // sql defined in battleDao.xml
-  List<BattleFullViewEntity> list(
+  List<BattleListView> list(
       @Param("battleFilter") BattleFilter battleFilter,
       @Param("sortList") Collection<BattleSortableField> sortList,
       @Param("userId") UUID userId,
@@ -34,7 +34,7 @@ public interface BattleDao extends BaseDao<BattleEntity, UUID> {
       "select * from battle where #{characterId} in (battle.starter_id, battle.receiver_id)"
           + "and #{userId} = battle.user_id")
   @ResultMap("battleFullView")
-  List<BattleFullViewEntity> getBattlesByCharacterId(
+  List<BattleFullView> getBattlesByCharacterId(
       @Param("characterId") UUID characterId, @Param("userId") UUID userId);
 
   // result map is defined in battleDao.xml
@@ -42,5 +42,5 @@ public interface BattleDao extends BaseDao<BattleEntity, UUID> {
   // receiver_id is mapped to characterEntity who receive this battle
   @Select("select * from battle where id = #{id}")
   @ResultMap("battleFullView")
-  Optional<BattleFullViewEntity> getBattleFullViewEntity(@Param("id") UUID id);
+  Optional<BattleFullView> getBattleFullViewEntity(@Param("id") UUID id);
 }

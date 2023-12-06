@@ -3,7 +3,6 @@ package com.yichi.onepiece.battle.model;
 import com.yichi.infra.support.EntityBuilder;
 import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
 import com.yichi.onepiece.model.Battle;
-import com.yichi.onepiece.model.BattleFullView;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -29,7 +28,7 @@ public interface BattleConverter {
   @Mapping(target = "creationTimestamp", source = "creationRecord.actionTimestamp")
   @Mapping(target = "modificationRecordId", source = "modificationRecord.id")
   @Mapping(target = "modificationTimestamp", source = "modificationRecord.actionTimestamp")
-  Battle toBattle(BattleFullViewEntity battleFullViewEntity);
+  Battle toBattle(BattleFullView battleFullViewEntity);
 
-  BattleFullView toBattleFullView(BattleFullViewEntity battleFullViewEntity);
+  com.yichi.onepiece.model.BattleFullView toBattleFullView(BattleFullView battleFullViewEntity);
 }
