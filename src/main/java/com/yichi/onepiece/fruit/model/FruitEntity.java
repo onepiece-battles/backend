@@ -18,7 +18,7 @@ public interface FruitEntity {
 
   FruitType getFruitType();
 
-  // Paramecia fruits consume positive magic, other types consume 0 magic.
+  // Paramecia fruits consume positive extra energy and other fruits consumes no extra energy
   Integer getEnergyConsume();
 
   Double getGroupGainStrengthen();

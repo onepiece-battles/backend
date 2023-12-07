@@ -36,7 +36,6 @@ public class UserService {
   private final UserDao userDao;
   private final RoleToResourcePermissionDao roleToResourcePermissionDao;
   private final ResourcePermissionDao resourcePermissionDao;
-  private final UserDetailDao userDetailDao;
   private final AuthenticationManager authenticationManager;
   private final TokenDao tokenDao;
   private final RoleDao roleDao;
@@ -52,7 +51,7 @@ public class UserService {
   public UserService(
       UserDao userDao,
       RoleToResourcePermissionDao roleToResourcePermissionDao,
-      ResourcePermissionDao resourcePermissionDao, UserDetailDao userDetailDao,
+      ResourcePermissionDao resourcePermissionDao,
       AuthenticationManager authenticationManager,
       TokenDao tokenDao,
       RoleDao roleDao,
@@ -66,7 +65,6 @@ public class UserService {
     this.userDao = userDao;
     this.roleToResourcePermissionDao = roleToResourcePermissionDao;
     this.resourcePermissionDao = resourcePermissionDao;
-    this.userDetailDao = userDetailDao;
     this.authenticationManager = authenticationManager;
     this.tokenDao = tokenDao;
     this.roleDao = roleDao;
@@ -182,7 +180,7 @@ public class UserService {
             .build();
     tokenDao.insert(tokenEntity);
     user.setAccountStatus(AccountStatus.LOGGED_IN);
-    userDetailDao.update(user);
+    userDao.update(user);
     var resources = getResourceTypeByRole(user.getLoginRole());
     var tokens =
         tokenDao.listTokenByUserId(user.getId()).stream().map(TokenEntity::getTokenValue).toList();

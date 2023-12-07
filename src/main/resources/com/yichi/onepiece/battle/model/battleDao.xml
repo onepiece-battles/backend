@@ -79,14 +79,15 @@
         <association column="receiver_id" property="receiver"
           select="com.yichi.onepiece.character.model.CharacterDao.findById"
         />
-        <association column="user_id" property="user"
-                     select="com.yichi.onepiece.user.model.UserDao.findById"
-        />
         <association column="creation_record_id" property="creationRecord"
                      select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
         />
         <association column="modification_record_id" property="modificationRecord"
                      select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
         />
+        <association property="battleStatus"
+          select="com.yichi.onepiece.battle.model.BattleStatusDetailDao.listByBattleId"/>
+        <association property="battleProcess"
+          select="com.yichi.onepiece.battle.model.BattleProcessDetailDao.listByBattleId"/>
     </resultMap>
 </mapper>

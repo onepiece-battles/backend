@@ -23,7 +23,6 @@ public interface UserDao extends BaseDao<UserEntity, UUID> {
       @Param("size") int size);
 
   @Select("select * from `user` where id = #{id}")
-  //  @ResultMap(value = "UserDetailView")
   Optional<UserDetailImpl> getById(@Param("id") UUID userId);
 
   int searchCount(@Param("userFilter") UserFilter userFilter);

@@ -7,8 +7,8 @@ import com.yichi.onepiece.model.AddBattleRequest;
 import com.yichi.onepiece.model.Battle;
 import com.yichi.onepiece.model.BattleFullView;
 import com.yichi.onepiece.model.GetBattleFullViewRequest;
-import com.yichi.onepiece.model.ListBattleByIdResponse;
 import com.yichi.onepiece.model.ListBattleByIdsRequest;
+import com.yichi.onepiece.model.ListBattleByIdsResponse;
 import com.yichi.onepiece.model.ListBattleRequest;
 import com.yichi.onepiece.model.ListBattleResponse;
 import com.yichi.onepiece.model.Permission;
@@ -56,7 +56,7 @@ public class BattleController implements BattleApi {
   }
 
   @Override
-  public ResponseEntity<ListBattleByIdResponse> listBattleByIds(
+  public ResponseEntity<ListBattleByIdsResponse> listBattleByIds(
       ListBattleByIdsRequest listBattleByIdsRequest) {
     StopWatch watch = new StopWatch();
     watch.start();

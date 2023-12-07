@@ -189,7 +189,7 @@ public class Battlefield {
         .setAttackerEnergyLoss(1)
         .setBattleProcessRoundNumber(battleProcessCount)
         .setAttackerEnergyLoss(attackSide.getMagicConsume())
-        .setAttackSkillType("");
+        .setAttackSkill("");
 
     var attackEntity = attackSide.attack();
     if (!hideSuccess()) {
@@ -198,7 +198,6 @@ public class Battlefield {
       var defenseResult = defense.defense(attackEntity);
       battleProcessDetailEntityBuilder
           .setDefenderBloodLoss(defenseResult.get(0))
-          .setDefenderMagicLoss(defenseResult.get(1))
           .setDefenderEnergyLoss(defenseResult.get(2));
     } else {
       battleProcessDetailEntityBuilder.setAttackMissed(Boolean.TRUE);

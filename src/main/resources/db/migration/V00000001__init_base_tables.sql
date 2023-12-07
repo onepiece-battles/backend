@@ -253,7 +253,7 @@ CREATE TABLE `battle_process_detail`(
     `attacker_energy_loss` INT NOT NULL,
     `defender_energy_loss` INT,
     `defender_blood_loss` VARCHAR(255) NOT NULL,
-    `attack_skill_type` VARCHAR(255) NOT NULL
+    `attack_skill` VARCHAR(255) NOT NULL
 );
 ALTER TABLE `battle_process_detail` ADD CONSTRAINT PRIMARY KEY(`id`);
 ALTER TABLE `battle_process_detail` ADD CONSTRAINT `fk_battle_process_detail__battle_id`
@@ -330,8 +330,8 @@ SELECT
    `battle`.winner_id,
    `battle`.type,
    `battle`.status,
-   `role`.name as role_name,
-   `user`.name as creator,
+   `creation_record`.user_name as creator,
+   `creation_record`.role_name,
    `creation_record`.action_timestamp as creation_timestamp,
    `modification_record`.action_timestamp as modification_timestamp,
    `starter`.name as starter_name,
@@ -341,9 +341,7 @@ SELECT
 FROM `battle` JOIN `character` AS `starter` on battle.starter_id = starter.id
 JOIN `character` AS `receiver` on battle.receiver_id = receiver.id
 JOIN `action_lineage` as creation_record on creation_record.id = battle.creation_record_id
-JOIN `action_lineage` as modification_record on modification_record.id = battle.modification_record_id
-JOIN `role` on battle.role_id = `role`.id
-JOIN `user` on battle.user_id = `user`.id;
+JOIN `action_lineage` as modification_record on modification_record.id = battle.modification_record_id;
 
 -- character_list_view
 CREATE VIEW `view_character_list_view`
@@ -352,13 +350,11 @@ SELECT
     `character`.*,
     `creation_record`.action_timestamp as creation_timestamp,
     `modification_record`.action_timestamp as modification_timestamp,
-    `role`.name as role_name,
-    `user`.name as creator
+    `creation_record`.user_name as creator,
+    `creation_record`.role_name
 FROM `character`
 JOIN `action_lineage` as creation_record on creation_record.id = `character`.creation_record_id
-JOIN `action_lineage` as modification_record on modification_record.id = `character`.modification_record_id
-JOIN `role` on `character`.role_id = `role`.id
-JOIN `user` on `character`.user_id = `user`.id;
+JOIN `action_lineage` as modification_record on modification_record.id = `character`.modification_record_id;
 
 -- fruit_list_view
 CREATE VIEW `view_fruit_list_view`
@@ -366,11 +362,9 @@ AS
 SELECT
     `fruit`.*,
     `creation_record`.action_timestamp as creation_timestamp,
-    `modification_record`.action_timestamp as modification_timestamp,
-    `role`.name as role_name,
-    `user`.name as creator
+    `creation_record`.user_name as creator,
+    `creation_record`.role_name,
+    `modification_record`.action_timestamp as modification_timestamp
 FROM `fruit`
 JOIN `action_lineage` as creation_record on creation_record.id = `fruit`.creation_record_id
-JOIN `action_lineage` as modification_record on modification_record.id = `fruit`.modification_record_id
-JOIN `role` on `fruit`.role_id = `role`.id
-JOIN `user` on `fruit`.user_id = `user`.id;
+JOIN `action_lineage` as modification_record on modification_record.id = `fruit`.modification_record_id;

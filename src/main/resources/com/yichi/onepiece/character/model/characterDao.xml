@@ -73,4 +73,8 @@
             </otherwise>
         </choose>
     </sql>
+    
+    <resultMap id="characterFullView" type="com.yichi.onepiece.character.model.CharacterFullView">
+
+    </resultMap>
 </mapper>
