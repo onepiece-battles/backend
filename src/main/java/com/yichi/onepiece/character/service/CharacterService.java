@@ -114,8 +114,8 @@ public class CharacterService {
   public CharacterFullView getCharacterFullView(UUID characterId) {
     var characterEntity = characterDao.findById(characterId).orElseThrow();
     var battles =
-        battleDao.getBattlesByCharacterId(characterId, UserHelper.getCurrentUserId()).stream()
-            .map(BattleConverter.INSTANCE::toBattle)
+        battleDao.listBattlesByCharacterId(characterId, UserHelper.getCurrentUserId()).stream()
+            .map(BattleConverter.INSTANCE::toBattleListView)
             .toList();
     var fruits =
         fruitService.listByCharacterId(characterId).stream()

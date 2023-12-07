@@ -42,7 +42,6 @@ public class FruitService {
 
   public Fruit addFruit(CreateFruitRequest request) {
     var actionRecord = actionRecordService.create();
-    var isSystemResource = UserHelper.hasAdminPermission();
     var fruitEntity =
         FruitConverter.INSTANCE.toFruitEntity(request).toBuilder()
             .setCreationRecordId(actionRecord.getId())

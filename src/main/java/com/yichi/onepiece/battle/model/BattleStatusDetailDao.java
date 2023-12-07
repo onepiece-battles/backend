@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Select;
 @Dao
 @Mapper
 public interface BattleStatusDetailDao extends BaseDao<BattleStatusDetailEntity, UUID> {
+
   @Select("SELECT * FROM battle_status_detail WHERE battle_id=#{battleId}")
   List<BattleStatusDetailEntity> listByBattleId(@Param("battleId")UUID battleId);
 }

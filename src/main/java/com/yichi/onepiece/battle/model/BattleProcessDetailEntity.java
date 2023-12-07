@@ -12,7 +12,6 @@ public interface BattleProcessDetailEntity {
   Integer getAttackerEnergyLoss();
   Integer getDefenderBloodLoss();
   Integer getDefenderEnergyLoss();
-  Integer getDefenderMagicLoss();
-  String getAttackSkillType();
+  String getAttackSkill();
   BattleProcessDetailEntityBuilder toBuilder();
 }

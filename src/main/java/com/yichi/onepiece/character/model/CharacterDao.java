@@ -6,7 +6,9 @@ import com.yichi.onepiece.model.CharacterFilter;
 import com.yichi.onepiece.model.CharacterSortableField;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import javax.swing.text.html.Option;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -26,6 +28,8 @@ public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
       // external resource ids means the ids of characters created by other users that are shared to
       // current user.
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
+
+  Optional<CharacterFullView> getFullViewById(@Param("id")UUID id);
 
   @Select(
       "select * from `character` as c inner join `character_to_fruit` as cf on c.id ="

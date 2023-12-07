@@ -31,10 +31,9 @@ public interface BattleDao extends BaseDao<BattleEntity, UUID> {
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
 
   @Select(
-      "select * from battle where #{characterId} in (battle.starter_id, battle.receiver_id)"
+      "select * from `view_battle_list_view` as battle where #{characterId} in (battle.starter_id, battle.receiver_id)"
           + "and #{userId} = battle.user_id")
-  @ResultMap("battleFullView")
-  List<BattleFullView> getBattlesByCharacterId(
+  List<BattleListView> listBattlesByCharacterId(
       @Param("characterId") UUID characterId, @Param("userId") UUID userId);
 
   // result map is defined in battleDao.xml
@@ -42,5 +41,5 @@ public interface BattleDao extends BaseDao<BattleEntity, UUID> {
   // receiver_id is mapped to characterEntity who receive this battle
   @Select("select * from battle where id = #{id}")
   @ResultMap("battleFullView")
-  Optional<BattleFullView> getBattleFullViewEntity(@Param("id") UUID id);
+  Optional<BattleFullView> getBattleFullView(@Param("id") UUID id);
 }

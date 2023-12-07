@@ -25,8 +25,10 @@ public interface FruitDao extends BaseDao<FruitEntity, UUID> {
       @Param("size") int size);
 
   @Select(
-      "select fruit.* from fruit inner join character_to_fruit as cf on fruit.id = cf.fruit_id"
-          + " inner join `character` as c on c.id = cf.character_id where c.id = #{characterId}")
+        "select `fruit`.* "
+            + "from `fruit` "
+            + "join `character_to_fruit` on `fruit`.`id` = `character_to_fruit`.`fruit_id` "
+            + "where `character_to_fruit`.id = #{characterId} ")
   List<FruitEntity> listByCharacterId(@Param("characterId") UUID characterId);
 
   int searchCount(

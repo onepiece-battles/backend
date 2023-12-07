@@ -90,24 +90,24 @@ public class BattleService {
                 offset,
                 request.getPageSize())
             .stream()
-            .map(BattleConverter.INSTANCE::toBattle)
+            .map(BattleConverter.INSTANCE::toBattleListView)
             .toList();
     return new ListBattleResponse().battles(battleList).totalSize(totalSize);
   }
 
   public BattleFullView getBattleFullView(GetBattleFullViewRequest request) {
     UUID battleId = request.getBattleId();
-    var battleFullViewEntity = battleDao.getBattleFullViewEntity(battleId).orElseThrow();
+    var battleFullViewEntity = battleDao.getBattleFullView(battleId).orElseThrow();
     return BattleConverter.INSTANCE.toBattleFullView(battleFullViewEntity);
   }
 
-  public ListBattleByIdResponse batchFindById(ListBattleByIdsRequest request) {
+  public ListBattleByIdsResponse batchFindById(ListBattleByIdsRequest request) {
     if (request.getBattleIds().isEmpty()) {
-      return new ListBattleByIdResponse().battles(List.of());
+      return new ListBattleByIdsResponse().battles(List.of());
     }
     var battleEntities = battleDao.batchFindById(request.getBattleIds());
     var battles = battleEntities.stream().map(BattleConverter.INSTANCE::toBattle).toList();
-    return new ListBattleByIdResponse().battles(battles);
+    return new ListBattleByIdsResponse().battles(battles);
   }
 
   public StartBattleResponse startBattle(UUID battleId) {
