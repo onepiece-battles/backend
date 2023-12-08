@@ -1,5 +1,7 @@
 package com.yichi.onepiece.character.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.yichi.onepiece.api.CharacterApi;
 import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.iam.service.IamService;
@@ -65,6 +67,14 @@ public class CharacterController implements CharacterApi {
     ListCharacterResponse response = characterService.listCharacters(listCharacterRequest);
     watch.stop();
     logger.info("list character takes: {}", watch.getTotalTimeSeconds());
+    ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+    try{
+      String json = ow.writeValueAsString(response);
+      logger.info(json);
+    }catch (Exception e){
+      e.printStackTrace();
+    }
+
     return ResponseEntity.ok(response);
   }
 }

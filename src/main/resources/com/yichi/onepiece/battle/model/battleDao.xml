@@ -85,9 +85,9 @@
         <association column="modification_record_id" property="modificationRecord"
                      select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
         />
-        <association property="battleStatus"
+        <association column="id" property="battleStatus"
           select="com.yichi.onepiece.battle.model.BattleStatusDetailDao.listByBattleId"/>
-        <association property="battleProcess"
+        <association column="id" property="battleProcess"
           select="com.yichi.onepiece.battle.model.BattleProcessDetailDao.listByBattleId"/>
     </resultMap>
 </mapper>

@@ -47,7 +47,9 @@ public class PrepareResourceAndPermissionData implements CommandLineRunner {
     ).filter(rp->
         !dbRpList.contains(
             String.format("%s%s%s", rp.getResourceType(), RESOURCE_PERMISSION_SPLITTER, rp.getPermission()))).toList();
-    resourcePermissionDao.batchInsert(newRPEntities);
+    if(!newRPEntities.isEmpty()){
+      resourcePermissionDao.batchInsert(newRPEntities);
+    }
 
     // initialize role data
     var existingRoleNames = roleDao.listAllRoleNames();

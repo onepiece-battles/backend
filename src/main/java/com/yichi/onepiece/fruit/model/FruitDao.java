@@ -27,7 +27,7 @@ public interface FruitDao extends BaseDao<FruitEntity, UUID> {
   @Select(
         "select * "
             + "from `view_fruit_list_view` "
-            + "join `character_to_fruit` on `fruit`.`id` = `character_to_fruit`.`fruit_id` "
+            + "join `character_to_fruit` on `view_fruit_list_view`.`id` = `character_to_fruit`.`fruit_id` "
             + "where `character_to_fruit`.id = #{characterId} ")
   List<FruitListView> listByCharacterId(@Param("characterId") UUID characterId);
 

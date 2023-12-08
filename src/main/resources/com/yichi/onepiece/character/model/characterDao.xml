@@ -85,7 +85,7 @@
           select="com.yichi.onepiece.battle.model.BattleDao.listBattlesByCharacterId"
         />
         <association column="id" property="fruits"
-          select="com.yichi.onepiece.fruit.model.BattleDao.listByCharacterId"
+          select="com.yichi.onepiece.fruit.model.FruitDao.listByCharacterId"
         />
         <association column="id" property="fruitInCharacter"
           select="com.yichi.onepiece.character.model.CharacterToFruitDao.listByCharacterId"

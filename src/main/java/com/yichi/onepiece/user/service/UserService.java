@@ -206,7 +206,7 @@ public class UserService {
     var resourcePermissionIds = roleToResourcePermissionDao.listByRoleId(roleId).stream().map(
         RoleToResourcePermissionEntity::getResourcePermissionId).toList();
     return resourcePermissionDao.batchFindById(resourcePermissionIds).stream().map(
-        ResourcePermissionEntity::getResourceType).toList();
+        ResourcePermissionEntity::getResourceType).distinct().toList();
   }
 
   public LogoutResponse logout(UUID userId) {
