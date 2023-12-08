@@ -75,6 +75,23 @@
     </sql>
     
     <resultMap id="characterFullView" type="com.yichi.onepiece.character.model.CharacterFullView">
-
+        <association column="creation_record_id" property="creationRecord"
+          select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
+        />
+        <association column="modification_record_id" property="modificationRecord"
+          select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
+        />
+        <association column="id" property="battles"
+          select="com.yichi.onepiece.battle.model.BattleDao.listBattlesByCharacterId"
+        />
+        <association column="id" property="fruits"
+          select="com.yichi.onepiece.fruit.model.BattleDao.listByCharacterId"
+        />
+        <association column="id" property="fruitInCharacter"
+          select="com.yichi.onepiece.character.model.CharacterToFruitDao.listByCharacterId"
+        />
+        <association column="id" property="groups"
+          select="com.yichi.onepiece.group.model.GroupDao.listGroupsByCharacterId"
+        />
     </resultMap>
 </mapper>

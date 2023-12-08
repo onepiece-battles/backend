@@ -11,6 +11,7 @@ import java.util.UUID;
 import javax.swing.text.html.Option;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
 
 @Dao
@@ -29,6 +30,7 @@ public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
       // current user.
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
 
+  @ResultMap("characterFullView")
   Optional<CharacterFullView> getFullViewById(@Param("id")UUID id);
 
   @Select(

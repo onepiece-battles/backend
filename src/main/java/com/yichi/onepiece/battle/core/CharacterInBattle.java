@@ -4,6 +4,7 @@ import com.yichi.onepiece.battle.model.CurrentCharacterEntityBuilder;
 import com.yichi.onepiece.battle.model.CurrentCharacterEntityImpl;
 import com.yichi.onepiece.character.model.CharacterEntity;
 import com.yichi.onepiece.fruit.model.FruitEntity;
+import com.yichi.onepiece.fruit.model.FruitListView;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -24,9 +25,9 @@ public class CharacterInBattle {
   private final CharacterEntity baseEntity;
   private CurrentCharacterEntityImpl currentCharacterEntity;
 
-  List<FruitEntity> fruitEntities;
+  List<FruitListView> fruitEntities;
 
-  public CharacterInBattle(CharacterEntity baseEntity, List<FruitEntity> fruitEntities) {
+  public CharacterInBattle(CharacterEntity baseEntity, List<FruitListView> fruitEntities) {
     this.baseEntity = baseEntity;
     this.fruitEntities = fruitEntities;
     this.name = baseEntity.getName();

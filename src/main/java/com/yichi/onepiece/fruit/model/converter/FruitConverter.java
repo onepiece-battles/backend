@@ -2,6 +2,7 @@ package com.yichi.onepiece.fruit.model.converter;
 
 import com.yichi.infra.support.EntityBuilder;
 import com.yichi.onepiece.fruit.model.FruitEntity;
+import com.yichi.onepiece.fruit.model.FruitListView;
 import com.yichi.onepiece.model.CreateFruitRequest;
 import com.yichi.onepiece.model.Fruit;
 import com.yichi.onepiece.model.UpdateFruitRequest;
@@ -28,6 +29,9 @@ public interface FruitConverter {
 
   @Mapping(target = "fruitHolders", ignore = true)
   Fruit toFruit(FruitEntity entity);
+
+  @Mapping(target = "fruitHolders", ignore = true)
+  com.yichi.onepiece.model.FruitListView toFruitListView(FruitListView fruitListView);
 
   default byte[] blobToResource(Byte[] profileByteArray) {
     if (profileByteArray == null) {
