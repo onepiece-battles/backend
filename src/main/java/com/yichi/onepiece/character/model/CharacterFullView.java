@@ -11,6 +11,7 @@ import java.util.List;
 public interface CharacterFullView extends CharacterEntity {
   List<BattleListView> getBattles();
   List<FruitListView> getFruits();
+  List<CharacterToFruitEntity> getFruitInCharacter();
   List<GroupEntity> getGroups();
   ActionRecordEntity getCreationRecord();
   ActionRecordEntity getModificationRecord();

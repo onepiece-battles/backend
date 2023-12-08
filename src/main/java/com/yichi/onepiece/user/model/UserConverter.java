@@ -14,13 +14,6 @@ import org.mapstruct.factory.Mappers;
 public interface UserConverter {
   UserConverter INSTANCE = Mappers.getMapper(UserConverter.class);
 
-  //  @Mapping(target = "tokens", ignore = true)
-  //  @Mapping(target = "loginRoleResources", ignore = true)
-  //  @Mapping(target = "userRoles", ignore = true)
-  //  @Mapping(target = "creationTimestamp", source = "creationRecord.actionTimestamp")
-  //  @Mapping(target = "modificationTimestamp", source = "modificationRecord.actionTimestamp")
-  //  User toUser(UserEntity userEntity);
-
   @Mapping(target = "creationRecordId", ignore = true)
   @Mapping(target = "modificationRecordId", ignore = true)
   @Mapping(target = "encryptedPassword", ignore = true)

@@ -6,6 +6,7 @@ import com.yichi.onepiece.constants.ConstantsContainer;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruit.model.FruitDao;
 import com.yichi.onepiece.fruit.model.FruitEntity;
+import com.yichi.onepiece.fruit.model.FruitListView;
 import com.yichi.onepiece.fruit.model.converter.FruitConverter;
 import com.yichi.onepiece.image.service.ImageUtil;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
@@ -84,7 +85,7 @@ public class FruitService {
                 offset,
                 request.getPageSize())
             .stream()
-            .map(FruitConverter.INSTANCE::toFruit)
+            .map(FruitConverter.INSTANCE::toFruitListView)
             .toList();
     return new ListFruitResponse().totalSize(totalSize).fruits(fruits);
   }
@@ -116,7 +117,7 @@ public class FruitService {
     return fruitDao.batchFindById(fruitIds);
   }
 
-  public List<FruitEntity> listByCharacterId(UUID characterId) {
+  public List<FruitListView> listByCharacterId(UUID characterId) {
     return fruitDao.listByCharacterId(characterId);
   }
 

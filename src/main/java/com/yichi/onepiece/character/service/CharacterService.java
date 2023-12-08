@@ -1,6 +1,5 @@
 package com.yichi.onepiece.character.service;
 
-import com.yichi.onepiece.battle.model.BattleConverter;
 import com.yichi.onepiece.battle.model.BattleDao;
 import com.yichi.onepiece.character.helper.CharacterHelper;
 import com.yichi.onepiece.character.model.CharacterDao;
@@ -10,7 +9,6 @@ import com.yichi.onepiece.character.model.CharacterToFruitEntityBuilder;
 import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
 import com.yichi.onepiece.constants.ConstantsContainer;
 import com.yichi.onepiece.exception.ExceptionUtils;
-import com.yichi.onepiece.fruit.model.converter.FruitConverter;
 import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.image.service.ImageUtil;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
@@ -80,11 +78,8 @@ public class CharacterService {
             .orElseThrow(
                 ExceptionUtils.notFound(
                     "Can not find inserted character with id %s", characterEntity.getId()));
-    var fruitsInCharacter =
-        characterHelper.getFruitInCharacterByCharacterId(characterEntity.getId());
     return CharacterEntityConverter.INSTANCE
-        .toCharacter(insertedEntity)
-        .fruitInCharacter(fruitsInCharacter);
+        .toCharacter(insertedEntity);
   }
 
   public String updateProfile(UUID characterId, String profile) {
@@ -107,22 +102,14 @@ public class CharacterService {
     var character =
         characterDao
             .findById(characterId)
-            .orElseThrow(ExceptionUtils.notFound("character with id %s not found", characterId));
+            .orElseThrow(
+                ExceptionUtils.notFound("character with id %s not found", characterId));
     return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(character.getProfileImage()));
   }
 
   public CharacterFullView getCharacterFullView(UUID characterId) {
-    var characterEntity = characterDao.findById(characterId).orElseThrow();
-    var battles =
-        battleDao.listBattlesByCharacterId(characterId, UserHelper.getCurrentUserId()).stream()
-            .map(BattleConverter.INSTANCE::toBattleListView)
-            .toList();
-    var fruits =
-        fruitService.listByCharacterId(characterId).stream()
-            .map(FruitConverter.INSTANCE::toFruit)
-            .toList();
-    var character = CharacterEntityConverter.INSTANCE.toCharacter(characterEntity);
-    return new CharacterFullView().character(character).battles(battles).fruits(fruits);
+    var characterFullView = characterDao.getFullViewById(characterId).orElseThrow();
+    return CharacterEntityConverter.INSTANCE.toCharacterFullView(characterFullView);
   }
 
   public EatFruitResponse eatFruit(UUID characterId, UUID fruitId) {
@@ -173,13 +160,7 @@ public class CharacterService {
                 userId,
                 resourceIds)
             .stream()
-            .map(CharacterEntityConverter.INSTANCE::toCharacter)
-            .map(
-                character -> {
-                  var fruitsInCharacter =
-                      characterHelper.getFruitInCharacterByCharacterId(character.getId());
-                  return character.fruitInCharacter(fruitsInCharacter);
-                })
+            .map(CharacterEntityConverter.INSTANCE::toCharacterListView)
             .toList();
     return new ListCharacterResponse().characters(characterList).totalSize(totalSize);
   }
