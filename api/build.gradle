@@ -21,12 +21,12 @@ openApiGenerate {
     generatorName = "spring"
     library = "spring-boot"
     inputSpec = "$rootDir/onepiece-battles-api/api/openapi.yaml".toString()
-    outputDir = "$buildDir/generated/sources".toString()
+    outputDir = "$buildDir".toString()
     apiPackage = "com.yichi.onepiece.api".toString()
     modelPackage = "com.yichi.onepiece.model".toString()
     configOptions = [
             basePackage: "com.yichi.onepiece".toString(),
-            sourceFolder: "src/main/java".toString(),
+            sourceFolder: "src".toString(),
             useTags: true.toString(),
             interfaceOnly: true.toString(),
             skipDefaultInterface: true.toString(),
@@ -54,7 +54,7 @@ dependencies {
 
 java {
     sourceSets["main"].java {
-        srcDir("build/generated/sources/src/main/java")
+        srcDir("build/src")
     }
 }
 
