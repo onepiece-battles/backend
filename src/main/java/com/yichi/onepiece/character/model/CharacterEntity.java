@@ -25,8 +25,6 @@ public interface CharacterEntity {
   @Nullable
   Byte[] getProfileImage();
 
-  UUID getGroupId();
-
   // default to be 1, unless special characters.
   Integer getMaximumFruitCount();
 

@@ -14,7 +14,7 @@ import org.apache.ibatis.annotations.Select;
 public interface UserResourceDao extends BaseDao<UserResourceEntity, UUID> {
 
   @Select(
-      "SELECT resource_ids FROM user_resource WHERE user_id = #{userId} AND resource_type ="
+      "SELECT resource_id FROM user_resource WHERE user_id = #{userId} AND resource_type ="
           + " #{resourceType}")
   List<UUID> getResourceIdsByUserIdAndResourceType(
       @Param("userId") UUID userId, @Param("resourceType") ResourceType resourceType);
