@@ -59,11 +59,6 @@ public class CharacterService {
     characterEntity =
         characterEntity.toBuilder()
             .setUserId(UserHelper.getCurrentUserId())
-            //            .setProfileImage(
-            //                ArrayUtils.toObject(
-            //                    ImageUtil.loadImageFromDisk(
-            //                        ConstantsContainer.USER_DEFAULT_PROFILE_PATH, "PNG")))
-            .setProfileImage(null)
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
             .build();
