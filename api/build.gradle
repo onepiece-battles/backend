@@ -32,7 +32,7 @@ openApiGenerate {
             skipDefaultInterface: true.toString(),
             generateSupportingFiles: false.toString(),
             serializableModel: true.toString(),
-            serializationLibrary: "jackson".toString(),
+            serializationLibrary: "jsonb".toString(),
     ]
 
     globalProperties = [

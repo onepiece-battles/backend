@@ -123,7 +123,6 @@ public class UserService {
             .setProfileImage(ArrayUtils.toObject(defaultImage))
             .build();
     userDao.insert(user);
-    logger.info("user registered: {}", user.toString());
     var actionRecord = actionRecordService.createWithUser(user);
     var updatedUser =
         user.toBuilder()
@@ -203,10 +202,14 @@ public class UserService {
 
   private List<ResourceType> getResourceTypeByRole(UserRole userRole) {
     var roleId = roleDao.findByRoleName(userRole).orElseThrow().getId();
-    var resourcePermissionIds = roleToResourcePermissionDao.listByRoleId(roleId).stream().map(
-        RoleToResourcePermissionEntity::getResourcePermissionId).toList();
-    return resourcePermissionDao.batchFindById(resourcePermissionIds).stream().map(
-        ResourcePermissionEntity::getResourceType).distinct().toList();
+    var resourcePermissionIds =
+        roleToResourcePermissionDao.listByRoleId(roleId).stream()
+            .map(RoleToResourcePermissionEntity::getResourcePermissionId)
+            .toList();
+    return resourcePermissionDao.batchFindById(resourcePermissionIds).stream()
+        .map(ResourcePermissionEntity::getResourceType)
+        .distinct()
+        .toList();
   }
 
   public LogoutResponse logout(UUID userId) {
@@ -302,13 +305,17 @@ public class UserService {
         userResourceDao.getResourceIdsByUserIdAndResourceType(
             targetUserId, request.getResourceType());
     userResourceIds.addAll(request.getResourceIds());
-    var userResourceEntities = userResourceIds.stream().map(
-        id-> UserResourceEntityBuilder.newBuilder()
-            .setUserId(targetUserId)
-            .setSourceUserId(sourceUserId)
-            .setResourceType(request.getResourceType())
-            .setResourceId(id).build()
-    ).toList();
+    var userResourceEntities =
+        userResourceIds.stream()
+            .map(
+                id ->
+                    UserResourceEntityBuilder.newBuilder()
+                        .setUserId(targetUserId)
+                        .setSourceUserId(sourceUserId)
+                        .setResourceType(request.getResourceType())
+                        .setResourceId(id)
+                        .build())
+            .toList();
     userResourceDao.batchInsert(userResourceEntities);
     ShareResourceResponse response = new ShareResourceResponse();
     response.setSharingInformation(
