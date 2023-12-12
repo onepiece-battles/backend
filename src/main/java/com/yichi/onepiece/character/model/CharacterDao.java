@@ -8,11 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import javax.swing.text.html.Option;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.ResultMap;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 @Dao
 @Mapper
@@ -20,6 +16,15 @@ public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
   String FIND_BY_ID = "com.yichi.onepiece.character.model.CharacterDao.findById";
 
   // see sql definition in characterDao.xml
+  @Result(
+      property = "characterTypes",
+      column = "id",
+      many =
+          @Many(select = "com.yichi.onepiece.character.model.CharacterTypeDao.listByCharacterId"))
+  @Result(
+      property = "hakis",
+      column = "id",
+      many = @Many(select = "com.yichi.onepiece.character.model.HakiDao.listByCharacterId"))
   List<CharacterListView> list(
       @Param("characterFilter") CharacterFilter characterFilter,
       @Param("sortList") Collection<CharacterSortableField> sortList,
@@ -32,7 +37,7 @@ public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
 
   @ResultMap("characterFullView")
   @Select("select * from `character` where id = #{id}")
-  Optional<CharacterFullView> getFullViewById(@Param("id")UUID id);
+  Optional<CharacterFullView> getFullViewById(@Param("id") UUID id);
 
   @Select(
       "select * from `character` as c inner join `character_to_fruit` as cf on c.id ="

@@ -1,7 +1,5 @@
 package com.yichi.onepiece.character.service;
 
-import com.yichi.onepiece.battle.model.BattleDao;
-import com.yichi.onepiece.character.helper.CharacterHelper;
 import com.yichi.onepiece.character.model.*;
 import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
 import com.yichi.onepiece.exception.ExceptionUtils;
@@ -28,28 +26,22 @@ public class CharacterService {
 
   private final CharacterDao characterDao;
   private final FruitService fruitService;
-  // use dao temporarily for cycle dependency
-  private final BattleDao battleDao;
+
   private final CharacterToFruitDao characterToFruitDao;
   private final ActionRecordService actionRecordService;
   private final UserService userService;
-  private final CharacterHelper characterHelper;
 
   public CharacterService(
       CharacterDao CharacterDao,
       FruitService fruitService,
-      BattleDao battleDao,
       CharacterToFruitDao characterToFruitDao,
       ActionRecordService actionRecordService,
-      UserService userService,
-      CharacterHelper characterHelper) {
+      UserService userService) {
     this.characterDao = CharacterDao;
     this.fruitService = fruitService;
-    this.battleDao = battleDao;
     this.characterToFruitDao = characterToFruitDao;
     this.actionRecordService = actionRecordService;
     this.userService = userService;
-    this.characterHelper = characterHelper;
   }
 
   public Character addCharacter(CreateCharacterRequest request) {
