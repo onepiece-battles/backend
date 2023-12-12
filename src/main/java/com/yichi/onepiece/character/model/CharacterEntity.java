@@ -1,6 +1,7 @@
 package com.yichi.onepiece.character.model;
 
 import com.yichi.infra.support.entity.Entity;
+import com.yichi.infra.support.mybatis.annotations.Column;
 import com.yichi.onepiece.model.CharacterType;
 import com.yichi.onepiece.model.Haki;
 import java.util.Date;
@@ -20,6 +21,7 @@ public interface CharacterEntity {
 
   String getName();
 
+  @Column(json = true)
   List<CharacterType> getCharacterTypes();
 
   @Nullable
@@ -36,6 +38,7 @@ public interface CharacterEntity {
 
   String getBirthPlace();
 
+  @Column(json = true)
   List<Haki> getHakis();
 
   Integer getBounty();

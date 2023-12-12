@@ -1,7 +1,5 @@
 package com.yichi.onepiece.character.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yichi.onepiece.battle.model.BattleDao;
 import com.yichi.onepiece.character.helper.CharacterHelper;
 import com.yichi.onepiece.character.model.*;
@@ -158,34 +156,7 @@ public class CharacterService {
             .stream()
             .map(CharacterEntityConverter.INSTANCE::toCharacterListView)
             .toList();
-    var currentList = characterList.get(0).getCharacterTypes();
-    String[] characterTypes = new String[currentList.size()];
-    for (int i = 0; i < characterTypes.length; i++) {
-      characterTypes[i] = String.valueOf(currentList.get(i));
-    }
-    var currentList2 = characterList.get(1).getCharacterTypes();
-    String[] characterTypes2 = new String[currentList2.size()];
-    for (int i = 0; i < characterTypes2.length; i++) {
-      characterTypes2[i] = String.valueOf(currentList2.get(i));
-    }
-    characterList
-        .get(0)
-        .setCharacterTypes(
-            List.copyOf(Arrays.stream(characterTypes).map(CharacterType::valueOf).toList()));
-    characterList
-        .get(1)
-        .setCharacterTypes(
-            List.copyOf(Arrays.stream(characterTypes2).map(CharacterType::valueOf).toList()));
-
-    var response = new ListCharacterResponse().characters(characterList).totalSize(totalSize);
-    var mapper = new ObjectMapper();
-    try {
-      var json = mapper.writeValueAsString(characterList);
-      System.out.println(json);
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-    return response;
+    return new ListCharacterResponse().characters(characterList).totalSize(totalSize);
   }
 
   public CharacterEntity getCharacterEntityById(UUID characterId) {
