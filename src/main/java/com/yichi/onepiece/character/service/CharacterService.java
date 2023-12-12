@@ -1,26 +1,23 @@
 package com.yichi.onepiece.character.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yichi.onepiece.battle.model.BattleDao;
 import com.yichi.onepiece.character.helper.CharacterHelper;
-import com.yichi.onepiece.character.model.CharacterDao;
-import com.yichi.onepiece.character.model.CharacterEntity;
-import com.yichi.onepiece.character.model.CharacterToFruitDao;
-import com.yichi.onepiece.character.model.CharacterToFruitEntityBuilder;
+import com.yichi.onepiece.character.model.*;
 import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
-import com.yichi.onepiece.constants.ConstantsContainer;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruit.service.FruitService;
-import com.yichi.onepiece.image.service.ImageUtil;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.model.Character;
+import com.yichi.onepiece.model.CharacterFullView;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import com.yichi.onepiece.utils.EncryptHelper;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,10 +61,11 @@ public class CharacterService {
     characterEntity =
         characterEntity.toBuilder()
             .setUserId(UserHelper.getCurrentUserId())
-            .setProfileImage(
-                ArrayUtils.toObject(
-                    ImageUtil.loadImageFromDisk(
-                        ConstantsContainer.USER_DEFAULT_PROFILE_PATH, "PNG")))
+            //            .setProfileImage(
+            //                ArrayUtils.toObject(
+            //                    ImageUtil.loadImageFromDisk(
+            //                        ConstantsContainer.USER_DEFAULT_PROFILE_PATH, "PNG")))
+            .setProfileImage(null)
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
             .build();
@@ -78,8 +76,7 @@ public class CharacterService {
             .orElseThrow(
                 ExceptionUtils.notFound(
                     "Can not find inserted character with id %s", characterEntity.getId()));
-    return CharacterEntityConverter.INSTANCE
-        .toCharacter(insertedEntity);
+    return CharacterEntityConverter.INSTANCE.toCharacter(insertedEntity);
   }
 
   public String updateProfile(UUID characterId, String profile) {
@@ -102,8 +99,7 @@ public class CharacterService {
     var character =
         characterDao
             .findById(characterId)
-            .orElseThrow(
-                ExceptionUtils.notFound("character with id %s not found", characterId));
+            .orElseThrow(ExceptionUtils.notFound("character with id %s not found", characterId));
     return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(character.getProfileImage()));
   }
 
@@ -162,7 +158,34 @@ public class CharacterService {
             .stream()
             .map(CharacterEntityConverter.INSTANCE::toCharacterListView)
             .toList();
-    return new ListCharacterResponse().characters(characterList).totalSize(totalSize);
+    var currentList = characterList.get(0).getCharacterTypes();
+    String[] characterTypes = new String[currentList.size()];
+    for (int i = 0; i < characterTypes.length; i++) {
+      characterTypes[i] = String.valueOf(currentList.get(i));
+    }
+    var currentList2 = characterList.get(1).getCharacterTypes();
+    String[] characterTypes2 = new String[currentList2.size()];
+    for (int i = 0; i < characterTypes2.length; i++) {
+      characterTypes2[i] = String.valueOf(currentList2.get(i));
+    }
+    characterList
+        .get(0)
+        .setCharacterTypes(
+            List.copyOf(Arrays.stream(characterTypes).map(CharacterType::valueOf).toList()));
+    characterList
+        .get(1)
+        .setCharacterTypes(
+            List.copyOf(Arrays.stream(characterTypes2).map(CharacterType::valueOf).toList()));
+
+    var response = new ListCharacterResponse().characters(characterList).totalSize(totalSize);
+    var mapper = new ObjectMapper();
+    try {
+      var json = mapper.writeValueAsString(characterList);
+      System.out.println(json);
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    return response;
   }
 
   public CharacterEntity getCharacterEntityById(UUID characterId) {

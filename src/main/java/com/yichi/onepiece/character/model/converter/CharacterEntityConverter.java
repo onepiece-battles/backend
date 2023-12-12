@@ -19,11 +19,13 @@ public interface CharacterEntityConverter {
 
   Character toCharacter(CharacterEntity entity);
 
-   com.yichi.onepiece.model.CharacterListView toCharacterListView(CharacterListView characterListView);
+  com.yichi.onepiece.model.CharacterListView toCharacterListView(
+      CharacterListView characterListView);
 
-   @Mapping(target = "roleName", source = "creationRecord.roleName")
-   @Mapping(target = "creator", source = "creationRecord.userName")
-   com.yichi.onepiece.model.CharacterFullView toCharacterFullView(CharacterFullView characterFullView);
+  @Mapping(target = "roleName", source = "creationRecord.roleName")
+  @Mapping(target = "creator", source = "creationRecord.userName")
+  com.yichi.onepiece.model.CharacterFullView toCharacterFullView(
+      CharacterFullView characterFullView);
 
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "profileImage", ignore = true)
