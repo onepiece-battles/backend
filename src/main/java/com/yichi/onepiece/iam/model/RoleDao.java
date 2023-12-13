@@ -2,6 +2,7 @@ package com.yichi.onepiece.iam.model;
 
 import com.yichi.infra.support.mybatis.annotations.Dao;
 import com.yichi.infra.support.mybatis.dao.BaseDao;
+import com.yichi.onepiece.model.ResourceType;
 import com.yichi.onepiece.model.UserRole;
 import java.util.*;
 import org.apache.ibatis.annotations.Mapper;
@@ -38,4 +39,13 @@ public interface RoleDao extends BaseDao<RoleEntity, UUID> {
       "SELECT DISTINCT name FROM role where id in (SELECT role_id FROM user_role WHERE"
           + " user_role.user_id = #{userId})")
   Set<String> listRolesByUserId(@Param("userId") UUID userId);
+
+  // todo(yichi): add user view to replace roleName by roleId in entity
+
+  @Select(
+      "select DISTINCT(resource_permission.resource_type) from role join"
+          + " role_to_resource_permission on role.id = role_to_resource_permission.role_id join"
+          + " resource_permission on role_to_resource_permission.resource_permission_id ="
+          + " resource_permission.id where role.name = #{roleName}")
+  List<ResourceType> listResourceTypeByRoleName(@Param("roleName") String roleName);
 }
