@@ -46,7 +46,7 @@ public class BattleService {
     this.userService = userService;
   }
 
-  public Battle addBattle(AddBattleRequest request) {
+  public Battle createBattle(AddBattleRequest request) {
     var actionRecord = actionRecordService.create();
     BattleEntity battleEntity =
         BattleEntityBuilder.newBuilder()

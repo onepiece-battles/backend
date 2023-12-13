@@ -150,8 +150,6 @@ CREATE TABLE `character`(
 ALTER TABLE `character` ADD CONSTRAINT PRIMARY KEY(`id`);
 ALTER TABLE `character` ADD CONSTRAINT `fk_character__user_id`
   FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
-ALTER TABLE `character` ADD CONSTRAINT `fk_character__role_id`
-    FOREIGN KEY(`role_id`) REFERENCES `role`(`id`);
 ALTER TABLE `character` ADD CONSTRAINT `fk_character__creation_record_id`
   FOREIGN KEY(`creation_record_id`) REFERENCES `action_lineage`(`id`);
 ALTER TABLE `character` ADD CONSTRAINT `fk_character__modification_record_id`
@@ -235,7 +233,6 @@ ALTER TABLE `character_to_fruit` ADD CONSTRAINT `fk_character_to_fruit__fruit_id
 CREATE TABLE `battle`(
     `id` BINARY(16) NOT NULL,
     `user_id` BINARY(16) NOT NULL,
-    `role_id` BINARY(16) NOT NULL,
     `starter_id` BINARY(16) NOT NULL,
     `receiver_id` BINARY(16) NOT NULL,
     `creation_record_id` BIGINT NOT NULL,
@@ -245,8 +242,6 @@ CREATE TABLE `battle`(
     `winner_id` BINARY(16)
 );
 ALTER TABLE `battle` ADD CONSTRAINT PRIMARY KEY(`id`);
-ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__role_id`
-    FOREIGN KEY(`role_id`) REFERENCES `role`(`id`);
 ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__starter_id`
   FOREIGN KEY(`starter_id`) REFERENCES `character`(`id`);
 ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__receiver_id`
@@ -340,13 +335,7 @@ ALTER TABLE `file_object` ADD CONSTRAINT `fk_file_creator_user_id__user_id`
 CREATE VIEW `view_battle_list_view`
 AS
 SELECT
-   `battle`.id,
-   `battle`.user_id,
-   `battle`.starter_id,
-   `battle`.receiver_id,
-   `battle`.winner_id,
-   `battle`.type,
-   `battle`.status,
+   `battle`.*,
    `creation_record`.user_name as creator,
    `creation_record`.role_name,
    `creation_record`.action_timestamp as creation_timestamp,
