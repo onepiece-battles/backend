@@ -66,7 +66,7 @@
         <result property="accountStatus" column="account_status"/>
         <result property="emailVerified" column="email_verified"/>
         <association column="login_role" property="loginRoleResources"
-                     select="com.yichi.onepiece.iam.model.RoleResourceDao.getResourceNamesByRoleName"
+                     select="com.yichi.onepiece.iam.model.RoleDao.listResourceTypeByRoleName"
         />
         <association column="id" property="tokens"
                      select="com.yichi.onepiece.iam.model.TokenDao.listTokenByUserId"
