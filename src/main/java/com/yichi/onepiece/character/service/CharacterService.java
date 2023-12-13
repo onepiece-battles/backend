@@ -184,7 +184,6 @@ public class CharacterService {
             .stream()
             .map(CharacterEntityConverter.INSTANCE::toCharacterListView)
             .toList();
-    logger.info("character list {}", characterList);
     return new ListCharacterResponse().characters(characterList).totalSize(totalSize);
   }
 
