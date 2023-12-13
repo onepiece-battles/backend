@@ -1,0 +1,1 @@
+alter table issue modify column id binary(16) not null;

@@ -98,7 +98,10 @@
         </choose>
     </sql>
     
-    <resultMap id="characterFullView" type="com.yichi.onepiece.character.model.CharacterFullView">
+    <resultMap id="characterFullView" type="com.yichi.onepiece.character.model.CharacterFullView" autoMapping="true">
+        <association column="id" property="id"
+        />
+        <association column="name" property="name"/>
         <association column="creation_record_id" property="creationRecord"
           select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
         />
