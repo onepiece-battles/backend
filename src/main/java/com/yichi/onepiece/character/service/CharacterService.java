@@ -167,6 +167,7 @@ public class CharacterService {
     var userId = UserHelper.getCurrentUserId();
     var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
     var totalSize = characterDao.searchCount(request.getCharacterFilter(), userId, resourceIds);
+    logger.info("count is {}", totalSize);
     // pageIndex is 1- based. offset is 0- based.
     var offset = (request.getPageIndex() - 1) * request.getPageSize();
     if (offset >= totalSize || offset < 0) {

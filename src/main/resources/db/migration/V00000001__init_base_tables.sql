@@ -361,7 +361,9 @@ SELECT
     `creation_record`.role_id
 FROM `character`
 JOIN `action_lineage` as creation_record on creation_record.id = `character`.creation_record_id
-JOIN `action_lineage` as modification_record on modification_record.id = `character`.modification_record_id;
+JOIN `action_lineage` as modification_record on modification_record.id = `character`.modification_record_id
+JOIN `character_type` on `character`.`id` = `character_type`.`character_id`
+JOIN `haki` on `character`.id = haki.character_id;
 
 -- fruit_list_view
 CREATE VIEW `view_fruit_list_view`

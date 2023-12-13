@@ -3,12 +3,24 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.character.model.CharacterDao">
     <select id="list" resultType="com.yichi.onepiece.character.model.CharacterListView" resultMap="characterListView">
-        SELECT * FROM `view_character_list_view`
+        SELECT
+        `character`.*,
+        `creation_record`.action_timestamp as creation_timestamp,
+        `modification_record`.action_timestamp as modification_timestamp,
+        `creation_record`.user_name as creator,
+        `creation_record`.role_name,
+        `creation_record`.role_id
+        FROM `character`
+        JOIN `action_lineage` as creation_record on creation_record.id = `character`.creation_record_id
+        JOIN `action_lineage` as modification_record on modification_record.id = `character`.modification_record_id
+        LEFT JOIN `character_type` on `character`.`id` = `character_type`.`character_id`
+        LEFT JOIN `haki` on `character`.id = haki.character_id
+        LEFT JOIN `character_to_fruit` on `character`.id = character_to_fruit.character_id
         WHERE
-        ( user_id = #{userId}
+        ( `character`.user_id = #{userId}
         <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
             OR
-            id IN
+            `character`.id IN
             <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
                 #{externalResourceId}
             </foreach>
@@ -17,18 +29,23 @@
         <include refid="characterFilter">
             <property name="characterFilter" value="characterFilter"/>
         </include>
+        GROUP BY `character`.`id`
         ORDER BY
         <include refid="orderClause"/>
         LIMIT #{offset}, #{size}
     </select>
 
     <select id="searchCount" resultType="int">
-        SELECT COUNT(*) FROM `character`
+        select count(distinct(`character`.id))
+        FROM `character`
+        LEFT JOIN `character_type` on `character`.`id` = `character_type`.`character_id`
+        LEFT JOIN `haki` on `character`.id = haki.`character_id`
+        LEFT JOIN `character_to_fruit` on `character`.id = character_to_fruit.character_id
         WHERE
         ( user_id = #{userId}
         <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
             OR
-            id IN
+            `character`.id IN
             <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
                 #{externalResourceId}
             </foreach>
@@ -46,30 +63,24 @@
             AND `name` like #{keyLike}
         </if>
         <if test="characterFilter.hasFruit != null">
-            AND `has_fruit` = #{characterFilter.hasFruit}
+            AND (`fruit_id` IS NOT NULL) = #{characterFilter.hasFruit}
         </if>
         <if test="characterFilter.onlySystem != null">
             AND `system_resource` = #{characterFilter.onlySystem}
         </if>
         <if test="characterFilter.characterTypes != null and !characterFilter.characterTypes.isEmpty">
-            AND EXISTS
-            (
-            select 1 from `character_type` where `character_type` in
-                <foreach item="characterType" collection="characterFilter.characterTypes" open="("
-                         separator="," close=")">
-                    #{characterType}
-                </foreach>
-            )
+            AND `character_type`.`character_type` in
+            <foreach item="characterType" collection="characterFilter.characterTypes" open="("
+                     separator="," close=")">
+                #{characterType}
+            </foreach>
         </if>
         <if test="characterFilter.hakis != null and !characterFilter.hakis.isEmpty">
-            AND EXISTS
-            (
-            select 1 from `haki` where `haki` in
+            AND `haki`.`haki` in
             <foreach item="haki" collection="characterFilter.hakis" open="("
                      separator="," close=")">
                 #{haki}
             </foreach>
-            )
         </if>
     </sql>
 
