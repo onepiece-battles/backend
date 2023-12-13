@@ -19,12 +19,14 @@ public interface FruitConverter {
   @Mapping(target = "profileImage", ignore = true)
   @Mapping(target = "creationRecordId", ignore = true)
   @Mapping(target = "modificationRecordId", ignore = true)
+  @Mapping(target = "systemResource", ignore = true)
   FruitEntity toFruitEntity(CreateFruitRequest request);
 
   @Mapping(target = "profileImage", ignore = true)
   @Mapping(target = "creationRecordId", ignore = true)
   @Mapping(target = "modificationRecordId", ignore = true)
   @Mapping(target = "userId", ignore = true)
+  @Mapping(target = "systemResource", ignore = true)
   FruitEntity toFruitEntity(UpdateFruitRequest request);
 
   @Mapping(target = "fruitHolders", ignore = true)

@@ -1,11 +1,7 @@
 package com.yichi.onepiece.character.model;
 
 import com.yichi.infra.support.entity.Entity;
-import com.yichi.infra.support.mybatis.annotations.Column;
-import com.yichi.onepiece.model.CharacterType;
-import com.yichi.onepiece.model.Haki;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
@@ -17,12 +13,7 @@ public interface CharacterEntity {
 
   UUID getUserId();
 
-  UUID getRoleId();
-
   String getName();
-
-  @Column(json = true)
-  List<CharacterType> getCharacterTypes();
 
   @Nullable
   Byte[] getProfileImage();
@@ -37,9 +28,6 @@ public interface CharacterEntity {
   Date getDateOfBirth();
 
   String getBirthPlace();
-
-  @Column(json = true)
-  List<Haki> getHakis();
 
   Integer getBounty();
 
@@ -62,6 +50,8 @@ public interface CharacterEntity {
   Long getCreationRecordId();
 
   Long getModificationRecordId();
+
+  Boolean getSystemResource();
 
   CharacterEntityBuilder toBuilder();
 }

@@ -11,7 +11,7 @@ import org.apache.ibatis.annotations.Select;
 
 @Dao
 @Mapper
-public interface HakiDao extends BaseDao<UUID, HakiEntity> {
+public interface HakiDao extends BaseDao<HakiEntity, UUID> {
   @Select("select `haki` from `haki` where `haki`.`character_id` = #{characterId}")
   List<Haki> listByCharacterId(@Param("characterId") UUID characterId);
 }

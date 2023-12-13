@@ -11,7 +11,7 @@ import org.apache.ibatis.annotations.Select;
 
 @Dao
 @Mapper
-public interface CharacterTypeDao extends BaseDao<UUID, CharacterTypeEntity> {
+public interface CharacterTypeDao extends BaseDao<CharacterTypeEntity, UUID> {
   @Select(
       "select `character_type` from `character_type` where `character_type`.`character_id` ="
           + " #{characterId}")

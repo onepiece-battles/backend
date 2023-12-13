@@ -10,9 +10,13 @@ public interface FruitEntity {
   String ENTITY_TYPE = "FRUIT";
 
   UUID getId();
+
   UUID getUserId();
+
   UUID getRoleId();
+
   String getName();
+
   @Nullable
   Byte[] getProfileImage();
 
@@ -36,6 +40,8 @@ public interface FruitEntity {
   Long getCreationRecordId();
 
   Long getModificationRecordId();
+
+  Boolean getSystemResource();
 
   FruitEntityBuilder toBuilder();
 }
