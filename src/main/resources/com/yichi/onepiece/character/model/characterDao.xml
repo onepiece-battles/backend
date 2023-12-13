@@ -61,6 +61,16 @@
                 </foreach>
             )
         </if>
+        <if test="characterFilter.hakis != null and !characterFilter.hakis.isEmpty">
+            AND EXISTS
+            (
+            select 1 from `haki` where `haki` in
+            <foreach item="haki" collection="characterFilter.hakis" open="("
+                     separator="," close=")">
+                #{haki}
+            </foreach>
+            )
+        </if>
     </sql>
 
     <!-- Construct order by clause -->
