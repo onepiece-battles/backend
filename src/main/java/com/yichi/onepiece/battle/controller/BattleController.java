@@ -38,15 +38,14 @@ public class BattleController implements BattleApi {
   public ResponseEntity<Battle> addBattle(AddBattleRequest addBattleRequest) {
     iamService.checkPermissionOfCurrentAccount(
         ResourceType.BATTLE, Set.of(Permission.CREATE, Permission.GET));
-    var battle = battleService.addBattle(addBattleRequest);
+    var battle = battleService.createBattle(addBattleRequest);
     return ResponseEntity.ok(battle);
   }
 
   @Override
   public ResponseEntity<BattleFullView> getBattleFullView(
       GetBattleFullViewRequest getBattleFullViewRequest) {
-    iamService.checkPermissionOfCurrentAccount(
-        ResourceType.BATTLE, Set.of(Permission.GET));
+    iamService.checkPermissionOfCurrentAccount(ResourceType.BATTLE, Set.of(Permission.GET));
     StopWatch watch = new StopWatch();
     watch.start();
     var response = battleService.getBattleFullView(getBattleFullViewRequest);
@@ -60,8 +59,7 @@ public class BattleController implements BattleApi {
       ListBattleByIdsRequest listBattleByIdsRequest) {
     StopWatch watch = new StopWatch();
     watch.start();
-    iamService.checkPermissionOfCurrentAccount(
-        ResourceType.BATTLE, Set.of(Permission.LIST));
+    iamService.checkPermissionOfCurrentAccount(ResourceType.BATTLE, Set.of(Permission.LIST));
     var response = battleService.batchFindById(listBattleByIdsRequest);
     watch.stop();
     logger.info("list battle by ids takes: {}", watch.getTotalTimeSeconds());
@@ -72,8 +70,7 @@ public class BattleController implements BattleApi {
   public ResponseEntity<ListBattleResponse> listBattles(ListBattleRequest listBattleRequest) {
     StopWatch watch = new StopWatch();
     watch.start();
-    iamService.checkPermissionOfCurrentAccount(
-        ResourceType.BATTLE, Set.of(Permission.LIST));
+    iamService.checkPermissionOfCurrentAccount(ResourceType.BATTLE, Set.of(Permission.LIST));
     var response = battleService.list(listBattleRequest);
     watch.stop();
     logger.info("list battle takes: {}", watch.getTotalTimeSeconds());
@@ -82,8 +79,7 @@ public class BattleController implements BattleApi {
 
   @Override
   public ResponseEntity<StartBattleResponse> startBattle(StartBattleRequest startBattleRequest) {
-    iamService.checkPermissionOfCurrentAccount(
-        ResourceType.BATTLE, Set.of(Permission.UPDATE));
+    iamService.checkPermissionOfCurrentAccount(ResourceType.BATTLE, Set.of(Permission.UPDATE));
     var battle = battleService.startBattle(startBattleRequest.getBattleId());
     return ResponseEntity.ok(battle);
   }
