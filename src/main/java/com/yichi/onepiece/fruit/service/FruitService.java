@@ -2,13 +2,11 @@ package com.yichi.onepiece.fruit.service;
 
 import com.yichi.onepiece.character.helper.CharacterHelper;
 import com.yichi.onepiece.character.model.CharacterEntity;
-import com.yichi.onepiece.constants.ConstantsContainer;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruit.model.FruitDao;
 import com.yichi.onepiece.fruit.model.FruitEntity;
 import com.yichi.onepiece.fruit.model.FruitListView;
 import com.yichi.onepiece.fruit.model.converter.FruitConverter;
-import com.yichi.onepiece.image.service.ImageUtil;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.user.UserHelper;
@@ -47,16 +45,8 @@ public class FruitService {
         FruitConverter.INSTANCE.toFruitEntity(request).toBuilder()
             .setCreationRecordId(actionRecord.getId())
             .setUserId(UserHelper.getCurrentUserId())
+            .setSystemResource(UserHelper.hasNikaPermission())
             .build();
-    if (fruitEntity.getProfileImage() == null) {
-      fruitEntity =
-          fruitEntity.toBuilder()
-              .setProfileImage(
-                  ArrayUtils.toObject(
-                      ImageUtil.loadImageFromDisk(
-                          ConstantsContainer.USER_DEFAULT_PROFILE_PATH, "PNG")))
-              .build();
-    }
     fruitDao.insert(fruitEntity);
     var characterNames =
         characterHelper.listByFruitId(fruitEntity.getId()).stream()

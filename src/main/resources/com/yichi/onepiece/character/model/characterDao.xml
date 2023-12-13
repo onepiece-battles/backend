@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.character.model.CharacterDao">
-    <select id="list" resultType="com.yichi.onepiece.character.model.CharacterListView">
+    <select id="list" resultType="com.yichi.onepiece.character.model.CharacterListView" resultMap="characterListView">
         SELECT * FROM `view_character_list_view`
         WHERE
         ( user_id = #{userId}
@@ -49,14 +49,17 @@
             AND `has_fruit` = #{characterFilter.hasFruit}
         </if>
         <if test="characterFilter.onlySystem != null">
-            AND `is_system_resource` = #{characterFilter.onlySystem}
+            AND `system_resource` = #{characterFilter.onlySystem}
         </if>
         <if test="characterFilter.characterTypes != null and !characterFilter.characterTypes.isEmpty">
-            AND `character_type` IN
-            <foreach item="characterType" collection="characterFilter.characterTypes" open="("
-                     separator="," close=")">
-                #{characterType}
-            </foreach>
+            AND EXISTS
+            (
+            select 1 from `character_type` where `character_type` in
+                <foreach item="characterType" collection="characterFilter.characterTypes" open="("
+                         separator="," close=")">
+                    #{characterType}
+                </foreach>
+            )
         </if>
     </sql>
 
@@ -92,6 +95,17 @@
         />
         <association column="id" property="groups"
           select="com.yichi.onepiece.group.model.GroupDao.listGroupsByCharacterId"
+        />
+    </resultMap>
+
+    <resultMap id="characterListView" type="com.yichi.onepiece.character.model.CharacterListView" autoMapping="true">
+        <association column="id" property="id"
+        />
+        <association column="id" property="characterTypes"
+                     select="com.yichi.onepiece.character.model.CharacterTypeDao.listByCharacterId"
+        />
+        <association column="id" property="hakis"
+                     select="com.yichi.onepiece.character.model.HakiDao.listByCharacterId"
         />
     </resultMap>
 </mapper>

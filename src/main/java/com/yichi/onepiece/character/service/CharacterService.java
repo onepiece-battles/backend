@@ -1,7 +1,5 @@
 package com.yichi.onepiece.character.service;
 
-import com.yichi.onepiece.battle.model.BattleDao;
-import com.yichi.onepiece.character.helper.CharacterHelper;
 import com.yichi.onepiece.character.model.*;
 import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
 import com.yichi.onepiece.exception.ExceptionUtils;
@@ -27,29 +25,29 @@ public class CharacterService {
   private static final ResourceType RESOURCE_TYPE = ResourceType.CHARACTER;
 
   private final CharacterDao characterDao;
+  private final CharacterTypeDao characterTypeDao;
+  private final HakiDao hakiDao;
   private final FruitService fruitService;
-  // use dao temporarily for cycle dependency
-  private final BattleDao battleDao;
+
   private final CharacterToFruitDao characterToFruitDao;
   private final ActionRecordService actionRecordService;
   private final UserService userService;
-  private final CharacterHelper characterHelper;
 
   public CharacterService(
       CharacterDao CharacterDao,
+      CharacterTypeDao characterTypeDao,
+      HakiDao hakiDao,
       FruitService fruitService,
-      BattleDao battleDao,
       CharacterToFruitDao characterToFruitDao,
       ActionRecordService actionRecordService,
-      UserService userService,
-      CharacterHelper characterHelper) {
+      UserService userService) {
     this.characterDao = CharacterDao;
+    this.characterTypeDao = characterTypeDao;
+    this.hakiDao = hakiDao;
     this.fruitService = fruitService;
-    this.battleDao = battleDao;
     this.characterToFruitDao = characterToFruitDao;
     this.actionRecordService = actionRecordService;
     this.userService = userService;
-    this.characterHelper = characterHelper;
   }
 
   public Character addCharacter(CreateCharacterRequest request) {
@@ -61,8 +59,11 @@ public class CharacterService {
             .setUserId(UserHelper.getCurrentUserId())
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
+            .setSystemResource(UserHelper.hasNikaPermission())
             .build();
     characterDao.insert(characterEntity);
+    createTypes(request.getCharacterTypes(), characterEntity.getId());
+    createHakis(request.getHakis(), characterEntity.getId());
     var insertedEntity =
         characterDao
             .findById(characterEntity.getId())
@@ -70,6 +71,38 @@ public class CharacterService {
                 ExceptionUtils.notFound(
                     "Can not find inserted character with id %s", characterEntity.getId()));
     return CharacterEntityConverter.INSTANCE.toCharacter(insertedEntity);
+  }
+
+  private void createTypes(List<CharacterType> types, UUID characterId) {
+    if (types.isEmpty()) {
+      return;
+    }
+    var typeEntities =
+        types.stream()
+            .map(
+                type ->
+                    CharacterTypeEntityBuilder.newBuilder()
+                        .setCharacterType(type)
+                        .setCharacterId(characterId)
+                        .build())
+            .toList();
+    characterTypeDao.batchInsert(typeEntities);
+  }
+
+  private void createHakis(List<Haki> hakis, UUID characterId) {
+    if (hakis.isEmpty()) {
+      return;
+    }
+    var hakiEntities =
+        hakis.stream()
+            .map(
+                haki ->
+                    HakiEntityBuilder.newBuilder()
+                        .setHaki(haki)
+                        .setCharacterId(characterId)
+                        .build())
+            .toList();
+    hakiDao.batchInsert(hakiEntities);
   }
 
   public String updateProfile(UUID characterId, String profile) {

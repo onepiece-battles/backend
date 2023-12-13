@@ -29,8 +29,7 @@ public class ImageService {
         return fruitService.updateProfile(targetId, profileImage);
       }
       case CHARACTER -> {
-        //        return characterService.updateProfile(targetId, profileImage);
-        return "";
+        return characterService.updateProfile(targetId, profileImage);
       }
     }
     throw new RuntimeException("file upload with id failed");

@@ -124,10 +124,8 @@ ALTER TABLE `group` ADD CONSTRAINT `fk_group__modification_record_id`
 CREATE TABLE `character`(
     `id` BINARY(16) NOT NULL,
     `user_id` BINARY(16) COMMENT 'Creator id',
-    `role_id` BINARY(16) COMMENT 'Creator role id',
     # basic information
     `name` VARCHAR(30) NOT NULL,
-    `character_types` TEXT,
     `profile_image` MEDIUMBLOB,
     `maximum_fruit_count` TINYINT NOT NULL,
     `age` INT,
@@ -144,6 +142,7 @@ CREATE TABLE `character`(
     `blood` INT NOT NULL,
     `energy` INT NOT NULL,
     `group_gain` DOUBLE NOT NULL,
+    `system_resource` BOOLEAN NOT NULL,
     # action lineage
     `creation_record_id` BIGINT NOT NULL,
     `modification_record_id` BIGINT NOT NULL
@@ -158,6 +157,23 @@ ALTER TABLE `character` ADD CONSTRAINT `fk_character__creation_record_id`
 ALTER TABLE `character` ADD CONSTRAINT `fk_character__modification_record_id`
   FOREIGN KEY(`modification_record_id`) REFERENCES `action_lineage`(`id`);
 
+CREATE TABLE `character_type`(
+    `id` BINARY(16) NOT NULL,
+    `character_id` BINARY(16) NOT NULL,
+    `character_type` VARCHAR(255) NOT NULL
+);
+ALTER TABLE `character_type` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `character_type` ADD CONSTRAINT `fk_character_type__character_id`
+    FOREIGN KEY(`character_id`) REFERENCES `character`(`id`);
+
+CREATE TABLE `haki`(
+     `id` BINARY(16) NOT NULL,
+     `character_id` BINARY(16) NOT NULL,
+     `haki` VARCHAR(255) NOT NULL
+);
+ALTER TABLE `haki` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `haki` ADD CONSTRAINT `fk_haki__character_id`
+    FOREIGN KEY(`character_id`) REFERENCES `character`(`id`);
 
 -- fruit
 CREATE TABLE `fruit`(
@@ -173,6 +189,7 @@ CREATE TABLE `fruit`(
     `intelligence_strengthen` INT NOT NULL,
     `blood_strengthen` INT NOT NULL,
     `profile_image` MEDIUMBLOB,
+    `system_resource` BOOLEAN NOT NULL,
     `creation_record_id` BIGINT NOT NULL,
     `modification_record_id` BIGINT NOT NULL,
     `speed_strengthen` INT NOT NULL
@@ -351,7 +368,8 @@ SELECT
     `creation_record`.action_timestamp as creation_timestamp,
     `modification_record`.action_timestamp as modification_timestamp,
     `creation_record`.user_name as creator,
-    `creation_record`.role_name
+    `creation_record`.role_name,
+    `creation_record`.role_id
 FROM `character`
 JOIN `action_lineage` as creation_record on creation_record.id = `character`.creation_record_id
 JOIN `action_lineage` as modification_record on modification_record.id = `character`.modification_record_id;

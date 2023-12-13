@@ -8,11 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import javax.swing.text.html.Option;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.ResultMap;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 @Dao
 @Mapper
@@ -32,7 +28,7 @@ public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
 
   @ResultMap("characterFullView")
   @Select("select * from `character` where id = #{id}")
-  Optional<CharacterFullView> getFullViewById(@Param("id")UUID id);
+  Optional<CharacterFullView> getFullViewById(@Param("id") UUID id);
 
   @Select(
       "select * from `character` as c inner join `character_to_fruit` as cf on c.id ="

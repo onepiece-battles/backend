@@ -42,7 +42,7 @@
     <!-- Construct where clause -->
     <sql id="fruitFilter">
         <if test="fruitFilter.onlySystem != null">
-            AND `is_system_resource` = #{fruitFilter.onlySystem}
+            AND `system_resource` = #{fruitFilter.onlySystem}
         </if>
         <if test="fruitFilter.name != null and fruitFilter.name != ''">
             <bind name="keyLike" value="'%' + fruitFilter.name + '%'"/>
