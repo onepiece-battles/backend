@@ -131,8 +131,6 @@ public class CharacterService {
 
   public CharacterFullView getCharacterFullView(UUID characterId) {
     var characterFullView = characterDao.getFullViewById(characterId).orElseThrow();
-    characterFullView = characterFullView.toBuilder().setProfileImage(null).build();
-    logger.info("fruits entity: {}", characterFullView);
     return CharacterEntityConverter.INSTANCE.toCharacterFullView(characterFullView);
   }
 
