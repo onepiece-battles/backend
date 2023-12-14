@@ -26,8 +26,7 @@ public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
       // current user.
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
 
-  @ResultMap("characterFullView")
-  @Select("select * from `character` where id = #{id}")
+  // see sql definition in characterDao.xml
   Optional<CharacterFullView> getFullViewById(@Param("id") UUID id);
 
   @Select(

@@ -52,6 +52,7 @@ public class CharacterController implements CharacterApi {
         characterService.getCharacterFullView(getCharacterFullViewRequest.getCharacterId());
     watch.stop();
     logger.info("get character takes: {}", watch.getTotalTimeSeconds());
+    logger.info("character fruits:{}", characterFullView.getFruits());
     return ResponseEntity.ok(characterFullView);
   }
 

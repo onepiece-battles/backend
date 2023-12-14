@@ -22,8 +22,6 @@ public interface CharacterEntityConverter {
   com.yichi.onepiece.model.CharacterListView toCharacterListView(
       CharacterListView characterListView);
 
-  @Mapping(target = "roleName", source = "creationRecord.roleName")
-  @Mapping(target = "creator", source = "creationRecord.userName")
   com.yichi.onepiece.model.CharacterFullView toCharacterFullView(
       CharacterFullView characterFullView);
 
