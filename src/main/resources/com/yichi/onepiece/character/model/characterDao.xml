@@ -35,6 +35,24 @@
         LIMIT #{offset}, #{size}
     </select>
 
+    <select id="getFullViewById" resultType="com.yichi.onepiece.character.model.CharacterFullView" resultMap="characterFullView">
+        SELECT
+            `character`.*,
+            `creation_record`.action_timestamp as creation_timestamp,
+            `modification_record`.action_timestamp as modification_timestamp,
+            `creation_record`.user_name as creator,
+            `creation_record`.role_name,
+            `creation_record`.role_id
+        FROM `character`
+                 JOIN `action_lineage` as creation_record on creation_record.id = `character`.creation_record_id
+                 JOIN `action_lineage` as modification_record on modification_record.id = `character`.modification_record_id
+                 LEFT JOIN `character_type` on `character`.`id` = `character_type`.`character_id`
+                 LEFT JOIN `haki` on `character`.id = haki.character_id
+                 LEFT JOIN `character_to_fruit` on `character`.id = character_to_fruit.character_id
+        WHERE `character`.id = #{id}
+        GROUP BY `character`.`id`
+    </select>
+
     <select id="searchCount" resultType="int">
         select count(distinct(`character`.id))
         FROM `character`
@@ -98,16 +116,7 @@
         </choose>
     </sql>
     
-    <resultMap id="characterFullView" type="com.yichi.onepiece.character.model.CharacterFullView" autoMapping="true">
-        <association column="id" property="id"
-        />
-        <association column="name" property="name"/>
-        <association column="creation_record_id" property="creationRecord"
-          select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
-        />
-        <association column="modification_record_id" property="modificationRecord"
-          select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
-        />
+    <resultMap id="characterFullView" type="com.yichi.onepiece.character.model.CharacterFullView" autoMapping="true" extends="characterListView">
         <association column="id" property="battles"
           select="com.yichi.onepiece.battle.model.BattleDao.listBattlesByCharacterId"
         />
