@@ -38,4 +38,6 @@ public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
       @Param("characterFilter") CharacterFilter characterFilter,
       @Param("userId") UUID userId,
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
+
+  List<CharacterListView> listCharactersByGroupId(@Param("groupId") UUID groupId);
 }
