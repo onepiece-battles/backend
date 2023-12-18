@@ -11,8 +11,10 @@ public interface GroupEntity {
     UUID getUserId();
     UUID getRoleId();
     String getName();
+    String getCategory();
     @Nullable
     Byte[] getProfileImage();
     Long getCreationRecordId();
     Long getModificationRecordId();
+    Boolean getSystemResource();
 }
