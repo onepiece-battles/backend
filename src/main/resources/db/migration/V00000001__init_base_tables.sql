@@ -105,10 +105,12 @@ CREATE TABLE `group` (
     `user_id` BINARY(16) NOT NULL,
     `role_id` BINARY(16) NOT NULL,
     `name` VARCHAR(100) NOT NULL,
+    `category` VARCHAR(100) NOT NULL,
     `profile_image` MEDIUMBLOB,
     # action lineage
     `creation_record_id` BIGINT NOT NULL,
-    `modification_record_id` BIGINT NOT NULL
+    `modification_record_id` BIGINT NOT NULL,
+    `system_resource` BOOLEAN NOT NULL
 );
 ALTER TABLE `group` ADD CONSTRAINT PRIMARY KEY(`id`);
 ALTER TABLE `group` ADD CONSTRAINT `fk_group__user_id`
@@ -207,6 +209,7 @@ CREATE TABLE `character_to_group` (
     `id` BINARY(16),
     `character_id` BINARY(16) NOT NULL,
     `group_id` BINARY(16) NOT NULL,
+    `position` VARCHAR(100),
     `once_belonged_to` TINYINT NOT NULL
 );
 ALTER TABLE `character_to_group` ADD CONSTRAINT PRIMARY KEY(`id`);

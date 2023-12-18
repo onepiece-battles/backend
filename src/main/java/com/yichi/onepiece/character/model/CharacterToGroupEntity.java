@@ -9,5 +9,6 @@ public interface CharacterToGroupEntity {
     UUID getId();
     UUID getCharacterId();
     UUID getGroupId();
+    String getPosition();
     Boolean getOnceBelongedTo();
 }

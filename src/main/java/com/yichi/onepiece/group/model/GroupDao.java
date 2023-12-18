@@ -12,9 +12,9 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface GroupDao extends BaseDao<GroupEntity, UUID> {
   @Select(
-      "select * "
+      "select `group`.*, `character_to_group`.`once_belonged_to`, `character_to_group`.`position` "
       + "from `group` "
-      + "join `character_to_group` on `group`.id = `character_to_group`.`group_id` "
+      + "left join `character_to_group` on `group`.id = `character_to_group`.`group_id` "
       + "where `character_to_group`.`character_id` = #{characterId}")
-  List<GroupEntity> listGroupsByCharacterId(@Param("characterId") UUID characterId);
+  List<CharacterInGroupView> listGroupsByCharacterId(@Param("characterId") UUID characterId);
 }

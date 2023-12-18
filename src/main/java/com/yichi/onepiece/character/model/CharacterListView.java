@@ -12,6 +12,9 @@ public interface CharacterListView extends CharacterEntity {
 
   Long getModificationTimestamp();
 
+  String getGroupName();
+  String getGroupPosition();
+
   UserRole getRoleName();
 
   String getCreator();
