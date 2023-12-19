@@ -5,10 +5,14 @@ import com.yichi.onepiece.model.UserRole;
 import java.util.List;
 
 @Entity
-public interface GroupListView {
+public interface GroupListView extends GroupEntity {
   Long getCreationTimestamp();
+
   Long getModificationTimestamp();
+
   UserRole getRoleName();
+
   List<CharacterInGroupLite> getCharacters();
+
   String getCreator();
 }

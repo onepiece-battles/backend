@@ -22,7 +22,7 @@
     </select>
 
     <select id="searchCount" resultType="int">
-        SELECT COUNT(*) FROM battle
+        SELECT COUNT(*) FROM view_battle_list_view
         WHERE ( user_id = #{userId}
         <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
             OR
