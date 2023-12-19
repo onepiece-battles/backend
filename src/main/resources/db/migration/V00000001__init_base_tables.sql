@@ -289,7 +289,7 @@ ALTER TABLE `battle_status_detail` ADD CONSTRAINT `fk_battle_status_detail__batt
 
 -- issue
 CREATE TABLE `issue`(
-    `id` BIGINT NOT NULL,
+    `id` binary(16) NOT NULL,
     `creation_user_id` BINARY(16) NOT NULL,
     `issue_type` VARCHAR(255) NOT NULL,
     `issue_header` VARCHAR(255) NOT NULL,
@@ -355,18 +355,22 @@ JOIN `action_lineage` as modification_record on modification_record.id = battle.
 -- character_list_view
 CREATE VIEW `view_character_list_view`
 AS
-SELECT
-    `character`.*,
+SELECT `character`.*,
     `creation_record`.action_timestamp as creation_timestamp,
     `modification_record`.action_timestamp as modification_timestamp,
     `creation_record`.user_name as creator,
     `creation_record`.role_name,
-    `creation_record`.role_id
+    `creation_record`.role_id,
+    `ctg`.`position` as group_position,
+    `group`.name as group_name
 FROM `character`
 JOIN `action_lineage` as creation_record on creation_record.id = `character`.creation_record_id
 JOIN `action_lineage` as modification_record on modification_record.id = `character`.modification_record_id
 LEFT JOIN `character_type` on `character`.`id` = `character_type`.`character_id`
-LEFT JOIN `haki` on `character`.id = haki.character_id;
+LEFT JOIN `haki` on `character`.id = haki.character_id
+LEFT JOIN `character_to_fruit` on `character`.id = character_to_fruit.character_id
+LEFT JOIN `character_to_group` as ctg on (`character`.id = `ctg`.`character_id` AND `ctg`.`once_belonged_to` = FALSE)
+LEFT JOIN `group` on `ctg`.group_id = `group`.id;
 
 -- fruit_list_view
 CREATE VIEW `view_fruit_list_view`
@@ -380,3 +384,15 @@ SELECT
 FROM `fruit`
 JOIN `action_lineage` as creation_record on creation_record.id = `fruit`.creation_record_id
 JOIN `action_lineage` as modification_record on modification_record.id = `fruit`.modification_record_id;
+
+-- group_list_view
+CREATE VIEW `view_group_list_view`
+AS
+SELECT `group`.*,
+       `creation_record`.action_timestamp as creation_timestamp,
+       `modification_record`.action_timestamp as modification_timestamp,
+       `creation_record`.user_name as creator,
+       `creation_record`.role_name
+FROM `group`
+JOIN `action_lineage` as creation_record on creation_record.id = `group`.creation_record_id
+JOIN `action_lineage` as modification_record on modification_record.id = `group`.modification_record_id;
