@@ -4,6 +4,7 @@ import com.yichi.onepiece.battle.model.BattleProcessDetailEntity;
 import com.yichi.onepiece.battle.model.BattleProcessDetailEntityBuilder;
 import com.yichi.onepiece.battle.model.BattleStatusDetailEntity;
 import com.yichi.onepiece.battle.model.BattleStatusDetailEntityBuilder;
+import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.utils.RandomGenerator;
 import java.util.*;
 import org.slf4j.Logger;
@@ -150,7 +151,7 @@ public class Battlefield {
         BattleStatusDetailEntityBuilder.newBuilder()
             .setBattleId(battleId)
             .setBattleStatusRoundNumber(battleStatusCount)
-            .setAttackSide("battle finished")
+            .setAttackSide(new I18nText())
             .setAttacker(characterInit.getCurrentCharacterEntity())
             .setDefender(characterReceive.getCurrentCharacterEntity())
             .build();
@@ -240,7 +241,7 @@ public class Battlefield {
   }
 
   private void reverseBattlefield(UUID characterId) {
-    String name = idToCharacterMap.get(characterId).getName();
+    String name = idToCharacterMap.get(characterId).getName().toString();
     logger.info("{} is reversed, reverse battle field", name);
     logger.info("recalculate hide index...");
     calculateHideIndex();

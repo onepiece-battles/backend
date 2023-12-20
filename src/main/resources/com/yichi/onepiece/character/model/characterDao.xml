@@ -50,8 +50,7 @@
     <!-- Construct where clause -->
     <sql id="characterFilter">
         <if test="characterFilter.name != null and characterFilter.name != ''">
-            <bind name="keyLike" value="'%' + characterFilter.name + '%'"/>
-            AND `name` like #{keyLike}
+            AND JSON_CONTAINS(name, #{characterFilter.name}, '${characterFilter.languageCode}')
         </if>
         <if test="characterFilter.hasFruit != null">
             AND (`fruit_id` IS NOT NULL) = #{characterFilter.hasFruit}

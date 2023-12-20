@@ -104,7 +104,7 @@ CREATE TABLE `group` (
     `id` BINARY(16) NOT NULL,
     `user_id` BINARY(16) NOT NULL,
     `role_id` BINARY(16) NOT NULL,
-    `name` VARCHAR(100) NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
     `category` VARCHAR(100) NOT NULL,
     `profile_image` MEDIUMBLOB,
     # action lineage
@@ -127,7 +127,7 @@ CREATE TABLE `character`(
     `id` BINARY(16) NOT NULL,
     `user_id` BINARY(16) COMMENT 'Creator id',
     # basic information
-    `name` VARCHAR(30) NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
     `profile_image` MEDIUMBLOB,
     `maximum_fruit_count` TINYINT NOT NULL,
     `age` INT,

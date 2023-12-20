@@ -5,6 +5,7 @@ import com.yichi.onepiece.battle.model.CurrentCharacterEntityImpl;
 import com.yichi.onepiece.character.model.CharacterEntity;
 import com.yichi.onepiece.fruit.model.FruitEntity;
 import com.yichi.onepiece.fruit.model.FruitListView;
+import com.yichi.onepiece.model.I18nText;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -15,7 +16,7 @@ public class CharacterInBattle {
   private static final int INIT_ENERGY_PERCENTAGE = 100;
   private static final int MINIMUM_FRUIT_ENERGY = 15;
   private final UUID characterId;
-  private final String name;
+  private final I18nText name;
   private int intelligence;
   private int magicConsume;
   private boolean defeated;
@@ -91,7 +92,7 @@ public class CharacterInBattle {
     return currentCharacterEntity.getSpeed();
   }
 
-  public String getName() {
+  public I18nText getName() {
     return name;
   }
 
