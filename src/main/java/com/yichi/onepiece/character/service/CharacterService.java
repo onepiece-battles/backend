@@ -1,7 +1,14 @@
 package com.yichi.onepiece.character.service;
 
-import com.yichi.onepiece.character.model.*;
 import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
+import com.yichi.onepiece.character.model.dao.CharacterDao;
+import com.yichi.onepiece.character.model.dao.CharacterToFruitDao;
+import com.yichi.onepiece.character.model.dao.CharacterTypeDao;
+import com.yichi.onepiece.character.model.dao.HakiDao;
+import com.yichi.onepiece.character.model.entity.CharacterEntity;
+import com.yichi.onepiece.character.model.entity.CharacterToFruitEntityBuilder;
+import com.yichi.onepiece.character.model.entity.CharacterTypeEntityBuilder;
+import com.yichi.onepiece.character.model.entity.HakiEntityBuilder;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
@@ -164,9 +171,10 @@ public class CharacterService {
   }
 
   public ListCharacterResponse listCharacters(ListCharacterRequest request) {
+    logger.info("character filter: {}", request.getCharacterFilter());
     var userId = UserHelper.getCurrentUserId();
     var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
-    var totalSize = characterDao.searchCount(request.getCharacterFilter(), userId, resourceIds);
+    var totalSize = characterDao.count(request.getCharacterFilter(), userId, resourceIds);
     logger.info("count is {}", totalSize);
     // pageIndex is 1- based. offset is 0- based.
     var offset = (request.getPageIndex() - 1) * request.getPageSize();

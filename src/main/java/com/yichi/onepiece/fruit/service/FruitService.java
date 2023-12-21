@@ -1,7 +1,7 @@
 package com.yichi.onepiece.fruit.service;
 
 import com.yichi.onepiece.character.helper.CharacterHelper;
-import com.yichi.onepiece.character.model.CharacterEntity;
+import com.yichi.onepiece.character.model.entity.CharacterEntity;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruit.model.FruitDao;
 import com.yichi.onepiece.fruit.model.FruitEntity;

@@ -42,7 +42,8 @@
 
   <sql id="groupFilter">
     <if test="groupFilter.name != null and groupFilter.name != ''">
-      AND JSON_CONTAINS(name, #{groupFilter.name}, '${groupFilter.languageCode}')
+      <bind name="keyLike" value="'%' + groupFilter.name + '%'" />
+      AND JSON_EXTRACT(name, CONCAT('$.', #{groupFilter.languageCode})) LIKE #{keyLike}
     </if>
     <if test="groupFilter.category != null and groupFilter.category != ''">
       AND JSON_CONTAINS(category, #{groupFilter.category}, '${groupFilter.languageCode}')
@@ -73,7 +74,7 @@
 
   <resultMap id="groupListView" type="com.yichi.onepiece.group.model.GroupListView">
     <association column="id" property="characters"
-      select="com.yichi.onepiece.character.model.CharacterToGroupDao.listCharacterInGroupLiteByGroupId"
+      select="com.yichi.onepiece.character.model.dao.CharacterToGroupDao.listCharacterInGroupLiteByGroupId"
     />
   </resultMap>
 

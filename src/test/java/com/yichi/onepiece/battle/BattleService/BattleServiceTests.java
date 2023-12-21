@@ -4,8 +4,8 @@ import static org.mockito.Mockito.when;
 
 import com.yichi.onepiece.battle.model.*;
 import com.yichi.onepiece.battle.service.BattleService;
-import com.yichi.onepiece.character.model.CharacterEntity;
 import com.yichi.onepiece.character.model.CharacterEntityBuilder;
+import com.yichi.onepiece.character.model.entity.CharacterEntity;
 import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.fruit.model.FruitEntity;
 import com.yichi.onepiece.fruit.model.FruitEntityBuilder;

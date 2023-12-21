@@ -45,7 +45,8 @@
             AND `system_resource` = #{fruitFilter.onlySystem}
         </if>
         <if test="fruitFilter.name != null and fruitFilter.name != ''">
-            AND JSON_CONTAINS(name, #{characterFilter.name}, '${characterFilter.languageCode}')
+            <bind name="keyLike" value="'%' + fruitFilter.name + '%'" />
+            AND JSON_EXTRACT(name, CONCAT('$.', #{fruitFilter.languageCode})) LIKE #{keyLike}
         </if>
         <if test="fruitFilter.types != null and !fruitFilter.types.isEmpty">
             AND `fruit_type` IN

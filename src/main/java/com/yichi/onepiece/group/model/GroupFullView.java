@@ -1,7 +1,7 @@
 package com.yichi.onepiece.group.model;
 
 import com.yichi.infra.support.entity.Entity;
-import com.yichi.onepiece.character.model.CharacterInGroupView;
+import com.yichi.onepiece.character.model.entity.CharacterInGroupView;
 import java.util.List;
 
 @Entity

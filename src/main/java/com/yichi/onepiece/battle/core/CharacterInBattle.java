@@ -2,7 +2,7 @@ package com.yichi.onepiece.battle.core;
 
 import com.yichi.onepiece.battle.model.CurrentCharacterEntityBuilder;
 import com.yichi.onepiece.battle.model.CurrentCharacterEntityImpl;
-import com.yichi.onepiece.character.model.CharacterEntity;
+import com.yichi.onepiece.character.model.entity.CharacterEntity;
 import com.yichi.onepiece.fruit.model.FruitEntity;
 import com.yichi.onepiece.fruit.model.FruitListView;
 import com.yichi.onepiece.model.I18nText;

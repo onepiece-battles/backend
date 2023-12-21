@@ -1,11 +1,9 @@
 package com.yichi.onepiece.character.helper;
 
-import com.yichi.onepiece.character.model.CharacterDao;
-import com.yichi.onepiece.character.model.CharacterEntity;
-import com.yichi.onepiece.character.model.CharacterToFruitDao;
+import com.yichi.onepiece.character.model.dao.CharacterDao;
+import com.yichi.onepiece.character.model.entity.CharacterEntity;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 @Component

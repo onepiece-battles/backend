@@ -1,7 +1,8 @@
-package com.yichi.onepiece.character.model;
+package com.yichi.onepiece.character.model.dao;
 
 import com.yichi.infra.support.mybatis.annotations.Dao;
 import com.yichi.infra.support.mybatis.dao.BaseDao;
+import com.yichi.onepiece.character.model.entity.CharacterTypeEntity;
 import com.yichi.onepiece.model.CharacterType;
 import java.util.List;
 import java.util.UUID;
