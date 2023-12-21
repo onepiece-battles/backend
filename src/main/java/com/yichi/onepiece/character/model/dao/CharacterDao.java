@@ -1,7 +1,10 @@
-package com.yichi.onepiece.character.model;
+package com.yichi.onepiece.character.model.dao;
 
 import com.yichi.infra.support.mybatis.annotations.Dao;
 import com.yichi.infra.support.mybatis.dao.BaseDao;
+import com.yichi.onepiece.character.model.entity.CharacterEntity;
+import com.yichi.onepiece.character.model.entity.CharacterFullView;
+import com.yichi.onepiece.character.model.entity.CharacterListView;
 import com.yichi.onepiece.model.CharacterFilter;
 import com.yichi.onepiece.model.CharacterSortableField;
 import java.util.Collection;
@@ -13,7 +16,7 @@ import org.apache.ibatis.annotations.*;
 @Dao
 @Mapper
 public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
-  String FIND_BY_ID = "com.yichi.onepiece.character.model.CharacterDao.findById";
+  String FIND_BY_ID = "com.yichi.onepiece.character.model.dao.CharacterDao.findById";
 
   // see sql definition in characterDao.xml
   List<CharacterListView> list(

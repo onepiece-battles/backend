@@ -74,10 +74,10 @@
 
     <resultMap id="battleFullView" type="com.yichi.onepiece.battle.model.BattleFullView">
         <association column="starter_id" property="starter"
-          select="com.yichi.onepiece.character.model.CharacterDao.findById"
+          select="com.yichi.onepiece.character.model.dao.CharacterDao.findById"
         />
         <association column="receiver_id" property="receiver"
-          select="com.yichi.onepiece.character.model.CharacterDao.findById"
+          select="com.yichi.onepiece.character.model.dao.CharacterDao.findById"
         />
         <association column="creation_record_id" property="creationRecord"
                      select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"

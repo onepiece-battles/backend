@@ -73,7 +73,7 @@
 
   <resultMap id="groupListView" type="com.yichi.onepiece.group.model.GroupListView">
     <association column="id" property="characters"
-      select="com.yichi.onepiece.character.model.CharacterToGroupDao.listCharacterInGroupLiteByGroupId"
+      select="com.yichi.onepiece.character.model.dao.CharacterToGroupDao.listCharacterInGroupLiteByGroupId"
     />
   </resultMap>
 

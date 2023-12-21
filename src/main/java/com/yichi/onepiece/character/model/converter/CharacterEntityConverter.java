@@ -1,9 +1,9 @@
 package com.yichi.onepiece.character.model.converter;
 
 import com.yichi.infra.support.EntityBuilder;
-import com.yichi.onepiece.character.model.CharacterEntity;
-import com.yichi.onepiece.character.model.CharacterFullView;
-import com.yichi.onepiece.character.model.CharacterListView;
+import com.yichi.onepiece.character.model.entity.CharacterEntity;
+import com.yichi.onepiece.character.model.entity.CharacterFullView;
+import com.yichi.onepiece.character.model.entity.CharacterListView;
 import com.yichi.onepiece.fruit.model.converter.FruitConverter;
 import com.yichi.onepiece.model.Character;
 import com.yichi.onepiece.model.CreateCharacterRequest;

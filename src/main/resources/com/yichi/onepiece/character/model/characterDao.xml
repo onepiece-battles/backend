@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yichi.onepiece.character.model.CharacterDao">
-    <select id="list" resultType="com.yichi.onepiece.character.model.CharacterListView" resultMap="characterListView">
+<mapper namespace="com.yichi.onepiece.character.model.dao.CharacterDao">
+    <select id="list" resultType="com.yichi.onepiece.character.model.entity.CharacterListView" resultMap="characterListView">
         SELECT * FROM `view_character_list_view`
         WHERE
         ( `view_character_list_view`.user_id = #{userId}
@@ -23,7 +23,7 @@
         LIMIT #{offset}, #{size}
     </select>
 
-    <select id="getFullViewById" resultType="com.yichi.onepiece.character.model.CharacterFullView" resultMap="characterFullView">
+    <select id="getFullViewById" resultType="com.yichi.onepiece.character.model.entity.CharacterFullView" resultMap="characterFullView">
         SELECT * FROM `view_character_list_view`
         WHERE `view_character_list_view`.id = #{id}
         GROUP BY `view_character_list_view`.`id`
@@ -88,7 +88,7 @@
         </choose>
     </sql>
     
-    <resultMap id="characterFullView" type="com.yichi.onepiece.character.model.CharacterFullView" autoMapping="true" extends="characterListView">
+    <resultMap id="characterFullView" type="com.yichi.onepiece.character.model.entity.CharacterFullView" autoMapping="true" extends="characterListView">
         <association column="id" property="battles"
           select="com.yichi.onepiece.battle.model.BattleDao.listBattlesByCharacterId"
         />
@@ -96,21 +96,21 @@
           select="com.yichi.onepiece.fruit.model.FruitDao.listByCharacterId"
         />
         <association column="id" property="fruitInCharacter"
-          select="com.yichi.onepiece.character.model.CharacterToFruitDao.listByCharacterId"
+          select="com.yichi.onepiece.character.model.dao.CharacterToFruitDao.listByCharacterId"
         />
         <association column="id" property="groups"
           select="com.yichi.onepiece.group.model.GroupDao.listGroupsByCharacterId"
         />
     </resultMap>
 
-    <resultMap id="characterListView" type="com.yichi.onepiece.character.model.CharacterListView" autoMapping="true">
+    <resultMap id="characterListView" type="com.yichi.onepiece.character.model.entity.CharacterListView" autoMapping="true">
         <association column="id" property="id"
         />
         <association column="id" property="characterTypes"
-                     select="com.yichi.onepiece.character.model.CharacterTypeDao.listByCharacterId"
+                     select="com.yichi.onepiece.character.model.dao.CharacterTypeDao.listByCharacterId"
         />
         <association column="id" property="hakis"
-                     select="com.yichi.onepiece.character.model.HakiDao.listByCharacterId"
+                     select="com.yichi.onepiece.character.model.dao.HakiDao.listByCharacterId"
         />
     </resultMap>
 </mapper>

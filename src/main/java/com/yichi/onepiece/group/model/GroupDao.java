@@ -2,7 +2,7 @@ package com.yichi.onepiece.group.model;
 
 import com.yichi.infra.support.mybatis.annotations.Dao;
 import com.yichi.infra.support.mybatis.dao.BaseDao;
-import com.yichi.onepiece.character.model.CharacterInGroupView;
+import com.yichi.onepiece.character.model.entity.CharacterInGroupView;
 import java.util.List;
 import java.util.UUID;
 import org.apache.ibatis.annotations.Mapper;
