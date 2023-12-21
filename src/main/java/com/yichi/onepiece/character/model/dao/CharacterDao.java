@@ -37,7 +37,7 @@ public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
           + " cf.character_id inner join fruit as f on f.id = cf.fruit_id where f.id = #{fruitId}")
   List<CharacterEntity> listByFruitId(@Param("fruitId") UUID fruitId);
 
-  int searchCount(
+  int count(
       @Param("characterFilter") CharacterFilter characterFilter,
       @Param("userId") UUID userId,
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);

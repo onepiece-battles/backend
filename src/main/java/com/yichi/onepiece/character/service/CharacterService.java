@@ -171,9 +171,10 @@ public class CharacterService {
   }
 
   public ListCharacterResponse listCharacters(ListCharacterRequest request) {
+    logger.info("character filter: {}", request.getCharacterFilter());
     var userId = UserHelper.getCurrentUserId();
     var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
-    var totalSize = characterDao.searchCount(request.getCharacterFilter(), userId, resourceIds);
+    var totalSize = characterDao.count(request.getCharacterFilter(), userId, resourceIds);
     logger.info("count is {}", totalSize);
     // pageIndex is 1- based. offset is 0- based.
     var offset = (request.getPageIndex() - 1) * request.getPageSize();

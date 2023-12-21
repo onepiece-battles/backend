@@ -29,8 +29,8 @@
         GROUP BY `view_character_list_view`.`id`
     </select>
 
-    <select id="searchCount" resultType="int">
-        select count(distinct(`view_character_list_view`.id))
+    <select id="count" resultType="int">
+        SELECT COUNT(distinct(`view_character_list_view`.id))
         FROM `view_character_list_view`
         WHERE
         ( user_id = #{userId}
@@ -50,7 +50,8 @@
     <!-- Construct where clause -->
     <sql id="characterFilter">
         <if test="characterFilter.name != null and characterFilter.name != ''">
-            AND JSON_CONTAINS(name, #{characterFilter.name}, '${characterFilter.languageCode}')
+            <bind name="keyLike" value="'%' + characterFilter.name + '%'" />
+            AND JSON_EXTRACT(name, CONCAT('$.', #{characterFilter.languageCode})) LIKE #{keyLike}
         </if>
         <if test="characterFilter.hasFruit != null">
             AND (`fruit_id` IS NOT NULL) = #{characterFilter.hasFruit}
