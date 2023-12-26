@@ -1,17 +1,26 @@
 package com.yichi.onepiece.battle.model;
 
-
 import com.yichi.infra.support.entity.Entity;
+import com.yichi.infra.support.mybatis.annotations.Column;
+import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.UserRole;
 
 @Entity
-public interface BattleListView extends BattleEntity{
+public interface BattleListView extends BattleEntity {
   Long getCreationTimestamp();
+
   Long getModificationTimestamp();
-  String getStarterName();
+
+  @Column(ignoreUpdates = true, json = true)
+  I18nText getStarterName();
+
   Byte[] getStarterImage();
-  String getReceiverName();
+
+  @Column(ignoreUpdates = true, json = true)
+  I18nText getReceiverName();
+
   Byte[] getReceiverImage();
+
   UserRole getRoleName();
 
   String getCreator();
