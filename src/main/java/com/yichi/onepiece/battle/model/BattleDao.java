@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.UUID;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
 
 @Dao
@@ -36,9 +35,5 @@ public interface BattleDao extends BaseDao<BattleEntity, UUID> {
   List<BattleListView> listBattlesByCharacterId(@Param("characterId") UUID characterId);
 
   // result map is defined in battleDao.xml
-  // starter_id is mapped to characterEntity who initiate this battle
-  // receiver_id is mapped to characterEntity who receive this battle
-  @Select("select * from battle where id = #{id}")
-  @ResultMap("battleFullView")
   Optional<BattleFullView> getBattleFullView(@Param("id") UUID id);
 }

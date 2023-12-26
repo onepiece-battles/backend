@@ -49,6 +49,7 @@ public class BattleController implements BattleApi {
     StopWatch watch = new StopWatch();
     watch.start();
     var response = battleService.getBattleFullView(getBattleFullViewRequest);
+    logger.info(response.toString());
     watch.stop();
     logger.info("get battle takes: {}", watch.getTotalTimeSeconds());
     return ResponseEntity.ok(response);
