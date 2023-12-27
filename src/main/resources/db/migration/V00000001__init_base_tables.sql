@@ -361,7 +361,6 @@ SELECT `character`.*,
     `creation_record`.user_name as creator,
     `creation_record`.role_name,
     `creation_record`.role_id,
-    `ctg`.`position` as group_position,
     `group`.name as group_name
 FROM `character`
 JOIN `action_lineage` as creation_record on creation_record.id = `character`.creation_record_id
