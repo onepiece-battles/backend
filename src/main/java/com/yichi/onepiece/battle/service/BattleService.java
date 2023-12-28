@@ -9,6 +9,7 @@ import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.model.BattleFullView;
+import com.yichi.onepiece.model.BattleLite;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
 import java.util.List;
@@ -101,6 +102,11 @@ public class BattleService {
     return BattleConverter.INSTANCE.toBattleFullView(battleFullViewEntity);
   }
 
+  public BattleLite getBattleLite(GetBattleLiteRequest request) {
+    var battleEntity = battleDao.findById(request.getBattleId()).orElseThrow();
+    return BattleConverter.INSTANCE.toBattleLite(battleEntity);
+  }
+
   public ListBattleByIdsResponse batchFindById(ListBattleByIdsRequest request) {
     if (request.getBattleIds().isEmpty()) {
       return new ListBattleByIdsResponse().battles(List.of());
@@ -151,6 +157,13 @@ public class BattleService {
     logger.info("loser information");
     logger.info("loser blood: {}", loser.getBlood());
     return new StartBattleResponse().battleId(battleId).result(new BattleResult());
+  }
+
+  // update pdf file id
+  public void updateFileId(UUID battleId, UUID fileId) {
+    var battleEntity = battleDao.findById(battleId).orElseThrow();
+    battleEntity = battleEntity.toBuilder().setReportFileId(fileId).build();
+    battleDao.update(battleEntity);
   }
 
   public List<BattleStatusDetailEntity> listBattleStatusDetailByBattleId(UUID battleId) {
