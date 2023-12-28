@@ -6,7 +6,9 @@ import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.AddBattleRequest;
 import com.yichi.onepiece.model.Battle;
 import com.yichi.onepiece.model.BattleFullView;
+import com.yichi.onepiece.model.BattleLite;
 import com.yichi.onepiece.model.GetBattleFullViewRequest;
+import com.yichi.onepiece.model.GetBattleLiteRequest;
 import com.yichi.onepiece.model.ListBattleByIdsRequest;
 import com.yichi.onepiece.model.ListBattleByIdsResponse;
 import com.yichi.onepiece.model.ListBattleRequest;
@@ -52,6 +54,13 @@ public class BattleController implements BattleApi {
     watch.stop();
     logger.info("get battle takes: {}", watch.getTotalTimeSeconds());
     return ResponseEntity.ok(response);
+  }
+
+  @Override
+  public ResponseEntity<BattleLite> getBattleLite(
+      GetBattleLiteRequest getBattleLiteRequest) {
+    iamService.checkPermissionOfCurrentAccount(ResourceType.BATTLE, Set.of(Permission.GET));
+    return ResponseEntity.ok(battleService.getBattleLite(getBattleLiteRequest));
   }
 
   @Override

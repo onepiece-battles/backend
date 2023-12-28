@@ -12,6 +12,7 @@ public interface BattleEntity {
   UUID getId();
 
   UUID getUserId();
+  UUID getReportFileId();
 
   UUID getStarterId();
 

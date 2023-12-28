@@ -86,6 +86,8 @@ public class DataExportService {
               .setResourceId(battleId)
               .build();
       fileObjectService.add(fileObjectEntity);
+      // update battle entity
+      battleService.updateFileId(battleId, fileObjectEntity.getId());
       return fileObjectEntity.getId();
     } catch (Exception e) {
       e.printStackTrace();
