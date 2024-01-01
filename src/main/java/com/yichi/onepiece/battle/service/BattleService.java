@@ -116,13 +116,20 @@ public class BattleService {
     return new ListBattleByIdsResponse().battles(battles);
   }
 
+  public void checkBattleStatus(BattleStatus status) {
+    if (BattleStatus.CREATED.equals(status)) {
+      return;
+    }
+    throw new RuntimeException("battle can not go to next process");
+  }
+
   public StartBattleResponse startBattle(UUID battleId) {
     var battle =
         battleDao
             .findById(battleId)
             .orElseThrow(ExceptionUtils.notFound("Battle with id %s not found", battleId));
     // update status
-    var battleStarted = battle.toBuilder().setStatus(BattleStatus.STARTED).build();
+    var battleStarted = battle.toBuilder().setStatus(BattleStatus.IN_PROGRESS).build();
     UUID starterId = battle.getStarterId();
     UUID receiverId = battle.getReceiverId();
     // prepare start character

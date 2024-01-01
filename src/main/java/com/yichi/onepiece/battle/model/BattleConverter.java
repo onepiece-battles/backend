@@ -12,12 +12,13 @@ import org.mapstruct.factory.Mappers;
 public interface BattleConverter {
   BattleConverter INSTANCE = Mappers.getMapper(BattleConverter.class);
 
-
   com.yichi.onepiece.model.BattleListView toBattleListView(BattleListView battleEntity);
+
   Battle toBattle(BattleEntity battleEntity);
 
   com.yichi.onepiece.model.BattleFullView toBattleFullView(BattleFullView battleFullViewEntity);
 
+  @Mapping(target = "battleReportStage", ignore = true)
   @Mapping(target = "battleStatus", source = "status")
   BattleLite toBattleLite(BattleEntity battleEntity);
 }
