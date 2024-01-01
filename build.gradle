@@ -48,6 +48,9 @@ dependencies {
     annotationProcessor "org.onepiece-battles:infra-support:$onepiece_infra_version"
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
+    // quartz
+    implementation 'org.quartz-scheduler:quartz:2.3.2'
+
     // generate pdf
     implementation "com.github.librepdf:openpdf:$open_pdf_version"
 
