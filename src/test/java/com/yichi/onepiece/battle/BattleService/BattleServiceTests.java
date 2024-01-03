@@ -40,7 +40,7 @@ public class BattleServiceTests {
     battleService =
         new BattleService(
             mockBattleDao,
-            mockCharacterService,
+            battleExecutionDao, mockCharacterService,
             mockFruitService,
             actionRecordService,
             battleProcessDetailDao,

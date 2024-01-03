@@ -18,7 +18,5 @@ public interface BattleConverter {
 
   com.yichi.onepiece.model.BattleFullView toBattleFullView(BattleFullView battleFullViewEntity);
 
-  @Mapping(target = "battleReportStage", ignore = true)
-  @Mapping(target = "battleStatus", source = "status")
-  BattleLite toBattleLite(BattleEntity battleEntity);
+  BattleLite toBattleLite(BattleExecutionEntity battleEntity);
 }
