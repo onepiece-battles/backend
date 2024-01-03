@@ -12,7 +12,6 @@ public interface BattleEntity {
   UUID getId();
 
   UUID getUserId();
-  UUID getReportFileId();
 
   UUID getStarterId();
 
@@ -22,11 +21,7 @@ public interface BattleEntity {
 
   Long getModificationRecordId();
 
-  BattleStatus getStatus();
-
   BattleType getType();
-
-  UUID getWinnerId();
 
   BattleEntityBuilder toBuilder();
 }

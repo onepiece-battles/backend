@@ -240,9 +240,7 @@ CREATE TABLE `battle`(
     `receiver_id` BINARY(16) NOT NULL,
     `creation_record_id` BIGINT NOT NULL,
     `modification_record_id` BIGINT NOT NULL,
-    `type` VARCHAR(255) NOT NULL,
-    `status` VARCHAR(255) NOT NULL,
-    `winner_id` BINARY(16)
+    `type` VARCHAR(255) NOT NULL
 );
 ALTER TABLE `battle` ADD CONSTRAINT PRIMARY KEY(`id`);
 ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__starter_id`
@@ -257,6 +255,23 @@ ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__creation_record_id`
   FOREIGN KEY(`creation_record_id`) REFERENCES `action_lineage`(`id`);
 ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__modification_record_id`
   FOREIGN KEY(`modification_record_id`) REFERENCES `action_lineage`(`id`);
+ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__report_file_id`
+    FOREIGN KEY(`report_file_id`) REFERENCES `file_object`(`id`);
+
+# this table will keep updating during battle execution
+CREATE TABLE `battle_execution` (
+    `id` BINARY(16) NOT NULL,
+    `battle_id` BINARY(16) NOT NULL,
+    `report_file_id` BINARY(16),
+    `winner_id` BINARY(16),
+    `battle_status` VARCHAR(255) NOT NULL,
+    `battle_report_stage` VARCHAR(255) NOT NULL,
+    `creation_timestamp` BIGINT NOT NULL,
+    `modification_timestamp` BIGINT NOT NULL
+);
+ALTER TABLE `battle_execution` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `battle_execution` ADD CONSTRAINT `fk_battle_execution__battle_id`
+    FOREIGN KEY(`battle_id`) REFERENCES `battle`(`id`);
 
 -- battle_process_detail
 CREATE TABLE `battle_process_detail`(
@@ -346,9 +361,14 @@ SELECT
    `starter`.name as starter_name,
    `starter`.profile_image as starter_image,
    `receiver`.name as receiver_name,
-   `receiver`.profile_image as receiver_image
+   `receiver`.profile_image as receiver_image,
+   `battle_execution`.battle_status as status,
+   `battle_execution`.winner_id,
+   `battle_execution`.winner_id,
+   `battle_execution`.report_file_id
 FROM `battle` JOIN `character` AS `starter` on battle.starter_id = starter.id
 JOIN `character` AS `receiver` on battle.receiver_id = receiver.id
+JOIN `battle_execution` on battle.id = battle_execution.battle_id
 JOIN `action_lineage` as creation_record on creation_record.id = battle.creation_record_id
 JOIN `action_lineage` as modification_record on modification_record.id = battle.modification_record_id;
 

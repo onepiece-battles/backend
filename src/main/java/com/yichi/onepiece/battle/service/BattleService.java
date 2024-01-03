@@ -23,6 +23,7 @@ public class BattleService {
   private static final ResourceType RESOURCE_TYPE = ResourceType.CHARACTER;
   Logger logger = LoggerFactory.getLogger(BattleService.class);
   private final BattleDao battleDao;
+  private final BattleExecutionDao battleExecutionDao;
   private final CharacterService characterService;
   private final FruitService fruitService;
   private final ActionRecordService actionRecordService;
@@ -32,13 +33,14 @@ public class BattleService {
 
   public BattleService(
       BattleDao battleDao,
-      CharacterService characterService,
+      BattleExecutionDao battleExecutionDao, CharacterService characterService,
       FruitService fruitService,
       ActionRecordService actionRecordService,
       BattleProcessDetailDao battleProcessDetailDao,
       BattleStatusDetailDao battleStatusDetailDao,
       UserService userService) {
     this.battleDao = battleDao;
+    this.battleExecutionDao = battleExecutionDao;
     this.characterService = characterService;
     this.fruitService = fruitService;
     this.actionRecordService = actionRecordService;
@@ -54,13 +56,20 @@ public class BattleService {
             .setUserId(request.getUserId())
             // this service focus on
             .setType(BattleType.SINGLE)
-            .setStatus(BattleStatus.CREATED)
             .setStarterId(request.getStarterId())
             .setReceiverId(request.getReceiverId())
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
             .build();
     battleDao.insert(battleEntity);
+    BattleExecutionEntity battleExecutionEntity = BattleExecutionEntityBuilder.newBuilder()
+        .setBattleId(battleEntity.getId())
+        .setBattleStatus(BattleStatus.CREATED)
+        .setBattleReportStage(BattleReportStage.WAITING)
+        .creationTimestamp(actionRecord.getActionTimestamp())
+        .modificationTimestamp(actionRecord.getActionTimestamp())
+        .build();
+    battleExecutionDao.insert(battleExecutionEntity);
     var insertedEntity =
         battleDao
             .findById(battleEntity.getId())
@@ -103,8 +112,8 @@ public class BattleService {
   }
 
   public BattleLite getBattleLite(GetBattleLiteRequest request) {
-    var battleEntity = battleDao.findById(request.getBattleId()).orElseThrow();
-    return BattleConverter.INSTANCE.toBattleLite(battleEntity);
+    var battleExecutionEntity = battleExecutionDao.findByBattleId(request.getBattleId()).orElseThrow();
+    return BattleConverter.INSTANCE.toBattleLite(battleExecutionEntity);
   }
 
   public ListBattleByIdsResponse batchFindById(ListBattleByIdsRequest request) {
