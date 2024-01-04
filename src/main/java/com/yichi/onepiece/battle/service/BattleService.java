@@ -111,6 +111,14 @@ public class BattleService {
     return BattleConverter.INSTANCE.toBattleFullView(battleFullViewEntity);
   }
 
+  public BattleExecutionEntity getBattleExecutionStatusByBattleId(UUID battleId) {
+    return battleExecutionDao.findByBattleId(battleId).orElseThrow();
+  }
+
+  public void updateBattleExecutionEntity(BattleExecutionEntity battleExecutionEntity) {
+    battleExecutionDao.update(battleExecutionEntity);
+  }
+
   public BattleLite getBattleLite(GetBattleLiteRequest request) {
     var battleExecutionEntity = battleExecutionDao.findByBattleId(request.getBattleId()).orElseThrow();
     return BattleConverter.INSTANCE.toBattleLite(battleExecutionEntity);
