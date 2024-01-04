@@ -24,4 +24,6 @@ public interface BattleExecutionEntity {
   Long getCreationTimestamp();
 
   Long getModificationTimestamp();
+
+  BattleExecutionEntityBuilder toBuilder();
 }
