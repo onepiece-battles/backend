@@ -13,12 +13,12 @@ import org.slf4j.LoggerFactory;
 
 public class CharacterInBattle {
   Logger logger = LoggerFactory.getLogger(CharacterInBattle.class);
-  private static final int INIT_ENERGY_PERCENTAGE = 100;
-  private static final int MINIMUM_FRUIT_ENERGY = 15;
+  private static final int DEFAULT_ENERGY_CONSUME = 2;
+  private int minimumFruitEnergy;
   private final UUID characterId;
   private final I18nText name;
   private int intelligence;
-  private int magicConsume;
+  private int energyConsume = 2;
   private boolean defeated;
   private boolean smarter;
   private boolean reversed;
@@ -41,12 +41,13 @@ public class CharacterInBattle {
   }
 
   private void initWithFruit(CharacterEntity baseEntity) {
+    minimumFruitEnergy = baseEntity.getEnergy()/10;
+    energyConsume = DEFAULT_ENERGY_CONSUME;
     int blood = baseEntity.getBlood();
     int attack = baseEntity.getAttack();
     int defense = baseEntity.getDefense();
     int intelligence = baseEntity.getIntelligence();
     int speed = baseEntity.getSpeed();
-    int energyConsume = 0;
     // add fruit strengthen if this character eats fruits.
     if (!fruitEntities.isEmpty()) {
       energyConsume = fruitEntities.stream().mapToInt(FruitEntity::getEnergyConsume).sum();
@@ -59,14 +60,14 @@ public class CharacterInBattle {
       }
     }
     this.intelligence = intelligence;
-    this.magicConsume = energyConsume;
     this.currentCharacterEntity =
         (CurrentCharacterEntityImpl)
             CurrentCharacterEntityBuilder.newBuilder()
                 .setAttack(attack)
                 .setBlood(blood)
                 .setDefense(defense)
-                .setEnergyPercentage(INIT_ENERGY_PERCENTAGE)
+                .setCurrentEnergy(baseEntity.getEnergy())
+                .setCurrentEnergyConsume(energyConsume)
                 .setSpeed(speed)
                 .build();
   }
@@ -100,8 +101,8 @@ public class CharacterInBattle {
     return smarter;
   }
 
-  public int getMagicConsume() {
-    return magicConsume;
+  public int getEnergyConsume() {
+    return energyConsume;
   }
 
   public void setSmarter(boolean smarter) {
@@ -117,12 +118,12 @@ public class CharacterInBattle {
   }
 
   public AttackEntity attack() {
-    if (currentCharacterEntity.getEnergyPercentage() < MINIMUM_FRUIT_ENERGY && !reversed) {
+    if (currentCharacterEntity.getCurrentEnergy() < minimumFruitEnergy && !reversed) {
       reverseCharacter();
       reversed = true;
       logger.info("run out of magic, reverse {}", name);
     }
-    logger.info("{} attack with power {}", name, currentCharacterEntity.getEnergyPercentage());
+    logger.info("{} attack with power {}", name, currentCharacterEntity.getCurrentEnergy());
     return attackEntity;
   }
 
@@ -154,6 +155,7 @@ public class CharacterInBattle {
     currentCharacterEntity.setAttack(baseEntity.getAttack());
     currentCharacterEntity.setDefense(baseEntity.getDefense());
     currentCharacterEntity.setSpeed(baseEntity.getSpeed());
+    currentCharacterEntity.setCurrentEnergyConsume(DEFAULT_ENERGY_CONSUME);
     this.intelligence = baseEntity.getIntelligence();
     // refresh attackEntity
     attackEntity = attackEntity.toBuilder().setAttack(currentCharacterEntity.getAttack()).build();

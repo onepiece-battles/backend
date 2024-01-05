@@ -181,9 +181,9 @@ public class BattleService {
 
   // update pdf file id
   public void updateFileId(UUID battleId, UUID fileId) {
-    var battleEntity = battleDao.findById(battleId).orElseThrow();
-    battleEntity = battleEntity.toBuilder().setReportFileId(fileId).build();
-    battleDao.update(battleEntity);
+    var battleExecutionEntity = battleExecutionDao.findById(battleId).orElseThrow();
+    battleExecutionEntity = battleExecutionEntity.toBuilder().setReportFileId(fileId).build();
+    battleExecutionDao.update(battleExecutionEntity);
   }
 
   public List<BattleStatusDetailEntity> listBattleStatusDetailByBattleId(UUID battleId) {

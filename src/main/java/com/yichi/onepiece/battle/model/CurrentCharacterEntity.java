@@ -6,7 +6,9 @@ import com.yichi.infra.support.entity.Entity;
 public interface CurrentCharacterEntity {
   Integer getBlood();
 
-  Integer getEnergyPercentage();
+  Integer getCurrentEnergy();
+
+  Integer getCurrentEnergyConsume();
 
   Integer getAttack();
 
