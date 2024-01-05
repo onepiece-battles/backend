@@ -1,6 +1,7 @@
 package com.yichi.onepiece.battle.controller;
 
 import com.yichi.onepiece.api.BattleApi;
+import com.yichi.onepiece.battle.async.BattleExecutionAsyncService;
 import com.yichi.onepiece.battle.service.BattleService;
 import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.AddBattleRequest;
@@ -29,10 +30,13 @@ public class BattleController implements BattleApi {
   Logger logger = LoggerFactory.getLogger(BattleController.class);
 
   private final BattleService battleService;
+  private final BattleExecutionAsyncService battleExecutionAsyncService;
   private final IamService iamService;
 
-  public BattleController(BattleService battleService, IamService iamService) {
+  public BattleController(BattleService battleService,
+      BattleExecutionAsyncService battleExecutionAsyncService, IamService iamService) {
     this.battleService = battleService;
+    this.battleExecutionAsyncService = battleExecutionAsyncService;
     this.iamService = iamService;
   }
 
@@ -89,7 +93,8 @@ public class BattleController implements BattleApi {
   @Override
   public ResponseEntity<StartBattleResponse> startBattle(StartBattleRequest startBattleRequest) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.BATTLE, Set.of(Permission.UPDATE));
-    var battle = battleService.startBattle(startBattleRequest.getBattleId());
-    return ResponseEntity.ok(battle);
+    battleExecutionAsyncService.scheduleAsyncJob(startBattleRequest.getBattleId());
+    // update start battle response api
+    return ResponseEntity.ok(new StartBattleResponse());
   }
 }
