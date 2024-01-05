@@ -140,13 +140,11 @@ public class BattleService {
     throw new RuntimeException("battle can not go to next process");
   }
 
-  public StartBattleResponse startBattle(UUID battleId) {
+  public void startBattle(UUID battleId) {
     var battle =
         battleDao
             .findById(battleId)
             .orElseThrow(ExceptionUtils.notFound("Battle with id %s not found", battleId));
-    // update status
-    var battleStarted = battle.toBuilder().setStatus(BattleStatus.IN_PROGRESS).build();
     UUID starterId = battle.getStarterId();
     UUID receiverId = battle.getReceiverId();
     // prepare start character
@@ -171,8 +169,6 @@ public class BattleService {
     logger.info("Battle finish");
     var winner = battlefield.getWinner();
     var loser = battlefield.getLoser();
-    battleStarted.toBuilder().setWinnerId(winner.getCharacterId());
-    battleDao.update(battleStarted);
     logger.info("Winner is {}", winner.getName());
     logger.info("Loser is {}", loser.getName());
     logger.info("------------------------------------------------");
@@ -180,7 +176,7 @@ public class BattleService {
     logger.info("winner blood: {}", winner.getBlood());
     logger.info("loser information");
     logger.info("loser blood: {}", loser.getBlood());
-    return new StartBattleResponse().battleId(battleId).result(new BattleResult());
+    new StartBattleResponse().battleId(battleId).result(new BattleResult());
   }
 
   // update pdf file id
