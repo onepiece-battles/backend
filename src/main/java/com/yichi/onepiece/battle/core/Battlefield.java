@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 public class Battlefield {
   private static final Logger logger = LoggerFactory.getLogger(Battlefield.class);
+  private static final int DEFAULT_ENERGY_CONSUME = 2;
   private static final int MAXIMUM_INTELLIGENCE = 260;
   private static final int MINIMUM_INTELLIGENCE = 70;
   private static final int MAXIMUM_SPEED = 200;
@@ -189,7 +190,7 @@ public class Battlefield {
         .setBattleId(battleId)
         .setAttackerEnergyLoss(1)
         .setBattleProcessRoundNumber(battleProcessCount)
-        .setAttackerEnergyLoss(attackSide.getMagicConsume())
+        .setAttackerEnergyLoss(attackSide.getEnergyConsume())
         .setAttackSkill("");
 
     var attackEntity = attackSide.attack();
