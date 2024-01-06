@@ -4,20 +4,7 @@ import com.yichi.onepiece.api.BattleApi;
 import com.yichi.onepiece.battle.async.BattleExecutionAsyncService;
 import com.yichi.onepiece.battle.service.BattleService;
 import com.yichi.onepiece.iam.service.IamService;
-import com.yichi.onepiece.model.AddBattleRequest;
-import com.yichi.onepiece.model.Battle;
-import com.yichi.onepiece.model.BattleFullView;
-import com.yichi.onepiece.model.BattleLite;
-import com.yichi.onepiece.model.GetBattleFullViewRequest;
-import com.yichi.onepiece.model.GetBattleLiteRequest;
-import com.yichi.onepiece.model.ListBattleByIdsRequest;
-import com.yichi.onepiece.model.ListBattleByIdsResponse;
-import com.yichi.onepiece.model.ListBattleRequest;
-import com.yichi.onepiece.model.ListBattleResponse;
-import com.yichi.onepiece.model.Permission;
-import com.yichi.onepiece.model.ResourceType;
-import com.yichi.onepiece.model.StartBattleRequest;
-import com.yichi.onepiece.model.StartBattleResponse;
+import com.yichi.onepiece.model.*;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +20,10 @@ public class BattleController implements BattleApi {
   private final BattleExecutionAsyncService battleExecutionAsyncService;
   private final IamService iamService;
 
-  public BattleController(BattleService battleService,
-      BattleExecutionAsyncService battleExecutionAsyncService, IamService iamService) {
+  public BattleController(
+      BattleService battleService,
+      BattleExecutionAsyncService battleExecutionAsyncService,
+      IamService iamService) {
     this.battleService = battleService;
     this.battleExecutionAsyncService = battleExecutionAsyncService;
     this.iamService = iamService;
@@ -61,8 +50,8 @@ public class BattleController implements BattleApi {
   }
 
   @Override
-  public ResponseEntity<BattleLite> getBattleLite(
-      GetBattleLiteRequest getBattleLiteRequest) {
+  public ResponseEntity<BattleExecution> getBattleExecution(
+      GetBattleExecutionRequest getBattleLiteRequest) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.BATTLE, Set.of(Permission.GET));
     return ResponseEntity.ok(battleService.getBattleLite(getBattleLiteRequest));
   }

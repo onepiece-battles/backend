@@ -3,9 +3,8 @@ package com.yichi.onepiece.battle.model;
 import com.yichi.infra.support.EntityBuilder;
 import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
 import com.yichi.onepiece.model.Battle;
-import com.yichi.onepiece.model.BattleLite;
+import com.yichi.onepiece.model.BattleExecution;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(uses = {EntityBuilder.class, CharacterEntityConverter.class})
@@ -18,5 +17,5 @@ public interface BattleConverter {
 
   com.yichi.onepiece.model.BattleFullView toBattleFullView(BattleFullView battleFullViewEntity);
 
-  BattleLite toBattleLite(BattleExecutionEntity battleEntity);
+  BattleExecution toBattleExecution(BattleExecutionEntity battleEntity);
 }
