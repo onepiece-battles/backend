@@ -9,7 +9,6 @@ import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.model.BattleFullView;
-import com.yichi.onepiece.model.BattleLite;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
 import java.util.List;
@@ -33,7 +32,8 @@ public class BattleService {
 
   public BattleService(
       BattleDao battleDao,
-      BattleExecutionDao battleExecutionDao, CharacterService characterService,
+      BattleExecutionDao battleExecutionDao,
+      CharacterService characterService,
       FruitService fruitService,
       ActionRecordService actionRecordService,
       BattleProcessDetailDao battleProcessDetailDao,
@@ -62,13 +62,14 @@ public class BattleService {
             .setModificationRecordId(actionRecord.getId())
             .build();
     battleDao.insert(battleEntity);
-    BattleExecutionEntity battleExecutionEntity = BattleExecutionEntityBuilder.newBuilder()
-        .setBattleId(battleEntity.getId())
-        .setBattleStatus(BattleStatus.CREATED)
-        .setBattleReportStage(BattleReportStage.WAITING)
-        .creationTimestamp(actionRecord.getActionTimestamp())
-        .modificationTimestamp(actionRecord.getActionTimestamp())
-        .build();
+    BattleExecutionEntity battleExecutionEntity =
+        BattleExecutionEntityBuilder.newBuilder()
+            .setBattleId(battleEntity.getId())
+            .setBattleStatus(BattleStatus.CREATED)
+            .setBattleReportStage(BattleReportStage.WAITING)
+            .creationTimestamp(actionRecord.getActionTimestamp())
+            .modificationTimestamp(actionRecord.getActionTimestamp())
+            .build();
     battleExecutionDao.insert(battleExecutionEntity);
     var insertedEntity =
         battleDao
@@ -119,9 +120,10 @@ public class BattleService {
     battleExecutionDao.update(battleExecutionEntity);
   }
 
-  public BattleLite getBattleLite(GetBattleLiteRequest request) {
-    var battleExecutionEntity = battleExecutionDao.findByBattleId(request.getBattleId()).orElseThrow();
-    return BattleConverter.INSTANCE.toBattleLite(battleExecutionEntity);
+  public BattleExecution getBattleLite(GetBattleExecutionRequest request) {
+    var battleExecutionEntity =
+        battleExecutionDao.findByBattleId(request.getBattleId()).orElseThrow();
+    return BattleConverter.INSTANCE.toBattleExecution(battleExecutionEntity);
   }
 
   public ListBattleByIdsResponse batchFindById(ListBattleByIdsRequest request) {

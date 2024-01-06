@@ -11,6 +11,8 @@ public interface BattleFullView extends BattleEntity {
 
   CharacterEntity getReceiver();
 
+  BattleExecutionEntity getBattleExecution();
+
   List<BattleProcessDetailEntity> getBattleProcessDetails();
 
   List<BattleStatusDetailEntity> getBattleStatusDetails();

@@ -255,8 +255,6 @@ ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__creation_record_id`
   FOREIGN KEY(`creation_record_id`) REFERENCES `action_lineage`(`id`);
 ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__modification_record_id`
   FOREIGN KEY(`modification_record_id`) REFERENCES `action_lineage`(`id`);
-ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__report_file_id`
-    FOREIGN KEY(`report_file_id`) REFERENCES `file_object`(`id`);
 
 # this table will keep updating during battle execution
 CREATE TABLE `battle_execution` (
@@ -272,6 +270,8 @@ CREATE TABLE `battle_execution` (
 ALTER TABLE `battle_execution` ADD CONSTRAINT PRIMARY KEY(`id`);
 ALTER TABLE `battle_execution` ADD CONSTRAINT `fk_battle_execution__battle_id`
     FOREIGN KEY(`battle_id`) REFERENCES `battle`(`id`);
+ALTER TABLE `battle_execution` ADD CONSTRAINT `fk_battle_execution__report_file_id`
+    FOREIGN KEY(`report_file_id`) REFERENCES `file_object`(`id`);
 
 -- battle_process_detail
 CREATE TABLE `battle_process_detail`(
@@ -363,9 +363,8 @@ SELECT
    `receiver`.name as receiver_name,
    `receiver`.profile_image as receiver_image,
    `battle_execution`.battle_status as status,
-   `battle_execution`.winner_id,
-   `battle_execution`.winner_id,
-   `battle_execution`.report_file_id
+   `battle_execution`.battle_report_stage as report_stage,
+   `battle_execution`.winner_id
 FROM `battle` JOIN `character` AS `starter` on battle.starter_id = starter.id
 JOIN `character` AS `receiver` on battle.receiver_id = receiver.id
 JOIN `battle_execution` on battle.id = battle_execution.battle_id
