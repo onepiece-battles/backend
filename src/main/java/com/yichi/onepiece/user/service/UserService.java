@@ -8,6 +8,7 @@ import com.yichi.onepiece.constants.ConstantsContainer;
 import com.yichi.onepiece.email.EmailClient;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.iam.model.*;
+import com.yichi.onepiece.iam.service.RoleService;
 import com.yichi.onepiece.image.service.ImageUtil;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
@@ -44,6 +45,7 @@ public class UserService {
   private final UserResourceDao userResourceDao;
   private final ActionRecordService actionRecordService;
   private final EmailClient emailClient;
+  private final RoleService roleService;
 
   private final EmailVerificationDao emailVerificationDao;
   private final Clock clock;
@@ -60,7 +62,7 @@ public class UserService {
       UserResourceDao userResourceDao,
       ActionRecordService actionRecordService,
       EmailClient emailClient,
-      EmailVerificationDao emailVerificationDao,
+      RoleService roleService, EmailVerificationDao emailVerificationDao,
       Clock clock) {
     this.userDao = userDao;
     this.roleToResourcePermissionDao = roleToResourcePermissionDao;
@@ -73,6 +75,7 @@ public class UserService {
     this.userResourceDao = userResourceDao;
     this.actionRecordService = actionRecordService;
     this.emailClient = emailClient;
+    this.roleService = roleService;
     this.emailVerificationDao = emailVerificationDao;
     this.clock = clock;
   }
@@ -180,7 +183,7 @@ public class UserService {
     tokenDao.insert(tokenEntity);
     user.setAccountStatus(AccountStatus.LOGGED_IN);
     userDao.update(user);
-    var resources = getResourceTypeByRole(user.getLoginRole());
+    var resourcePermissionMaps = getPermissionMapByRoleName(user.getLoginRole());
     var tokens =
         tokenDao.listTokenByUserId(user.getId()).stream().map(TokenEntity::getTokenValue).toList();
     var roleIds = userRoleDao.getByUserId(user.getId());
@@ -195,21 +198,20 @@ public class UserService {
         .user(
             UserConverter.INSTANCE
                 .toUser(user)
-                .loginRoleResources(resources)
+                .loginRoleResourcesPermissionMap(resourcePermissionMaps)
                 .userRoles(roleNames)
                 .tokens(tokens));
   }
 
-  private List<ResourceType> getResourceTypeByRole(UserRole userRole) {
+  private List<ResourcePermissionMap> getPermissionMapByRoleName(UserRole userRole) {
     var roleId = roleDao.findByRoleName(userRole).orElseThrow().getId();
-    var resourcePermissionIds =
-        roleToResourcePermissionDao.listByRoleId(roleId).stream()
-            .map(RoleToResourcePermissionEntity::getResourcePermissionId)
-            .toList();
-    return resourcePermissionDao.batchFindById(resourcePermissionIds).stream()
-        .map(ResourcePermissionEntity::getResourceType)
-        .distinct()
-        .toList();
+  return
+        roleService.getResourcePermissionMapByRoleId(roleId).entrySet().stream().map(entry -> {
+          var resourcePermissionMap = new ResourcePermissionMap();
+          resourcePermissionMap.setResourceType(entry.getKey());
+          resourcePermissionMap.setPermissions(entry.getValue());
+          return resourcePermissionMap;
+        }).toList();
   }
 
   public LogoutResponse logout(UUID userId) {
@@ -283,14 +285,14 @@ public class UserService {
     }
   }
 
-  public List<ResourceType> updateLoginRole(UserRole role) {
+  public List<ResourcePermissionMap> updateLoginRole(UserRole role) {
     var user = UserHelper.getCurrentUserDetail();
     if (!user.getUserRoles().contains(role.toString())) {
       ExceptionUtils.notFound("user role %s not found when shifting role.", role).get();
     }
     user.setLoginRole(role);
     userDao.update(user);
-    return getResourceTypeByRole(role);
+    return getPermissionMapByRoleName(role);
   }
 
   public User getUserById(UUID userId) {
@@ -336,14 +338,14 @@ public class UserService {
             .setName(request.getName())
             .build();
     userDao.update(updatedUser);
-    var loginUserResource = getResourceTypeByRole(user.getLoginRole());
+    var loginUserResource = getPermissionMapByRoleName(user.getLoginRole());
     var tokens =
         tokenDao.listTokenByUserId(user.getId()).stream().map(TokenEntity::getTokenValue).toList();
     var roleIds = userRoleDao.getByUserId(user.getId());
     var roleNames = roleDao.batchFindById(roleIds).stream().map(RoleEntity::getName).toList();
     return UserConverter.INSTANCE
         .toUser(userDao.getById(request.getId()).orElseThrow())
-        .loginRoleResources(loginUserResource)
+        .loginRoleResourcesPermissionMap(loginUserResource)
         .userRoles(roleNames)
         .tokens(tokens);
   }
