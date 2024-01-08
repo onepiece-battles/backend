@@ -143,23 +143,7 @@ public class BattleService {
   }
 
   public void startBattle(UUID battleId) {
-    var battle =
-        battleDao
-            .findById(battleId)
-            .orElseThrow(ExceptionUtils.notFound("Battle with id %s not found", battleId));
-    UUID starterId = battle.getStarterId();
-    UUID receiverId = battle.getReceiverId();
-    // prepare start character
-    var startCharacter = characterService.getCharacterEntityById(starterId);
-    var startFruits = fruitService.listByCharacterId(startCharacter.getId());
-    // prepare receive character
-    var receiveCharacter = characterService.getCharacterEntityById(receiverId);
-    var receiveFruits = fruitService.listByCharacterId(receiveCharacter.getId());
-    // create characterInBattle object and battlefield object
-    var characterInBattleInit = new CharacterInBattle(startCharacter, startFruits);
-    var characterInBattleReceive = new CharacterInBattle(receiveCharacter, receiveFruits);
-    var battlefield = new Battlefield(characterInBattleInit, characterInBattleReceive, battleId);
-
+    var battlefield = createBattleField(battleId);
     while (battlefield.allAlive()) {
       battlefield.checkReverse();
       battlefield.processBattle();
@@ -179,6 +163,25 @@ public class BattleService {
     logger.info("loser information");
     logger.info("loser blood: {}", loser.getBlood());
     new StartBattleResponse().battleId(battleId).result(new BattleResult());
+  }
+
+  Battlefield createBattleField(UUID battleId) {
+    var battle =
+        battleDao
+            .findById(battleId)
+            .orElseThrow(ExceptionUtils.notFound("Battle with id %s not found", battleId));
+    UUID starterId = battle.getStarterId();
+    UUID receiverId = battle.getReceiverId();
+    // prepare start character
+    var startCharacter = characterService.getCharacterEntityById(starterId);
+    var startFruits = fruitService.listByCharacterId(startCharacter.getId());
+    // prepare receive character
+    var receiveCharacter = characterService.getCharacterEntityById(receiverId);
+    var receiveFruits = fruitService.listByCharacterId(receiveCharacter.getId());
+    // create characterInBattle object and battlefield object
+    var characterInBattleInit = new CharacterInBattle(startCharacter, startFruits);
+    var characterInBattleReceive = new CharacterInBattle(receiveCharacter, receiveFruits);
+    return new Battlefield(characterInBattleInit, characterInBattleReceive, battleId);
   }
 
   // update pdf file id

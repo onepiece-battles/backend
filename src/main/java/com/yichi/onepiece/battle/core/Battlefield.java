@@ -203,7 +203,7 @@ public class Battlefield {
           .setDefenderEnergyLoss(defenseResult.get(2));
     } else {
       battleProcessDetailEntityBuilder.setAttackMissed(Boolean.TRUE);
-      logger.info("{} hide SUCCESS, not damage is casted", defense.getName());
+      logger.info("{} hide SUCCESS, no damage is casted", defense.getName());
     }
     battleProcessDetailEntities.add(battleProcessDetailEntityBuilder.build());
     logger.info("---------------------new battle process end-----------------------------");
