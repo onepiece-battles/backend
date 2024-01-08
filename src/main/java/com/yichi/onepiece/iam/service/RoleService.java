@@ -3,6 +3,9 @@ package com.yichi.onepiece.iam.service;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.iam.model.*;
 import com.yichi.onepiece.model.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +32,11 @@ public class RoleService {
 
   public RoleEntity getRoleByName(UserRole roleName) {
     return roleDao.findByRoleName(roleName).orElseThrow();
+  }
+
+  public Map<ResourceType, List<Permission>> getResourcePermissionMapByRoleId(UUID roleId) {
+    var resourcePermissions = resourcePermissionDao.listResourcePermissionsByRoleId(roleId);
+    return resourcePermissions.stream().collect(Collectors.groupingBy(ResourcePermissionEntity::getResourceType, Collectors.mapping(ResourcePermissionEntity::getPermission, Collectors.toList())));
   }
 
   public AssignResourcePermissionsToRoleResponse assignResourceToRole(AssignResourcePermissionsToRoleRequest request) {

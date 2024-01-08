@@ -25,4 +25,8 @@ public interface ResourcePermissionDao extends BaseDao<ResourcePermissionEntity,
   @Select("select * from resource_permission where resource_type = #{resourceType} and permission = #{permission}")
   Optional<ResourcePermissionEntity> findByResourceAndPermission(
       @Param("resourceType") ResourceType resourceType, @Param("permission") Permission permission);
+
+  @Select("select resource_permission.* from resource_permission left join role_to_resource_permission "
+      + "on resource_permission.id = role_to_resource_permission.resource_permission_id ")
+  List<ResourcePermissionEntity> listResourcePermissionsByRoleId(@Param("roleId") UUID roleId);
 }
