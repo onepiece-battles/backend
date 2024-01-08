@@ -118,11 +118,15 @@ public class CharacterInBattle {
   }
 
   public AttackEntity attack() {
+    if(currentCharacterEntity.getCurrentEnergy()<energyConsume) {
+      defeated = true;
+    }
     if (currentCharacterEntity.getCurrentEnergy() < minimumFruitEnergy && !reversed) {
       reverseCharacter();
       reversed = true;
       logger.info("run out of magic, reverse {}", name);
     }
+    currentCharacterEntity.setCurrentEnergy(currentCharacterEntity.getCurrentEnergy()-energyConsume);
     logger.info("{} attack with power {}", name, currentCharacterEntity.getCurrentEnergy());
     return attackEntity;
   }
