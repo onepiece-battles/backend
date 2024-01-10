@@ -85,7 +85,7 @@
         />
         <result column="modification_record_id" property="modificationRecordId"
         />
-        <association column="id" property="battle_execution"
+        <association column="id" property="battleExecution"
                      select="com.yichi.onepiece.battle.model.BattleExecutionDao.findByBattleId"
         />
         <association column="starter_id" property="starter"
