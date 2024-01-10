@@ -22,7 +22,7 @@
     LIMIT #{offset}, #{size}
   </select>
 
-  <select id="searchCount" resultType="int">
+  <select id="count" resultType="int">
     select count(distinct(`view_group_list_view`.id))
     from `view_group_list_view`
     WHERE (`view_group_list_view`.user_id = #{userId}
@@ -58,6 +58,10 @@
     </if>
   </sql>
 
+<!--  <select id="getFullViewById" resultType="com.yichi.onepiece.group.model.GroupFullView" resultMap="groupFullView">-->
+<!--    select * from `group`-->
+<!--  </select>-->
+
   <!-- Construct order by clause -->
   <sql id="orderClause">
     <choose>
@@ -78,4 +82,11 @@
     />
   </resultMap>
 
+  <resultMap id="groupFullView" type="com.yichi.onepiece.group.model.GroupFullView" autoMapping="true">
+    <association column="id" property="id"
+    />
+    <association column="id" property="characters"
+      select="com.yichi.onepiece.character.model.dao.CharacterToGroupDao.listCharacterInGroupLiteByGroupId"
+    />
+  </resultMap>
 </mapper>

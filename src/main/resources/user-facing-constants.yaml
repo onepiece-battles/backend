@@ -61,3 +61,11 @@ user:
       displayName:
         en-US: "Fruit has successfully eaten by this character"
         zh-CN: "恶魔果实已经成功被食用"
+    GROUP_CREATION_SUCCESS:
+      displayName:
+        en-US: "Group Creation Success"
+        zh-CN: "团体创建成功"
+    GROUP_CREATION_FAILED:
+      displayName:
+        en-US: "Group Creation Failed"
+        zh-CN: "团体创建失败"
