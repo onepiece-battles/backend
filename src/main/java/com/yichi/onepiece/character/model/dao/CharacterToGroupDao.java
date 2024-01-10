@@ -26,4 +26,8 @@ public interface CharacterToGroupDao extends BaseDao<CharacterToGroupEntity, UUI
       "where character_to_group.group_id = #{groupId}"
   })
   List<CharacterInGroupView> listCharacterInGroupViewByGroupId(@Param("groupId") UUID groupId);
+
+  @Select({"select character_to_group.position from character_to_group where character_to_group.character_id = #{characterId} ",
+       "and character_to_group.once_belonged_to = false"})
+  String getPositionByCharacterId(@Param("characterId")UUID characterId);
 }

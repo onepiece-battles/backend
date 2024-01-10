@@ -364,8 +364,8 @@ SELECT
    `starter`.profile_image as starter_image,
    `receiver`.name as receiver_name,
    `receiver`.profile_image as receiver_image,
-   `battle_execution`.battle_status as status,
-   `battle_execution`.battle_report_stage as report_stage,
+   `battle_execution`.battle_status as battle_status,
+   `battle_execution`.battle_report_stage as battle_report_stage,
    `battle_execution`.winner_id
 FROM `battle` JOIN `character` AS `starter` on battle.starter_id = starter.id
 JOIN `character` AS `receiver` on battle.receiver_id = receiver.id
@@ -382,17 +382,12 @@ SELECT `character`.*,
     `modification_record`.action_timestamp as modification_timestamp,
     `creation_record`.user_name as creator,
     `creation_record`.role_name,
-    `creation_record`.role_id,
-    `character_to_fruit`.`fruit_id`,
-    `group`.name as group_name
+    `creation_record`.role_id
 FROM `character`
 JOIN `action_lineage` as creation_record on creation_record.id = `character`.creation_record_id
 JOIN `action_lineage` as modification_record on modification_record.id = `character`.modification_record_id
 LEFT JOIN `character_type` on `character`.`id` = `character_type`.`character_id`
-LEFT JOIN `haki` on `character`.id = haki.character_id
-LEFT JOIN `character_to_fruit` on `character`.id = character_to_fruit.character_id
-LEFT JOIN `character_to_group` as ctg on (`character`.id = `ctg`.`character_id` AND `ctg`.`once_belonged_to` = FALSE)
-LEFT JOIN `group` on `ctg`.group_id = `group`.id;
+LEFT JOIN `haki` on `character`.id = haki.character_id;
 
 -- fruit_list_view
 CREATE VIEW `view_fruit_list_view`

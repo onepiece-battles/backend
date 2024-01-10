@@ -1,10 +1,13 @@
 package com.yichi.onepiece.character.model.entity;
 
 import com.yichi.infra.support.entity.Entity;
+import com.yichi.infra.support.mybatis.annotations.Column;
 import com.yichi.onepiece.model.CharacterType;
 import com.yichi.onepiece.model.Haki;
+import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.UserRole;
 import java.util.List;
+import javax.annotation.Nullable;
 
 @Entity
 public interface CharacterListView extends CharacterEntity {
@@ -12,8 +15,11 @@ public interface CharacterListView extends CharacterEntity {
 
   Long getModificationTimestamp();
 
-  String getGroupName();
+  @Nullable
+  @Column(json = true)
+  I18nText getGroupName();
 
+  @Nullable
   String getGroupPosition();
 
   UserRole getRoleName();
