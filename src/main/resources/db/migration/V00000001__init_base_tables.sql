@@ -99,6 +99,23 @@ ALTER TABLE `action_lineage` ADD CONSTRAINT `fk_action_lineage__user_id`
 ALTER TABLE `action_lineage` ADD CONSTRAINT `fk_action_lineage__role_id`
     FOREIGN KEY(`role_id`) REFERENCES `role`(`id`);
 
+-- file_object
+CREATE TABLE `file_object`(
+  `id` BINARY(16) NOT NULL,
+  `file_name` VARCHAR(255) NOT NULL,
+  `resource` BINARY(16),
+  `creator_id` BINARY(16),
+  `creation_record_id` BIGINT NOT NULL,
+  `file_category` VARCHAR(255) NOT NULL,
+  `http_mime_type` VARCHAR(255) NOT NULL,
+  `oss_uri` VARCHAR(255) NOT NULL
+);
+ALTER TABLE `file_object` ADD CONSTRAINT PRIMARY KEY(`id`);
+ALTER TABLE `file_object` ADD CONSTRAINT `fk_file_object__creation_record_id`
+    FOREIGN KEY(`creation_record_id`) REFERENCES `action_lineage`(`id`);
+ALTER TABLE `file_object` ADD CONSTRAINT `fk_file_creator_user_id__user_id`
+    FOREIGN KEY(`creator_id`) REFERENCES `user`(`id`);
+
 -- group
 CREATE TABLE `group` (
     `id` BINARY(16) NOT NULL,
@@ -247,8 +264,6 @@ ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__starter_id`
   FOREIGN KEY(`starter_id`) REFERENCES `character`(`id`);
 ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__receiver_id`
   FOREIGN KEY(`receiver_id`) REFERENCES `character`(`id`);
-ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__winner_id`
-  FOREIGN KEY(`winner_id`) REFERENCES `character`(`id`);
 ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__user_id`
   FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
 ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__creation_record_id`
@@ -272,6 +287,8 @@ ALTER TABLE `battle_execution` ADD CONSTRAINT `fk_battle_execution__battle_id`
     FOREIGN KEY(`battle_id`) REFERENCES `battle`(`id`);
 ALTER TABLE `battle_execution` ADD CONSTRAINT `fk_battle_execution__report_file_id`
     FOREIGN KEY(`report_file_id`) REFERENCES `file_object`(`id`);
+ALTER TABLE `battle_execution` ADD CONSTRAINT `fk_battle_execution__winner_id`
+    FOREIGN KEY(`winner_id`) REFERENCES `character`(`id`);
 
 -- battle_process_detail
 CREATE TABLE `battle_process_detail`(
@@ -332,22 +349,7 @@ ALTER TABLE `email_verification` ADD CONSTRAINT `fk_email_verification__user_id`
   FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
 
 
--- file_object
-CREATE TABLE `file_object`(
-    `id` BINARY(16) NOT NULL,
-    `file_name` VARCHAR(255) NOT NULL,
-    `resource` BINARY(16),
-    `creator_id` BINARY(16),
-    `creation_record_id` BIGINT NOT NULL,
-    `file_category` VARCHAR(255) NOT NULL,
-    `http_mime_type` VARCHAR(255) NOT NULL,
-    `oss_uri` VARCHAR(255) NOT NULL
-);
-ALTER TABLE `file_object` ADD CONSTRAINT PRIMARY KEY(`id`);
-ALTER TABLE `file_object` ADD CONSTRAINT `fk_file_object__creation_record_id`
-  FOREIGN KEY(`creation_record_id`) REFERENCES `action_lineage`(`id`);
-ALTER TABLE `file_object` ADD CONSTRAINT `fk_file_creator_user_id__user_id`
-  FOREIGN KEY(`creator_id`) REFERENCES `user`(`id`);
+
 
 -- battle_list_view
 CREATE VIEW `view_battle_list_view`
