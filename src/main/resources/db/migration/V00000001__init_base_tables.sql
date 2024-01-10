@@ -371,6 +371,7 @@ JOIN `battle_execution` on battle.id = battle_execution.battle_id
 JOIN `action_lineage` as creation_record on creation_record.id = battle.creation_record_id
 JOIN `action_lineage` as modification_record on modification_record.id = battle.modification_record_id;
 
+
 -- character_list_view
 CREATE VIEW `view_character_list_view`
 AS
