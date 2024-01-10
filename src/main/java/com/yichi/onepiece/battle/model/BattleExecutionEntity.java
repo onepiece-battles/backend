@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Entity
 public interface BattleExecutionEntity {
-  Long getId();
+  UUID getId();
 
   @Column(ignoreUpdates = true)
   UUID getBattleId();
