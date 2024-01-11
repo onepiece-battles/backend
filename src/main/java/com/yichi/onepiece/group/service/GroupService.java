@@ -42,7 +42,7 @@ public class GroupService {
     var user = UserHelper.getCurrentUserDetail();
     GroupEntity groupEntity = GroupEntityBuilder.newBuilder()
         .setName(request.getName())
-        .setCategory(request.getCategory())
+        .setGroupCategory(request.getGroupCategory())
         .setCreationRecordId(actionRecord.getId())
         .setModificationRecordId(actionRecord.getId())
         .setUserId(user.getId())
