@@ -2,6 +2,7 @@ package com.yichi.onepiece.group.model;
 
 import com.yichi.infra.support.entity.Entity;
 import com.yichi.infra.support.mybatis.annotations.Column;
+import com.yichi.onepiece.model.GroupCategory;
 import com.yichi.onepiece.model.I18nText;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -17,7 +18,7 @@ public interface GroupEntity {
   @Column(ignoreUpdates = true, json = true)
   I18nText getName();
 
-  String getCategory();
+  GroupCategory getGroupCategory();
 
   @Nullable
   Byte[] getProfileImage();

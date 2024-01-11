@@ -23,7 +23,7 @@
   </select>
 
   <select id="count" resultType="int">
-    select count(distinct(`view_group_list_view`.id))
+    select COUNT(distinct(`view_group_list_view`.id))
     from `view_group_list_view`
     WHERE (`view_group_list_view`.user_id = #{userId}
     <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
@@ -37,7 +37,6 @@
     <include refid="groupFilter">
       <property name="groupFilter" value="groupFilter"/>
     </include>
-    GROUP BY `view_group_list_view`.`id`
   </select>
 
   <sql id="groupFilter">
@@ -45,22 +44,15 @@
       <bind name="keyLike" value="'%' + groupFilter.name + '%'" />
       AND JSON_EXTRACT(name, CONCAT('$.', #{groupFilter.languageCode})) LIKE #{keyLike}
     </if>
-    <if test="groupFilter.category != null and groupFilter.category != ''">
-      AND JSON_CONTAINS(category, #{groupFilter.category}, '${groupFilter.languageCode}')
-    </if>
     # 海军，海贼，革命军，山贼，七武海，CP9，CP0，神之骑士团，五老星，国王军，海贼猎人，其他组织
-    <if test="groupFilter.groupCategories != null and groupFilter.groupCategories.isEmpty">
-      AND `category` in
+    <if test="groupFilter.groupCategories != null and !groupFilter.groupCategories.isEmpty">
+      AND `group_category` in
       <foreach item="category" collection="groupFilter.groupCategories" open="("
         separator="," close=")">
         #{category}
       </foreach>
     </if>
   </sql>
-
-<!--  <select id="getFullViewById" resultType="com.yichi.onepiece.group.model.GroupFullView" resultMap="groupFullView">-->
-<!--    select * from `group`-->
-<!--  </select>-->
 
   <!-- Construct order by clause -->
   <sql id="orderClause">
