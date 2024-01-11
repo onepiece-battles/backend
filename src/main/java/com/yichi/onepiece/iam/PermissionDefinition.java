@@ -13,16 +13,6 @@ import org.slf4j.LoggerFactory;
 public class PermissionDefinition {
   public static final Logger logger = LoggerFactory.getLogger(PermissionDefinition.class);
   public static final String RESOURCE_PERMISSION_SPLITTER = "__";
-  private static final String CHARACTER_PREFIX = "CHARACTER";
-  private static final String FRUIT_PREFIX = "FRUIT";
-  private static final String BATTLE_PREFIX = "BATTLE";
-  private static final String CREATE_SUFFIX = "CREATE";
-  private static final String GET_SUFFIX = "GET";
-  private static final String LIST_SUFFIX = "LIST";
-  private static final String UPDATE_SUFFIX = "UPDATE";
-  private static final String DELETE_SUFFIX = "DELETE";
-
-
 
   // resource permission full map
   public static final EnumMap<ResourceType, Set<Permission>> resourcePermissionMap = new EnumMap<>(
@@ -33,6 +23,7 @@ public class PermissionDefinition {
                   Map.entry(ResourceType.BATTLE, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet())),
                   Map.entry(ResourceType.FRUIT, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet())),
                   Map.entry(ResourceType.ISSUE, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet())),
+                  Map.entry(ResourceType.GROUP, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet())),
                   Map.entry(ResourceType.ROLE, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet()))
           )
   );
