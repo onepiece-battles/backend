@@ -2,6 +2,7 @@ package com.yichi.onepiece.character.model.dao;
 
 import com.yichi.infra.support.mybatis.annotations.Dao;
 import com.yichi.infra.support.mybatis.dao.BaseDao;
+import com.yichi.onepiece.character.model.entity.CharacterInGroupLite;
 import com.yichi.onepiece.character.model.entity.CharacterInGroupView;
 import com.yichi.onepiece.character.model.entity.CharacterToGroupEntity;
 import java.util.List;
@@ -26,6 +27,11 @@ public interface CharacterToGroupDao extends BaseDao<CharacterToGroupEntity, UUI
       "where character_to_group.group_id = #{groupId}"
   })
   List<CharacterInGroupView> listCharacterInGroupViewByGroupId(@Param("groupId") UUID groupId);
+
+  @Select("select `character_to_group`.*, `character`.name from `character_to_group` left join `character` "
+      + "on character_to_group.character_id = `character`.`id` "
+      + "where `character_to_group`.group_id = #{groupId}")
+  List<CharacterInGroupLite> listCharacterInGroupLiteByGroupId(@Param("groupId") UUID groupId);
 
   @Select({"select character_to_group.position from character_to_group where character_to_group.character_id = #{characterId} ",
        "and character_to_group.once_belonged_to = false"})
