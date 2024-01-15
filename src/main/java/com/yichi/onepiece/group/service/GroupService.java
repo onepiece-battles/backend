@@ -1,6 +1,7 @@
 package com.yichi.onepiece.group.service;
 
 import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.GROUP_CREATION_SUCCESS;
+
 import com.yichi.onepiece.group.model.GroupConverter;
 import com.yichi.onepiece.group.model.GroupDao;
 import com.yichi.onepiece.group.model.GroupEntity;
@@ -29,7 +30,9 @@ public class GroupService {
   private final UserService userService;
 
   public GroupService(
-      GroupDao groupDao, RoleService roleService, ActionRecordService actionRecordService,
+      GroupDao groupDao,
+      RoleService roleService,
+      ActionRecordService actionRecordService,
       UserService userService) {
     this.groupDao = groupDao;
     this.roleService = roleService;
@@ -40,18 +43,20 @@ public class GroupService {
   public CreateGroupResponse create(CreateGroupRequest request) {
     var actionRecord = actionRecordService.create();
     var user = UserHelper.getCurrentUserDetail();
-    GroupEntity groupEntity = GroupEntityBuilder.newBuilder()
-        .setName(request.getName())
-        .setGroupCategory(request.getGroupCategory())
-        .setCreationRecordId(actionRecord.getId())
-        .setModificationRecordId(actionRecord.getId())
-        .setUserId(user.getId())
-        .setRoleId(roleService.getRoleByName(user.getLoginRole()).getId())
-        .setSystemResource(UserHelper.hasNikaPermission())
-        .build();
+    GroupEntity groupEntity =
+        GroupEntityBuilder.newBuilder()
+            .setName(request.getName())
+            .setGroupCategory(request.getGroupCategory())
+            .setCreationRecordId(actionRecord.getId())
+            .setModificationRecordId(actionRecord.getId())
+            .setUserId(user.getId())
+            .setRoleId(roleService.getRoleByName(user.getLoginRole()).getId())
+            .setSystemResource(UserHelper.hasNikaPermission())
+            .build();
     groupDao.insert(groupEntity);
     return new CreateGroupResponse()
-        .result( UserFacingConstants.getConstant(GROUP_CREATION_SUCCESS).getDisplayName());
+        .result(UserFacingConstants.getConstant(GROUP_CREATION_SUCCESS).getDisplayName())
+        .id(groupEntity.getId());
   }
 
   public ListGroupResponse list(ListGroupRequest request) {
@@ -63,13 +68,18 @@ public class GroupService {
     if (offset >= totalSize || offset < 0) {
       return new ListGroupResponse().groups(List.of()).totalSize(totalSize);
     }
-    var groupList = groupDao.list(
-        request.getGroupFilter(),
-        request.getSortKeys(),
-        offset,
-        request.getPageSize(),
-        userId,
-        resourceIds).stream().map(GroupConverter.INSTANCE::toGroupListView).toList();
+    var groupList =
+        groupDao
+            .list(
+                request.getGroupFilter(),
+                request.getSortKeys(),
+                offset,
+                request.getPageSize(),
+                userId,
+                resourceIds)
+            .stream()
+            .map(GroupConverter.INSTANCE::toGroupListView)
+            .toList();
     return new ListGroupResponse().totalSize(totalSize).groups(groupList);
   }
 
