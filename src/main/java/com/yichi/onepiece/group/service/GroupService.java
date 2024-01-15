@@ -18,7 +18,10 @@ import com.yichi.onepiece.model.ResourceType;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
+import com.yichi.onepiece.utils.EncryptHelper;
 import java.util.List;
+import java.util.UUID;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -86,5 +89,18 @@ public class GroupService {
   public GroupFullView getGroupFullView(GetGroupRequest getGroupRequest) {
     var groupFullView = groupDao.getFullViewById(getGroupRequest.getId()).orElseThrow();
     return GroupConverter.INSTANCE.toGroupFullView(groupFullView);
+  }
+
+  public String updateGroupImage(UUID groupId, String image) {
+    Byte[] profileByte = ArrayUtils.toObject(EncryptHelper.base64Decode(image));
+    var modificationRecord = actionRecordService.create();
+    var group = groupDao.findById(groupId).orElseThrow();
+    var updatedGroup =
+        group.toBuilder()
+            .setProfileImage(profileByte)
+            .setModificationRecordId(modificationRecord.getId())
+            .build();
+    groupDao.update(updatedGroup);
+    return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(updatedGroup.getProfileImage()));
   }
 }
