@@ -40,17 +40,20 @@
   </select>
 
   <sql id="groupFilter">
-    <if test="groupFilter.name != null and groupFilter.name != ''">
-      <bind name="keyLike" value="'%' + groupFilter.name + '%'" />
-      AND JSON_EXTRACT(name, CONCAT('$.', #{groupFilter.languageCode})) LIKE #{keyLike}
+    <if test="groupFilter.onlySystem != null">
+      AND `system_resource` = #{groupFilter.onlySystem}
     </if>
     # 海军，海贼，革命军，山贼，七武海，CP9，CP0，神之骑士团，五老星，国王军，海贼猎人，其他组织
     <if test="groupFilter.groupCategories != null and !groupFilter.groupCategories.isEmpty">
       AND `group_category` in
       <foreach item="category" collection="groupFilter.groupCategories" open="("
-        separator="," close=")">
+               separator="," close=")">
         #{category}
       </foreach>
+    </if>
+    <if test="groupFilter.name != null and groupFilter.name != ''">
+      <bind name="keyLike" value="'%' + groupFilter.name + '%'" />
+      AND JSON_EXTRACT(name, CONCAT('$.', #{groupFilter.languageCode})) LIKE #{keyLike}
     </if>
   </sql>
 

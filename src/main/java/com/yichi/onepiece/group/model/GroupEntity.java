@@ -28,4 +28,6 @@ public interface GroupEntity {
   Long getModificationRecordId();
 
   Boolean getSystemResource();
+
+  GroupEntityBuilder toBuilder();
 }
