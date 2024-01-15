@@ -2,7 +2,6 @@ package com.yichi.onepiece.group.model;
 
 import com.yichi.infra.support.mybatis.annotations.Dao;
 import com.yichi.infra.support.mybatis.dao.BaseDao;
-import com.yichi.onepiece.model.CharacterSortableField;
 import com.yichi.onepiece.model.GroupFilter;
 import com.yichi.onepiece.model.GroupSortableField;
 import com.yichi.onepiece.model.I18nText;
@@ -37,10 +36,17 @@ public interface GroupDao extends BaseDao<GroupEntity, UUID> {
   @Select("select * from group where id = #{groupId}")
   Optional<GroupFullView> getFullViewById(@Param("groupId") UUID groupId);
 
-
-  @Select({"select `group`.`name` from `group` ",
-       "left join `character_to_group` on `group`.`id` = `character_to_group`.`group_id` ",
-       "left join `character` on `character`.`id` = `character_to_group`.`character_id` ",
-       "where `character`.`id` = #{characterId} and `character_to_group`.`once_belonged_to` = false"})
+  @Select({
+    "select `group`.`name` from `group` ",
+    "left join `character_to_group` on `group`.`id` = `character_to_group`.`group_id` ",
+    "left join `character` on `character`.`id` = `character_to_group`.`character_id` ",
+    "where `character`.`id` = #{characterId} and `character_to_group`.`once_belonged_to` = false"
+  })
   I18nText getCurrentGroupNameByCharacterId(@Param("characterId") UUID characterId);
+
+  @Select(
+      "select `group`.* from `group` left join `character_to_group` on `group`.`id` ="
+          + " `character_to_group`.`group_id` where `character_to_group`.`character_id` ="
+          + " #{characterId}")
+  List<GroupEntity> listGroupsByCharacterId(@Param("characterId") UUID characterId);
 }
