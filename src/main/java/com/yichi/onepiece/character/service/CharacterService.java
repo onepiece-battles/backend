@@ -3,10 +3,13 @@ package com.yichi.onepiece.character.service;
 import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
 import com.yichi.onepiece.character.model.dao.CharacterDao;
 import com.yichi.onepiece.character.model.dao.CharacterToFruitDao;
+import com.yichi.onepiece.character.model.dao.CharacterToGroupDao;
 import com.yichi.onepiece.character.model.dao.CharacterTypeDao;
 import com.yichi.onepiece.character.model.dao.HakiDao;
 import com.yichi.onepiece.character.model.entity.CharacterEntity;
 import com.yichi.onepiece.character.model.entity.CharacterToFruitEntityBuilder;
+import com.yichi.onepiece.character.model.entity.CharacterToGroupEntity;
+import com.yichi.onepiece.character.model.entity.CharacterToGroupEntityBuilder;
 import com.yichi.onepiece.character.model.entity.CharacterTypeEntityBuilder;
 import com.yichi.onepiece.character.model.entity.HakiEntityBuilder;
 import com.yichi.onepiece.exception.ExceptionUtils;
@@ -33,6 +36,7 @@ public class CharacterService {
 
   private final CharacterDao characterDao;
   private final CharacterTypeDao characterTypeDao;
+  private final CharacterToGroupDao characterToGroupDao;
   private final HakiDao hakiDao;
   private final FruitService fruitService;
 
@@ -43,13 +47,14 @@ public class CharacterService {
   public CharacterService(
       CharacterDao CharacterDao,
       CharacterTypeDao characterTypeDao,
-      HakiDao hakiDao,
+      CharacterToGroupDao characterToGroupDao, HakiDao hakiDao,
       FruitService fruitService,
       CharacterToFruitDao characterToFruitDao,
       ActionRecordService actionRecordService,
       UserService userService) {
     this.characterDao = CharacterDao;
     this.characterTypeDao = characterTypeDao;
+    this.characterToGroupDao = characterToGroupDao;
     this.hakiDao = hakiDao;
     this.fruitService = fruitService;
     this.characterToFruitDao = characterToFruitDao;
@@ -139,6 +144,18 @@ public class CharacterService {
   public CharacterFullView getCharacterFullView(UUID characterId) {
     var characterFullView = characterDao.getFullViewById(characterId).orElseThrow();
     return CharacterEntityConverter.INSTANCE.toCharacterFullView(characterFullView);
+  }
+
+  public JoinGroupResponse joinGroup(JoinGroupRequest request){
+    CharacterToGroupEntity characterToGroupEntity = CharacterToGroupEntityBuilder.newBuilder()
+        .setCharacterId(request.getCharacterId())
+        .setGroupId(request.getGroupId())
+        .onceBelongedTo(false)
+        .build();
+    characterToGroupDao.insert(characterToGroupEntity);
+    return new JoinGroupResponse()
+        .result(UserFacingConstants.getConstant(UserFacingConstantsKey.GROUP_JOIN_SUCCESS)
+        .getDisplayName());
   }
 
   public EatFruitResponse eatFruit(UUID characterId, UUID fruitId) {

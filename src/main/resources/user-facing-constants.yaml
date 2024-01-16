@@ -69,3 +69,7 @@ user:
       displayName:
         en-US: "Group Creation Failed"
         zh-CN: "团体创建失败"
+    GROUP_JOIN_SUCCESS:
+      display:
+        en-US: "Group Join Success"
+        zh-CN: "成功加入团体"
