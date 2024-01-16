@@ -46,6 +46,7 @@ public class CharacterController implements CharacterApi {
     iamService.checkPermissionOfCurrentAccount(ResourceType.CHARACTER, Set.of(Permission.GET));
     iamService.checkPermissionOfCurrentAccount(ResourceType.BATTLE, Set.of(Permission.GET));
     iamService.checkPermissionOfCurrentAccount(ResourceType.FRUIT, Set.of(Permission.GET));
+    iamService.checkPermissionOfCurrentAccount(ResourceType.GROUP, Set.of(Permission.GET));
     StopWatch watch = new StopWatch();
     watch.start();
     var characterFullView =
@@ -53,6 +54,13 @@ public class CharacterController implements CharacterApi {
     watch.stop();
     logger.info("get character takes: {}", watch.getTotalTimeSeconds());
     return ResponseEntity.ok(characterFullView);
+  }
+
+  @Override
+  public ResponseEntity<JoinGroupResponse> joinGroup(JoinGroupRequest joinGroupRequest) {
+    iamService.checkPermissionOfCurrentAccount(ResourceType.CHARACTER, Set.of(Permission.UPDATE));
+    var response = characterService.joinGroup(joinGroupRequest);
+    return ResponseEntity.ok(response);
   }
 
   @Override
