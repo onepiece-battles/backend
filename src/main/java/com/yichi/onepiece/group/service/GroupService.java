@@ -2,6 +2,7 @@ package com.yichi.onepiece.group.service;
 
 import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.GROUP_CREATION_SUCCESS;
 
+import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.group.model.GroupConverter;
 import com.yichi.onepiece.group.model.GroupDao;
 import com.yichi.onepiece.group.model.GroupEntity;
@@ -22,10 +23,14 @@ import com.yichi.onepiece.utils.EncryptHelper;
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GroupService {
+  Logger logger = LoggerFactory.getLogger(GroupService.class);
+
   private static final ResourceType RESOURCE_TYPE = ResourceType.GROUP;
   private final GroupDao groupDao;
   private final RoleService roleService;

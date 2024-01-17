@@ -146,13 +146,37 @@ public class CharacterService {
     return CharacterEntityConverter.INSTANCE.toCharacterFullView(characterFullView);
   }
 
-  public JoinGroupResponse joinGroup(JoinGroupRequest request){
-    CharacterToGroupEntity characterToGroupEntity = CharacterToGroupEntityBuilder.newBuilder()
-        .setCharacterId(request.getCharacterId())
-        .setGroupId(request.getGroupId())
-        .onceBelongedTo(false)
-        .build();
-    characterToGroupDao.insert(characterToGroupEntity);
+  /**
+   * This function execute the request for a character to join a group.
+   * <li> First, mark all groups related to this character not in unless the group id from request matches </li>
+   * <li> Insert new group relation if new group not found. </li>
+   *
+   * @param request the request for a character to join a group.
+   * @return Whether this character successfully joined this group.
+   */
+  public JoinGroupResponse joinGroup(JoinGroupRequest request) {
+    var characterToGroups = characterToGroupDao.findByCharacterId(request.getCharacterId());
+    var currentGroup = characterToGroups.stream()
+        .filter(characterToGroupEntity -> !characterToGroupEntity.getOnceBelongedTo()).findFirst();
+    // exit current group if present
+    currentGroup.ifPresent(characterToGroupEntity -> characterToGroupDao.update(
+        characterToGroupEntity.toBuilder().setOnceBelongedTo(true).build()));
+    // update original groups
+    var groupMatchEntity = characterToGroups
+        .stream()
+        .filter(characterToGroupEntity ->
+           characterToGroupEntity.getGroupId() == request.getGroupId()
+          ).findFirst();
+    if (groupMatchEntity.isPresent()) {
+      characterToGroupDao.update(groupMatchEntity.get().toBuilder().setOnceBelongedTo(false).build());
+    } else {
+      CharacterToGroupEntity characterToGroupEntity = CharacterToGroupEntityBuilder.newBuilder()
+          .setCharacterId(request.getCharacterId())
+          .setGroupId(request.getGroupId())
+          .onceBelongedTo(false)
+          .build();
+      characterToGroupDao.insert(characterToGroupEntity);
+    }
     return new JoinGroupResponse()
         .result(UserFacingConstants.getConstant(UserFacingConstantsKey.GROUP_JOIN_SUCCESS)
         .getDisplayName());

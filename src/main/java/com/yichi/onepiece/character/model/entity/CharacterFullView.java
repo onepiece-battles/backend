@@ -14,7 +14,7 @@ public interface CharacterFullView extends CharacterListView {
 
   List<CharacterToFruitEntity> getFruitInCharacter();
 
-  List<GroupEntity> getGroups();
+  List<GroupForCharacterView> getGroups();
 
   CharacterFullViewBuilder toBuilder();
 }
