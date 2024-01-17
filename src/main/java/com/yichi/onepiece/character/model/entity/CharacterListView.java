@@ -15,13 +15,6 @@ public interface CharacterListView extends CharacterEntity {
 
   Long getModificationTimestamp();
 
-  @Nullable
-  @Column(json = true)
-  I18nText getGroupName();
-
-  @Nullable
-  String getGroupPosition();
-
   UserRole getRoleName();
 
   String getCreator();

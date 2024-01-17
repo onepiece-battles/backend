@@ -113,11 +113,5 @@
         <association column="id" property="hakis"
                      select="com.yichi.onepiece.character.model.dao.HakiDao.listByCharacterId"
         />
-        <association column="id" property="groupName"
-          select="com.yichi.onepiece.group.model.GroupDao.getCurrentGroupNameByCharacterId"
-        />
-        <association column="id" property="groupPosition"
-          select="com.yichi.onepiece.character.model.dao.CharacterToGroupDao.getPositionByCharacterId"
-        />
     </resultMap>
 </mapper>

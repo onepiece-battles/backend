@@ -14,4 +14,6 @@ public interface CharacterToGroupEntity {
   String getPosition();
 
   Boolean getOnceBelongedTo();
+
+  CharacterToGroupEntityBuilder toBuilder();
 }

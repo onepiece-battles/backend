@@ -5,6 +5,7 @@ import com.yichi.infra.support.mybatis.dao.BaseDao;
 import com.yichi.onepiece.character.model.entity.CharacterInGroupLite;
 import com.yichi.onepiece.character.model.entity.CharacterInGroupView;
 import com.yichi.onepiece.character.model.entity.CharacterToGroupEntity;
+import com.yichi.onepiece.character.model.entity.GroupForCharacterView;
 import java.util.List;
 import java.util.UUID;
 import org.apache.ibatis.annotations.Mapper;
@@ -14,11 +15,17 @@ import org.apache.ibatis.annotations.Select;
 @Dao
 @Mapper
 public interface CharacterToGroupDao extends BaseDao<CharacterToGroupEntity, UUID> {
-
   String CHARACTER_FIELDS = ""
       + "character.name, "
       + "character.profile_image, "
       + "character.system_resource ";
+
+  String GROUP_FIELDS = ""
+      + "group.name, "
+      + "group.profile_image, "
+      + "group.system_resource, "
+      + "group.category ";
+
   @Select({
       "select character_to_group.*, ",
       CHARACTER_FIELDS,
@@ -28,6 +35,15 @@ public interface CharacterToGroupDao extends BaseDao<CharacterToGroupEntity, UUI
   })
   List<CharacterInGroupView> listCharacterInGroupViewByGroupId(@Param("groupId") UUID groupId);
 
+  @Select({
+      "select character_to_group.*, ",
+      GROUP_FIELDS,
+      "from character_to_group ",
+      "left join `group` on `group`.`id` = group.group_id ",
+      "where character_to_group.character_id = #{characterId}"
+  })
+  List<GroupForCharacterView> listGroupForCharacterViewByCharacterID(@Param("characterId") UUID characterId);
+
   @Select("select `character_to_group`.*, `character`.name from `character_to_group` left join `character` "
       + "on character_to_group.character_id = `character`.`id` "
       + "where `character_to_group`.group_id = #{groupId}")
@@ -36,4 +52,7 @@ public interface CharacterToGroupDao extends BaseDao<CharacterToGroupEntity, UUI
   @Select({"select character_to_group.position from character_to_group where character_to_group.character_id = #{characterId} ",
        "and character_to_group.once_belonged_to = false"})
   String getPositionByCharacterId(@Param("characterId")UUID characterId);
+
+  @Select("select * from character_to_group where character_id = #{characterId}")
+  List<CharacterToGroupEntity> findByCharacterId(@Param("characterId") UUID characterId);
 }

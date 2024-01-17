@@ -7,6 +7,7 @@ import com.yichi.onepiece.character.model.entity.CharacterListView;
 import com.yichi.onepiece.fruit.model.converter.FruitConverter;
 import com.yichi.onepiece.model.Character;
 import com.yichi.onepiece.model.CreateCharacterRequest;
+import com.yichi.onepiece.model.GroupForCharacterView;
 import com.yichi.onepiece.utils.EncryptHelper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.mapstruct.Mapper;
@@ -24,6 +25,9 @@ public interface CharacterEntityConverter {
 
   com.yichi.onepiece.model.CharacterFullView toCharacterFullView(
       CharacterFullView characterFullView);
+
+  GroupForCharacterView toGroupForCharacterView(
+      com.yichi.onepiece.character.model.entity.GroupForCharacterView groupForCharacterView);
 
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "profileImage", ignore = true)
