@@ -15,4 +15,6 @@ public interface GroupForCharacterView extends CharacterToGroupEntity {
   GroupCategory getCategory();
 
   Boolean getSystemResource();
+
+  GroupForCharacterViewBuilder toBuilder();
 }
