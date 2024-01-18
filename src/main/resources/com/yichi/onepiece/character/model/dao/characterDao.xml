@@ -100,7 +100,7 @@
           select="com.yichi.onepiece.character.model.dao.CharacterToFruitDao.listByCharacterId"
         />
         <association column="id" property="groups"
-          select="com.yichi.onepiece.group.model.GroupDao.listGroupsByCharacterId"
+          select="com.yichi.onepiece.character.model.dao.CharacterToGroupDao.listGroupForCharacterViewByCharacterId"
         />
     </resultMap>
 

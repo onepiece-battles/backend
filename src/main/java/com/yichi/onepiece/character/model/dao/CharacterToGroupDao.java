@@ -24,7 +24,7 @@ public interface CharacterToGroupDao extends BaseDao<CharacterToGroupEntity, UUI
       + "group.name, "
       + "group.profile_image, "
       + "group.system_resource, "
-      + "group.category ";
+      + "group.group_category as category ";
 
   @Select({
       "select character_to_group.*, ",
@@ -36,13 +36,13 @@ public interface CharacterToGroupDao extends BaseDao<CharacterToGroupEntity, UUI
   List<CharacterInGroupView> listCharacterInGroupViewByGroupId(@Param("groupId") UUID groupId);
 
   @Select({
-      "select character_to_group.*, ",
+      "select `character_to_group`.*, ",
       GROUP_FIELDS,
-      "from character_to_group ",
-      "left join `group` on `group`.`id` = group.group_id ",
-      "where character_to_group.character_id = #{characterId}"
+      "from `character_to_group` ",
+      "left join `group` on `group`.`id` = `character_to_group`.`group_id` ",
+      "where `character_to_group`.`character_id` = #{characterId}"
   })
-  List<GroupForCharacterView> listGroupForCharacterViewByCharacterID(@Param("characterId") UUID characterId);
+  List<GroupForCharacterView> listGroupForCharacterViewByCharacterId(@Param("characterId") UUID characterId);
 
   @Select("select `character_to_group`.*, `character`.name from `character_to_group` left join `character` "
       + "on character_to_group.character_id = `character`.`id` "
