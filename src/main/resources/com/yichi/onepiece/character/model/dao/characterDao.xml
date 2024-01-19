@@ -3,7 +3,9 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.character.model.dao.CharacterDao">
     <select id="list" resultType="com.yichi.onepiece.character.model.entity.CharacterListView" resultMap="characterListView">
-        SELECT * FROM `view_character_list_view`
+        SELECT DISTINCT `view_character_list_view`.*
+        FROM `view_character_list_view`
+            LEFT JOIN `character_to_fruit` ON `view_character_list_view`.`id` = `character_to_fruit`.`character_id`
         WHERE
         ( `view_character_list_view`.user_id = #{userId}
         <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
@@ -17,7 +19,7 @@
         <include refid="characterFilter">
             <property name="characterFilter" value="characterFilter"/>
         </include>
-        GROUP BY `view_character_list_view`.`id`
+
         ORDER BY
         <include refid="orderClause"/>
         LIMIT #{offset}, #{size}
@@ -32,8 +34,9 @@
     <select id="count" resultType="int">
         SELECT COUNT(distinct(`view_character_list_view`.id))
         FROM `view_character_list_view`
+            LEFT JOIN `character_to_fruit` ON `view_character_list_view`.`id` = `character_to_fruit`.`character_id`
         WHERE
-        ( user_id = #{userId}
+        ( `view_character_list_view`.`user_id` = #{userId}
         <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
             OR
             `view_character_list_view`.id IN
@@ -54,7 +57,7 @@
             AND JSON_EXTRACT(name, CONCAT('$.', #{characterFilter.languageCode})) LIKE #{keyLike}
         </if>
         <if test="characterFilter.hasFruit != null">
-            AND (`fruit_id` IS NOT NULL) = #{characterFilter.hasFruit}
+            AND (`character_to_fruit`.`fruit_id` IS NOT NULL) = #{characterFilter.hasFruit}
         </if>
         <if test="characterFilter.onlySystem != null">
             AND `system_resource` = #{characterFilter.onlySystem}
