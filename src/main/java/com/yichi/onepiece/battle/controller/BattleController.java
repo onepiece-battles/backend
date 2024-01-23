@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 
 @Controller
@@ -53,7 +54,7 @@ public class BattleController implements BattleApi {
   public ResponseEntity<BattleExecution> getBattleExecution(
       GetBattleExecutionRequest getBattleLiteRequest) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.BATTLE, Set.of(Permission.GET));
-    return ResponseEntity.ok(battleService.getBattleLite(getBattleLiteRequest));
+    return ResponseEntity.ok(battleService.getBattleExecution(getBattleLiteRequest));
   }
 
   @Override
@@ -80,6 +81,7 @@ public class BattleController implements BattleApi {
   }
 
   @Override
+  @Transactional
   public ResponseEntity<StartBattleResponse> startBattle(StartBattleRequest startBattleRequest) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.BATTLE, Set.of(Permission.UPDATE));
     battleExecutionAsyncService.scheduleAsyncJob(startBattleRequest.getBattleId());

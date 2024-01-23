@@ -8,11 +8,13 @@ import java.util.UUID;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,26 +42,7 @@ public class BattleExecutionAsyncService {
     var actionRecord = actionRecordService.create();
     battleExecution = battleExecution.toBuilder().setModificationTimestamp(
         actionRecord.getActionTimestamp()).setBattleStatus(BattleStatus.IN_PROGRESS).build();
-    JobDataMap jobDataMap = new JobDataMap();
-    jobDataMap.put("battleId", battleId);
-    JobDetail battleJobDetail = JobBuilder.newJob()
-        .ofType(BattleExecutionJob.class)
-        .withIdentity("battle job detail")
-        .setJobData(jobDataMap)
-        .build();
-    // create trigger
-    Trigger trigger = TriggerBuilder.newTrigger().withDescription("trigger for starting a battle")
-        .withIdentity("battle trigger")
-        .forJob(battleJobDetail)
-        .startNow().build();
-    // create scheduler and schedule job
-    try {
-      SchedulerFactory schedulerFactory = new StdSchedulerFactory();
-      Scheduler scheduler = schedulerFactory.getScheduler();
-      scheduler.scheduleJob(battleJobDetail, trigger);
-    } catch (SchedulerException e) {
-      throw new IllegalStateException("Failed to scheduler job", e);
-    }
+
     battleService.updateBattleExecutionEntity(battleExecution);
   }
 }

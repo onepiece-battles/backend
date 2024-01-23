@@ -13,7 +13,6 @@ import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -121,7 +120,7 @@ public class BattleService {
     battleExecutionDao.update(battleExecutionEntity);
   }
 
-  public BattleExecution getBattleLite(GetBattleExecutionRequest request) {
+  public BattleExecution getBattleExecution(GetBattleExecutionRequest request) {
     var battleExecutionEntity =
         battleExecutionDao.findByBattleId(request.getBattleId()).orElseThrow();
     return BattleConverter.INSTANCE.toBattleExecution(battleExecutionEntity);
