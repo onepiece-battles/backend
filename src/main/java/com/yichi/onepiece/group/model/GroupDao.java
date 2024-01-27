@@ -33,7 +33,7 @@ public interface GroupDao extends BaseDao<GroupEntity, UUID> {
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
 
   @ResultMap("groupFullView")
-  @Select("select * from group where id = #{groupId}")
+  @Select("select * from `group` where id = #{groupId}")
   Optional<GroupFullView> getFullViewById(@Param("groupId") UUID groupId);
 
   @Select({

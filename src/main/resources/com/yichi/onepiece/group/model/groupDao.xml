@@ -82,7 +82,7 @@
     <association column="id" property="id"
     />
     <association column="id" property="characters"
-      select="com.yichi.onepiece.character.model.dao.CharacterToGroupDao.listCharacterInGroupLiteByGroupId"
+      select="com.yichi.onepiece.character.model.dao.CharacterToGroupDao.listCharacterInGroupViewByGroupId"
     />
   </resultMap>
 </mapper>
