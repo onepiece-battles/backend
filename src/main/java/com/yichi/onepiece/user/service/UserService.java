@@ -97,7 +97,7 @@ public class UserService {
       String username,
       String confirmedPassword,
       OnepieceLocale onepieceLocale) {
-    if (!userDao.listByName(nickName).isEmpty()) {
+    if (!userDao.listByNickName(nickName).isEmpty()) {
       return UserFacingConstantsKey.DUPLICATE_USER_NAME;
     }
     if (!userDao.listByEmailAddress(username).isEmpty()) {
