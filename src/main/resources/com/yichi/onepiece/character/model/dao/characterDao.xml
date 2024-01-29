@@ -6,8 +6,9 @@
         SELECT DISTINCT `view_character_list_view`.*
         FROM `view_character_list_view`
             LEFT JOIN `character_to_fruit` ON `view_character_list_view`.`id` = `character_to_fruit`.`character_id`
+            LEFT JOIN `haki` on `haki`.character_id = `view_character_list_view`.id
         WHERE
-        ( `view_character_list_view`.user_id = #{userId}
+        ( `view_character_list_view`.`user_id` = #{userId} OR `view_character_list_view`.`system_resource` = true
         <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
             OR
             `view_character_list_view`.id IN
@@ -34,8 +35,9 @@
         SELECT COUNT(distinct(`view_character_list_view`.id))
         FROM `view_character_list_view`
             LEFT JOIN `character_to_fruit` ON `view_character_list_view`.`id` = `character_to_fruit`.`character_id`
+            LEFT JOIN `haki` on `haki`.character_id = `view_character_list_view`.id
         WHERE
-        ( `view_character_list_view`.`user_id` = #{userId}
+        ( `view_character_list_view`.`user_id` = #{userId} OR `view_character_list_view`.`system_resource` = true
         <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
             OR
             `view_character_list_view`.id IN
