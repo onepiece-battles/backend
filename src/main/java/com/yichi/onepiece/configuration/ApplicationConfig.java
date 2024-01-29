@@ -35,7 +35,7 @@ public class ApplicationConfig {
   public UserDetailsService getUserDetailService() {
     return username ->
         userDao
-            .getUserDetailByName(username)
+            .getUserByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException("User detail not found"));
   }
 

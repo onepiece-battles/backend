@@ -43,7 +43,7 @@ public class ActionRecordService {
     ActionRecordEntity actionRecordEntity =
         ActionRecordEntityBuilder.newBuilder()
             .setUserId(userEntity.getId())
-            .setUserName(userEntity.getName())
+            .setUserName(userEntity.getUsername())
             .setRoleId(roleEntity.getId())
             .setRoleName(roleEntity.getName())
             .setActionTimestamp(clock.millis())

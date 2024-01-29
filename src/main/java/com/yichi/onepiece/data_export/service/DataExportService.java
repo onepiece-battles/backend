@@ -60,7 +60,7 @@ public class DataExportService {
       Document doc = new Document(rectangle);
       PdfWriter writer = PdfWriter.getInstance(doc, outputStream);
       doc.addTitle("battle");
-      doc.addAuthor(user.getName());
+      doc.addAuthor(user.getUsername());
       doc.addSubject("battle details");
       doc.addCreator("onepiece-battles");
       doc.setMargins(30, 30, 30, 30);

@@ -45,7 +45,7 @@ public class JwtHelper {
   private static String buildToken(UserEntity user, Integer expirationPeriod) {
     return Jwts.builder()
         .setClaims(new HashMap<>())
-        .setSubject(user.getName())
+        .setSubject(user.getUsername())
         .setIssuedAt(new Date(System.currentTimeMillis()))
         .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_PERIOD))
         .signWith(getSignInKey(), SignatureAlgorithm.HS256)
