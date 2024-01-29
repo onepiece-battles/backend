@@ -4,7 +4,7 @@
 <mapper namespace="com.yichi.onepiece.group.model.GroupDao">
   <select id="list" resultType="com.yichi.onepiece.group.model.GroupListView" resultMap="groupListView">
     SELECT * FROM `view_group_list_view`
-    WHERE (`view_group_list_view`.user_id = #{userId}
+    WHERE (`view_group_list_view`.user_id = #{userId} or `view_group_list_view`.system_resource = true
     <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
       OR
       `view_group_list_view`.id IN
@@ -25,7 +25,7 @@
   <select id="count" resultType="int">
     select COUNT(distinct(`view_group_list_view`.id))
     from `view_group_list_view`
-    WHERE (`view_group_list_view`.user_id = #{userId}
+    WHERE (`view_group_list_view`.user_id = #{userId}  or `view_group_list_view`.system_resource = true
     <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
       OR
       `view_group_list_view`.id IN

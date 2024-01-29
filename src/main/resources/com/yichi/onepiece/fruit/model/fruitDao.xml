@@ -5,7 +5,7 @@
     <select id="listFruits" resultType="com.yichi.onepiece.fruit.model.FruitListView">
         SELECT * FROM `view_fruit_list_view`
         WHERE
-        ( user_id = #{userId}
+        (`view_fruit_list_view`.user_id = #{userId} or `view_fruit_list_view`.system_resource = true
         <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
             OR
             id IN
@@ -25,7 +25,7 @@
     <select id="searchCount" resultType="int">
         SELECT COUNT(*) FROM fruit
         WHERE
-        ( user_id = #{userId}
+        ( user_id = #{userId} or system_resource = true
         <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
             OR
             id IN
