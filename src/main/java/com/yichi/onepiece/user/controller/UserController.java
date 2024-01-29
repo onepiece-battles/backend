@@ -26,8 +26,7 @@ public class UserController implements UserApi {
 
   @Override
   public ResponseEntity<AssignRoleResponse> assignRole(AssignRoleRequest assignRoleRequest) {
-    iamService.checkPermissionOfCurrentAccount(
-        ResourceType.USER, Set.of(Permission.UPDATE));
+    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
     var roles =
         userService.assignRoleToUser(assignRoleRequest.getUserId(), assignRoleRequest.getRoles());
     return ResponseEntity.ok(
@@ -36,16 +35,14 @@ public class UserController implements UserApi {
 
   @Override
   public ResponseEntity<User> getUser(GetUserRequest getUserRequest) {
-    iamService.checkPermissionOfCurrentAccount(
-        ResourceType.USER, Set.of(Permission.GET));
+    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.GET));
     var user = userService.getUserById(getUserRequest.getUserId());
     return ResponseEntity.ok(user);
   }
 
   @Override
   public ResponseEntity<ListUsersResponse> listUsers(ListUsersRequest listUsersRequest) {
-    iamService.checkPermissionOfCurrentAccount(
-        ResourceType.USER, Set.of(Permission.LIST));
+    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.LIST));
     var response = userService.list(listUsersRequest);
     return ResponseEntity.ok(response);
   }
@@ -58,8 +55,7 @@ public class UserController implements UserApi {
 
   @Override
   public ResponseEntity<LogoutResponse> logout(LogoutRequest logoutRequest) {
-    iamService.checkPermissionOfCurrentAccount(
-        ResourceType.USER, Set.of(Permission.UPDATE));
+    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
     var response = userService.logout(logoutRequest.getUserId());
     return ResponseEntity.ok(response);
   }
@@ -68,11 +64,10 @@ public class UserController implements UserApi {
   public ResponseEntity<RegisterResponse> register(RegisterRequest registerRequest) {
     var verificationKey =
         userService.register(
-            registerRequest.getUserName(),
+            registerRequest.getNickname(),
             registerRequest.getPassword(),
-            registerRequest.getEmail(),
+            registerRequest.getUsername(),
             registerRequest.getConfirmedPassword(),
-            registerRequest.getOrganization(),
             registerRequest.getLocale());
     var registerSuccess = verificationKey.equals(SUCCESS);
     return ResponseEntity.ok(
@@ -87,25 +82,24 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<ShareResourceResponse> shareResource(
       ShareResourceRequest shareResourceRequest) {
-    iamService.checkPermissionOfCurrentAccount(
-        ResourceType.USER, Set.of(Permission.UPDATE));
+    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
     var response = userService.shareResource(shareResourceRequest);
     return ResponseEntity.ok(response);
   }
 
   @Override
   public ResponseEntity<UpdateLoginRoleResponse> updateRole(UpdateLoginRoleRequest request) {
-    iamService.checkPermissionOfCurrentAccount(
-        ResourceType.USER, Set.of(Permission.UPDATE));
+    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
     var resourcePermissionMaps = userService.updateLoginRole(request.getRole());
     return ResponseEntity.ok(
-        new UpdateLoginRoleResponse().currentRole(request.getRole()).resourcePermissionMap(resourcePermissionMaps));
+        new UpdateLoginRoleResponse()
+            .currentRole(request.getRole())
+            .resourcePermissionMap(resourcePermissionMaps));
   }
 
   @Override
   public ResponseEntity<UpdateUserResponse> updateUser(UpdateUserRequest updateUserRequest) {
-    iamService.checkPermissionOfCurrentAccount(
-        ResourceType.USER, Set.of(Permission.UPDATE));
+    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
     var user = userService.updateUser(updateUserRequest);
     return ResponseEntity.ok(new UpdateUserResponse().user(user));
   }
@@ -113,8 +107,7 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<VerifyByEmailCodeResponse> verifyByEmailCode(
       VerifyByEmailCodeRequest verifyByEmailCodeRequest) {
-    iamService.checkPermissionOfCurrentAccount(
-        ResourceType.USER, Set.of(Permission.UPDATE));
+    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
     var response = userService.verifyByCode(verifyByEmailCodeRequest);
     return ResponseEntity.ok(response);
   }
@@ -122,8 +115,7 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<VerifyEmailResponse> verifyUserEmail(
       VerifyEmailRequest verifyEmailRequest) {
-    iamService.checkPermissionOfCurrentAccount(
-        ResourceType.USER, Set.of(Permission.UPDATE));
+    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
     var response =
         new VerifyEmailResponse().emailNotification(userService.verifyEmail(verifyEmailRequest));
     return ResponseEntity.ok(response);

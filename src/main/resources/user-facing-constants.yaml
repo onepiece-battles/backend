@@ -2,8 +2,8 @@ user:
   constants:
     DUPLICATE_USER_NAME:
       displayName:
-        en-US: "User name is taken, please consider anther name"
-        zh-CN: "用户名被占用，请选择其他名字"
+        en-US: "Nickname is taken, please consider anther name"
+        zh-CN: "昵称被占用，请选择其他名字"
     PASSWORD_CONFIRMATION:
       displayName:
         en-US: "Please confirm your password again"

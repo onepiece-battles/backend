@@ -57,6 +57,6 @@ public interface UserDao extends BaseDao<UserEntity, UUID> {
         @Result(property = "modificationRecordId", column = "modification_record_id"),
         @Result(property = "loginRole", column = "login_role")
       })
-  @Select("SELECT * FROM user WHERE name=#{username}")
-  Optional<UserDetailImpl> getUserDetailByName(@Param("username") String username);
+  @Select("SELECT * FROM user WHERE username=#{userName}")
+  Optional<UserDetailImpl> getUserByUsername(@Param("userName") String userName);
 }

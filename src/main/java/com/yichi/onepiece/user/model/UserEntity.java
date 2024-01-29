@@ -13,9 +13,9 @@ public interface UserEntity {
 
   UUID getId();
 
-  String getName();
+  String getNickname();
 
-  String getEmail();
+  String getUsername();
 
   Boolean getEmailVerified();
 
@@ -24,8 +24,6 @@ public interface UserEntity {
   Long getCreationRecordId();
 
   Long getModificationRecordId();
-
-  String getOrganization();
 
   UserRole getLoginRole();
 

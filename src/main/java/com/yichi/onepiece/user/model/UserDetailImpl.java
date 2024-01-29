@@ -75,10 +75,10 @@ public class UserDetailImpl extends UserEntityImpl
     return getEncryptedPassword();
   }
 
-  @Override
-  public String getUsername() {
-    return getName();
-  }
+  //  @Override
+  //  public String getUsername() {
+  //    return getUsername();
+  //  }
 
   @Override
   public boolean isAccountNonExpired() {
@@ -105,9 +105,8 @@ public class UserDetailImpl extends UserEntityImpl
     StringBuilder sb = new StringBuilder();
     sb.append("class ").append(getClass().getName()).append(" {\n");
     sb.append("  id: ").append(toIndentedString(getId())).append("\n");
-    sb.append("  name: ").append(toIndentedString(getName())).append("\n");
-    sb.append("  email: ").append(toIndentedString(getEmail())).append("\n");
-    sb.append("  organization: ").append(toIndentedString(getOrganization())).append("\n");
+    sb.append("  nickname: ").append(toIndentedString(getNickname())).append("\n");
+    sb.append("  username: ").append(toIndentedString(getUsername())).append("\n");
     sb.append("  encryptedPassword: ")
         .append(toIndentedString(getEncryptedPassword()))
         .append("\n");

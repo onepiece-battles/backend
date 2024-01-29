@@ -62,7 +62,8 @@ public class UserService {
       UserResourceDao userResourceDao,
       ActionRecordService actionRecordService,
       EmailClient emailClient,
-      RoleService roleService, EmailVerificationDao emailVerificationDao,
+      RoleService roleService,
+      EmailVerificationDao emailVerificationDao,
       Clock clock) {
     this.userDao = userDao;
     this.roleToResourcePermissionDao = roleToResourcePermissionDao;
@@ -83,27 +84,26 @@ public class UserService {
   /**
    * Request to register into system
    *
-   * @param name username
+   * @param nickName nickname
    * @param password password
-   * @param email email address
+   * @param username email address as username
    * @param confirmedPassword confirmed password
-   * @param organization organization user belongs to
+   * @param onepieceLocale the local information (i18n information) based on FE language
    * @return register verification: key of DUPLICATE_USER_NAME/PASSWORD_DIFFERENT/REGISTER_SUCCESS
    */
   public String register(
-      String name,
+      String nickName,
       String password,
-      String email,
+      String username,
       String confirmedPassword,
-      String organization,
       OnepieceLocale onepieceLocale) {
-    if (!userDao.listByName(name).isEmpty()) {
+    if (!userDao.listByName(nickName).isEmpty()) {
       return UserFacingConstantsKey.DUPLICATE_USER_NAME;
     }
-    if (!userDao.listByEmailAddress(email).isEmpty()) {
+    if (!userDao.listByEmailAddress(username).isEmpty()) {
       return UserFacingConstantsKey.EMAIL_HAS_BEEN_REGISTERED;
     }
-    if (!email.matches(VALID_EMAIL_PATTERN)) {
+    if (!username.matches(VALID_EMAIL_PATTERN)) {
       return UserFacingConstantsKey.INVALID_EMAIL_ADDRESS;
     }
     if (!password.equals(confirmedPassword)) {
@@ -114,15 +114,14 @@ public class UserService {
     var encryptedPassword = passwordEncoder.encode(password);
     UserEntity user =
         UserEntityBuilder.newBuilder()
-            .setName(name)
+            .setNickname(nickName)
             .setAccountStatus(AccountStatus.LOGGED_OUT)
             .setEncryptedPassword(encryptedPassword)
-            .setEmail(email)
+            .setUsername(username)
             .setEmailVerified(false)
             .setLocale(onepieceLocale)
             // USER role is the default login role
             .setLoginRole(UserRole.NIKA)
-            .setOrganization(organization)
             .setProfileImage(ArrayUtils.toObject(defaultImage))
             .build();
     userDao.insert(user);
@@ -147,9 +146,9 @@ public class UserService {
   }
 
   public LoginResponse login(LoginRequest request) {
-    var userName = request.getUserName();
+    var email = request.getEmail();
     var password = request.getPassword();
-    var userDetail = userDao.getUserDetailByName(userName);
+    var userDetail = userDao.getUserByUsername(email);
     I18nText verification;
     if (userDetail.isEmpty()) {
       verification = UserFacingConstants.getConstant(REGISTER_FIRST_BEFORE_LOGIN).getDisplayName();
@@ -157,8 +156,7 @@ public class UserService {
     }
     // Authenticate username and password with registered information.
     try {
-      authenticationManager.authenticate(
-          new UsernamePasswordAuthenticationToken(userName, password));
+      authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
     } catch (Exception e) {
       verification = UserFacingConstants.getConstant(WRONG_PASSWORD).getDisplayName();
       return new LoginResponse().verification(verification);
@@ -205,13 +203,15 @@ public class UserService {
 
   private List<ResourcePermissionMap> getPermissionMapByRoleName(UserRole userRole) {
     var roleId = roleDao.findByRoleName(userRole).orElseThrow().getId();
-  return
-        roleService.getResourcePermissionMapByRoleId(roleId).entrySet().stream().map(entry -> {
-          var resourcePermissionMap = new ResourcePermissionMap();
-          resourcePermissionMap.setResourceType(entry.getKey());
-          resourcePermissionMap.setPermissions(entry.getValue());
-          return resourcePermissionMap;
-        }).toList();
+    return roleService.getResourcePermissionMapByRoleId(roleId).entrySet().stream()
+        .map(
+            entry -> {
+              var resourcePermissionMap = new ResourcePermissionMap();
+              resourcePermissionMap.setResourceType(entry.getKey());
+              resourcePermissionMap.setPermissions(entry.getValue());
+              return resourcePermissionMap;
+            })
+        .toList();
   }
 
   public LogoutResponse logout(UUID userId) {
@@ -223,7 +223,7 @@ public class UserService {
     var user = userOptional.get();
     var signedOutUser = user.toBuilder().setAccountStatus(AccountStatus.LOGGED_OUT).build();
     userDao.update(signedOutUser);
-    return new LogoutResponse().logoutResult(SUCCESS).userName(user.getName());
+    return new LogoutResponse().logoutResult(SUCCESS).userName(user.getUsername());
   }
 
   public ListUsersResponse list(ListUsersRequest request) {
@@ -332,11 +332,7 @@ public class UserService {
   public User updateUser(UpdateUserRequest request) {
     var user = userDao.findById(request.getId()).orElseThrow();
     var updatedUser =
-        user.toBuilder()
-            .setEmail(request.getEmail())
-            .setLocale(request.getLocale())
-            .setName(request.getName())
-            .build();
+        user.toBuilder().setLocale(request.getLocale()).setNickname(request.getNickname()).build();
     userDao.update(updatedUser);
     var loginUserResource = getPermissionMapByRoleName(user.getLoginRole());
     var tokens =
