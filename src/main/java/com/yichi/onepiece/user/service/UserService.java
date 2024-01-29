@@ -23,6 +23,7 @@ import com.yichi.onepiece.utils.RandomGenerator;
 import java.time.Clock;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,7 +97,8 @@ public class UserService {
       String password,
       String username,
       String confirmedPassword,
-      OnepieceLocale onepieceLocale) {
+      OnepieceLocale onepieceLocale,
+      @Nullable UserRole userRole) {
     if (!userDao.listByNickName(nickName).isEmpty()) {
       return UserFacingConstantsKey.DUPLICATE_USER_NAME;
     }
@@ -121,7 +123,7 @@ public class UserService {
             .setEmailVerified(false)
             .setLocale(onepieceLocale)
             // USER role is the default login role
-            .setLoginRole(UserRole.NIKA)
+            .setLoginRole(userRole == null ? UserRole.NIKA : userRole)
             .setProfileImage(ArrayUtils.toObject(defaultImage))
             .build();
     userDao.insert(user);

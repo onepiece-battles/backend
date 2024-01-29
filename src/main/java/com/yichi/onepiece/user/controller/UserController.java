@@ -68,7 +68,8 @@ public class UserController implements UserApi {
             registerRequest.getPassword(),
             registerRequest.getUsername(),
             registerRequest.getConfirmedPassword(),
-            registerRequest.getLocale());
+            registerRequest.getLocale(),
+            registerRequest.getUserRole());
     var registerSuccess = verificationKey.equals(SUCCESS);
     return ResponseEntity.ok(
         new RegisterResponse()
