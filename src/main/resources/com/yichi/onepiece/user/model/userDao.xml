@@ -3,7 +3,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.user.model.UserDao">
     <select id="listUsers" resultType="com.yichi.onepiece.user.model.UserDetailImpl" resultMap="userDetailView">
-        SELECT * FROM `user`
+        SELECT
+            `id`,
+            `nickname`,
+            `username`, `login_role`, `encrypted_password`, `account_status`, `profile_image`,
+            `locale`, `email_verified`, `creation_record_id`, `modification_record_id`
+        FROM `user`
         WHERE
         true
         <include refid="userFilter">
@@ -27,11 +32,11 @@
     <sql id="userFilter">
         <if test="userFilter.name != null and userFilter.name != ''">
             <bind name="keyLike" value="'%' + userFilter.name + '%'"/>
-            AND `name` like #{keyLike}
+            AND `nickname` like #{keyLike}
         </if>
         <if test="userFilter.email != null and userFilter.email != ''">
             <bind name="keyLike" value="'%' + userFilter.email + '%'"/>
-            AND `email` like #{keyLike}
+            AND `username` like #{keyLike}
         </if>
         <if test="userFilter.userRoles != null and !userFilter.userRoles.isEmpty">
             AND `login_role` IN
@@ -61,8 +66,8 @@
         <result property="creationRecordId" column="creation_record_id"/>
         <result property="modificationRecordId" column="modification_record_id"/>
         <result property="loginRole" column="login_role"/>
-        <result property="name" column="name"/>
-        <result property="organization" column="organization"/>
+        <result property="username" column="username"/>
+        <result property="nickname" column="nickname"/>
         <result property="accountStatus" column="account_status"/>
         <result property="emailVerified" column="email_verified"/>
         <association column="login_role" property="loginRoleResources"

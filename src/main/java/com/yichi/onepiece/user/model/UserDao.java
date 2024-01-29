@@ -27,10 +27,10 @@ public interface UserDao extends BaseDao<UserEntity, UUID> {
 
   int searchCount(@Param("userFilter") UserFilter userFilter);
 
-  @Select("SELECT * FROM user WHERE name = #{name}")
-  List<UserEntity> listByName(@Param("name") String name);
+  @Select("SELECT * FROM user WHERE nickname = #{nickname}")
+  List<UserEntity> listByNickName(@Param("nickname") String nickname);
 
-  @Select("SELECT * FROM user WHERE email= #{email}")
+  @Select("SELECT * FROM user WHERE username= #{email}")
   List<UserEntity> listByEmailAddress(@Param("email") String email);
 
   @Results(
