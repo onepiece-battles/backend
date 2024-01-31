@@ -348,7 +348,7 @@ public class UserService {
         .tokens(tokens);
   }
 
-  public I18nText verifyEmail(VerifyEmailRequest verifyEmailRequest) {
+  public I18nText verifyEmail(SendEmailRequest sendEmailRequest) {
     // todo(yichi): send email according to locale information.
     try {
       long creationTimestamp = clock.millis();
@@ -357,8 +357,8 @@ public class UserService {
       String verificationCode = RandomGenerator.generateVerificationCode();
       var emailVerificationEntity =
           EmailVerificationEntityBuilder.newBuilder()
-              .setEmail(verifyEmailRequest.getEmail())
-              .setUserId(verifyEmailRequest.getId())
+              .setEmail(sendEmailRequest.getEmail())
+              .setUserId(sendEmailRequest.getId())
               .setEmailVerificationCode(verificationCode)
               .setCreationTimestamp(clock.millis())
               .setExpirationTimestamp(expirationTimestamp)
@@ -366,7 +366,7 @@ public class UserService {
               .build();
       emailVerificationDao.insert(emailVerificationEntity);
       emailClient.sendMail(
-          verifyEmailRequest.getEmail(),
+          sendEmailRequest.getEmail(),
           "This is the verification email, The verification code is: " + verificationCode,
           "Email address verification");
     } catch (Exception e) {
