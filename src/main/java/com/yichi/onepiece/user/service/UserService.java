@@ -348,9 +348,9 @@ public class UserService {
         .tokens(tokens);
   }
 
-  public I18nText verifyEmail(SendEmailRequest sendEmailRequest) {
-    // todo(yichi): send email according to locale information.
+  public I18nText sendEmail(SendEmailRequest sendEmailRequest) {
     try {
+      emailVerificationDao.markEmailAsUsed(sendEmailRequest.getId(), sendEmailRequest.getEmail());
       long creationTimestamp = clock.millis();
       // 5 minutes later
       long expirationTimestamp = creationTimestamp + 300000L;
@@ -365,10 +365,17 @@ public class UserService {
               .isUsed(false)
               .build();
       emailVerificationDao.insert(emailVerificationEntity);
-      emailClient.sendMail(
-          sendEmailRequest.getEmail(),
-          "This is the verification email, The verification code is: " + verificationCode,
-          "Email address verification");
+      if (UserHelper.getCurrentUserDetail().getLocale() == OnepieceLocale.EN_US) {
+        emailClient.sendMail(
+            sendEmailRequest.getEmail(),
+            "This is the verification email, The verification code is: " + verificationCode,
+            "[Onepiece Battles] Email address verification");
+      } else {
+        emailClient.sendMail(
+            sendEmailRequest.getEmail(),
+            "这是您的验证邮件，验证码为：" + verificationCode,
+            "[Onepiece Battles] 电子邮箱验证");
+      }
     } catch (Exception e) {
       return UserFacingConstants.getConstant(EMAIL_SENDING_FAILED).getDisplayName();
     }
@@ -378,18 +385,26 @@ public class UserService {
   public VerifyByEmailCodeResponse verifyByCode(VerifyByEmailCodeRequest request) {
     var emailVerificationEntity =
         emailVerificationDao
-            .getByEmailAndUserId(request.getEmail(), request.getUserId())
-            .orElseThrow();
-    boolean verifyResult =
-        emailVerificationEntity.getEmailVerificationCode().equals(request.getVerificationCode())
-            && !emailVerificationEntity.getIsUsed()
-            && emailVerificationEntity.getExpirationTimestamp() > clock.millis();
-    // if verification code is correct, send mark user email as verified.
-    if (verifyResult) {
-      var user = userDao.findById(request.getUserId()).orElseThrow();
-      user.toBuilder().setEmailVerified(true);
-      userDao.update(user);
+            .getByEmailAndUserId(request.getEmail(), request.getUserId(), request.getVerificationCode());
+    if (emailVerificationEntity.isEmpty()) {
+      return new VerifyByEmailCodeResponse()
+          .verifyResult(false).verifyMessage(UserFacingConstants.getConstant(
+              VERIFICATION_CODE_NOT_MATCH).getDisplayName());
     }
-    return new VerifyByEmailCodeResponse().verifyResult(verifyResult);
+    if (emailVerificationEntity.get().getExpirationTimestamp() < clock.millis()) {
+      return new VerifyByEmailCodeResponse().verifyResult(false)
+          .verifyMessage(UserFacingConstants.getConstant(
+          VERIFICATION_CODE_EXPIRED).getDisplayName());
+    }
+
+    // mark email as used.
+    emailVerificationDao.markEmailAsUsed(request.getUserId(), request.getEmail());
+    // if verification code is correct, send mark user email as verified.
+    var user = userDao.findById(request.getUserId()).orElseThrow();
+    user = user.toBuilder().setEmailVerified(true).build();
+    userDao.update(user);
+    return new VerifyByEmailCodeResponse()
+        .verifyResult(true).verifyMessage(UserFacingConstants.getConstant(
+        VERIFICATION_SUCCESS).getDisplayName());
   }
 }

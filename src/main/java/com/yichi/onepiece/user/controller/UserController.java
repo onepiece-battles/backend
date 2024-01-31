@@ -85,7 +85,7 @@ public class UserController implements UserApi {
       SendEmailRequest sendEmailRequest) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
     var response =
-        new SendEmailResponse().emailNotification(userService.verifyEmail(sendEmailRequest));
+        new SendEmailResponse().emailNotification(userService.sendEmail(sendEmailRequest));
     return ResponseEntity.ok(response);
   }
 
