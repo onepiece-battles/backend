@@ -81,6 +81,15 @@ public class UserController implements UserApi {
   }
 
   @Override
+  public ResponseEntity<SendEmailResponse> sendVerificationEmail(
+      SendEmailRequest sendEmailRequest) {
+    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
+    var response =
+        new SendEmailResponse().emailNotification(userService.sendEmail(sendEmailRequest));
+    return ResponseEntity.ok(response);
+  }
+
+  @Override
   public ResponseEntity<ShareResourceResponse> shareResource(
       ShareResourceRequest shareResourceRequest) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
@@ -110,15 +119,6 @@ public class UserController implements UserApi {
       VerifyByEmailCodeRequest verifyByEmailCodeRequest) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
     var response = userService.verifyByCode(verifyByEmailCodeRequest);
-    return ResponseEntity.ok(response);
-  }
-
-  @Override
-  public ResponseEntity<VerifyEmailResponse> verifyUserEmail(
-      VerifyEmailRequest verifyEmailRequest) {
-    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
-    var response =
-        new VerifyEmailResponse().emailNotification(userService.verifyEmail(verifyEmailRequest));
     return ResponseEntity.ok(response);
   }
 }
