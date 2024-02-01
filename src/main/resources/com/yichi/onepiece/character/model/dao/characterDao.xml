@@ -53,6 +53,9 @@
 
     <!-- Construct where clause -->
     <sql id="characterFilter">
+        <if test="characterFilter.userId != null">
+            AND `user_id` = #{characterFilter.userId}
+        </if>
         <if test="characterFilter.name != null and characterFilter.name != ''">
             <bind name="keyLike" value="'%' + characterFilter.name + '%'" />
             AND JSON_EXTRACT(name, CONCAT('$.', #{characterFilter.languageCode})) LIKE #{keyLike}

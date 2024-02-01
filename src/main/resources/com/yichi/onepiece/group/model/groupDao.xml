@@ -40,6 +40,9 @@
   </select>
 
   <sql id="groupFilter">
+    <if test="groupFilter.userId != null">
+      AND `user_id` = #{groupFilter.userId}
+    </if>
     <if test="groupFilter.onlySystem != null">
       AND `system_resource` = #{groupFilter.onlySystem}
     </if>

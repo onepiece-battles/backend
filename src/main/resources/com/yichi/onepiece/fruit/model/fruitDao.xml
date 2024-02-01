@@ -41,6 +41,9 @@
 
     <!-- Construct where clause -->
     <sql id="fruitFilter">
+        <if test="fruitFilter.userId != null">
+            AND `user_id` = #{fruitFilter.userId}
+        </if>
         <if test="fruitFilter.onlySystem != null">
             AND `system_resource` = #{fruitFilter.onlySystem}
         </if>
