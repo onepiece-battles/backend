@@ -4,15 +4,8 @@
 <mapper namespace="com.yichi.onepiece.battle.model.BattleDao">
     <select id="list" resultType="com.yichi.onepiece.battle.model.BattleListView">
         SELECT * FROM view_battle_list_view
-        WHERE ( user_id = #{userId}
-        <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
-            OR
-            id IN
-            <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
-                #{externalResourceId}
-            </foreach>
-        </if>
-        )
+        WHERE
+            1=1
         <include refid="battleFilter">
             <property name="battleFilter" value="battleFilter"/>
         </include>
@@ -23,15 +16,7 @@
 
     <select id="searchCount" resultType="int">
         SELECT COUNT(*) FROM view_battle_list_view
-        WHERE ( user_id = #{userId}
-        <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
-            OR
-            id IN
-            <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
-                #{externalResourceId}
-            </foreach>
-        </if>
-        )
+        WHERE 1=1
         <include refid="battleFilter">
             <property name="battleFilter" value="battleFilter"/>
         </include>
@@ -39,6 +24,9 @@
 
     <!-- Construct where clause -->
     <sql id="battleFilter">
+        <if test="battleFilter.userId != null">
+            AND `user_id` = #{battleFilter.userId}
+        </if>
         <if test="battleFilter.onlySystem != null">
             AND `is_system_resource` = #{battleFilter.onlySystem}
         </if>
@@ -54,6 +42,13 @@
             <foreach item="battleStatus" collection="battleFilter.battleStatuses" open="("
                      separator="," close=")">
                 #{battleStatus}
+            </foreach>
+        </if>
+        <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
+            OR
+            id IN
+            <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
+                #{externalResourceId}
             </foreach>
         </if>
     </sql>
