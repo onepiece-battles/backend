@@ -28,7 +28,7 @@
             AND `user_id` = #{battleFilter.userId}
         </if>
         <if test="battleFilter.onlySystem != null">
-            AND `is_system_resource` = #{battleFilter.onlySystem}
+            AND `system_resource` = #{battleFilter.onlySystem}
         </if>
         <if test="battleFilter.battleTypes != null and !battleFilter.battleTypes.isEmpty">
             AND type IN
