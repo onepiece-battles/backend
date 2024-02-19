@@ -56,6 +56,7 @@ public class BattleService {
             .setUserId(request.getUserId())
             // this service focus on
             .setType(BattleType.SINGLE)
+            .setSystemResource(UserHelper.hasNikaPermission())
             .setStarterId(request.getStarterId())
             .setReceiverId(request.getReceiverId())
             .setCreationRecordId(actionRecord.getId())
