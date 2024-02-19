@@ -23,5 +23,7 @@ public interface BattleEntity {
 
   BattleType getType();
 
+  Boolean getSystemResource();
+
   BattleEntityBuilder toBuilder();
 }
