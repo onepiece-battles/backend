@@ -75,4 +75,12 @@ public class CharacterController implements CharacterApi {
     logger.info("list character takes: {}", watch.getTotalTimeSeconds());
     return ResponseEntity.ok(response);
   }
+
+  @Override
+  public ResponseEntity<UpdateCharacterResponse> updateCharacter(Character character) {
+    iamService.checkPermissionOfCurrentAccount(ResourceType.CHARACTER, Set.of(Permission.UPDATE));
+    logger.info("start updating character");
+    var response = characterService.updateCharacter(character);
+    return ResponseEntity.ok(response);
+  }
 }

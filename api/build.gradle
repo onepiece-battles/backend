@@ -33,6 +33,7 @@ openApiGenerate {
             generateSupportingFiles: false.toString(),
             serializableModel: true.toString(),
             serializationLibrary: "jackson".toString(),
+            dateLibrary: "legacy"
     ]
 
     globalProperties = [

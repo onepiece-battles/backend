@@ -85,3 +85,7 @@ user:
       displayName:
         en-US: "Verification Success!"
         zh-CN: "验证成功！"
+    UPDATE_SUCCESS:
+      displayName:
+        en-US: "Update Success!"
+        zh-CN: "更新成功！"
