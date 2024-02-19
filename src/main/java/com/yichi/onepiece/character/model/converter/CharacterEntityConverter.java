@@ -36,10 +36,21 @@ public interface CharacterEntityConverter {
   @Mapping(target = "systemResource", ignore = true)
   CharacterEntity toCharacterEntity(CreateCharacterRequest addCharacterRequest);
 
+  @Mapping(target = "creationRecordId", ignore = true)
+  @Mapping(target = "modificationRecordId", ignore = true)
+  CharacterEntity toCharacterEntity(Character character);
+
   default String blobToString(Byte[] profileByteArray) {
     if (profileByteArray == null) {
       return null;
     }
     return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(profileByteArray));
+  }
+
+  default Byte[] stringToBlob(String string) {
+    if (string == null) {
+      return null;
+    }
+    return ArrayUtils.toObject(EncryptHelper.base64Decode(string));
   }
 }

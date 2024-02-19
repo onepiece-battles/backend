@@ -246,4 +246,13 @@ public class CharacterService {
   public CharacterEntity findByCharacterId(UUID characterId) {
     return characterDao.findById(characterId).orElseThrow();
   }
+
+  public UpdateCharacterResponse updateCharacter(Character character) {
+    characterDao.update(CharacterEntityConverter.INSTANCE.toCharacterEntity(character));
+    logger.info("the date is: {}", character.getDateOfBirth().toString());
+    var response = new UpdateCharacterResponse();
+    return response.result(
+            UserFacingConstants.getConstant(UserFacingConstantsKey.UPDATE_SUCCESS)
+                    .getDisplayName()).success(Boolean.TRUE);
+  }
 }
