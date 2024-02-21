@@ -8,23 +8,39 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EmailClient {
+  private final Logger logger = LoggerFactory.getLogger(EmailClient.class);
   private final JavaMailSender javaMailSender;
-  private final String from;
 
   public EmailClient(JavaMailSender mailSender) {
     this.javaMailSender = mailSender;
-    this.from = FROM_EMAIL_ADDRESS;
   }
 
   public void sendMail(String toEmail, String body, String subject) throws MessagingException {
     MimeMessage mimeMessage = javaMailSender.createMimeMessage();
     // body part to save img
+    MimeMultipart multipart = getMimeMultipart(body);
+    mimeMessage.setContent(multipart);
+    MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+    helper.setFrom(FROM_EMAIL_ADDRESS);
+    helper.setTo(toEmail);
+    helper.setSubject(subject);
+    try{
+      javaMailSender.send(mimeMessage);
+    } catch (MailException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private static MimeMultipart getMimeMultipart(String body) throws MessagingException {
     MimeBodyPart picturePart = new MimeBodyPart();
     DataHandler dataHandler =
         new DataHandler(new FileDataSource("src/test/resources/email_resources/sunny.png"));
@@ -37,14 +53,6 @@ public class EmailClient {
     multipart.addBodyPart(textPart);
     multipart.addBodyPart(picturePart);
     multipart.setSubType("related");
-
-    mimeMessage.setContent(multipart);
-
-    MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
-    helper.setFrom(from);
-    helper.setTo(toEmail);
-    helper.setSubject(subject);
-    javaMailSender.send(mimeMessage);
-    System.out.println("message sent successfully");
+    return multipart;
   }
 }

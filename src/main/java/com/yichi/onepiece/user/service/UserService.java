@@ -36,8 +36,6 @@ import org.springframework.stereotype.Service;
 public class UserService {
   private final Logger logger = LoggerFactory.getLogger(UserService.class);
   private final UserDao userDao;
-  private final RoleToResourcePermissionDao roleToResourcePermissionDao;
-  private final ResourcePermissionDao resourcePermissionDao;
   private final AuthenticationManager authenticationManager;
   private final TokenDao tokenDao;
   private final RoleDao roleDao;
@@ -53,8 +51,6 @@ public class UserService {
 
   public UserService(
       UserDao userDao,
-      RoleToResourcePermissionDao roleToResourcePermissionDao,
-      ResourcePermissionDao resourcePermissionDao,
       AuthenticationManager authenticationManager,
       TokenDao tokenDao,
       RoleDao roleDao,
@@ -67,8 +63,6 @@ public class UserService {
       EmailVerificationDao emailVerificationDao,
       Clock clock) {
     this.userDao = userDao;
-    this.roleToResourcePermissionDao = roleToResourcePermissionDao;
-    this.resourcePermissionDao = resourcePermissionDao;
     this.authenticationManager = authenticationManager;
     this.tokenDao = tokenDao;
     this.roleDao = roleDao;
@@ -352,7 +346,7 @@ public class UserService {
     try {
       emailVerificationDao.markEmailAsUsed(sendEmailRequest.getId(), sendEmailRequest.getEmail());
       long creationTimestamp = clock.millis();
-      // 5 minutes later
+      // expires 5 minutes later
       long expirationTimestamp = creationTimestamp + 300000L;
       String verificationCode = RandomGenerator.generateVerificationCode();
       var emailVerificationEntity =
