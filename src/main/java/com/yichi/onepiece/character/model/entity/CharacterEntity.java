@@ -15,7 +15,7 @@ public interface CharacterEntity {
 
   UUID getUserId();
 
-  @Column(ignoreUpdates = true, json = true)
+  @Column(json = true)
   I18nText getName();
 
   @Nullable
