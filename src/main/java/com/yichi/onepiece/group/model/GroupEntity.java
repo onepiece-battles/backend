@@ -15,7 +15,7 @@ public interface GroupEntity {
 
   UUID getRoleId();
 
-  @Column(ignoreUpdates = true, json = true)
+  @Column(json = true)
   I18nText getName();
 
   GroupCategory getGroupCategory();

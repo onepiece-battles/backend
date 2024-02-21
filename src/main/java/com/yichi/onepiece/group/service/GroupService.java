@@ -9,16 +9,11 @@ import com.yichi.onepiece.group.model.GroupEntity;
 import com.yichi.onepiece.group.model.GroupEntityBuilder;
 import com.yichi.onepiece.iam.service.RoleService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
-import com.yichi.onepiece.model.CreateGroupRequest;
-import com.yichi.onepiece.model.CreateGroupResponse;
-import com.yichi.onepiece.model.GetGroupRequest;
-import com.yichi.onepiece.model.GroupFullView;
-import com.yichi.onepiece.model.ListGroupRequest;
-import com.yichi.onepiece.model.ListGroupResponse;
-import com.yichi.onepiece.model.ResourceType;
+import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
+import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import com.yichi.onepiece.utils.EncryptHelper;
 import java.util.List;
 import java.util.UUID;
@@ -107,5 +102,14 @@ public class GroupService {
             .build();
     groupDao.update(updatedGroup);
     return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(updatedGroup.getProfileImage()));
+  }
+
+  public UpdateGroupResponse update(Group group) {
+    GroupEntity groupEntity = GroupConverter.INSTANCE.toGroupEntity(group);
+    groupDao.update(groupEntity);
+    UpdateGroupResponse response = new UpdateGroupResponse();
+    return response.result(
+            UserFacingConstants.getConstant(UserFacingConstantsKey.UPDATE_SUCCESS)
+                    .getDisplayName()).success(Boolean.TRUE);
   }
 }

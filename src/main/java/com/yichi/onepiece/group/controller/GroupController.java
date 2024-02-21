@@ -41,4 +41,11 @@ public class GroupController implements GroupApi {
         ResourceType.GROUP, Set.of(Permission.LIST));
     return ResponseEntity.ok(groupService.list(listGroupRequest));
   }
+
+  @Override
+  public ResponseEntity<UpdateGroupResponse> updateGroup(Group group) {
+    iamService.checkPermissionOfCurrentAccount(
+            ResourceType.GROUP, Set.of(Permission.UPDATE));
+    return ResponseEntity.ok(groupService.update(group));
+  }
 }
