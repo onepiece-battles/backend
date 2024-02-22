@@ -5,7 +5,9 @@ import com.yichi.onepiece.fruit.model.FruitEntity;
 import com.yichi.onepiece.fruit.model.FruitListView;
 import com.yichi.onepiece.model.CreateFruitRequest;
 import com.yichi.onepiece.model.Fruit;
+import com.yichi.onepiece.model.FruitFullView;
 import com.yichi.onepiece.model.UpdateFruitRequest;
+import com.yichi.onepiece.utils.EncryptHelper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -33,12 +35,22 @@ public interface FruitConverter {
   Fruit toFruit(FruitEntity entity);
 
   @Mapping(target = "fruitHolders", ignore = true)
+  FruitFullView toFruitFullView(com.yichi.onepiece.fruit.model.FruitFullView fruitFullView);
+
+  @Mapping(target = "fruitHolders", ignore = true)
   com.yichi.onepiece.model.FruitListView toFruitListView(FruitListView fruitListView);
 
-  default byte[] blobToResource(Byte[] profileByteArray) {
+  default String blobToString(Byte[] profileByteArray) {
     if (profileByteArray == null) {
       return null;
     }
-    return ArrayUtils.toPrimitive(profileByteArray);
+    return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(profileByteArray));
+  }
+
+  default Byte[] stringToBlob(String string) {
+    if (string == null) {
+      return new Byte[]{};
+    }
+    return ArrayUtils.toObject(EncryptHelper.base64Decode(string));
   }
 }

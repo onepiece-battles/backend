@@ -8,8 +8,6 @@ import com.yichi.onepiece.fruit.model.converter.FruitConverter;
 import com.yichi.onepiece.model.Character;
 import com.yichi.onepiece.model.CreateCharacterRequest;
 import com.yichi.onepiece.model.GroupForCharacterView;
-import com.yichi.onepiece.utils.EncryptHelper;
-import org.apache.commons.lang3.ArrayUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -39,18 +37,4 @@ public interface CharacterEntityConverter {
   @Mapping(target = "creationRecordId", ignore = true)
   @Mapping(target = "modificationRecordId", ignore = true)
   CharacterEntity toCharacterEntity(Character character);
-
-  default String blobToString(Byte[] profileByteArray) {
-    if (profileByteArray == null) {
-      return null;
-    }
-    return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(profileByteArray));
-  }
-
-  default Byte[] stringToBlob(String string) {
-    if (string == null) {
-      return null;
-    }
-    return ArrayUtils.toObject(EncryptHelper.base64Decode(string));
-  }
 }

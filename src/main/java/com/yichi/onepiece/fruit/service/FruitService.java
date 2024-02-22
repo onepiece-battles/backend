@@ -11,6 +11,8 @@ import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
+import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
+import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import com.yichi.onepiece.utils.EncryptHelper;
 import java.util.List;
 import java.util.UUID;
@@ -56,6 +58,11 @@ public class FruitService {
     return FruitConverter.INSTANCE.toFruit(fruitEntity).fruitHolders(characterNames);
   }
 
+  public FruitFullView getFruit(GetFruitRequest request) {
+    var fruitFullView  = fruitDao.getFruitFullViewById(request.getFruitId()).orElseThrow();
+    return FruitConverter.INSTANCE.toFruitFullView(fruitFullView);
+  }
+
   public ListFruitResponse listFruit(ListFruitRequest request) {
     var userId = UserHelper.getCurrentUserId();
     var resourceList = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
@@ -81,7 +88,7 @@ public class FruitService {
     return new ListFruitResponse().totalSize(totalSize).fruits(fruits);
   }
 
-  public Fruit updateFruit(UpdateFruitRequest request) {
+  public UpdateFruitResponse updateFruit(UpdateFruitRequest request) {
     var modificationRecord = actionRecordService.create();
     fruitDao
         .findById(request.getId())
@@ -93,12 +100,10 @@ public class FruitService {
             .setModificationRecordId(modificationRecord.getId())
             .build();
     fruitDao.update(fruitEntity);
-    var updatedFruit = fruitDao.findById(request.getId()).orElseThrow();
-    var characterNames =
-        characterHelper.listByFruitId(fruitEntity.getId()).stream()
-            .map(CharacterEntity::getName)
-            .toList();
-    return FruitConverter.INSTANCE.toFruit(updatedFruit).fruitHolders(characterNames);
+    var response = new UpdateFruitResponse();
+    return response.result(
+            UserFacingConstants.getConstant(UserFacingConstantsKey.UPDATE_SUCCESS)
+                    .getDisplayName()).success(Boolean.TRUE);
   }
 
   public List<FruitEntity> getFruitsByIds(List<UUID> fruitIds) {

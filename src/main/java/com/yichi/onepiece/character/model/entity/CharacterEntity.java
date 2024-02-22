@@ -47,7 +47,6 @@ public interface CharacterEntity {
 
   Integer getSpeed();
 
-  // magic will be used if character has fruit in Paramecia type.
   Integer getEnergy();
 
   Long getCreationRecordId();

@@ -17,7 +17,7 @@ public interface FruitEntity {
 
   UUID getRoleId();
 
-  @Column(ignoreUpdates = true, json = true)
+  @Column(json = true)
   I18nText getName();
 
   @Nullable
