@@ -39,6 +39,17 @@
         </include>
     </select>
 
+    <select id="getFruitFullViewById" resultType="com.yichi.onepiece.fruit.model.FruitFullView" resultMap="fruitFullView">
+        SELECT * FROM `view_fruit_list_view`
+        WHERE view_fruit_list_view.id = #{fruitId}
+    </select>
+
+    <resultMap id="fruitFullView" type="com.yichi.onepiece.fruit.model.FruitFullView" autoMapping="true">
+        <association column="id" property="characters"
+                     select="com.yichi.onepiece.character.model.dao.CharacterToFruitDao.listCharacterInFruitViewByFruitId"
+        />
+    </resultMap>
+
     <!-- Construct where clause -->
     <sql id="fruitFilter">
         <if test="fruitFilter.userId != null">

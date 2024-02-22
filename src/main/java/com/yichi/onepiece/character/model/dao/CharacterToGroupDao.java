@@ -15,13 +15,13 @@ import org.apache.ibatis.annotations.Select;
 @Dao
 @Mapper
 public interface CharacterToGroupDao extends BaseDao<CharacterToGroupEntity, UUID> {
-  String CHARACTER_FIELDS = ""
-      + "character.name, "
+  String CHARACTER_FIELDS =
+       "character.name, "
       + "character.profile_image, "
       + "character.system_resource ";
 
-  String GROUP_FIELDS = ""
-      + "group.name, "
+  String GROUP_FIELDS =
+       "group.name, "
       + "group.profile_image, "
       + "group.system_resource, "
       + "group.group_category as category ";
