@@ -6,6 +6,7 @@ import com.yichi.onepiece.model.GroupFullView;
 import com.yichi.onepiece.utils.EncryptHelper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(uses = {EntityBuilder.class})
@@ -17,6 +18,8 @@ public interface GroupConverter {
 
   GroupFullView toGroupFullView(com.yichi.onepiece.group.model.GroupFullView groupFullView);
 
+  @Mapping(target = "userId", ignore = true)
+  @Mapping(target = "systemResource", ignore = true)
   GroupEntity toGroupEntity(Group group);
 
   default String blobToString(Byte[] profileByteArray) {

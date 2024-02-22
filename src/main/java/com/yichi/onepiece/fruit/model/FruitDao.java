@@ -6,6 +6,7 @@ import com.yichi.onepiece.model.FruitFilter;
 import com.yichi.onepiece.model.FruitSortableField;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -29,6 +30,8 @@ public interface FruitDao extends BaseDao<FruitEntity, UUID> {
           + " `view_fruit_list_view`.`id` = `character_to_fruit`.`fruit_id` where"
           + " `character_to_fruit`.`character_id` = #{characterId} ")
   List<FruitListView> listByCharacterId(@Param("characterId") UUID characterId);
+
+  Optional<FruitFullView> getFruitFullViewById(@Param("fruitId") UUID fruitId);
 
   int searchCount(
       @Param("userId") UUID userId,

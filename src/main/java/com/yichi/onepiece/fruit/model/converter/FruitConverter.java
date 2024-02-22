@@ -5,6 +5,7 @@ import com.yichi.onepiece.fruit.model.FruitEntity;
 import com.yichi.onepiece.fruit.model.FruitListView;
 import com.yichi.onepiece.model.CreateFruitRequest;
 import com.yichi.onepiece.model.Fruit;
+import com.yichi.onepiece.model.FruitFullView;
 import com.yichi.onepiece.model.UpdateFruitRequest;
 import org.apache.commons.lang3.ArrayUtils;
 import org.mapstruct.Mapper;
@@ -31,6 +32,8 @@ public interface FruitConverter {
 
   @Mapping(target = "fruitHolders", ignore = true)
   Fruit toFruit(FruitEntity entity);
+
+  FruitFullView toFruitFullView(com.yichi.onepiece.fruit.model.FruitFullView fruitFullView);
 
   @Mapping(target = "fruitHolders", ignore = true)
   com.yichi.onepiece.model.FruitListView toFruitListView(FruitListView fruitListView);
