@@ -66,11 +66,18 @@
         <if test="characterFilter.onlySystem != null">
             AND `system_resource` = #{characterFilter.onlySystem}
         </if>
-        <if test="characterFilter.characterTypes != null and !characterFilter.characterTypes.isEmpty">
-            AND `character_type`.`character_type` in
-            <foreach item="characterType" collection="characterFilter.characterTypes" open="("
+        <if test="characterFilter.battleStyles != null and !characterFilter.battleStyles.isEmpty">
+            AND `battle_style` in
+            <foreach item="battleStyle" collection="characterFilter.battleStyles" open="("
                      separator="," close=")">
-                #{characterType}
+                #{battleStyle}
+            </foreach>
+        </if>
+        <if test="characterFilter.races != null and !characterFilter.races.isEmpty">
+            AND `race` in
+            <foreach item="race" collection="characterFilter.races" open="("
+                     separator="," close=")">
+                #{race}
             </foreach>
         </if>
         <if test="characterFilter.hakis != null and !characterFilter.hakis.isEmpty">
@@ -113,9 +120,6 @@
 
     <resultMap id="characterListView" type="com.yichi.onepiece.character.model.entity.CharacterListView" autoMapping="true">
         <association column="id" property="id"
-        />
-        <association column="id" property="characterTypes"
-                     select="com.yichi.onepiece.character.model.dao.CharacterTypeDao.listByCharacterId"
         />
         <association column="id" property="hakis"
                      select="com.yichi.onepiece.character.model.dao.HakiDao.listByCharacterId"
