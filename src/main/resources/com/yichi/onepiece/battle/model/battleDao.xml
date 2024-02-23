@@ -15,7 +15,8 @@
     </select>
 
     <select id="searchCount" resultType="int">
-        SELECT COUNT(*) FROM view_battle_list_view
+        SELECT COUNT(distinct(`view_battle_list_view`.id))
+        FROM view_battle_list_view
         WHERE 1=1
         <include refid="battleFilter">
             <property name="battleFilter" value="battleFilter"/>
@@ -29,6 +30,14 @@
         </if>
         <if test="battleFilter.onlySystem != null">
             AND `system_resource` = #{battleFilter.onlySystem}
+        </if>
+        <if test="battleFilter.starterName != null and battleFilter.starterName != ''">
+            <bind name="starterKeyLike" value="'%' + battleFilter.starterName + '%'" />
+            AND JSON_EXTRACT(starter_name, CONCAT('$.', #{battleFilter.languageCode})) LIKE #{starterKeyLike}
+        </if>
+        <if test="battleFilter.receiverName != null and battleFilter.receiverName != ''">
+            <bind name="receiverKeyLike" value="'%' + battleFilter.receiverName + '%'" />
+            AND JSON_EXTRACT(receiver_name, CONCAT('$.', #{battleFilter.languageCode})) LIKE #{receiverKeyLike}
         </if>
         <if test="battleFilter.battleTypes != null and !battleFilter.battleTypes.isEmpty">
             AND type IN
