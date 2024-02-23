@@ -4,13 +4,11 @@ import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
 import com.yichi.onepiece.character.model.dao.CharacterDao;
 import com.yichi.onepiece.character.model.dao.CharacterToFruitDao;
 import com.yichi.onepiece.character.model.dao.CharacterToGroupDao;
-import com.yichi.onepiece.character.model.dao.CharacterTypeDao;
 import com.yichi.onepiece.character.model.dao.HakiDao;
 import com.yichi.onepiece.character.model.entity.CharacterEntity;
 import com.yichi.onepiece.character.model.entity.CharacterToFruitEntityBuilder;
 import com.yichi.onepiece.character.model.entity.CharacterToGroupEntity;
 import com.yichi.onepiece.character.model.entity.CharacterToGroupEntityBuilder;
-import com.yichi.onepiece.character.model.entity.CharacterTypeEntityBuilder;
 import com.yichi.onepiece.character.model.entity.HakiEntityBuilder;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruit.service.FruitService;
@@ -35,7 +33,6 @@ public class CharacterService {
   private static final ResourceType RESOURCE_TYPE = ResourceType.CHARACTER;
 
   private final CharacterDao characterDao;
-  private final CharacterTypeDao characterTypeDao;
   private final CharacterToGroupDao characterToGroupDao;
   private final HakiDao hakiDao;
   private final FruitService fruitService;
@@ -46,14 +43,12 @@ public class CharacterService {
 
   public CharacterService(
       CharacterDao CharacterDao,
-      CharacterTypeDao characterTypeDao,
       CharacterToGroupDao characterToGroupDao, HakiDao hakiDao,
       FruitService fruitService,
       CharacterToFruitDao characterToFruitDao,
       ActionRecordService actionRecordService,
       UserService userService) {
     this.characterDao = CharacterDao;
-    this.characterTypeDao = characterTypeDao;
     this.characterToGroupDao = characterToGroupDao;
     this.hakiDao = hakiDao;
     this.fruitService = fruitService;
@@ -74,7 +69,6 @@ public class CharacterService {
             .setSystemResource(UserHelper.hasNikaPermission())
             .build();
     characterDao.insert(characterEntity);
-    createTypes(request.getCharacterTypes(), characterEntity.getId());
     createHakis(request.getHakis(), characterEntity.getId());
     var insertedEntity =
         characterDao
@@ -83,22 +77,6 @@ public class CharacterService {
                 ExceptionUtils.notFound(
                     "Can not find inserted character with id %s", characterEntity.getId()));
     return CharacterEntityConverter.INSTANCE.toCharacter(insertedEntity);
-  }
-
-  private void createTypes(List<CharacterType> types, UUID characterId) {
-    if (types.isEmpty()) {
-      return;
-    }
-    var typeEntities =
-        types.stream()
-            .map(
-                type ->
-                    CharacterTypeEntityBuilder.newBuilder()
-                        .setCharacterType(type)
-                        .setCharacterId(characterId)
-                        .build())
-            .toList();
-    characterTypeDao.batchInsert(typeEntities);
   }
 
   private void createHakis(List<Haki> hakis, UUID characterId) {

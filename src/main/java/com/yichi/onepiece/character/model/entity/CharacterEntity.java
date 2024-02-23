@@ -2,7 +2,10 @@ package com.yichi.onepiece.character.model.entity;
 
 import com.yichi.infra.support.entity.Entity;
 import com.yichi.infra.support.mybatis.annotations.Column;
+import com.yichi.onepiece.model.BattleStyle;
 import com.yichi.onepiece.model.I18nText;
+import com.yichi.onepiece.model.Race;
+
 import java.util.Date;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -18,6 +21,8 @@ public interface CharacterEntity {
   @Column(json = true)
   I18nText getName();
 
+  BattleStyle getBattleStyle();
+  Race getRace();
   @Nullable
   Byte[] getProfileImage();
 
