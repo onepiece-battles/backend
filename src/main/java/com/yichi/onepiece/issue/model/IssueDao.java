@@ -15,7 +15,7 @@ public interface IssueDao extends BaseDao<IssueEntity, UUID> {
   // sql defined in userDao.xml
   int searchCount(@Param("issueFilter") IssueFilter issueFilter);
 
-  List<IssueEntity> listIssues(
+  List<IssueListView> listIssues(
       @Param("issueFilter") IssueFilter issueFilter,
       @Param("sortList") Collection<IssueSortableField> sortList,
       @Param("offset") int offset,

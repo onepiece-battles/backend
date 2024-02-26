@@ -28,17 +28,14 @@ public class GroupService {
 
   private static final ResourceType RESOURCE_TYPE = ResourceType.GROUP;
   private final GroupDao groupDao;
-  private final RoleService roleService;
   private final ActionRecordService actionRecordService;
   private final UserService userService;
 
   public GroupService(
       GroupDao groupDao,
-      RoleService roleService,
       ActionRecordService actionRecordService,
       UserService userService) {
     this.groupDao = groupDao;
-    this.roleService = roleService;
     this.actionRecordService = actionRecordService;
     this.userService = userService;
   }
@@ -52,8 +49,6 @@ public class GroupService {
             .setGroupCategory(request.getGroupCategory())
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
-            .setUserId(user.getId())
-            .setRoleId(roleService.getRoleByName(user.getLoginRole()).getId())
             .setSystemResource(UserHelper.hasNikaPermission())
             .build();
     groupDao.insert(groupEntity);

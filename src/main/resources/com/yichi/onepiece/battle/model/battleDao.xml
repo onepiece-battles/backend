@@ -2,10 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.battle.model.BattleDao">
-    <select id="list" resultType="com.yichi.onepiece.battle.model.BattleListView">
-        SELECT * FROM view_battle_list_view
-        WHERE
-            1=1
+    <select id="list" resultType="com.yichi.onepiece.battle.model.BattleListView" resultMap="battleListView">
+        SELECT *
+        FROM `battle`
+        LEFT JOIN `battle_execution` on `battle`.id = `battle_execution`.`battle_id`
+        LEFT JOIN `action_lineage` on `battle`.`creation_record_id` = `action_lineage`.`id`
         <include refid="battleFilter">
             <property name="battleFilter" value="battleFilter"/>
         </include>
@@ -15,9 +16,10 @@
     </select>
 
     <select id="searchCount" resultType="int">
-        SELECT COUNT(distinct(`view_battle_list_view`.id))
-        FROM view_battle_list_view
-        WHERE 1=1
+        SELECT COUNT(distinct(`battle`.id))
+        FROM `battle`
+        LEFT JOIN `battle_execution` on `battle`.id = `battle_execution`.`battle_id`
+        LEFT JOIN `action_lineage` on `battle`.`creation_record_id` = `action_lineage`.`id`
         <include refid="battleFilter">
             <property name="battleFilter" value="battleFilter"/>
         </include>
@@ -25,8 +27,20 @@
 
     <!-- Construct where clause -->
     <sql id="battleFilter">
+        WHERE (`user_id` = #{userId} OR `system_resource` = true
+            <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
+                OR
+                `battle`.id IN
+                <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
+                    #{externalResourceId}
+                </foreach>
+            </if>
+        )
         <if test="battleFilter.userId != null">
             AND `user_id` = #{battleFilter.userId}
+        </if>
+        <if test="battleFilter.roleId != null">
+            AND `role_id` = #{battleFilter.roleId}
         </if>
         <if test="battleFilter.onlySystem != null">
             AND `system_resource` = #{battleFilter.onlySystem}
@@ -53,13 +67,6 @@
                 #{battleStatus}
             </foreach>
         </if>
-        <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
-            OR
-            id IN
-            <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
-                #{externalResourceId}
-            </foreach>
-        </if>
     </sql>
 
     <!-- Construct order by clause -->
@@ -80,23 +87,22 @@
         SELECT * FROM `battle` WHERE `battle`.id = #{id}
     </select>
 
-    <resultMap id="battleFullView" type="com.yichi.onepiece.battle.model.BattleFullView"
-      autoMapping="true">
+    <resultMap id="battleListView" type="com.yichi.onepiece.battle.model.BattleListView" autoMapping="true">
         <result column="id" property="id"/>
+        <result column="winner_id" property="winnerId"/>
         <result column="starter_id" property="starterId"/>
         <result column="receiver_id" property="receiverId"/>
+        <result column="battle_status" property="battleStatus"/>
+        <result column="battle_report_stage" property="battleReportStage"/>
         <result column="creation_record_id" property="creationRecordId"
         />
         <result column="modification_record_id" property="modificationRecordId"
         />
-        <association column="id" property="battleExecution"
-                     select="com.yichi.onepiece.battle.model.BattleExecutionDao.findByBattleId"
-        />
         <association column="starter_id" property="starter"
-          select="com.yichi.onepiece.character.model.dao.CharacterDao.findById"
+                     select="com.yichi.onepiece.character.model.dao.CharacterDao.findById"
         />
         <association column="receiver_id" property="receiver"
-          select="com.yichi.onepiece.character.model.dao.CharacterDao.findById"
+                     select="com.yichi.onepiece.character.model.dao.CharacterDao.findById"
         />
         <association column="creation_record_id" property="creationRecord"
                      select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
@@ -104,6 +110,11 @@
         <association column="modification_record_id" property="modificationRecord"
                      select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
         />
+    </resultMap>
+
+    <resultMap id="battleFullView" type="com.yichi.onepiece.battle.model.BattleFullView"
+      autoMapping="true" extends="battleListView">
+        <result column="id" property="id"/>
         <association column="id" property="battleStatusDetails"
           select="com.yichi.onepiece.battle.model.BattleStatusDetailDao.listByBattleId"/>
         <association column="id" property="battleProcessDetails"

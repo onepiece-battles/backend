@@ -2,10 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.issue.model.IssueDao">
-    <select id="listIssues" resultType="com.yichi.onepiece.issue.model.IssueEntity">
+    <select id="listIssues" resultType="com.yichi.onepiece.issue.model.IssueListView">
         SELECT * FROM `issue`
-        WHERE
-        true
+        LEFT JOIN `action_lineage` on `issue`.`creation_record_id` = `action_lineage`.`id`
         <include refid="issueFilter">
             <property name="issueFilter" value="issueFilter"/>
         </include>
@@ -16,15 +15,32 @@
 
     <select id="searchCount" resultType="int">
         SELECT COUNT(*) FROM `issue`
-        WHERE
-        true
         <include refid="issueFilter">
             <property name="issueFilter" value="issueFilter"/>
         </include>
     </select>
 
+    <resultMap id="issueListView" type="com.yichi.onepiece.issue.model.IssueEntity" autoMapping="true">
+        <result column="id" property="id"/>
+        <association column="creation_record_id" property="creationRecord"
+                     select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
+        />
+        <association column="modification_record_id" property="modificationRecord"
+                     select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
+        />
+    </resultMap>
+
     <!-- Construct where clause -->
     <sql id="issueFilter">
+        WHERE 1=1
+        <if test="issueFilter.username != null and issueFilter.username != ''">
+            <bind name="keyLike" value="'%' + issueFilter.username + '%'"/>
+            AND `username` like #{keyLike}
+        </if>
+        <if test="issueFilter.nickname != null and issueFilter.nickname != ''">
+            <bind name="keyLike" value="'%' + issueFilter.nickname + '%'"/>
+            AND `nickname` like #{keyLike}
+        </if>
         <if test="issueFilter.issueHeader != null and issueFilter.issueHeader != ''">
             <bind name="keyLike" value="'%' + issueFilter.issueHeader + '%'"/>
             AND `issue_header` like #{keyLike}

@@ -11,10 +11,6 @@ import javax.annotation.Nullable;
 public interface GroupEntity {
   UUID getId();
 
-  UUID getUserId();
-
-  UUID getRoleId();
-
   @Column(json = true)
   I18nText getName();
 

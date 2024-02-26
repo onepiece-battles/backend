@@ -30,7 +30,7 @@ public interface BattleDao extends BaseDao<BattleEntity, UUID> {
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
 
   @Select(
-      "select * from `view_battle_list_view` as battle where #{characterId} in (battle.starter_id,"
+      "select * from `battle` where #{characterId} in (battle.starter_id,"
           + " battle.receiver_id)")
   List<BattleListView> listBattlesByCharacterId(@Param("characterId") UUID characterId);
 

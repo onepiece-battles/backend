@@ -11,14 +11,14 @@ import org.mapstruct.factory.Mappers;
 public interface IssueConverter {
   IssueConverter INSTANCE = Mappers.getMapper(IssueConverter.class);
 
-  @Mapping(target = "creationUserId", ignore = true)
+  @Mapping(target = "creationRecordId", ignore = true)
+  @Mapping(target = "modificationRecordId", ignore = true)
   IssueEntity toIssueEntity(Issue issue);
 
   @Mapping(target = "id", ignore = true)
-  @Mapping(target = "creationUserId", ignore = true)
-  @Mapping(target = "creationTimestamp", ignore = true)
-  @Mapping(target = "modificationTimestamp", ignore = true)
+  @Mapping(target = "creationRecordId", ignore = true)
+  @Mapping(target = "modificationRecordId", ignore = true)
   IssueEntity toIssueEntity(CreateIssueRequest request);
 
-  Issue toIssue(IssueEntity issueEntity);
+  com.yichi.onepiece.model.IssueListView toIssue(IssueListView issueEntity);
 }

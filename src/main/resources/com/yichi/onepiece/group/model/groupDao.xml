@@ -3,50 +3,43 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.group.model.GroupDao">
   <select id="list" resultType="com.yichi.onepiece.group.model.GroupListView" resultMap="groupListView">
-    SELECT * FROM `view_group_list_view`
-    WHERE (`view_group_list_view`.user_id = #{userId} or `view_group_list_view`.system_resource = true
-    <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
-      OR
-      `view_group_list_view`.id IN
-      <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator=","
-        close=")">
-        #{externalResourceId}
-      </foreach>
-    </if>)
+    SELECT DISTINCT `group`.* FROM `group`
+    LEFT JOIN `action_lineage` on `group`.`creation_record_id` = `action_lineage`.`id`
     <include refid="groupFilter">
       <property name="groupFilter" value="groupFilter"/>
     </include>
-    GROUP BY `view_group_list_view`.`id`
     ORDER BY
     <include refid="orderClause"/>
     LIMIT #{offset}, #{size}
   </select>
 
   <select id="count" resultType="int">
-    select COUNT(distinct(`view_group_list_view`.id))
-    from `view_group_list_view`
-    WHERE (`view_group_list_view`.user_id = #{userId}  or `view_group_list_view`.system_resource = true
-    <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
-      OR
-      `view_group_list_view`.id IN
-      <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator=","
-        close=")">
-        #{externalResourceId}
-      </foreach>
-    </if>)
+    select COUNT(distinct(`group`.id)) from `group`
+    LEFT JOIN `action_lineage` on `group`.`creation_record_id` = `action_lineage`.`id`
     <include refid="groupFilter">
       <property name="groupFilter" value="groupFilter"/>
     </include>
   </select>
 
   <sql id="groupFilter">
+    WHERE  (`user_id` = #{userId} or `system_resource` = true
+    <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
+      OR
+      `group`.id IN
+      <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator=","
+               close=")">
+        #{externalResourceId}
+      </foreach>
+    </if>)
     <if test="groupFilter.userId != null">
       AND `user_id` = #{groupFilter.userId}
+    </if>
+    <if test="groupFilter.roleId != null">
+      AND `role_id` = #{groupFilter.roleId}
     </if>
     <if test="groupFilter.onlySystem != null">
       AND `system_resource` = #{groupFilter.onlySystem}
     </if>
-    # 海军，海贼，革命军，山贼，七武海，CP9，CP0，神之骑士团，五老星，国王军，海贼猎人，其他组织
     <if test="groupFilter.groupCategories != null and !groupFilter.groupCategories.isEmpty">
       AND `group_category` in
       <foreach item="category" collection="groupFilter.groupCategories" open="("
@@ -76,12 +69,18 @@
 
   <resultMap id="groupListView" type="com.yichi.onepiece.group.model.GroupListView">
     <result column="id" property="id"/>
-    <association column="id" property="characters"
+    <association column="id" property="characterInGroup"
       select="com.yichi.onepiece.character.model.dao.CharacterToGroupDao.listCharacterInGroupLiteByGroupId"
+    />
+    <association column="creation_record_id" property="creationRecord"
+                 select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
+    />
+    <association column="modification_record_id" property="modificationRecord"
+                 select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
     />
   </resultMap>
 
-  <resultMap id="groupFullView" type="com.yichi.onepiece.group.model.GroupFullView" autoMapping="true">
+  <resultMap id="groupFullView" type="com.yichi.onepiece.group.model.GroupFullView" autoMapping="true" extends="groupListView">
     <association column="id" property="id"
     />
     <association column="id" property="characters"

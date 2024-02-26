@@ -2,6 +2,7 @@ package com.yichi.onepiece.character.model.entity;
 
 import com.yichi.infra.support.entity.Entity;
 import com.yichi.infra.support.mybatis.annotations.Column;
+import com.yichi.onepiece.lineage.model.ActionRecordEntity;
 import com.yichi.onepiece.model.BattleStyle;
 import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.Race;
@@ -16,13 +17,13 @@ public interface CharacterEntity {
 
   UUID getId();
 
-  UUID getUserId();
-
   @Column(json = true)
   I18nText getName();
 
   BattleStyle getBattleStyle();
+
   Race getRace();
+
   @Nullable
   Byte[] getProfileImage();
 
@@ -54,11 +55,10 @@ public interface CharacterEntity {
 
   Integer getEnergy();
 
-  Long getCreationRecordId();
-
-  Long getModificationRecordId();
-
   Boolean getSystemResource();
+
+  Long getCreationRecordId();
+  Long getModificationRecordId();
 
   CharacterEntityBuilder toBuilder();
 }

@@ -26,7 +26,7 @@ public class IssueController implements IssueApi {
         Set.of(
             Permission.BATCH_UPDATE,
             Permission.UPDATE));
-    issueService.BatchUpdateIssue(request);
+    issueService.batchUpdateIssue(request);
     return ResponseEntity.ok(null);
   }
 

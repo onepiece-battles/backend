@@ -3,20 +3,11 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.character.model.dao.CharacterDao">
     <select id="list" resultType="com.yichi.onepiece.character.model.entity.CharacterListView" resultMap="characterListView">
-        SELECT DISTINCT `view_character_list_view`.*
-        FROM `view_character_list_view`
-            LEFT JOIN `character_to_fruit` ON `view_character_list_view`.`id` = `character_to_fruit`.`character_id`
-            LEFT JOIN `haki` on `haki`.character_id = `view_character_list_view`.id
-        WHERE
-        ( `view_character_list_view`.`user_id` = #{userId} OR `view_character_list_view`.`system_resource` = true
-        <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
-            OR
-            `view_character_list_view`.id IN
-            <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
-                #{externalResourceId}
-            </foreach>
-        </if>
-        )
+        SELECT DISTINCT `character`.*
+        FROM `character`
+            LEFT JOIN `character_to_fruit` ON `character`.`id` = `character_to_fruit`.`character_id`
+            LEFT JOIN `haki` on `character`.id = `haki`.character_id
+            LEFT JOIN `action_lineage` on `character`.`creation_record_id` = `action_lineage`.`id`
         <include refid="characterFilter">
             <property name="characterFilter" value="characterFilter"/>
         </include>
@@ -26,26 +17,17 @@
     </select>
 
     <select id="getFullViewById" resultType="com.yichi.onepiece.character.model.entity.CharacterFullView" resultMap="characterFullView">
-        SELECT * FROM `view_character_list_view`
-        WHERE `view_character_list_view`.id = #{id}
-        GROUP BY `view_character_list_view`.`id`
+        SELECT * FROM `character`
+        WHERE `character`.id = #{id}
+        GROUP BY `character`.`id`
     </select>
 
     <select id="count" resultType="int">
-        SELECT COUNT(distinct(`view_character_list_view`.id))
-        FROM `view_character_list_view`
-            LEFT JOIN `character_to_fruit` ON `view_character_list_view`.`id` = `character_to_fruit`.`character_id`
-            LEFT JOIN `haki` on `haki`.character_id = `view_character_list_view`.id
-        WHERE
-        ( `view_character_list_view`.`user_id` = #{userId} OR `view_character_list_view`.`system_resource` = true
-        <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
-            OR
-            `view_character_list_view`.id IN
-            <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
-                #{externalResourceId}
-            </foreach>
-        </if>
-        )
+        SELECT COUNT(distinct(`character`.id))
+        FROM `character`
+            LEFT JOIN `character_to_fruit` ON `character`.`id` = `character_to_fruit`.`character_id`
+            LEFT JOIN `haki` on `haki`.character_id = `character`.id
+            LEFT JOIN `action_lineage` on `character`.`creation_record_id` = `action_lineage`.`id`
         <include refid="characterFilter">
             <property name="characterFilter" value="characterFilter"/>
         </include>
@@ -53,8 +35,19 @@
 
     <!-- Construct where clause -->
     <sql id="characterFilter">
+        WHERE (`user_id` = #{userId} OR `system_resource` is true
+        <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
+            OR
+            `character`.id IN
+            <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
+                #{externalResourceId}
+            </foreach>
+        </if>)
         <if test="characterFilter.userId != null">
             AND `user_id` = #{characterFilter.userId}
+        </if>
+        <if test="characterFilter.roleId != null">
+            AND `role_id` = #{characterFilter.roleId}
         </if>
         <if test="characterFilter.name != null and characterFilter.name != ''">
             <bind name="keyLike" value="'%' + characterFilter.name + '%'" />
@@ -123,6 +116,12 @@
         />
         <association column="id" property="hakis"
                      select="com.yichi.onepiece.character.model.dao.HakiDao.listByCharacterId"
+        />
+        <association column="creation_record_id" property="creationRecord"
+                     select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
+        />
+        <association column="modification_record_id" property="modificationRecord"
+                     select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
         />
     </resultMap>
 </mapper>

@@ -18,7 +18,6 @@ public interface GroupConverter {
 
   GroupFullView toGroupFullView(com.yichi.onepiece.group.model.GroupFullView groupFullView);
 
-  @Mapping(target = "userId", ignore = true)
   @Mapping(target = "systemResource", ignore = true)
   GroupEntity toGroupEntity(Group group);
 

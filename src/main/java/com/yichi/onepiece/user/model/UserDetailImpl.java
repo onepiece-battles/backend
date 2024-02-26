@@ -75,11 +75,6 @@ public class UserDetailImpl extends UserEntityImpl
     return getEncryptedPassword();
   }
 
-  //  @Override
-  //  public String getUsername() {
-  //    return getUsername();
-  //  }
-
   @Override
   public boolean isAccountNonExpired() {
     return true;

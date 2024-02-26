@@ -14,7 +14,8 @@ public interface ActionRecordEntity {
 
   UUID getUserId();
 
-  String getUserName();
+  String getUsername();
+  String getNickname();
 
   UUID getRoleId();
 

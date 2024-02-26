@@ -11,8 +11,6 @@ public interface IssueEntity {
 
   UUID getId();
 
-  UUID getCreationUserId();
-
   IssueType getIssueType();
 
   String getIssueHeader();
@@ -21,9 +19,9 @@ public interface IssueEntity {
 
   IssueStatus getIssueStatus();
 
-  Long getCreationTimestamp();
+  Long getCreationRecordId();
 
-  Long getModificationTimestamp();
+  Long getModificationRecordId();
 
   IssueEntityBuilder toBuilder();
 }

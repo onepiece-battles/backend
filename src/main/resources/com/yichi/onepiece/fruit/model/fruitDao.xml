@@ -3,17 +3,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.fruit.model.FruitDao">
     <select id="listFruits" resultType="com.yichi.onepiece.fruit.model.FruitListView">
-        SELECT * FROM `view_fruit_list_view`
-        WHERE
-        (`view_fruit_list_view`.user_id = #{userId} or `view_fruit_list_view`.system_resource = true
-        <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
-            OR
-            id IN
-            <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
-                #{externalResourceId}
-            </foreach>
-        </if>
-        )
+        SELECT * FROM `fruit`
+        LEFT JOIN `action_lineage` on `fruit`.`creation_record_id` = `action_lineage`.`id`
         <include refid="fruitFilter">
             <property name="fruitFilter" value="fruitFilter"/>
         </include>
@@ -24,8 +15,38 @@
 
     <select id="searchCount" resultType="int">
         SELECT COUNT(*) FROM fruit
-        WHERE
-        ( user_id = #{userId} or system_resource = true
+        LEFT JOIN `action_lineage` on `fruit`.`creation_record_id` = `action_lineage`.`id`
+        <include refid="fruitFilter">
+            <property name="fruitFilter" value="fruitFilter"/>
+        </include>
+    </select>
+
+    <select id="getFruitFullViewById" resultType="com.yichi.onepiece.fruit.model.FruitFullView" resultMap="fruitFullView">
+        SELECT * FROM `fruit`
+        WHERE `fruit`.id = #{fruitId}
+    </select>
+
+    <resultMap id="fruitListView" type="com.yichi.onepiece.fruit.model.FruitListView" autoMapping="true">
+        <result column="id" property="id"/>
+        <association column="creation_record_id" property="creationRecord"
+                     select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
+        />
+        <association column="modification_record_id" property="modificationRecord"
+                     select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
+        />
+    </resultMap>
+
+    <resultMap id="fruitFullView" type="com.yichi.onepiece.fruit.model.FruitFullView" autoMapping="true">
+        <result column="id" property="id"/>
+        <association column="id" property="characters"
+                     select="com.yichi.onepiece.character.model.dao.CharacterToFruitDao.listCharacterInFruitViewByFruitId"
+        />
+    </resultMap>
+
+    <!-- Construct where clause -->
+    <sql id="fruitFilter">
+        WHERE (
+        `user_id` = #{userId} or `fruit`.system_resource = true
         <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
             OR
             id IN
@@ -34,24 +55,6 @@
             </foreach>
         </if>
         )
-        <include refid="fruitFilter">
-            <property name="fruitFilter" value="fruitFilter"/>
-        </include>
-    </select>
-
-    <select id="getFruitFullViewById" resultType="com.yichi.onepiece.fruit.model.FruitFullView" resultMap="fruitFullView">
-        SELECT * FROM `view_fruit_list_view`
-        WHERE view_fruit_list_view.id = #{fruitId}
-    </select>
-
-    <resultMap id="fruitFullView" type="com.yichi.onepiece.fruit.model.FruitFullView" autoMapping="true">
-        <association column="id" property="characters"
-                     select="com.yichi.onepiece.character.model.dao.CharacterToFruitDao.listCharacterInFruitViewByFruitId"
-        />
-    </resultMap>
-
-    <!-- Construct where clause -->
-    <sql id="fruitFilter">
         <if test="fruitFilter.userId != null">
             AND `user_id` = #{fruitFilter.userId}
         </if>

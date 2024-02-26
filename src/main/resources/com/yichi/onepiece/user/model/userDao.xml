@@ -9,8 +9,6 @@
             `username`, `login_role`, `encrypted_password`, `account_status`, `profile_image`,
             `locale`, `email_verified`, `creation_record_id`, `modification_record_id`
         FROM `user`
-        WHERE
-        true
         <include refid="userFilter">
             <property name="userFilter" value="userFilter"/>
         </include>
@@ -21,8 +19,6 @@
 
     <select id="searchCount" resultType="int">
         SELECT COUNT(*) FROM `user`
-        WHERE
-        true
         <include refid="userFilter">
             <property name="userFilter" value="userFilter"/>
         </include>
@@ -30,12 +26,13 @@
 
     <!-- Construct where clause -->
     <sql id="userFilter">
-        <if test="userFilter.name != null and userFilter.name != ''">
-            <bind name="keyLike" value="'%' + userFilter.name + '%'"/>
+        WHERE 1=1
+        <if test="userFilter.nickname != null and userFilter.nickname != ''">
+            <bind name="keyLike" value="'%' + userFilter.nickname + '%'"/>
             AND `nickname` like #{keyLike}
         </if>
-        <if test="userFilter.email != null and userFilter.email != ''">
-            <bind name="keyLike" value="'%' + userFilter.email + '%'"/>
+        <if test="userFilter.username != null and userFilter.username != ''">
+            <bind name="keyLike" value="'%' + userFilter.username + '%'"/>
             AND `username` like #{keyLike}
         </if>
         <if test="userFilter.userRoles != null and !userFilter.userRoles.isEmpty">
@@ -61,15 +58,11 @@
         </choose>
     </sql>
 
-    <resultMap id="userDetailView" type="com.yichi.onepiece.user.model.UserDetailImpl">
+    <resultMap id="userDetailView" type="com.yichi.onepiece.user.model.UserDetailImpl" autoMapping="true">
         <result property="id" column="id"/>
         <result property="creationRecordId" column="creation_record_id"/>
         <result property="modificationRecordId" column="modification_record_id"/>
         <result property="loginRole" column="login_role"/>
-        <result property="username" column="username"/>
-        <result property="nickname" column="nickname"/>
-        <result property="accountStatus" column="account_status"/>
-        <result property="emailVerified" column="email_verified"/>
         <association column="login_role" property="loginRoleResources"
                      select="com.yichi.onepiece.iam.model.RoleDao.listResourceTypeByRoleName"
         />
