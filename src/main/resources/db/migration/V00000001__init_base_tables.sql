@@ -1,12 +1,20 @@
 -- THIS IS THE DB GOLDEN SCHEMA FOR UNIT TEST.
 
+-- role
+CREATE TABLE `role`(
+   `id` BINARY(16) NOT NULL,
+   `name` VARCHAR(255) NOT NULL
+);
+
+ALTER TABLE `role` ADD CONSTRAINT PRIMARY KEY(`id`);
 -- user
 CREATE TABLE `user`(
     `id` BINARY(16) NOT NULL,
     `name` VARCHAR(255) NOT NULL,
     `email` VARCHAR(255) NOT NULL,
     `organization` VARCHAR(255),
-    `login_role` VARCHAR(255) NOT NULL,
+    `login_role` VARCHAR(255),
+    `login_role_id` BINARY(16),
     `encrypted_password` VARCHAR(100) NOT NULL,
     `account_status` VARCHAR(100) NOT NULL,
     `profile_image` MEDIUMBLOB,
@@ -18,6 +26,7 @@ CREATE TABLE `user`(
 ALTER TABLE `user` ADD CONSTRAINT PRIMARY KEY(`id`);
 ALTER TABLE `user` ADD CONSTRAINT `unique_name`
   UNIQUE(`name`);
+ALTER TABLE `user` ADD CONSTRAINT fk_user__login_role_id FOREIGN KEY(login_role_id) REFERENCES `role`(`id`);
 
 -- token
 CREATE TABLE `token`(
@@ -46,12 +55,6 @@ ALTER TABLE `user_resource` ADD CONSTRAINT `fk_user_resource__source_user_id`
 ALTER TABLE `user_resource` ADD CONSTRAINT `fk_user_resource__user_id`
   FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
 
--- role
-CREATE TABLE `role`(
-    `id` BINARY(16) NOT NULL,
-    `name` VARCHAR(255) NOT NULL
-);
-ALTER TABLE `role` ADD CONSTRAINT PRIMARY KEY(`id`);
 
 -- user_role
 CREATE TABLE `user_role`(
@@ -322,61 +325,3 @@ CREATE TABLE `email_verification`(
 ALTER TABLE `email_verification` ADD CONSTRAINT PRIMARY KEY(`id`);
 ALTER TABLE `email_verification` ADD CONSTRAINT `fk_email_verification__user_id`
   FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
-
-
-
-
--- battle_list_view
-# CREATE VIEW `view_battle_list_view`
-# AS
-# SELECT
-#    `battle`.*,
-#    `creation_record`.user_name as creator,
-#    `creation_record`.role_name,
-#    `creation_record`.action_timestamp as creation_timestamp,
-#    `modification_record`.action_timestamp as modification_timestamp,
-#    `starter`.name as starter_name,
-#    `starter`.profile_image as starter_image,
-#    `receiver`.name as receiver_name,
-#    `receiver`.profile_image as receiver_image,
-#    `battle_execution`.battle_status as battle_status,
-#    `battle_execution`.battle_report_stage as battle_report_stage,
-#    `battle_execution`.winner_id
-# FROM `battle` JOIN `character` AS `starter` on battle.starter_id = starter.id
-# JOIN `character` AS `receiver` on battle.receiver_id = receiver.id
-# JOIN `battle_execution` on battle.id = battle_execution.battle_id
-# JOIN `action_lineage` as creation_record on creation_record.id = battle.creation_record_id
-# JOIN `action_lineage` as modification_record on modification_record.id = battle.modification_record_id;
-
-
--- character_list_view
-# CREATE VIEW `view_character_list_view`
-# AS
-# SELECT `character`.*,
-#     `creation_record`.action_timestamp as creation_timestamp,
-#     `modification_record`.action_timestamp as modification_timestamp,
-#     `creation_record`.user_name as creator,
-#     `creation_record`.role_name,
-#     `creation_record`.role_id
-# FROM `character`
-# JOIN `action_lineage` as creation_record on creation_record.id = `character`.creation_record_id
-# JOIN `action_lineage` as modification_record on modification_record.id = `character`.modification_record_id
-# LEFT JOIN `haki` on `character`.id = haki.character_id;
-
-# -- fruit_list_view
-# CREATE VIEW `view_fruit_list_view`
-# AS
-# SELECT
-#     `fruit`.*, creation_record, modification_record
-# FROM `fruit`
-# JOIN `action_lineage` as creation_record on creation_record.id = `fruit`.creation_record_id
-# JOIN `action_lineage` as modification_record on modification_record.id = `fruit`.modification_record_id;
-#
-# -- group_list_view
-# CREATE VIEW `view_group_list_view`
-# AS
-# SELECT `group`.*,
-#        creation_record, modification_record
-# FROM `group`
-# JOIN `action_lineage` as creation_record on creation_record.id = `group`.creation_record_id
-# JOIN `action_lineage` as modification_record on modification_record.id = `group`.modification_record_id;

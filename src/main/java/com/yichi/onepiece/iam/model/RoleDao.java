@@ -40,6 +40,9 @@ public interface RoleDao extends BaseDao<RoleEntity, UUID> {
           + " user_role.user_id = #{userId})")
   Set<String> listRolesByUserId(@Param("userId") UUID userId);
 
+  @Select("select * from role left join user_role on user_role.role_id = role.id where user_role.user_id = #{userId}")
+  List<RoleEntity> listByUserId(@Param("userId") UUID userId);
+
   // todo(yichi): add user view to replace roleName by roleId in entity
 
   @Select(

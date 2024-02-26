@@ -25,6 +25,8 @@ public interface UserEntity {
 
   Long getModificationRecordId();
 
+  UUID getLoginRoleId();
+
   UserRole getLoginRole();
 
   String getEncryptedPassword();
