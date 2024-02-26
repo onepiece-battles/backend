@@ -4,6 +4,7 @@ import com.yichi.onepiece.iam.service.RoleService;
 import com.yichi.onepiece.lineage.model.ActionRecordDao;
 import com.yichi.onepiece.lineage.model.ActionRecordEntity;
 import com.yichi.onepiece.lineage.model.ActionRecordEntityBuilder;
+import com.yichi.onepiece.model.UserRole;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.model.UserEntity;
 import io.micrometer.core.annotation.Timed;
@@ -49,6 +50,21 @@ public class ActionRecordService {
             .setRoleName(roleEntity.getName())
             .setActionTimestamp(clock.millis())
             .build();
+    actionRecordDao.insert(actionRecordEntity);
+    return actionRecordEntity;
+  }
+
+  public ActionRecordEntity createWithUserAndRole(UserEntity userEntity, UserRole userRole) {
+    var roleEntity = roleService.getRoleByName(userRole);
+    ActionRecordEntity actionRecordEntity =
+            ActionRecordEntityBuilder.newBuilder()
+                    .setUserId(userEntity.getId())
+                    .setUsername(userEntity.getUsername())
+                    .setNickname(userEntity.getNickname())
+                    .setRoleId(roleEntity.getId())
+                    .setRoleName(roleEntity.getName())
+                    .setActionTimestamp(clock.millis())
+                    .build();
     actionRecordDao.insert(actionRecordEntity);
     return actionRecordEntity;
   }

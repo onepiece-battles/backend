@@ -22,7 +22,9 @@ import com.yichi.onepiece.utils.JwtHelper;
 import com.yichi.onepiece.utils.RandomGenerator;
 import java.time.Clock;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
@@ -116,12 +118,13 @@ public class UserService {
             .setUsername(username)
             .setEmailVerified(false)
             .setLocale(onepieceLocale)
-            // USER role is the default login role
-            .setLoginRole(userRole == null ? UserRole.NIKA : userRole)
+            .setLoginRole(null)
+            .setLoginRoleId(null)
             .setProfileImage(ArrayUtils.toObject(defaultImage))
             .build();
     userDao.insert(user);
-    var actionRecord = actionRecordService.createWithUser(user);
+    // new user are default to be created by NIKA
+    var actionRecord = actionRecordService.createWithUserAndRole(user, UserRole.NIKA);
     var updatedUser =
         user.toBuilder()
             .setCreationRecordId(actionRecord.getId())
@@ -175,7 +178,13 @@ public class UserService {
             .setRevoked(false)
             .build();
     tokenDao.insert(tokenEntity);
+
+    // update user login role id
+    var roles = roleDao.listByUserId(user.getId());
+    var roleEntity = getHighestPermissionRole(roles);
     user.setAccountStatus(AccountStatus.LOGGED_IN);
+    user.setLoginRole(roleEntity.getName());
+    user.setLoginRoleId(roleEntity.getId());
     userDao.update(user);
     var resourcePermissionMaps = getPermissionMapByRoleName(user.getLoginRole());
     var tokens =
@@ -195,6 +204,18 @@ public class UserService {
                 .loginRoleResourcesPermissionMap(resourcePermissionMaps)
                 .userRoles(roleNames)
                 .tokens(tokens));
+  }
+
+  private RoleEntity getHighestPermissionRole(List<RoleEntity> roles) {
+    if (roles.isEmpty()) {
+      throw ExceptionUtils.notFound("no role assigned to user").get();
+    }
+    Map<UserRole, RoleEntity> roleNameToRole = roles.stream()
+            .collect(Collectors.toMap(RoleEntity::getName, Function.identity()));
+    var selectedRole = Stream.of(UserRole.NIKA, UserRole.ADMIN, UserRole.NORMAL, UserRole.VISITOR).filter(
+            roleNameToRole::containsKey
+    ).findFirst().orElseThrow();
+    return roleNameToRole.get(selectedRole);
   }
 
   private List<ResourcePermissionMap> getPermissionMapByRoleName(UserRole userRole) {
@@ -229,10 +250,6 @@ public class UserService {
     if (offset >= totalSize || offset < 0) {
       return new ListUsersResponse().users(List.of()).totalSize(totalSize);
     }
-    var user = userDao
-            .listUsers(
-                    request.getUserFilter(), request.getSortKeys(), offset, request.getPageSize()).get(0);
-    logger.info("user is: {}", user.toString());
     var users =
         userDao
             .listUsers(
@@ -240,7 +257,6 @@ public class UserService {
             .stream()
             .map(UserConverter.INSTANCE::toUser)
             .toList();
-
     return new ListUsersResponse().users(users).totalSize(totalSize);
   }
 
@@ -286,14 +302,19 @@ public class UserService {
     }
   }
 
-  public List<ResourcePermissionMap> updateLoginRole(UserRole role) {
+  public UpdateLoginRoleResponse updateLoginRole(UserRole role) {
     var user = UserHelper.getCurrentUserDetail();
     if (!user.getUserRoles().contains(role.toString())) {
       ExceptionUtils.notFound("user role %s not found when shifting role.", role).get();
     }
+    var updatedRole = roleDao.findByRoleName(role).orElseThrow();
     user.setLoginRole(role);
+    user.setLoginRoleId(updatedRole.getId());
     userDao.update(user);
-    return getPermissionMapByRoleName(role);
+    return new UpdateLoginRoleResponse()
+            .currentRole(role)
+            .currentRoleId(updatedRole.getId())
+            .resourcePermissionMap(getPermissionMapByRoleName(role));
   }
 
   public User getUserById(UUID userId) {

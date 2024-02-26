@@ -189,6 +189,7 @@ public class CharacterService {
   }
 
   public ListCharacterResponse listCharacters(ListCharacterRequest request) {
+    logger.info("filter character: {}", request.getCharacterFilter());
     var userId = UserHelper.getCurrentUserId();
     var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
     var totalSize = characterDao.count(request.getCharacterFilter(), userId, resourceIds);
