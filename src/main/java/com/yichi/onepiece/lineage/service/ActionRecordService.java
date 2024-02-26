@@ -43,7 +43,8 @@ public class ActionRecordService {
     ActionRecordEntity actionRecordEntity =
         ActionRecordEntityBuilder.newBuilder()
             .setUserId(userEntity.getId())
-            .setUserName(userEntity.getUsername())
+            .setUsername(userEntity.getUsername())
+            .setNickname(userEntity.getNickname())
             .setRoleId(roleEntity.getId())
             .setRoleName(roleEntity.getName())
             .setActionTimestamp(clock.millis())
@@ -67,7 +68,8 @@ public class ActionRecordService {
     var roleEntity = roleService.getRoleByName(user.getLoginRole());
     actionRecordEntityBuilder
         .setUserId(user.getId())
-        .setUserName(user.getUsername())
+        .setUsername(user.getUsername())
+        .setNickname(user.getNickname())
         .setRoleId(roleEntity.getId())
         .setRoleName(roleEntity.getName())
         .setActionTimestamp(clock.millis());

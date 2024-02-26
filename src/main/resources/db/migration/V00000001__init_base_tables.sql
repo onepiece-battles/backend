@@ -90,7 +90,8 @@ CREATE TABLE `action_lineage`(
     `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
     `action_timestamp` BIGINT NOT NULL COMMENT 'the action timestamp in milliseconds',
     `user_id` BINARY(16) NOT NULL COMMENT 'either a user or a service account id',
-    `user_name` VARCHAR(255) NOT NULL COMMENT 'the account display name at the time of the action',
+    `nickname` VARCHAR(255) NOT NULL COMMENT 'the display name of this user',
+    `username` VARCHAR(255) NOT NULL COMMENT 'the email address of this user',
     `role_id` BINARY(16) COMMENT 'role Id',
     `role_name` VARCHAR(255) COMMENT 'role name, eg: NIKA, ADMIN'
 );
@@ -119,8 +120,6 @@ ALTER TABLE `file_object` ADD CONSTRAINT `fk_file_creator_user_id__user_id`
 -- group
 CREATE TABLE `group` (
     `id` BINARY(16) NOT NULL,
-    `user_id` BINARY(16) NOT NULL,
-    `role_id` BINARY(16) NOT NULL,
     `name` VARCHAR(255) NOT NULL,
     `group_category` VARCHAR(100) NOT NULL,
     `profile_image` MEDIUMBLOB,
@@ -130,10 +129,6 @@ CREATE TABLE `group` (
     `system_resource` BOOLEAN NOT NULL
 );
 ALTER TABLE `group` ADD CONSTRAINT PRIMARY KEY(`id`);
-ALTER TABLE `group` ADD CONSTRAINT `fk_group__user_id`
-    FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
-ALTER TABLE `group` ADD CONSTRAINT `fk_group__role_id`
-    FOREIGN KEY(`role_id`) REFERENCES `role`(`id`);
 ALTER TABLE `group` ADD CONSTRAINT `fk_group__creation_record_id`
     FOREIGN KEY(`creation_record_id`) REFERENCES `action_lineage`(`id`);
 ALTER TABLE `group` ADD CONSTRAINT `fk_group__modification_record_id`
@@ -142,7 +137,6 @@ ALTER TABLE `group` ADD CONSTRAINT `fk_group__modification_record_id`
 -- character
 CREATE TABLE `character`(
     `id` BINARY(16) NOT NULL,
-    `user_id` BINARY(16) COMMENT 'Creator id',
     # basic information
     `name` VARCHAR(255) NOT NULL,
     `profile_image` MEDIUMBLOB,
@@ -167,21 +161,10 @@ CREATE TABLE `character`(
     `modification_record_id` BIGINT NOT NULL
 );
 ALTER TABLE `character` ADD CONSTRAINT PRIMARY KEY(`id`);
-ALTER TABLE `character` ADD CONSTRAINT `fk_character__user_id`
-  FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
 ALTER TABLE `character` ADD CONSTRAINT `fk_character__creation_record_id`
   FOREIGN KEY(`creation_record_id`) REFERENCES `action_lineage`(`id`);
 ALTER TABLE `character` ADD CONSTRAINT `fk_character__modification_record_id`
   FOREIGN KEY(`modification_record_id`) REFERENCES `action_lineage`(`id`);
-
-CREATE TABLE `character_type`(
-    `id` BINARY(16) NOT NULL,
-    `character_id` BINARY(16) NOT NULL,
-    `character_type` VARCHAR(255) NOT NULL
-);
-ALTER TABLE `character_type` ADD CONSTRAINT PRIMARY KEY(`id`);
-ALTER TABLE `character_type` ADD CONSTRAINT `fk_character_type__character_id`
-    FOREIGN KEY(`character_id`) REFERENCES `character`(`id`);
 
 CREATE TABLE `haki`(
      `id` BINARY(16) NOT NULL,
@@ -195,8 +178,6 @@ ALTER TABLE `haki` ADD CONSTRAINT `fk_haki__character_id`
 -- fruit
 CREATE TABLE `fruit`(
     `id` BINARY(16) NOT NULL,
-    `user_id` BINARY(16),
-    `role_id` BINARY(16),
     `name` VARCHAR(255) NOT NULL,
     `fruit_type` VARCHAR(40) NOT NULL,
     `energy_consume` INT NOT NULL,
@@ -212,10 +193,6 @@ CREATE TABLE `fruit`(
     `speed_strengthen` INT NOT NULL
 );
 ALTER TABLE `fruit` ADD CONSTRAINT PRIMARY KEY(`id`);
-ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__user_id`
-  FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
-ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__role_id`
-    FOREIGN KEY(`role_id`) REFERENCES `role`(`id`);
 ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__creation_record_id`
   FOREIGN KEY(`creation_record_id`) REFERENCES `action_lineage`(`id`);
 ALTER TABLE `fruit` ADD CONSTRAINT `fk_fruit__modification_record_id`
@@ -252,7 +229,6 @@ ALTER TABLE `character_to_fruit` ADD CONSTRAINT `fk_character_to_fruit__fruit_id
 -- battle
 CREATE TABLE `battle`(
     `id` BINARY(16) NOT NULL,
-    `user_id` BINARY(16) NOT NULL,
     `starter_id` BINARY(16) NOT NULL,
     `receiver_id` BINARY(16) NOT NULL,
     `creation_record_id` BIGINT NOT NULL,
@@ -264,8 +240,6 @@ ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__starter_id`
   FOREIGN KEY(`starter_id`) REFERENCES `character`(`id`);
 ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__receiver_id`
   FOREIGN KEY(`receiver_id`) REFERENCES `character`(`id`);
-ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__user_id`
-  FOREIGN KEY(`user_id`) REFERENCES `user`(`id`);
 ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__creation_record_id`
   FOREIGN KEY(`creation_record_id`) REFERENCES `action_lineage`(`id`);
 ALTER TABLE `battle` ADD CONSTRAINT `fk_battle__modification_record_id`
@@ -322,17 +296,18 @@ ALTER TABLE `battle_status_detail` ADD CONSTRAINT `fk_battle_status_detail__batt
 -- issue
 CREATE TABLE `issue`(
     `id` binary(16) NOT NULL,
-    `creation_user_id` BINARY(16) NOT NULL,
     `issue_type` VARCHAR(255) NOT NULL,
     `issue_header` VARCHAR(255) NOT NULL,
     `issue_description` VARCHAR(255) NOT NULL,
     `issue_status` VARCHAR(255) NOT NULL,
-    `creation_timestamp` BIGINT NOT NULL,
-    `modification_timestamp` BIGINT NOT NULL
+    `creation_record_id` BIGINT NOT NULL,
+    `modification_record_id` BIGINT NOT NULL
 );
 ALTER TABLE `issue` ADD CONSTRAINT PRIMARY KEY(`id`);
-ALTER TABLE `issue` ADD CONSTRAINT `fk_issue__creation_user_id`
-  FOREIGN KEY(`creation_user_id`) REFERENCES `user`(`id`);
+ALTER TABLE `issue` ADD CONSTRAINT `fk_issue__creation_record_id`
+    FOREIGN KEY(`creation_record_id`) REFERENCES `action_lineage`(`id`);
+ALTER TABLE `issue` ADD CONSTRAINT `fk_issue__modification_record_id`
+    FOREIGN KEY(`modification_record_id`) REFERENCES `action_lineage`(`id`);
 
 -- email_verification
 CREATE TABLE `email_verification`(
@@ -352,64 +327,56 @@ ALTER TABLE `email_verification` ADD CONSTRAINT `fk_email_verification__user_id`
 
 
 -- battle_list_view
-CREATE VIEW `view_battle_list_view`
-AS
-SELECT
-   `battle`.*,
-   `creation_record`.user_name as creator,
-   `creation_record`.role_name,
-   `creation_record`.action_timestamp as creation_timestamp,
-   `modification_record`.action_timestamp as modification_timestamp,
-   `starter`.name as starter_name,
-   `starter`.profile_image as starter_image,
-   `receiver`.name as receiver_name,
-   `receiver`.profile_image as receiver_image,
-   `battle_execution`.battle_status as battle_status,
-   `battle_execution`.battle_report_stage as battle_report_stage,
-   `battle_execution`.winner_id
-FROM `battle` JOIN `character` AS `starter` on battle.starter_id = starter.id
-JOIN `character` AS `receiver` on battle.receiver_id = receiver.id
-JOIN `battle_execution` on battle.id = battle_execution.battle_id
-JOIN `action_lineage` as creation_record on creation_record.id = battle.creation_record_id
-JOIN `action_lineage` as modification_record on modification_record.id = battle.modification_record_id;
+# CREATE VIEW `view_battle_list_view`
+# AS
+# SELECT
+#    `battle`.*,
+#    `creation_record`.user_name as creator,
+#    `creation_record`.role_name,
+#    `creation_record`.action_timestamp as creation_timestamp,
+#    `modification_record`.action_timestamp as modification_timestamp,
+#    `starter`.name as starter_name,
+#    `starter`.profile_image as starter_image,
+#    `receiver`.name as receiver_name,
+#    `receiver`.profile_image as receiver_image,
+#    `battle_execution`.battle_status as battle_status,
+#    `battle_execution`.battle_report_stage as battle_report_stage,
+#    `battle_execution`.winner_id
+# FROM `battle` JOIN `character` AS `starter` on battle.starter_id = starter.id
+# JOIN `character` AS `receiver` on battle.receiver_id = receiver.id
+# JOIN `battle_execution` on battle.id = battle_execution.battle_id
+# JOIN `action_lineage` as creation_record on creation_record.id = battle.creation_record_id
+# JOIN `action_lineage` as modification_record on modification_record.id = battle.modification_record_id;
 
 
 -- character_list_view
-CREATE VIEW `view_character_list_view`
-AS
-SELECT `character`.*,
-    `creation_record`.action_timestamp as creation_timestamp,
-    `modification_record`.action_timestamp as modification_timestamp,
-    `creation_record`.user_name as creator,
-    `creation_record`.role_name,
-    `creation_record`.role_id
-FROM `character`
-JOIN `action_lineage` as creation_record on creation_record.id = `character`.creation_record_id
-JOIN `action_lineage` as modification_record on modification_record.id = `character`.modification_record_id
-LEFT JOIN `character_type` on `character`.`id` = `character_type`.`character_id`
-LEFT JOIN `haki` on `character`.id = haki.character_id;
+# CREATE VIEW `view_character_list_view`
+# AS
+# SELECT `character`.*,
+#     `creation_record`.action_timestamp as creation_timestamp,
+#     `modification_record`.action_timestamp as modification_timestamp,
+#     `creation_record`.user_name as creator,
+#     `creation_record`.role_name,
+#     `creation_record`.role_id
+# FROM `character`
+# JOIN `action_lineage` as creation_record on creation_record.id = `character`.creation_record_id
+# JOIN `action_lineage` as modification_record on modification_record.id = `character`.modification_record_id
+# LEFT JOIN `haki` on `character`.id = haki.character_id;
 
--- fruit_list_view
-CREATE VIEW `view_fruit_list_view`
-AS
-SELECT
-    `fruit`.*,
-    `creation_record`.action_timestamp as creation_timestamp,
-    `creation_record`.user_name as creator,
-    `creation_record`.role_name,
-    `modification_record`.action_timestamp as modification_timestamp
-FROM `fruit`
-JOIN `action_lineage` as creation_record on creation_record.id = `fruit`.creation_record_id
-JOIN `action_lineage` as modification_record on modification_record.id = `fruit`.modification_record_id;
-
--- group_list_view
-CREATE VIEW `view_group_list_view`
-AS
-SELECT `group`.*,
-       `creation_record`.action_timestamp as creation_timestamp,
-       `modification_record`.action_timestamp as modification_timestamp,
-       `creation_record`.user_name as creator,
-       `creation_record`.role_name
-FROM `group`
-JOIN `action_lineage` as creation_record on creation_record.id = `group`.creation_record_id
-JOIN `action_lineage` as modification_record on modification_record.id = `group`.modification_record_id;
+# -- fruit_list_view
+# CREATE VIEW `view_fruit_list_view`
+# AS
+# SELECT
+#     `fruit`.*, creation_record, modification_record
+# FROM `fruit`
+# JOIN `action_lineage` as creation_record on creation_record.id = `fruit`.creation_record_id
+# JOIN `action_lineage` as modification_record on modification_record.id = `fruit`.modification_record_id;
+#
+# -- group_list_view
+# CREATE VIEW `view_group_list_view`
+# AS
+# SELECT `group`.*,
+#        creation_record, modification_record
+# FROM `group`
+# JOIN `action_lineage` as creation_record on creation_record.id = `group`.creation_record_id
+# JOIN `action_lineage` as modification_record on modification_record.id = `group`.modification_record_id;

@@ -29,9 +29,9 @@ public interface CharacterEntityConverter {
 
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "profileImage", ignore = true)
+  @Mapping(target = "systemResource", ignore = true)
   @Mapping(target = "creationRecordId", ignore = true)
   @Mapping(target = "modificationRecordId", ignore = true)
-  @Mapping(target = "systemResource", ignore = true)
   CharacterEntity toCharacterEntity(CreateCharacterRequest addCharacterRequest);
 
   @Mapping(target = "creationRecordId", ignore = true)

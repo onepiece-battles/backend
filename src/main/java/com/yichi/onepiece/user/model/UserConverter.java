@@ -20,8 +20,6 @@ public interface UserConverter {
   UserEntity toUserEntity(User user);
 
   @Mapping(target = "loginRoleResourcesPermissionMap", ignore = true)
-  @Mapping(target = "creationTimestamp", source = "creationRecord.actionTimestamp")
-  @Mapping(target = "modificationTimestamp", source = "modificationRecord.actionTimestamp")
   User toUser(UserDetailImpl userDetail);
 
   default String blobToString(Byte[] profileByteArray) {

@@ -229,6 +229,10 @@ public class UserService {
     if (offset >= totalSize || offset < 0) {
       return new ListUsersResponse().users(List.of()).totalSize(totalSize);
     }
+    var user = userDao
+            .listUsers(
+                    request.getUserFilter(), request.getSortKeys(), offset, request.getPageSize()).get(0);
+    logger.info("user is: {}", user.toString());
     var users =
         userDao
             .listUsers(
@@ -236,6 +240,7 @@ public class UserService {
             .stream()
             .map(UserConverter.INSTANCE::toUser)
             .toList();
+
     return new ListUsersResponse().users(users).totalSize(totalSize);
   }
 

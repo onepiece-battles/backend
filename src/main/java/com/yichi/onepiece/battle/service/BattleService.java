@@ -53,7 +53,6 @@ public class BattleService {
     var actionRecord = actionRecordService.create();
     BattleEntity battleEntity =
         BattleEntityBuilder.newBuilder()
-            .setUserId(request.getUserId())
             // this service focus on
             .setType(BattleType.SINGLE)
             .setSystemResource(UserHelper.hasNikaPermission())
@@ -78,7 +77,6 @@ public class BattleService {
             .orElseThrow(ExceptionUtils.notFound("Battle entity not found"));
     return new Battle()
         .id(insertedEntity.getId())
-        .userId(insertedEntity.getUserId())
         .type(insertedEntity.getType())
         .starterId(insertedEntity.getStarterId())
         .receiverId(insertedEntity.getReceiverId());
@@ -93,6 +91,15 @@ public class BattleService {
     if (offset >= totalSize || offset < 0) {
       return new ListBattleResponse().battles(List.of()).totalSize(totalSize);
     }
+    var battle = battleDao
+            .list(
+                    request.getBattleFilter(),
+                    request.getSortKeys(),
+                    userId,
+                    resourceIds,
+                    offset,
+                    request.getPageSize()).get(0);
+    logger.info("battle: {}", battle);
     var battleList =
         battleDao
             .list(

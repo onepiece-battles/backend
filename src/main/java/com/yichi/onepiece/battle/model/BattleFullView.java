@@ -16,8 +16,4 @@ public interface BattleFullView extends BattleEntity {
   List<BattleProcessDetailEntity> getBattleProcessDetails();
 
   List<BattleStatusDetailEntity> getBattleStatusDetails();
-
-  ActionRecordEntity getCreationRecord();
-
-  ActionRecordEntity getModificationRecord();
 }

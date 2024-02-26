@@ -63,7 +63,6 @@ public class CharacterService {
     // character does not eat any fruit by default.
     characterEntity =
         characterEntity.toBuilder()
-            .setUserId(UserHelper.getCurrentUserId())
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
             .setSystemResource(UserHelper.hasNikaPermission())
@@ -190,7 +189,6 @@ public class CharacterService {
   }
 
   public ListCharacterResponse listCharacters(ListCharacterRequest request) {
-    logger.info("character filter: {}", request.getCharacterFilter());
     var userId = UserHelper.getCurrentUserId();
     var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
     var totalSize = characterDao.count(request.getCharacterFilter(), userId, resourceIds);

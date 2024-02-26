@@ -13,10 +13,6 @@ public interface FruitEntity {
 
   UUID getId();
 
-  UUID getUserId();
-
-  UUID getRoleId();
-
   @Column(json = true)
   I18nText getName();
 
