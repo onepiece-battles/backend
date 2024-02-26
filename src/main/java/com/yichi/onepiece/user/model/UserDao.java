@@ -22,6 +22,8 @@ public interface UserDao extends BaseDao<UserEntity, UUID> {
       @Param("offset") int offset,
       @Param("size") int size);
 
+
+  @ResultMap("userDetailView")
   @Select("select * from `user` where id = #{id}")
   Optional<UserDetailImpl> getById(@Param("id") UUID userId);
 

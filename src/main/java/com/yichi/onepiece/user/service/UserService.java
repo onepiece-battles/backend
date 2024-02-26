@@ -319,7 +319,8 @@ public class UserService {
 
   public User getUserById(UUID userId) {
     var user = userDao.getById(userId).orElseThrow();
-    return UserConverter.INSTANCE.toUser(user);
+    return UserConverter.INSTANCE.toUser(user)
+            .loginRoleResourcesPermissionMap(getPermissionMapByRoleName(user.getLoginRole()));
   }
 
   public ShareResourceResponse shareResource(ShareResourceRequest request) {
