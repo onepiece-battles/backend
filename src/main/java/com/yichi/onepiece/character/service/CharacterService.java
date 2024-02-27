@@ -150,6 +150,7 @@ public class CharacterService {
       CharacterToGroupEntity characterToGroupEntity = CharacterToGroupEntityBuilder.newBuilder()
           .setCharacterId(request.getCharacterId())
           .setGroupId(request.getGroupId())
+          .position(request.getPosition())
           .onceBelongedTo(false)
           .build();
       characterToGroupDao.insert(characterToGroupEntity);
@@ -189,11 +190,9 @@ public class CharacterService {
   }
 
   public ListCharacterResponse listCharacters(ListCharacterRequest request) {
-    logger.info("filter character: {}", request.getCharacterFilter());
     var userId = UserHelper.getCurrentUserId();
     var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
     var totalSize = characterDao.count(request.getCharacterFilter(), userId, resourceIds);
-    logger.info("count is {}", totalSize);
     // pageIndex is 1- based. offset is 0- based.
     var offset = (request.getPageIndex() - 1) * request.getPageSize();
     if (offset >= totalSize || offset < 0) {
@@ -226,7 +225,6 @@ public class CharacterService {
 
   public UpdateCharacterResponse updateCharacter(Character character) {
     characterDao.update(CharacterEntityConverter.INSTANCE.toCharacterEntity(character));
-    logger.info("the date is: {}", character.getDateOfBirth().toString());
     var response = new UpdateCharacterResponse();
     return response.result(
             UserFacingConstants.getConstant(UserFacingConstantsKey.UPDATE_SUCCESS)
