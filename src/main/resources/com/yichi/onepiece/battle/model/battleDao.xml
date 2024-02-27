@@ -84,7 +84,10 @@
     </sql>
 
     <select id="getBattleFullView" resultMap="battleFullView" resultType="com.yichi.onepiece.battle.model.BattleFullView">
-        SELECT * FROM `battle` WHERE `battle`.id = #{id}
+        SELECT * FROM `battle`
+        LEFT JOIN `battle_execution` on `battle`.id = `battle_execution`.`battle_id`
+        LEFT JOIN `action_lineage` on `battle`.`creation_record_id` = `action_lineage`.`id`
+        WHERE `battle`.id = #{id}
     </select>
 
     <resultMap id="battleListView" type="com.yichi.onepiece.battle.model.BattleListView" autoMapping="true">
@@ -92,12 +95,12 @@
         <result column="winner_id" property="winnerId"/>
         <result column="starter_id" property="starterId"/>
         <result column="receiver_id" property="receiverId"/>
-        <result column="battle_status" property="battleStatus"/>
-        <result column="battle_report_stage" property="battleReportStage"/>
         <result column="creation_record_id" property="creationRecordId"
         />
         <result column="modification_record_id" property="modificationRecordId"
         />
+        <association column="id" property="battleExecution"
+                     select="com.yichi.onepiece.battle.model.BattleExecutionDao.findByBattleId"/>
         <association column="starter_id" property="starter"
                      select="com.yichi.onepiece.character.model.dao.CharacterDao.findById"
         />

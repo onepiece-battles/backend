@@ -65,7 +65,7 @@
     <sql id="orderClause">
         <choose>
             <when test="sortList == null or sortList.isEmpty">
-                creation_timestamp DESC
+                creation_record_id DESC
             </when>
             <otherwise>
                 <foreach item="item" collection="sortList" separator=",">
