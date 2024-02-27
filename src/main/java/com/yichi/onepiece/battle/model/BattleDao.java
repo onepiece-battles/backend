@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
 
 @Dao
@@ -29,6 +30,7 @@ public interface BattleDao extends BaseDao<BattleEntity, UUID> {
       @Param("battleFilter") BattleFilter battleFilter,
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
 
+  @ResultMap("battleListView")
   @Select(
       "select * from `battle` where #{characterId} in (battle.starter_id,"
           + " battle.receiver_id)")
