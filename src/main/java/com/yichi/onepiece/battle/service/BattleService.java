@@ -91,15 +91,6 @@ public class BattleService {
     if (offset >= totalSize || offset < 0) {
       return new ListBattleResponse().battles(List.of()).totalSize(totalSize);
     }
-    var battle = battleDao
-            .list(
-                    request.getBattleFilter(),
-                    request.getSortKeys(),
-                    userId,
-                    resourceIds,
-                    offset,
-                    request.getPageSize()).get(0);
-    logger.info("battle: {}", battle);
     var battleList =
         battleDao
             .list(
@@ -118,6 +109,7 @@ public class BattleService {
   public BattleFullView getBattleFullView(GetBattleFullViewRequest request) {
     UUID battleId = request.getBattleId();
     var battleFullViewEntity = battleDao.getBattleFullView(battleId).orElseThrow();
+    logger.info("battle full view: {}", battleFullViewEntity);
     return BattleConverter.INSTANCE.toBattleFullView(battleFullViewEntity);
   }
 

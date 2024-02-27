@@ -6,13 +6,7 @@ import com.yichi.onepiece.lineage.model.ActionRecordEntity;
 import java.util.List;
 
 @Entity
-public interface BattleFullView extends BattleEntity {
-  CharacterEntity getStarter();
-
-  CharacterEntity getReceiver();
-
-  BattleExecutionEntity getBattleExecution();
-
+public interface BattleFullView extends BattleListView {
   List<BattleProcessDetailEntity> getBattleProcessDetails();
 
   List<BattleStatusDetailEntity> getBattleStatusDetails();
