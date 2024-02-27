@@ -142,10 +142,11 @@ public class CharacterService {
     var groupMatchEntity = characterToGroups
         .stream()
         .filter(characterToGroupEntity ->
-           characterToGroupEntity.getGroupId() == request.getGroupId()
+           characterToGroupEntity.getGroupId().equals(request.getGroupId())
           ).findFirst();
     if (groupMatchEntity.isPresent()) {
-      characterToGroupDao.update(groupMatchEntity.get().toBuilder().setOnceBelongedTo(false).build());
+      var updatedEntity = groupMatchEntity.get().toBuilder().setOnceBelongedTo(false).build();
+      characterToGroupDao.update(updatedEntity);
     } else {
       CharacterToGroupEntity characterToGroupEntity = CharacterToGroupEntityBuilder.newBuilder()
           .setCharacterId(request.getCharacterId())
