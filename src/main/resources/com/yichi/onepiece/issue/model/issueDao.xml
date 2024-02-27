@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.issue.model.IssueDao">
-    <select id="listIssues" resultType="com.yichi.onepiece.issue.model.IssueListView">
+    <select id="listIssues" resultType="com.yichi.onepiece.issue.model.IssueListView" resultMap="issueListView">
         SELECT * FROM `issue`
         LEFT JOIN `action_lineage` on `issue`.`creation_record_id` = `action_lineage`.`id`
         <include refid="issueFilter">
@@ -15,12 +15,13 @@
 
     <select id="searchCount" resultType="int">
         SELECT COUNT(*) FROM `issue`
+        LEFT JOIN `action_lineage` on `issue`.`creation_record_id` = `action_lineage`.`id`
         <include refid="issueFilter">
             <property name="issueFilter" value="issueFilter"/>
         </include>
     </select>
 
-    <resultMap id="issueListView" type="com.yichi.onepiece.issue.model.IssueEntity" autoMapping="true">
+    <resultMap id="issueListView" type="com.yichi.onepiece.issue.model.IssueListView" autoMapping="true">
         <result column="id" property="id"/>
         <association column="creation_record_id" property="creationRecord"
                      select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
@@ -34,16 +35,16 @@
     <sql id="issueFilter">
         WHERE 1=1
         <if test="issueFilter.username != null and issueFilter.username != ''">
-            <bind name="keyLike" value="'%' + issueFilter.username + '%'"/>
-            AND `username` like #{keyLike}
+            <bind name="nameKeyLike" value="'%' + issueFilter.username + '%'"/>
+            AND `username` like #{nameKeyLike}
         </if>
         <if test="issueFilter.nickname != null and issueFilter.nickname != ''">
-            <bind name="keyLike" value="'%' + issueFilter.nickname + '%'"/>
-            AND `nickname` like #{keyLike}
+            <bind name="nicknameKeyLike" value="'%' + issueFilter.nickname + '%'"/>
+            AND `nickname` like #{nicknameKeyLike}
         </if>
         <if test="issueFilter.issueHeader != null and issueFilter.issueHeader != ''">
-            <bind name="keyLike" value="'%' + issueFilter.issueHeader + '%'"/>
-            AND `issue_header` like #{keyLike}
+            <bind name="headerKeyLike" value="'%' + issueFilter.issueHeader + '%'"/>
+            AND `issue_header` like #{headerKeyLike}
         </if>
         <if test="issueFilter.issueTypes != null and !issueFilter.issueTypes.isEmpty">
             AND `issue_type` IN

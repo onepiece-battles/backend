@@ -65,6 +65,7 @@ public class IssueService {
             .stream()
             .map(IssueConverter.INSTANCE::toIssue)
             .collect(Collectors.toList());
+    logger.info("filter:{}", request.getIssueFilter());
     return new ListIssueResponse().issues(issues).totalSize(totalSize);
   }
 }
