@@ -1,0 +1,1 @@
+alter table `email_verification` modify `user_id` binary(16);

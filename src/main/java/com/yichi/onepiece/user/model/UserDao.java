@@ -35,6 +35,9 @@ public interface UserDao extends BaseDao<UserEntity, UUID> {
   @Select("SELECT * FROM user WHERE username= #{email}")
   List<UserEntity> listByEmailAddress(@Param("email") String email);
 
+  @Select("select * from `user` where `user`.`username` = #{username}")
+  Optional<UserEntity> getByUsername(@Param("username") String username);
+
   @Results(
       id = "UserDetailView",
       value = {

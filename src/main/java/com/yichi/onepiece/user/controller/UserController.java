@@ -1,7 +1,6 @@
 package com.yichi.onepiece.user.controller;
 
 import static com.yichi.onepiece.constants.ConstantsContainer.SUCCESS;
-
 import com.yichi.onepiece.api.UserApi;
 import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.*;
@@ -81,11 +80,19 @@ public class UserController implements UserApi {
   }
 
   @Override
+  public ResponseEntity<PasswordRetrievalResponse> sendRetrievalEmail(
+          PasswordRetrievalRequest passwordRetrievalRequest) {
+    var response =  userService.sendRetrievalEmail(passwordRetrievalRequest);
+    return ResponseEntity.ok(response);
+  }
+
+  @Override
   public ResponseEntity<SendEmailResponse> sendVerificationEmail(
       SendEmailRequest sendEmailRequest) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
     var response =
-        new SendEmailResponse().emailNotification(userService.sendEmail(sendEmailRequest));
+        new SendEmailResponse().emailNotification(
+                userService.sendEmail(sendEmailRequest.getEmail(), sendEmailRequest.getId()));
     return ResponseEntity.ok(response);
   }
 
@@ -94,6 +101,12 @@ public class UserController implements UserApi {
       ShareResourceRequest shareResourceRequest) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
     var response = userService.shareResource(shareResourceRequest);
+    return ResponseEntity.ok(response);
+  }
+
+  @Override
+  public ResponseEntity<UpdatePasswordResponse> updatePassword(UpdatePasswordRequest updatePasswordRequest) {
+    var response = userService.updatePassword(updatePasswordRequest);
     return ResponseEntity.ok(response);
   }
 
