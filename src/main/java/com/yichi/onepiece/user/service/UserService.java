@@ -450,13 +450,17 @@ public class UserService {
   }
 
   private String justifyVerificationCode(@Nullable UUID userId, String email, String verificationCode) {
-    var emailVerificationEntity =
-            emailVerificationDao
-                    .getByEmailAndUserId(email, userId, verificationCode);
+    List<EmailVerificationEntity> emailVerificationEntity;
+    if (userId==null) {
+      emailVerificationEntity= emailVerificationDao.getByEmailAndNullUserId(email, verificationCode);
+    } else {
+      emailVerificationEntity =emailVerificationDao
+              .getByEmailAndUserId(email, userId, verificationCode);
+    }
     if (emailVerificationEntity.isEmpty()) {
       return VERIFICATION_CODE_NOT_MATCH;
     }
-    if (emailVerificationEntity.get().getExpirationTimestamp() < clock.millis()) {
+    if (emailVerificationEntity.get(0).getExpirationTimestamp() < clock.millis()) {
       return VERIFICATION_CODE_EXPIRED;
     }
     // mark email as used.
