@@ -66,6 +66,7 @@ public class CharacterService {
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
             .setSystemResource(UserHelper.hasNikaPermission())
+            .setScore(0)
             .build();
     characterDao.insert(characterEntity);
     createHakis(request.getHakis(), characterEntity.getId());
