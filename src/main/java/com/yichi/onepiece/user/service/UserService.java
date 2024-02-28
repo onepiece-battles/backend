@@ -243,6 +243,27 @@ public class UserService {
     return new LogoutResponse().logoutResult(SUCCESS).userName(user.getUsername());
   }
 
+  public PasswordRetrievalResponse sendRetrievalEmail(PasswordRetrievalRequest request) {
+    var text = sendEmail(request.getEmail(), null);
+    return new PasswordRetrievalResponse().result(true).notification(text);
+  }
+
+  public UpdatePasswordResponse updatePassword(UpdatePasswordRequest request) {
+    var userOptional = userDao.getByUsername(request.getUsername());
+    if (userOptional.isPresent()) {
+      var user = userOptional.get();
+      user = user.toBuilder().setEncryptedPassword(passwordEncoder.encode(request.getPassword())).build();
+      userDao.update(user);
+      return new UpdatePasswordResponse().result(true).notification(
+              UserFacingConstants.getConstant(
+                      PASSWORD_UPDATED_SUCCESS).getDisplayName());
+    } else {
+      return new UpdatePasswordResponse().result(false).notification(
+              UserFacingConstants.getConstant(
+                      UserFacingConstantsKey.EMAIL_HAS_BEEN_REGISTERED).getDisplayName());
+    }
+  }
+
   public ListUsersResponse list(ListUsersRequest request) {
     var totalSize = userDao.searchCount(request.getUserFilter());
     // pageIndex is 1- based. offset is 0- based.
@@ -369,17 +390,17 @@ public class UserService {
         .tokens(tokens);
   }
 
-  public I18nText sendEmail(SendEmailRequest sendEmailRequest) {
+  public I18nText sendEmail(String email, @Nullable UUID userId) {
     try {
-      emailVerificationDao.markEmailAsUsed(sendEmailRequest.getId(), sendEmailRequest.getEmail());
+      emailVerificationDao.markEmailAsUsed(userId, email);
       long creationTimestamp = clock.millis();
       // expires 5 minutes later
       long expirationTimestamp = creationTimestamp + 300000L;
       String verificationCode = RandomGenerator.generateVerificationCode();
       var emailVerificationEntity =
           EmailVerificationEntityBuilder.newBuilder()
-              .setEmail(sendEmailRequest.getEmail())
-              .setUserId(sendEmailRequest.getId())
+              .setEmail(email)
+              .setUserId(userId)
               .setEmailVerificationCode(verificationCode)
               .setCreationTimestamp(clock.millis())
               .setExpirationTimestamp(expirationTimestamp)
@@ -388,12 +409,12 @@ public class UserService {
       emailVerificationDao.insert(emailVerificationEntity);
       if (UserHelper.getCurrentUserDetail().getLocale() == OnepieceLocale.EN_US) {
         emailClient.sendMail(
-            sendEmailRequest.getEmail(),
+            email,
             "This is the verification email, The verification code is: " + verificationCode,
             "[Onepiece Battles] Email address verification");
       } else {
         emailClient.sendMail(
-            sendEmailRequest.getEmail(),
+            email,
             "这是您的验证邮件，验证码为：" + verificationCode,
             "[Onepiece Battles] 电子邮箱验证");
       }
