@@ -112,7 +112,6 @@ public class UserController implements UserApi {
 
   @Override
   public ResponseEntity<UpdateLoginRoleResponse> updateRole(UpdateLoginRoleRequest request) {
-    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
     var response = userService.updateLoginRole(request.getRole());
     return ResponseEntity.ok(response);
   }

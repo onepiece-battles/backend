@@ -24,6 +24,8 @@ public interface CharacterEntity {
 
   Race getRace();
 
+  Integer getScore();
+
   @Nullable
   Byte[] getProfileImage();
 
