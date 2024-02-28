@@ -244,11 +244,18 @@ public class UserService {
   }
 
   public PasswordRetrievalResponse sendRetrievalEmail(PasswordRetrievalRequest request) {
-    var text = sendEmail(request.getEmail(), null);
-    return new PasswordRetrievalResponse().result(true).notification(text);
+    var text = sendEmail(request.getEmail(), null, request.getLocale());
+    boolean result = text.equals(UserFacingConstants.getConstant(EMAIL_SENT).getDisplayName());
+    return new PasswordRetrievalResponse().result(result).notification(text);
   }
 
   public UpdatePasswordResponse updatePassword(UpdatePasswordRequest request) {
+    var result = justifyVerificationCode(null, request.getUsername(), request.getVerificationCode());
+    if (!VERIFICATION_SUCCESS.equals(result)) {
+      return new UpdatePasswordResponse()
+              .result(false).notification(UserFacingConstants.getConstant(
+                      result).getDisplayName());
+    }
     var userOptional = userDao.getByUsername(request.getUsername());
     if (userOptional.isPresent()) {
       var user = userOptional.get();
@@ -390,7 +397,7 @@ public class UserService {
         .tokens(tokens);
   }
 
-  public I18nText sendEmail(String email, @Nullable UUID userId) {
+  public I18nText sendEmail(String email, @Nullable UUID userId, @Nullable OnepieceLocale onepieceLocale) {
     try {
       emailVerificationDao.markEmailAsUsed(userId, email);
       long creationTimestamp = clock.millis();
@@ -407,7 +414,9 @@ public class UserService {
               .isUsed(false)
               .build();
       emailVerificationDao.insert(emailVerificationEntity);
-      if (UserHelper.getCurrentUserDetail().getLocale() == OnepieceLocale.EN_US) {
+      // in the case of sending password retrieval mail, the locale will not be null.
+      var locale = onepieceLocale != null? onepieceLocale: UserHelper.getCurrentUserDetail().getLocale();
+      if (locale == OnepieceLocale.EN_US) {
         emailClient.sendMail(
             email,
             "This is the verification email, The verification code is: " + verificationCode,
@@ -424,23 +433,13 @@ public class UserService {
     return UserFacingConstants.getConstant(EMAIL_SENT).getDisplayName();
   }
 
-  public VerifyByEmailCodeResponse verifyByCode(VerifyByEmailCodeRequest request) {
-    var emailVerificationEntity =
-        emailVerificationDao
-            .getByEmailAndUserId(request.getEmail(), request.getUserId(), request.getVerificationCode());
-    if (emailVerificationEntity.isEmpty()) {
+  public VerifyByEmailCodeResponse verifyUserEmail(VerifyByEmailCodeRequest request) {
+    var result =  justifyVerificationCode(request.getUserId(), request.getEmail(),request.getVerificationCode());
+    if (!VERIFICATION_SUCCESS.equals(result)) {
       return new VerifyByEmailCodeResponse()
-          .verifyResult(false).verifyMessage(UserFacingConstants.getConstant(
-              VERIFICATION_CODE_NOT_MATCH).getDisplayName());
+              .verifyResult(false).verifyMessage(UserFacingConstants.getConstant(
+                      result).getDisplayName());
     }
-    if (emailVerificationEntity.get().getExpirationTimestamp() < clock.millis()) {
-      return new VerifyByEmailCodeResponse().verifyResult(false)
-          .verifyMessage(UserFacingConstants.getConstant(
-          VERIFICATION_CODE_EXPIRED).getDisplayName());
-    }
-
-    // mark email as used.
-    emailVerificationDao.markEmailAsUsed(request.getUserId(), request.getEmail());
     // if verification code is correct, send mark user email as verified.
     var user = userDao.findById(request.getUserId()).orElseThrow();
     user = user.toBuilder().setEmailVerified(true).build();
@@ -448,5 +447,20 @@ public class UserService {
     return new VerifyByEmailCodeResponse()
         .verifyResult(true).verifyMessage(UserFacingConstants.getConstant(
         VERIFICATION_SUCCESS).getDisplayName());
+  }
+
+  private String justifyVerificationCode(@Nullable UUID userId, String email, String verificationCode) {
+    var emailVerificationEntity =
+            emailVerificationDao
+                    .getByEmailAndUserId(email, userId, verificationCode);
+    if (emailVerificationEntity.isEmpty()) {
+      return VERIFICATION_CODE_NOT_MATCH;
+    }
+    if (emailVerificationEntity.get().getExpirationTimestamp() < clock.millis()) {
+      return VERIFICATION_CODE_EXPIRED;
+    }
+    // mark email as used.
+    emailVerificationDao.markEmailAsUsed(userId, email);
+    return VERIFICATION_SUCCESS;
   }
 }
