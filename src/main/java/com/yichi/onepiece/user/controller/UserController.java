@@ -92,7 +92,7 @@ public class UserController implements UserApi {
     iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
     var response =
         new SendEmailResponse().emailNotification(
-                userService.sendEmail(sendEmailRequest.getEmail(), sendEmailRequest.getId()));
+                userService.sendEmail(sendEmailRequest.getEmail(), sendEmailRequest.getId(), null));
     return ResponseEntity.ok(response);
   }
 
@@ -128,7 +128,7 @@ public class UserController implements UserApi {
   public ResponseEntity<VerifyByEmailCodeResponse> verifyByEmailCode(
       VerifyByEmailCodeRequest verifyByEmailCodeRequest) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
-    var response = userService.verifyByCode(verifyByEmailCodeRequest);
+    var response = userService.verifyUserEmail(verifyByEmailCodeRequest);
     return ResponseEntity.ok(response);
   }
 }
