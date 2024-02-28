@@ -85,7 +85,7 @@ public class UserService {
    * @param password password
    * @param username email address as username
    * @param confirmedPassword confirmed password
-   * @param onepieceLocale the local information (i18n information) based on FE language
+   * @param onepieceLocale the locale information (i18n information) based on FE language
    * @return register verification: key of DUPLICATE_USER_NAME/PASSWORD_DIFFERENT/REGISTER_SUCCESS
    */
   public String register(
@@ -464,7 +464,11 @@ public class UserService {
       return VERIFICATION_CODE_EXPIRED;
     }
     // mark email as used.
-    emailVerificationDao.markEmailAsUsed(userId, email);
+    if (userId==null) {
+      emailVerificationDao.markEmailAsUsedNullUserId(email);
+    } else {
+      emailVerificationDao.markEmailAsUsed(userId, email);
+    }
     return VERIFICATION_SUCCESS;
   }
 }

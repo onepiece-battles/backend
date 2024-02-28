@@ -30,7 +30,9 @@ public interface EmailVerificationDao extends BaseDao<EmailVerificationEntity, U
           @Param("verificationCode") String verificationCode
   );
 
-
+  @Update("update email_verification set is_used = true where user_id is null "
+          + "and email_verification.email = #{email}")
+  void markEmailAsUsedNullUserId(@Param("email") String email);
 
   @Update("update email_verification set is_used = true where user_id = #{userId} "
       + "and email_verification.email = #{email}")
