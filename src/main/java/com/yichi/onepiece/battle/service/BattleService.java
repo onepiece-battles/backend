@@ -156,6 +156,12 @@ public class BattleService {
     logger.info("Battle finish");
     var winner = battlefield.getWinner();
     var loser = battlefield.getLoser();
+    var battleExecution = battleExecutionDao.findByBattleId(battleId).orElseThrow();
+    battleExecution = battleExecution.toBuilder()
+            .setBattleStatus(BattleStatus.FINISHED)
+            .setWinnerId(winner.getCharacterId())
+            .build();
+    battleExecutionDao.update(battleExecution);
     logger.info("Winner is {}", winner.getName());
     logger.info("Loser is {}", loser.getName());
     logger.info("------------------------------------------------");
@@ -163,7 +169,6 @@ public class BattleService {
     logger.info("winner blood: {}", winner.getBlood());
     logger.info("loser information");
     logger.info("loser blood: {}", loser.getBlood());
-    new StartBattleResponse().battleId(battleId).result(new BattleResult());
   }
 
   Battlefield createBattleField(UUID battleId) {
