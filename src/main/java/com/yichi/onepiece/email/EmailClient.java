@@ -14,8 +14,9 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class EmailClient {
   private final Logger logger = LoggerFactory.getLogger(EmailClient.class);
   private final JavaMailSender javaMailSender;
@@ -24,19 +25,19 @@ public class EmailClient {
     this.javaMailSender = mailSender;
   }
 
-  public void sendMail(String toEmail, String body, String subject) throws MessagingException {
+  public void sendMail(String receiverEmailAddress, String body, String subject) throws MessagingException {
     MimeMessage mimeMessage = javaMailSender.createMimeMessage();
     // body part to save img
     MimeMultipart multipart = getMimeMultipart(body);
     mimeMessage.setContent(multipart);
     MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
     helper.setFrom(FROM_EMAIL_ADDRESS);
-    helper.setTo(toEmail);
+    helper.setTo(receiverEmailAddress);
     helper.setSubject(subject);
     try{
       javaMailSender.send(mimeMessage);
     } catch (MailException e) {
-      e.printStackTrace();
+      logger.error(e.toString());
     }
   }
 

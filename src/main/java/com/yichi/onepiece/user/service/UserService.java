@@ -1,11 +1,10 @@
 package com.yichi.onepiece.user.service;
 
-import static com.yichi.onepiece.constants.ConstantsContainer.SUCCESS;
-import static com.yichi.onepiece.constants.ConstantsContainer.VALID_EMAIL_PATTERN;
+import static com.yichi.onepiece.constants.ConstantsContainer.*;
 import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.*;
 
+import com.yichi.onepiece.quartz.jobs.EmailJob;
 import com.yichi.onepiece.constants.ConstantsContainer;
-import com.yichi.onepiece.email.EmailClient;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.iam.model.*;
 import com.yichi.onepiece.iam.service.RoleService;
@@ -27,8 +26,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.ArrayUtils;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,25 +46,25 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
   private final UserResourceDao userResourceDao;
   private final ActionRecordService actionRecordService;
-  private final EmailClient emailClient;
+  private final SchedulerFactoryBean schedulerFactoryBean;
   private final RoleService roleService;
 
   private final EmailVerificationDao emailVerificationDao;
   private final Clock clock;
 
   public UserService(
-      UserDao userDao,
-      AuthenticationManager authenticationManager,
-      TokenDao tokenDao,
-      RoleDao roleDao,
-      UserRoleDao userRoleDao,
-      PasswordEncoder passwordEncoder,
-      UserResourceDao userResourceDao,
-      ActionRecordService actionRecordService,
-      EmailClient emailClient,
-      RoleService roleService,
-      EmailVerificationDao emailVerificationDao,
-      Clock clock) {
+          UserDao userDao,
+          AuthenticationManager authenticationManager,
+          TokenDao tokenDao,
+          RoleDao roleDao,
+          UserRoleDao userRoleDao,
+          PasswordEncoder passwordEncoder,
+          UserResourceDao userResourceDao,
+          ActionRecordService actionRecordService,
+          SchedulerFactoryBean schedulerFactoryBean,
+          RoleService roleService,
+          EmailVerificationDao emailVerificationDao,
+          Clock clock) {
     this.userDao = userDao;
     this.authenticationManager = authenticationManager;
     this.tokenDao = tokenDao;
@@ -72,7 +73,7 @@ public class UserService {
     this.passwordEncoder = passwordEncoder;
     this.userResourceDao = userResourceDao;
     this.actionRecordService = actionRecordService;
-    this.emailClient = emailClient;
+    this.schedulerFactoryBean = schedulerFactoryBean;
     this.roleService = roleService;
     this.emailVerificationDao = emailVerificationDao;
     this.clock = clock;
@@ -244,7 +245,31 @@ public class UserService {
   }
 
   public PasswordRetrievalResponse sendRetrievalEmail(PasswordRetrievalRequest request) {
-    var text = sendEmail(request.getEmail(), null, request.getLocale());
+    emailVerificationDao.markEmailAsUsedNullUserId(request.getEmail());
+    long creationTimestamp = clock.millis();
+    var verificationCode = RandomGenerator.generateVerificationCode();
+    String subject = "";
+    String body = "";
+    if(OnepieceLocale.EN_US.equals(request.getLocale())) {
+      subject = "[Onepiece Battles] Reset Password";
+      body = String.format("This is the verification email, The verification code is: %s", verificationCode);
+    } else {
+      subject = "[Onepiece Battles] 找回密码";
+      body = String.format("这是您的验证邮件，验证码为：%s", verificationCode);
+    }
+    var text = sendEmail(request.getEmail(), subject, body);
+    // expires 5 minutes later
+    long expirationTimestamp = creationTimestamp + 300000L;
+    var emailVerificationEntity =
+            EmailVerificationEntityBuilder.newBuilder()
+                    .setEmail(request.getEmail())
+                    .setUserId(null)
+                    .setEmailVerificationCode(verificationCode)
+                    .setCreationTimestamp(clock.millis())
+                    .setExpirationTimestamp(expirationTimestamp)
+                    .isUsed(false)
+                    .build();
+    emailVerificationDao.insert(emailVerificationEntity);
     boolean result = text.equals(UserFacingConstants.getConstant(EMAIL_SENT).getDisplayName());
     return new PasswordRetrievalResponse().result(result).notification(text);
   }
@@ -397,37 +422,63 @@ public class UserService {
         .tokens(tokens);
   }
 
-  public I18nText sendEmail(String email, @Nullable UUID userId, @Nullable OnepieceLocale onepieceLocale) {
+  public VerifyEmailAddressResponse verifyEmailAddress(VerifyEmailAddressRequest request) {
+    // id from  request is user id
+    emailVerificationDao.markEmailAsUsed(request.getId(), request.getEmail());
+    long creationTimestamp = clock.millis();
+    var verificationCode = RandomGenerator.generateVerificationCode();
+    var locale = UserHelper.getCurrentUserDetail().getLocale();
+    String subject = "";
+    String body = "";
+    if(OnepieceLocale.EN_US.equals(locale)) {
+      subject = "[Onepiece Battles] Email address verification";
+      body = String.format("This is the verification email, The verification code is: %s", verificationCode);
+    } else {
+      subject = "[Onepiece Battles] 电子邮箱验证";
+      body = String.format("这是您的验证邮件，验证码为：%s", verificationCode);
+    }
+    var text = sendEmail(request.getEmail(), subject, body);
+
+    // expires 5 minutes later
+    long expirationTimestamp = creationTimestamp + 300000L;
+    var emailVerificationEntity =
+            EmailVerificationEntityBuilder.newBuilder()
+                    .setEmail(request.getEmail())
+                    .setUserId(request.getId())
+                    .setEmailVerificationCode(verificationCode)
+                    .setCreationTimestamp(clock.millis())
+                    .setExpirationTimestamp(expirationTimestamp)
+                    .isUsed(false)
+                    .build();
+    emailVerificationDao.insert(emailVerificationEntity);
+    // TODO: 2024/2/29 consider the case when email sent failed. 
+    //boolean result = text.equals(UserFacingConstants.getConstant(EMAIL_SENT).getDisplayName());
+    return new VerifyEmailAddressResponse().emailNotification(text);
+  }
+
+  public I18nText sendEmail(
+          String email,
+          String subject,
+          String body) {
     try {
-      emailVerificationDao.markEmailAsUsed(userId, email);
-      long creationTimestamp = clock.millis();
-      // expires 5 minutes later
-      long expirationTimestamp = creationTimestamp + 300000L;
-      String verificationCode = RandomGenerator.generateVerificationCode();
-      var emailVerificationEntity =
-          EmailVerificationEntityBuilder.newBuilder()
-              .setEmail(email)
-              .setUserId(userId)
-              .setEmailVerificationCode(verificationCode)
-              .setCreationTimestamp(clock.millis())
-              .setExpirationTimestamp(expirationTimestamp)
-              .isUsed(false)
+      JobDataMap jobDataMap = new JobDataMap();
+      jobDataMap.put(RECEIVER_EMAIL_ADDRESS, email);
+      jobDataMap.put(SUBJECT, subject);
+      jobDataMap.put(BODY, body);
+
+      JobDetail emailSendingJob = JobBuilder.newJob(EmailJob.class)
+              .setJobData(jobDataMap)
+              .withIdentity(UUID.randomUUID().toString(), EMAIL_JOB_GROUP)
+              .withDescription("send email job")
               .build();
-      emailVerificationDao.insert(emailVerificationEntity);
-      // in the case of sending password retrieval mail, the locale will not be null.
-      var locale = onepieceLocale != null? onepieceLocale: UserHelper.getCurrentUserDetail().getLocale();
-      if (locale == OnepieceLocale.EN_US) {
-        emailClient.sendMail(
-            email,
-            "This is the verification email, The verification code is: " + verificationCode,
-            "[Onepiece Battles] Email address verification");
-      } else {
-        emailClient.sendMail(
-            email,
-            "这是您的验证邮件，验证码为：" + verificationCode,
-            "[Onepiece Battles] 电子邮箱验证");
-      }
+      Scheduler scheduler = schedulerFactoryBean.getScheduler();
+      Trigger emailJobTrigger = TriggerBuilder.newTrigger()
+              .forJob(emailSendingJob)
+              .startNow().build();
+      scheduler.start();
+      scheduler.scheduleJob(emailSendingJob, emailJobTrigger);
     } catch (Exception e) {
+      logger.error(e.toString());
       return UserFacingConstants.getConstant(EMAIL_SENDING_FAILED).getDisplayName();
     }
     return UserFacingConstants.getConstant(EMAIL_SENT).getDisplayName();
