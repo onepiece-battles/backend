@@ -83,7 +83,8 @@ public class DataExportService {
       logger.info("start writing files to alicloud");
       String uri =
           AliCloudObjectStorage.putFileStream(new ByteArrayInputStream(outputStream.toByteArray()));
-      var actionRecordEntity = actionRecordService.create();
+      logger.info("finish uploading to alicloud oss");
+      // todo(yichi): add creation record entity here
       var fileObjectEntity =
           FileObjectEntityBuilder.newBuilder()
               .setFileName(
@@ -92,7 +93,7 @@ public class DataExportService {
               .setFileCategory(FileCategory.SINGLE_BATTLE_DETAIL)
               .setHttpMimeType("application/pdf")
               .setCreatorUserId(userId)
-              .setCreationRecordId(actionRecordEntity.getId())
+              .setCreationRecordId(122L)
               .setOssUri(uri)
               .setResourceId(battleId)
               .build();
