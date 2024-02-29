@@ -202,7 +202,7 @@ public class Battlefield {
           .setDefenderBloodLoss(defenseResult.get(0))
           .setDefenderEnergyLoss(defenseResult.get(2));
     } else {
-      battleProcessDetailEntityBuilder.setAttackMissed(Boolean.TRUE);
+      battleProcessDetailEntityBuilder.setAttackMissed(Boolean.TRUE).setDefenderBloodLoss(0).setDefenderEnergyLoss(0);
       logger.info("{} hide SUCCESS, no damage is casted", defense.getName());
     }
     battleProcessDetailEntities.add(battleProcessDetailEntityBuilder.build());
