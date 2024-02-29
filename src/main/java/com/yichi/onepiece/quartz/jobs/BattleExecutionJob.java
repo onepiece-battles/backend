@@ -1,13 +1,20 @@
-package com.yichi.onepiece.battle.async;
+package com.yichi.onepiece.quartz.jobs;
 
 import com.yichi.onepiece.battle.service.BattleService;
 import java.util.UUID;
 import org.quartz.JobExecutionContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nonnull;
+
+import static com.yichi.onepiece.constants.ConstantsContainer.BATTLE_ID;
+
 @Component
 public class BattleExecutionJob extends QuartzJobBean {
+  private final Logger logger = LoggerFactory.getLogger(BattleExecutionJob.class);
   private final BattleService battleService;
 
   public BattleExecutionJob(BattleService battleService) {
@@ -16,12 +23,12 @@ public class BattleExecutionJob extends QuartzJobBean {
 
 
   @Override
-  protected void executeInternal(JobExecutionContext jobExecutionContext) {
+  protected void executeInternal(@Nonnull JobExecutionContext jobExecutionContext) {
     try {
-      String battleId = jobExecutionContext.getJobDetail().getJobDataMap().getString("battleId");
+      String battleId = jobExecutionContext.getJobDetail().getJobDataMap().getString(BATTLE_ID);
       battleService.startBattle(UUID.fromString(battleId));
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e.toString());
     }
   }
 }

@@ -9,4 +9,13 @@ public class ConstantsContainer {
   public static final String SUCCESS = "SUCCESS";
   public static final String USER_DEFAULT_PROFILE_PATH =
       "src/main/resources/images/user_default_profile.png";
+
+
+  // async constants
+  public static final String BATTLE_ID = "BATTLE_ID";
+  public static final String EMAIL_JOB_GROUP = "EMAIL_JOB_GROUP";
+  public static final String BATTLE_JOB_GROUP = "BATTLE_JOB_GROUP";
+  public static final String SUBJECT = "SUBJECT";
+  public static final String BODY = "BODY";
+  public static final String RECEIVER_EMAIL_ADDRESS = "RECEIVER_EMAIL_ADDRESS";
 }

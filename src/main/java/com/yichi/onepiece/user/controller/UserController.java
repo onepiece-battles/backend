@@ -87,12 +87,10 @@ public class UserController implements UserApi {
   }
 
   @Override
-  public ResponseEntity<SendEmailResponse> sendVerificationEmail(
-      SendEmailRequest sendEmailRequest) {
+  public ResponseEntity<VerifyEmailAddressResponse> verifyEmailAddress(
+      VerifyEmailAddressRequest verifyEmailAddressRequest) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
-    var response =
-        new SendEmailResponse().emailNotification(
-                userService.sendEmail(sendEmailRequest.getEmail(), sendEmailRequest.getId(), null));
+    var response = userService.verifyEmailAddress(verifyEmailAddressRequest);
     return ResponseEntity.ok(response);
   }
 
