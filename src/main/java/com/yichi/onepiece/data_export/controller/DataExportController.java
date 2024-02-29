@@ -7,6 +7,8 @@ import com.yichi.onepiece.model.GeneratePdfResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
+import java.util.UUID;
+
 @Controller
 public class DataExportController implements DataExportApi {
   private final DataExportService dataExportService;
@@ -18,7 +20,7 @@ public class DataExportController implements DataExportApi {
   @Override
   public ResponseEntity<GeneratePdfResponse> generatePdf(GeneratePdfRequest generatePdfRequest) {
     // todo(yichi): add permission check here
-    var fileId = dataExportService.createBattleResultPdf(generatePdfRequest.getResourceId());
-    return ResponseEntity.ok(new GeneratePdfResponse().fileId(fileId));
+    dataExportService.generateBattleResultPdf(generatePdfRequest.getResourceId(),"","",UUID.randomUUID());
+    return ResponseEntity.ok(new GeneratePdfResponse().fileId(UUID.randomUUID()));
   }
 }

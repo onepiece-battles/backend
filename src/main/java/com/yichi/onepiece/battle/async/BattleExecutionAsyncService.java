@@ -5,6 +5,7 @@ import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.BattleStatus;
 import com.yichi.onepiece.quartz.jobs.BattleExecutionJob;
 import com.yichi.onepiece.quartz.jobs.EmailJob;
+import com.yichi.onepiece.user.UserHelper;
 import io.micrometer.core.annotation.Timed;
 import java.util.UUID;
 import org.quartz.JobBuilder;
@@ -53,6 +54,9 @@ public class BattleExecutionAsyncService {
         actionRecord.getActionTimestamp()).setBattleStatus(BattleStatus.IN_PROGRESS).build();
     JobDataMap jobDataMap = new JobDataMap();
     jobDataMap.put(BATTLE_ID, battleId.toString());
+    jobDataMap.put(USER_ID, UserHelper.getCurrentUserId().toString());
+    jobDataMap.put(USER_EMAIL, UserHelper.getCurrentUserDetail().getUsername());
+    jobDataMap.put(USER_NICKNAME, UserHelper.getCurrentUserDetail().getNickname());
     JobDetail battleStartJob = JobBuilder.newJob(BattleExecutionJob.class)
             .setJobData(jobDataMap)
             .withIdentity(UUID.randomUUID().toString(), BATTLE_JOB_GROUP)

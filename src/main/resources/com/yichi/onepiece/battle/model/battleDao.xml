@@ -92,7 +92,6 @@
 
     <resultMap id="battleListView" type="com.yichi.onepiece.battle.model.BattleListView" autoMapping="true">
         <result column="id" property="id"/>
-        <result column="winner_id" property="winnerId"/>
         <result column="starter_id" property="starterId"/>
         <result column="receiver_id" property="receiverId"/>
         <result column="creation_record_id" property="creationRecordId"

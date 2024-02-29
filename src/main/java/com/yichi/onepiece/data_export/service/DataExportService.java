@@ -13,16 +13,23 @@ import com.yichi.onepiece.file.model.FileCategory;
 import com.yichi.onepiece.file.model.FileObjectEntityBuilder;
 import com.yichi.onepiece.file.service.FileObjectService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
+import com.yichi.onepiece.model.BattleReportStage;
 import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.user.UserHelper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.UUID;
+
+import com.yichi.onepiece.user.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DataExportService {
+  private final Logger logger = LoggerFactory.getLogger(DataExportService.class);
+
   private final BattleService battleService;
   private final CharacterService characterService;
   private final FileObjectService fileObjectService;
@@ -44,32 +51,36 @@ public class DataExportService {
    * Export pdf data to AliYun oss and return the path.
    *
    * @param battleId id of battle that will be analyzed.
-   * @return Path to the exported pdf.
    */
-  public UUID createBattleResultPdf(UUID battleId) {
-    var user = UserHelper.getCurrentUserDetail();
+  public void generateBattleResultPdf(UUID battleId, String userEmail, String userNickname, UUID userId) {
+    logger.info("start getting source data for report generation");
     var battleEntity = battleService.findBattleById(battleId);
     var statusList = battleService.listBattleStatusDetailByBattleId(battleId);
     var processList = battleService.listBattleProcessDetailByBattleId(battleId);
     var starterCharacter = characterService.findByCharacterId(battleEntity.getStarterId());
     var receiverCharacter = characterService.findByCharacterId(battleEntity.getReceiverId());
     try {
+      logger.info("start creating files");
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
       Rectangle rectangle = new Rectangle(PageSize.A4);
       rectangle.setBackgroundColor(BaseColor.GRAY);
       Document doc = new Document(rectangle);
       PdfWriter writer = PdfWriter.getInstance(doc, outputStream);
       doc.addTitle("battle");
-      doc.addAuthor(user.getUsername());
+      doc.addAuthor(String.format("%s %s", userEmail, userNickname));
       doc.addSubject("battle details");
       doc.addCreator("onepiece-battles");
       doc.setMargins(30, 30, 30, 30);
       doc.open();
-      doc.add(new Paragraph("paragraph 1"));
-      doc.add(new Paragraph("paragraph 2"));
-      doc.add(new Paragraph("paragraph 3"));
+      for (var status: statusList) {
+        doc.add(new Paragraph(status.toString()));
+      }
+      for (var process: processList) {
+        doc.add(new Paragraph(process.toString()));
+      }
       doc.close();
       writer.close();
+      logger.info("start writing files to alicloud");
       String uri =
           AliCloudObjectStorage.putFileStream(new ByteArrayInputStream(outputStream.toByteArray()));
       var actionRecordEntity = actionRecordService.create();
@@ -77,29 +88,28 @@ public class DataExportService {
           FileObjectEntityBuilder.newBuilder()
               .setFileName(
                   getFileName(
-                      user, starterCharacter.getName(), receiverCharacter.getName(), battleId))
+                      userEmail, starterCharacter.getName(), receiverCharacter.getName(), battleId))
               .setFileCategory(FileCategory.SINGLE_BATTLE_DETAIL)
               .setHttpMimeType("application/pdf")
-              .setCreatorUserId(user.getId())
+              .setCreatorUserId(userId)
               .setCreationRecordId(actionRecordEntity.getId())
               .setOssUri(uri)
               .setResourceId(battleId)
               .build();
       fileObjectService.add(fileObjectEntity);
+      logger.info("pdf report generating finish");
       // update battle entity
+      battleService.updateBattleReportStage(battleId, BattleReportStage.FINISHED);
       battleService.updateFileId(battleId, fileObjectEntity.getId());
-      return fileObjectEntity.getId();
     } catch (Exception e) {
-      e.printStackTrace();
-      // todo(yichi): handle exception.
-      return null;
+      logger.error(e.toString());
     }
   }
 
   private String getFileName(
-      UserDetails user, I18nText starterCharacter, I18nText receiverCharacter, UUID battleId) {
+      String userEmail, I18nText starterCharacter, I18nText receiverCharacter, UUID battleId) {
     return String.format(
         "Created By %s, %s to %s, %s",
-        user.getUsername(), starterCharacter, receiverCharacter, battleId);
+        userEmail, starterCharacter, receiverCharacter, battleId);
   }
 }

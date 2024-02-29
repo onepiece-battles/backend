@@ -40,9 +40,11 @@ public class AliCloudObjectStorage {
   public static String putFileStream(ByteArrayInputStream content) throws FileStorageException {
     String key = UUID.randomUUID().toString();
     try {
+      logger.info("start putting file to alicloud");
       ossClient.putObject(OSS_BUCKET_NAME, key, content);
       return toOssUri(key);
     } catch (OSSException oe) {
+      oe.printStackTrace();
       throw toFileStorageException(oe);
     } finally {
       if (ossClient != null) {
