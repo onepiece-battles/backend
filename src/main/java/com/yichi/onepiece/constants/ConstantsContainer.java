@@ -13,6 +13,9 @@ public class ConstantsContainer {
 
   // async constants
   public static final String BATTLE_ID = "BATTLE_ID";
+  public static final String USER_ID = "USER_ID";
+  public static final String USER_EMAIL = "USER_EMAIL";
+  public static final String USER_NICKNAME = "USER_NICKNAME";
   public static final String EMAIL_JOB_GROUP = "EMAIL_JOB_GROUP";
   public static final String BATTLE_JOB_GROUP = "BATTLE_JOB_GROUP";
   public static final String SUBJECT = "SUBJECT";

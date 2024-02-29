@@ -9,13 +9,23 @@ import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.model.BattleFullView;
+import com.yichi.onepiece.quartz.jobs.EmailJob;
+import com.yichi.onepiece.quartz.jobs.ReportGeneratingJob;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
 import java.util.List;
 import java.util.UUID;
+
+import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
+
+import static com.yichi.onepiece.constants.ConstantsContainer.*;
+import static com.yichi.onepiece.constants.ConstantsContainer.EMAIL_JOB_GROUP;
+import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.EMAIL_SENDING_FAILED;
 
 @Service
 public class BattleService {
@@ -23,6 +33,7 @@ public class BattleService {
   Logger logger = LoggerFactory.getLogger(BattleService.class);
   private final BattleDao battleDao;
   private final BattleExecutionDao battleExecutionDao;
+  private final SchedulerFactoryBean schedulerFactoryBean;
   private final CharacterService characterService;
   private final FruitService fruitService;
   private final ActionRecordService actionRecordService;
@@ -31,16 +42,17 @@ public class BattleService {
   private final UserService userService;
 
   public BattleService(
-      BattleDao battleDao,
-      BattleExecutionDao battleExecutionDao,
-      CharacterService characterService,
-      FruitService fruitService,
-      ActionRecordService actionRecordService,
-      BattleProcessDetailDao battleProcessDetailDao,
-      BattleStatusDetailDao battleStatusDetailDao,
-      UserService userService) {
+          BattleDao battleDao,
+          BattleExecutionDao battleExecutionDao, SchedulerFactoryBean schedulerFactoryBean,
+          CharacterService characterService,
+          FruitService fruitService,
+          ActionRecordService actionRecordService,
+          BattleProcessDetailDao battleProcessDetailDao,
+          BattleStatusDetailDao battleStatusDetailDao,
+          UserService userService) {
     this.battleDao = battleDao;
     this.battleExecutionDao = battleExecutionDao;
+    this.schedulerFactoryBean = schedulerFactoryBean;
     this.characterService = characterService;
     this.fruitService = fruitService;
     this.actionRecordService = actionRecordService;
@@ -109,7 +121,6 @@ public class BattleService {
   public BattleFullView getBattleFullView(GetBattleFullViewRequest request) {
     UUID battleId = request.getBattleId();
     var battleFullViewEntity = battleDao.getBattleFullView(battleId).orElseThrow();
-    logger.info("battle full view: {}", battleFullViewEntity);
     return BattleConverter.INSTANCE.toBattleFullView(battleFullViewEntity);
   }
 
@@ -143,7 +154,7 @@ public class BattleService {
     throw new RuntimeException("battle can not go to next process");
   }
 
-  public void startBattle(UUID battleId) {
+  public void startBattle(UUID battleId, UUID userId, String email, String nickname) {
     var battlefield = createBattleField(battleId);
     while (battlefield.allAlive()) {
       battlefield.checkReverse();
@@ -164,11 +175,39 @@ public class BattleService {
     battleExecutionDao.update(battleExecution);
     logger.info("Winner is {}", winner.getName());
     logger.info("Loser is {}", loser.getName());
-    logger.info("------------------------------------------------");
-    logger.info("winner information");
-    logger.info("winner blood: {}", winner.getBlood());
-    logger.info("loser information");
-    logger.info("loser blood: {}", loser.getBlood());
+    scheduleFileGeneratingJob(battleId, userId, email, nickname);
+  }
+
+  private void scheduleFileGeneratingJob(UUID battleId, UUID userId, String email, String nickname) {
+    try {
+      logger.info("start generating report");
+      JobDataMap jobDataMap = new JobDataMap();
+      jobDataMap.put(BATTLE_ID, battleId.toString());
+      jobDataMap.put(USER_ID, userId.toString());
+      jobDataMap.put(USER_EMAIL, email);
+      jobDataMap.put(USER_NICKNAME, nickname);
+      JobDetail reportGeneratingJob = JobBuilder.newJob(ReportGeneratingJob.class)
+              .setJobData(jobDataMap)
+              .withIdentity(UUID.randomUUID().toString(), BATTLE_JOB_GROUP)
+              .withDescription("generating battle pdf report")
+              .build();
+      Scheduler scheduler = schedulerFactoryBean.getScheduler();
+      Trigger reportGeneratingTrigger = TriggerBuilder.newTrigger()
+              .forJob(reportGeneratingJob)
+              .startNow().build();
+      scheduler.start();
+      scheduler.scheduleJob(reportGeneratingJob, reportGeneratingTrigger);
+      updateBattleReportStage(battleId, BattleReportStage.IN_PROGRESS);
+    } catch (Exception e) {
+      logger.error(e.toString());
+    }
+  }
+
+  public void updateBattleReportStage(UUID battleId, BattleReportStage battleReportStage) {
+    logger.info("update battle report stage to {}", battleReportStage);
+    var battleExecution = battleExecutionDao.findByBattleId(battleId).orElseThrow();
+    battleExecution = battleExecution.toBuilder().setBattleReportStage(battleReportStage).build();
+    battleExecutionDao.update(battleExecution);
   }
 
   Battlefield createBattleField(UUID battleId) {
@@ -192,6 +231,7 @@ public class BattleService {
 
   // update pdf file id
   public void updateFileId(UUID battleId, UUID fileId) {
+    logger.info("update file id");
     var battleExecutionEntity = battleExecutionDao.findById(battleId).orElseThrow();
     battleExecutionEntity = battleExecutionEntity.toBuilder().setReportFileId(fileId).build();
     battleExecutionDao.update(battleExecutionEntity);

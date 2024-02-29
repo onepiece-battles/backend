@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 
-import static com.yichi.onepiece.constants.ConstantsContainer.BATTLE_ID;
+import static com.yichi.onepiece.constants.ConstantsContainer.*;
 
 @Component
 public class BattleExecutionJob extends QuartzJobBean {
@@ -26,7 +26,10 @@ public class BattleExecutionJob extends QuartzJobBean {
   protected void executeInternal(@Nonnull JobExecutionContext jobExecutionContext) {
     try {
       String battleId = jobExecutionContext.getJobDetail().getJobDataMap().getString(BATTLE_ID);
-      battleService.startBattle(UUID.fromString(battleId));
+      String userId = jobExecutionContext.getJobDetail().getJobDataMap().getString(USER_ID);
+      String email = jobExecutionContext.getJobDetail().getJobDataMap().getString(USER_EMAIL);
+      String nickname = jobExecutionContext.getJobDetail().getJobDataMap().getString(USER_NICKNAME);
+      battleService.startBattle(UUID.fromString(battleId), UUID.fromString(userId), email, nickname);
     } catch (Exception e) {
       logger.error(e.toString());
     }

@@ -11,6 +11,7 @@ import com.aliyun.oss.model.ObjectListing;
 import com.aliyuncs.exceptions.ClientException;
 import com.yichi.onepiece.exception.FileStorageException;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
@@ -24,25 +25,17 @@ public class AliCloudObjectStorage {
   private static final OSS ossClient;
 
   static {
-    try {
-      EnvironmentVariableCredentialsProvider provider =
-          CredentialsProviderFactory.newEnvironmentVariableCredentialsProvider();
-      ossClient = new OSSClientBuilder().build(OSS_EXTERNAL_ENDPOINT, provider);
-    } catch (ClientException ce) {
-      try {
-        throw toFileStorageException(ce);
-      } catch (FileStorageException e) {
-        throw new RuntimeException(e);
-      }
-    }
+      ossClient = new OSSClientBuilder().build(OSS_EXTERNAL_ENDPOINT, "REDACTED", "REDACTED");
   }
 
   public static String putFileStream(ByteArrayInputStream content) throws FileStorageException {
     String key = UUID.randomUUID().toString();
     try {
+      logger.info("start putting file to alicloud");
       ossClient.putObject(OSS_BUCKET_NAME, key, content);
       return toOssUri(key);
     } catch (OSSException oe) {
+      logger.info(oe.toString());
       throw toFileStorageException(oe);
     } finally {
       if (ossClient != null) {
@@ -75,7 +68,9 @@ public class AliCloudObjectStorage {
 
   public static InputStream getFileStream(String uri) throws FileStorageException {
     try{
+      logger.info("uri is: {}", uri);
       String key = extractFromUri(uri);
+      logger.info("key is: {}", key);
       OSSObject ossObject = ossClient.getObject(OSS_BUCKET_NAME, key);
       return ossObject.getObjectContent();
     } catch (OSSException oe) {
