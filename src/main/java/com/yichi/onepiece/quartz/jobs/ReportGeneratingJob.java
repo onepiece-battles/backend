@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import java.util.UUID;
 
-import static com.yichi.onepiece.constants.ConstantsContainer.*;
+import static com.yichi.onepiece.constants.OnepieceConstants.*;
 
 @Component
 public class ReportGeneratingJob extends QuartzJobBean {
@@ -23,12 +23,14 @@ public class ReportGeneratingJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(@Nonnull JobExecutionContext context) {
-        String battleId = context.getJobDetail().getJobDataMap().getString(BATTLE_ID);
-        String userId = context.getJobDetail().getJobDataMap().getString(USER_ID);
-        String userEmail = context.getJobDetail().getJobDataMap().getString(USER_EMAIL);
-        String userNickname = context.getJobDetail().getJobDataMap().getString(USER_NICKNAME);
+        var jobDetailMap = context.getJobDetail().getJobDataMap();
+        String battleId = jobDetailMap.getString(BATTLE_ID);
+        String userId = jobDetailMap.getString(USER_ID);
+        String userEmail = jobDetailMap.getString(USER_EMAIL);
+        String userNickname = jobDetailMap.getString(USER_NICKNAME);
+        String roleName = jobDetailMap.getString(ROLE_NAME);
         try{
-            dataExportService.generateBattleResultPdf(UUID.fromString(battleId), userEmail, userNickname, UUID.fromString(userId));
+            dataExportService.generateBattleResultPdf(UUID.fromString(battleId), userEmail, userNickname, UUID.fromString(userId), roleName);
         }catch (Exception e) {
             logger.error(e.toString());
         }

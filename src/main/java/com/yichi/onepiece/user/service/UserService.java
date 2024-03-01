@@ -1,10 +1,10 @@
 package com.yichi.onepiece.user.service;
 
-import static com.yichi.onepiece.constants.ConstantsContainer.*;
+import static com.yichi.onepiece.constants.OnepieceConstants.*;
 import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.*;
 
 import com.yichi.onepiece.quartz.jobs.EmailJob;
-import com.yichi.onepiece.constants.ConstantsContainer;
+import com.yichi.onepiece.constants.OnepieceConstants;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.iam.model.*;
 import com.yichi.onepiece.iam.service.RoleService;
@@ -109,7 +109,7 @@ public class UserService {
       return UserFacingConstantsKey.PASSWORD_CONFIRMATION;
     }
     var defaultImage =
-        ImageUtil.loadImageFromDisk(ConstantsContainer.USER_DEFAULT_PROFILE_PATH, "PNG");
+        ImageUtil.loadImageFromDisk(OnepieceConstants.USER_DEFAULT_PROFILE_PATH, "PNG");
     var encryptedPassword = passwordEncoder.encode(password);
     UserEntity user =
         UserEntityBuilder.newBuilder()
@@ -374,6 +374,10 @@ public class UserService {
     var user = userDao.getById(userId).orElseThrow();
     return UserConverter.INSTANCE.toUser(user)
             .loginRoleResourcesPermissionMap(getPermissionMapByRoleName(user.getLoginRole()));
+  }
+
+  public UserEntity getUserEntityById(UUID userId) {
+    return userDao.getById(userId).orElseThrow();
   }
 
   public ShareResourceResponse shareResource(ShareResourceRequest request) {

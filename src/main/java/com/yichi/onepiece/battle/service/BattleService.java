@@ -9,23 +9,19 @@ import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.model.BattleFullView;
-import com.yichi.onepiece.quartz.jobs.EmailJob;
 import com.yichi.onepiece.quartz.jobs.ReportGeneratingJob;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
 import java.util.List;
 import java.util.UUID;
 
-import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
-import static com.yichi.onepiece.constants.ConstantsContainer.*;
-import static com.yichi.onepiece.constants.ConstantsContainer.EMAIL_JOB_GROUP;
-import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.EMAIL_SENDING_FAILED;
+import static com.yichi.onepiece.constants.OnepieceConstants.*;
 
 @Service
 public class BattleService {
@@ -154,7 +150,7 @@ public class BattleService {
     throw new RuntimeException("battle can not go to next process");
   }
 
-  public void startBattle(UUID battleId, UUID userId, String email, String nickname) {
+  public void startBattle(UUID battleId, UUID userId, String email, String nickname, String roleName) {
     var battlefield = createBattleField(battleId);
     while (battlefield.allAlive()) {
       battlefield.checkReverse();
@@ -175,10 +171,10 @@ public class BattleService {
     battleExecutionDao.update(battleExecution);
     logger.info("Winner is {}", winner.getName());
     logger.info("Loser is {}", loser.getName());
-    scheduleFileGeneratingJob(battleId, userId, email, nickname);
+    scheduleFileGeneratingJob(battleId, userId, email, nickname, roleName);
   }
 
-  private void scheduleFileGeneratingJob(UUID battleId, UUID userId, String email, String nickname) {
+  private void scheduleFileGeneratingJob(UUID battleId, UUID userId, String email, String nickname, String roleName) {
     try {
       logger.info("start generating report");
       JobDataMap jobDataMap = new JobDataMap();
@@ -186,6 +182,7 @@ public class BattleService {
       jobDataMap.put(USER_ID, userId.toString());
       jobDataMap.put(USER_EMAIL, email);
       jobDataMap.put(USER_NICKNAME, nickname);
+      jobDataMap.put(ROLE_NAME, roleName);
       JobDetail reportGeneratingJob = JobBuilder.newJob(ReportGeneratingJob.class)
               .setJobData(jobDataMap)
               .withIdentity(UUID.randomUUID().toString(), BATTLE_JOB_GROUP)
@@ -232,7 +229,7 @@ public class BattleService {
   // update pdf file id
   public void updateFileId(UUID battleId, UUID fileId) {
     logger.info("update file id");
-    var battleExecutionEntity = battleExecutionDao.findById(battleId).orElseThrow();
+    var battleExecutionEntity = battleExecutionDao.findByBattleId(battleId).orElseThrow();
     battleExecutionEntity = battleExecutionEntity.toBuilder().setReportFileId(fileId).build();
     battleExecutionDao.update(battleExecutionEntity);
   }

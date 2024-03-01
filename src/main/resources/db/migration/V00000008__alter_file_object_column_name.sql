@@ -1,0 +1,1 @@
+alter table file_object rename column resource to resource_id;

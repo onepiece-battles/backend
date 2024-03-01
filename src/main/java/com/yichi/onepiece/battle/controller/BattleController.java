@@ -1,7 +1,7 @@
 package com.yichi.onepiece.battle.controller;
 
 import com.yichi.onepiece.api.BattleApi;
-import com.yichi.onepiece.battle.async.BattleExecutionAsyncService;
+import com.yichi.onepiece.battle.service.BattleExecutionAsyncService;
 import com.yichi.onepiece.battle.service.BattleService;
 import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.*;

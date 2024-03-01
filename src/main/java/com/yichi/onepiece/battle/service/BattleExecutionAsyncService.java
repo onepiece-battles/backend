@@ -1,24 +1,17 @@
-package com.yichi.onepiece.battle.async;
+package com.yichi.onepiece.battle.service;
 
-import com.yichi.onepiece.battle.service.BattleService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.BattleStatus;
 import com.yichi.onepiece.quartz.jobs.BattleExecutionJob;
-import com.yichi.onepiece.quartz.jobs.EmailJob;
 import com.yichi.onepiece.user.UserHelper;
 import io.micrometer.core.annotation.Timed;
 import java.util.UUID;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
-import org.quartz.JobKey;
 import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
-import org.quartz.TriggerKey;
-import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
@@ -26,8 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.yichi.onepiece.constants.ConstantsContainer.*;
-import static com.yichi.onepiece.constants.ConstantsContainer.EMAIL_JOB_GROUP;
+import static com.yichi.onepiece.constants.OnepieceConstants.*;
 
 @Service
 public class BattleExecutionAsyncService {
@@ -57,6 +49,7 @@ public class BattleExecutionAsyncService {
     jobDataMap.put(USER_ID, UserHelper.getCurrentUserId().toString());
     jobDataMap.put(USER_EMAIL, UserHelper.getCurrentUserDetail().getUsername());
     jobDataMap.put(USER_NICKNAME, UserHelper.getCurrentUserDetail().getNickname());
+    jobDataMap.put(ROLE_NAME, UserHelper.getCurrentUserDetail().getLoginRole().toString());
     JobDetail battleStartJob = JobBuilder.newJob(BattleExecutionJob.class)
             .setJobData(jobDataMap)
             .withIdentity(UUID.randomUUID().toString(), BATTLE_JOB_GROUP)

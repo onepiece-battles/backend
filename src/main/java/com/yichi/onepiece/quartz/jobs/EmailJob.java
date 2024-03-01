@@ -9,7 +9,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
-import static com.yichi.onepiece.constants.ConstantsContainer.*;
+import static com.yichi.onepiece.constants.OnepieceConstants.*;
 
 @Component
 public class EmailJob extends QuartzJobBean {

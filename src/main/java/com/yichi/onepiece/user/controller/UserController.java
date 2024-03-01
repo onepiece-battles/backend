@@ -1,6 +1,6 @@
 package com.yichi.onepiece.user.controller;
 
-import static com.yichi.onepiece.constants.ConstantsContainer.SUCCESS;
+import static com.yichi.onepiece.constants.OnepieceConstants.SUCCESS;
 import com.yichi.onepiece.api.UserApi;
 import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.*;
