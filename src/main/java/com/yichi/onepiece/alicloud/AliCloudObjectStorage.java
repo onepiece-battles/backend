@@ -71,10 +71,6 @@ public class AliCloudObjectStorage {
       return ossObject.getObjectContent();
     } catch (OSSException oe) {
       throw toFileStorageException(oe);
-    } finally {
-      if (ossClient != null) {
-        ossClient.shutdown();
-      }
     }
   }
 

@@ -17,9 +17,9 @@ public class FileController implements FileApi {
   }
 
   @Override
-  public ResponseEntity<Resource> downloadFile(DownloadFileRequest downloadFileRequest) {
+  public ResponseEntity<byte[]> downloadFile(DownloadFileRequest downloadFileRequest) {
     // todo(yichi): add permission control here.
-    Resource resource = fileService.downloadFile(downloadFileRequest.getId());
+    byte[] resource = fileService.downloadFile(downloadFileRequest.getId());
     if (resource==null) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     } else {
