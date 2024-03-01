@@ -12,9 +12,12 @@ import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.file.model.FileCategory;
 import com.yichi.onepiece.file.model.FileObjectEntityBuilder;
 import com.yichi.onepiece.file.service.FileObjectService;
+import com.yichi.onepiece.iam.service.RoleService;
+import com.yichi.onepiece.lineage.model.ActionRecordEntityBuilder;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.BattleReportStage;
 import com.yichi.onepiece.model.I18nText;
+import com.yichi.onepiece.model.UserRole;
 import com.yichi.onepiece.user.UserHelper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,18 +36,19 @@ public class DataExportService {
   private final BattleService battleService;
   private final CharacterService characterService;
   private final FileObjectService fileObjectService;
-
   private final ActionRecordService actionRecordService;
+  private final UserService userService;
 
   public DataExportService(
-      BattleService battleService,
-      CharacterService characterService,
-      FileObjectService fileObjectService,
-      ActionRecordService actionRecordService) {
+          BattleService battleService,
+          CharacterService characterService,
+          FileObjectService fileObjectService, ActionRecordService actionRecordService,
+          UserService userService) {
     this.battleService = battleService;
     this.characterService = characterService;
     this.fileObjectService = fileObjectService;
-    this.actionRecordService = actionRecordService;
+      this.actionRecordService = actionRecordService;
+      this.userService = userService;
   }
 
   /**
@@ -52,9 +56,10 @@ public class DataExportService {
    *
    * @param battleId id of battle that will be analyzed.
    */
-  public void generateBattleResultPdf(UUID battleId, String userEmail, String userNickname, UUID userId) {
+  public void generateBattleResultPdf(UUID battleId, String userEmail, String userNickname, UUID userId, String roleName) {
     logger.info("start getting source data for report generation");
     var battleEntity = battleService.findBattleById(battleId);
+    var userEntity = userService.getUserEntityById(userId);
     var statusList = battleService.listBattleStatusDetailByBattleId(battleId);
     var processList = battleService.listBattleProcessDetailByBattleId(battleId);
     var starterCharacter = characterService.findByCharacterId(battleEntity.getStarterId());
@@ -84,7 +89,7 @@ public class DataExportService {
       String uri =
           AliCloudObjectStorage.putFileStream(new ByteArrayInputStream(outputStream.toByteArray()));
       logger.info("finish uploading to alicloud oss");
-      // todo(yichi): add creation record entity here
+      var actionRecordEntity = actionRecordService.createWithUserAndRole(userEntity, UserRole.fromValue(roleName));
       var fileObjectEntity =
           FileObjectEntityBuilder.newBuilder()
               .setFileName(
@@ -92,8 +97,8 @@ public class DataExportService {
                       userEmail, starterCharacter.getName(), receiverCharacter.getName(), battleId))
               .setFileCategory(FileCategory.SINGLE_BATTLE_DETAIL)
               .setHttpMimeType("application/pdf")
-              .setCreatorUserId(userId)
-              .setCreationRecordId(122L)
+              .setCreatorId(userId)
+              .setCreationRecordId(actionRecordEntity.getId())
               .setOssUri(uri)
               .setResourceId(battleId)
               .build();

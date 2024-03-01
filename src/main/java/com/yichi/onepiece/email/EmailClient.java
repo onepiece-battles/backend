@@ -1,6 +1,6 @@
 package com.yichi.onepiece.email;
 
-import static com.yichi.onepiece.constants.ConstantsContainer.FROM_EMAIL_ADDRESS;
+import static com.yichi.onepiece.constants.OnepieceConstants.FROM_EMAIL_ADDRESS;
 
 import jakarta.activation.DataHandler;
 import jakarta.activation.FileDataSource;
@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service

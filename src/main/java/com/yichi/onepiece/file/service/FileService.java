@@ -3,12 +3,16 @@ package com.yichi.onepiece.file.service;
 import com.yichi.onepiece.alicloud.AliCloudObjectStorage;
 import com.yichi.onepiece.exception.FileStorageException;
 import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 @Service
 public class FileService {
+  private static final Logger logger = LoggerFactory.getLogger(AliCloudObjectStorage.class);
 
   private final FileObjectService fileObjectService;
 
@@ -23,8 +27,8 @@ public class FileService {
       var inputStream = AliCloudObjectStorage.getFileStream(uri);
       return new InputStreamResource(inputStream);
     } catch (FileStorageException e) {
-      e.printStackTrace();
-      return null;
+      logger.error("error downloading file", e);
     }
+    return null;
   }
 }
