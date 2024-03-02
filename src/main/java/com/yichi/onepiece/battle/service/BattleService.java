@@ -15,6 +15,8 @@ import com.yichi.onepiece.user.service.UserService;
 import java.util.List;
 import java.util.UUID;
 
+import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
+import org.apache.commons.lang3.tuple.Pair;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
 import static com.yichi.onepiece.constants.OnepieceConstants.*;
+import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.CREATION_SUCCESS;
 
 @Service
 public class BattleService {
@@ -57,7 +60,7 @@ public class BattleService {
     this.userService = userService;
   }
 
-  public Battle createBattle(AddBattleRequest request) {
+  public CreateBattleResponse createBattle(CreateBattleRequest request) {
     var actionRecord = actionRecordService.create();
     BattleEntity battleEntity =
         BattleEntityBuilder.newBuilder()
@@ -79,15 +82,9 @@ public class BattleService {
             .modificationTimestamp(actionRecord.getActionTimestamp())
             .build();
     battleExecutionDao.insert(battleExecutionEntity);
-    var insertedEntity =
-        battleDao
-            .findById(battleEntity.getId())
-            .orElseThrow(ExceptionUtils.notFound("Battle entity not found"));
-    return new Battle()
-        .id(insertedEntity.getId())
-        .type(insertedEntity.getType())
-        .starterId(insertedEntity.getStarterId())
-        .receiverId(insertedEntity.getReceiverId());
+    return new CreateBattleResponse().result(true).notification(
+            UserFacingConstants.getConstant(CREATION_SUCCESS).getDisplayName()
+    );
   }
 
   public ListBattleResponse list(ListBattleRequest request) {
@@ -163,10 +160,12 @@ public class BattleService {
     logger.info("Battle finish");
     var winner = battlefield.getWinner();
     var loser = battlefield.getLoser();
-    updateCharacterScores(winner, loser);
+    var scores = updateCharacterScores(winner, loser);
     var battleExecution = battleExecutionDao.findByBattleId(battleId).orElseThrow();
     battleExecution = battleExecution.toBuilder()
             .setBattleStatus(BattleStatus.FINISHED)
+            .setWinnerScoreChange(scores.getLeft())
+            .setLoserScoreChange(scores.getRight())
             .setWinnerId(winner.getCharacterId())
             .build();
     battleExecutionDao.update(battleExecution);
@@ -186,8 +185,9 @@ public class BattleService {
    *
    * @param winner Winner of the battle
    * @param loser Loser of the battle
+   * @return pair of [winner real change of score, loser real change of score]
    */
-  private void updateCharacterScores(CharacterInBattle winner, CharacterInBattle loser) {
+  private Pair<Integer, Integer> updateCharacterScores(CharacterInBattle winner, CharacterInBattle loser) {
     var winnerEntity = characterService.findByCharacterId(winner.getCharacterId());
     var loserEntity = characterService.findByCharacterId(loser.getCharacterId());
 
@@ -197,57 +197,50 @@ public class BattleService {
     int winnerScore = winnerEntity.getScore();
     int loserScore = loserEntity.getScore();
 
-    double diffFactor = getDiffFactor(winnerScore, loserScore);
-    logger.info("diff factor: {}", diffFactor);
+    double expectedWinnerChange = 1.0 / (1.0 + Math.pow(10, (double) (loserScore - winnerScore) / 3000));
+    double expectedLoserChange = 1.0 / (1.0 + Math.pow(10, (double) (winnerScore -loserScore) / 3000));
 
-    logger.info("winner score:{}, loser score: {}", winnerScore, loserScore);
+    int winnerRealChange = (int) (winnerKFactor*(1-expectedWinnerChange));
+    int loserRealChange = (int) (loserKFactor*(0-expectedLoserChange));
 
-    double expectedWinnerChange = 1.0 / (1.0 + Math.pow(10, (double) (loserScore - winnerScore  ) / 1000));
-    double expectedLoserChange = 1.0 / (1.0 + Math.pow(10, (double) (winnerScore -loserScore) / 1000));
+    logger.info("winner expected change:{}, loser expected change:{}",expectedWinnerChange, expectedLoserChange);
+    logger.info("winner real change:{}, loser real change:{}",winnerRealChange, loserRealChange);
 
-    logger.info("winner change:{}, loser change: {}", expectedWinnerChange, expectedLoserChange);
-    logger.info("winner real change:{}, loser real change: {}", diffFactor*winnerKFactor*(1-expectedWinnerChange), diffFactor*loserKFactor*(0-expectedLoserChange));
 
-    double updatedWinnerScore = winnerScore + diffFactor*winnerKFactor*(1-expectedWinnerChange);
-    double updatedLoserScore = loserScore + diffFactor*loserKFactor*(0-expectedLoserChange);
+    int updatedWinnerScore = winnerScore + winnerRealChange;
+    int updatedLoserScore = loserScore + loserRealChange;
 
-    logger.info("updated winner score: {}, updated loser score: {}", updatedWinnerScore, updatedLoserScore);
+
 
     int finalWinnerScore = roundScoreBoundary(updatedWinnerScore);
     int finalLoserScore = roundScoreBoundary(updatedLoserScore);
-    logger.info("final winner score: {}, final loser score: {}", finalWinnerScore, finalLoserScore);
+
     winnerEntity = winnerEntity.toBuilder().setScore(finalWinnerScore).build();
     loserEntity = loserEntity.toBuilder().setScore(finalLoserScore).build();
 
     characterService.updateCharacterEntity(winnerEntity);
     characterService.updateCharacterEntity(loserEntity);
+
+    return Pair.of(finalWinnerScore-winnerScore, finalLoserScore - loserScore);
   }
 
   private int getKFactorOfCharacter(UUID characterId) {
     int battleCount = battleDao.listBattlesByCharacterId(characterId).size();
     if(battleCount<=10) {
-      return 320;
+      return 1500;
     }
-    int newKFactor =  320 - (battleCount-10);
-    if (newKFactor < 160) {
-      newKFactor = 160;
+    int newKFactor =  2000 - (battleCount-10)*30;
+    if (newKFactor < 500) {
+      newKFactor = 500;
     }
     return  newKFactor;
   }
 
-  private double getDiffFactor(int winnerScore, int loserScore) {
-    var factor =  (double) (Math.abs(winnerScore - loserScore) * 5) /(winnerScore+loserScore);
-    if (factor < 1) {
-      return 1;
-    }
-    return factor;
-  }
-
-  private int roundScoreBoundary(double score) {
+  private int roundScoreBoundary(int score) {
     if (score<100) {
       return 100;
     }
-    return (int) Math.min(score, 10000);
+    return Math.min(score, 10000);
   }
 
   private void scheduleFileGeneratingJob(UUID battleId, UUID userId, String email, String nickname, String roleName) {

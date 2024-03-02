@@ -131,22 +131,20 @@ public class CharacterInBattle {
     return attackEntity;
   }
 
-  // the order of return list is: blood loss, magic loss and energy loss.
-  public List<Integer> defense(AttackEntity attackEntity) {
+  // the order of return list is: blood loss, and energy loss.
+  public List<Integer> defend(AttackEntity attackEntity) {
     if (!reversed) {
       reverseCharacter();
       reversed = true;
-      logger.info("run out of magic, reverse {}", name);
     }
     int blood = currentCharacterEntity.getBlood();
     if (blood <= 0) {
       this.defeated = true;
-      return List.of(0, 0, 0);
+      return List.of(0, 0);
     }
     int bloodLoss = Math.max(attackEntity.getAttack() - currentCharacterEntity.getDefense(), 0);
     currentCharacterEntity.setBlood(blood - bloodLoss);
-    logger.info("{} defense with bloodLoss {}", name, bloodLoss);
-    return List.of(bloodLoss, 0, 0);
+    return List.of(bloodLoss, 0);
   }
 
   public CurrentCharacterEntityImpl getCurrentCharacterEntity() {

@@ -173,17 +173,17 @@ public class Battlefield {
     battleStatusCount++;
     battleProcessCount++;
     var attackSide = getAttackSide();
-    var defense = getDefenseSide();
+    var defenseSide = getDefenseSide();
     BattleStatusDetailEntity battleStatusDetailEntity =
         BattleStatusDetailEntityBuilder.newBuilder()
             .setBattleId(battleId)
             .setBattleStatusRoundNumber(battleStatusCount)
             .setAttackSide(attackSide.getName())
             .setAttacker(attackSide.getCurrentCharacterEntity())
-            .setDefender(defense.getCurrentCharacterEntity())
+            .setDefender(defenseSide.getCurrentCharacterEntity())
             .build();
     battleStatusDetailEntities.add(battleStatusDetailEntity);
-    logger.info("attack side: {}, defense side: {}", attackSide.getName(), defense.getName());
+    logger.info("attack side: {}, defense side: {}", attackSide.getName(), defenseSide.getName());
     BattleProcessDetailEntityBuilder battleProcessDetailEntityBuilder =
         BattleProcessDetailEntityBuilder.newBuilder();
     battleProcessDetailEntityBuilder
@@ -197,13 +197,13 @@ public class Battlefield {
     if (!hideSuccess()) {
       battleProcessDetailEntityBuilder.setAttackMissed(Boolean.FALSE);
       // the order of return list is: blood loss, magic loss and energy loss.
-      var defenseResult = defense.defense(attackEntity);
+      var defenseResult = defenseSide.defend(attackEntity);
       battleProcessDetailEntityBuilder
           .setDefenderBloodLoss(defenseResult.get(0))
-          .setDefenderEnergyLoss(defenseResult.get(2));
+          .setDefenderEnergyLoss(defenseResult.get(1));
     } else {
       battleProcessDetailEntityBuilder.setAttackMissed(Boolean.TRUE).setDefenderBloodLoss(0).setDefenderEnergyLoss(0);
-      logger.info("{} hide SUCCESS, no damage is casted", defense.getName());
+      logger.info("{} hide SUCCESS, no damage is casted", defenseSide.getName());
     }
     battleProcessDetailEntities.add(battleProcessDetailEntityBuilder.build());
     logger.info("---------------------new battle process end-----------------------------");
