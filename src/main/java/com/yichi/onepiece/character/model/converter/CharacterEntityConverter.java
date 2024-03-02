@@ -37,5 +37,7 @@ public interface CharacterEntityConverter {
 
   @Mapping(target = "creationRecordId", ignore = true)
   @Mapping(target = "modificationRecordId", ignore = true)
+  // ignore profile image to make it null, so that the update process will be correct
+//  @Mapping(target = "profileImage", ignore = true)
   CharacterEntity toCharacterEntity(Character character);
 }

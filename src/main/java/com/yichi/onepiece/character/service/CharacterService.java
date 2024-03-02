@@ -66,7 +66,7 @@ public class CharacterService {
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
             .setSystemResource(UserHelper.hasNikaPermission())
-            .setScore(0)
+            .setScore(calculateInitialScore(characterEntity))
             .build();
     characterDao.insert(characterEntity);
     createHakis(request.getHakis(), characterEntity.getId());
@@ -77,6 +77,10 @@ public class CharacterService {
                 ExceptionUtils.notFound(
                     "Can not find inserted character with id %s", characterEntity.getId()));
     return CharacterEntityConverter.INSTANCE.toCharacter(insertedEntity);
+  }
+
+  private int calculateInitialScore(CharacterEntity characterEntity) {
+   return  (characterEntity.getAttack() * 10 + characterEntity.getDefense() * 10 +characterEntity.getBlood())/3;
   }
 
   private void createHakis(List<Haki> hakis, UUID characterId) {
@@ -223,6 +227,11 @@ public class CharacterService {
 
   public CharacterEntity findByCharacterId(UUID characterId) {
     return characterDao.findById(characterId).orElseThrow();
+  }
+
+  public void updateCharacterEntity(CharacterEntity characterEntity) {
+    logger.info("updating score: {}", characterEntity.getScore());
+    characterDao.update(characterEntity);
   }
 
   public UpdateCharacterResponse updateCharacter(Character character) {

@@ -37,10 +37,6 @@ public class AliCloudObjectStorage {
     } catch (OSSException oe) {
       logger.info(oe.toString());
       throw toFileStorageException(oe);
-    } finally {
-      if (ossClient != null) {
-        ossClient.shutdown();
-      }
     }
   }
 
@@ -75,10 +71,6 @@ public class AliCloudObjectStorage {
       return ossObject.getObjectContent();
     } catch (OSSException oe) {
       throw toFileStorageException(oe);
-    } finally {
-      if (ossClient != null) {
-        ossClient.shutdown();
-      }
     }
   }
 
