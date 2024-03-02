@@ -163,6 +163,7 @@ public class BattleService {
     logger.info("Battle finish");
     var winner = battlefield.getWinner();
     var loser = battlefield.getLoser();
+    updateCharacterScores(winner, loser);
     var battleExecution = battleExecutionDao.findByBattleId(battleId).orElseThrow();
     battleExecution = battleExecution.toBuilder()
             .setBattleStatus(BattleStatus.FINISHED)
@@ -172,6 +173,81 @@ public class BattleService {
     logger.info("Winner is {}", winner.getName());
     logger.info("Loser is {}", loser.getName());
     scheduleFileGeneratingJob(battleId, userId, email, nickname, roleName);
+  }
+
+  /**
+   * Calculate the new score of two participants.
+   * [K value description]
+   * K value here depends on how many battles this participant has already conducted.
+   * The range of K value is [16-32]
+   * The more battles this character has participated in battle, the smaller the k value is for this character.
+   * 1. For characters participated in less or equal than 10 battles, the k value is 32.
+   * 2. For every more 10 battles this character conducted, the K value decrease by 1.
+   *
+   * @param winner Winner of the battle
+   * @param loser Loser of the battle
+   */
+  private void updateCharacterScores(CharacterInBattle winner, CharacterInBattle loser) {
+    var winnerEntity = characterService.findByCharacterId(winner.getCharacterId());
+    var loserEntity = characterService.findByCharacterId(loser.getCharacterId());
+
+    int winnerKFactor = getKFactorOfCharacter(winner.getCharacterId());
+    int loserKFactor = getKFactorOfCharacter(loser.getCharacterId());
+
+    int winnerScore = winnerEntity.getScore();
+    int loserScore = loserEntity.getScore();
+
+    double diffFactor = getDiffFactor(winnerScore, loserScore);
+    logger.info("diff factor: {}", diffFactor);
+
+    logger.info("winner score:{}, loser score: {}", winnerScore, loserScore);
+
+    double expectedWinnerChange = 1.0 / (1.0 + Math.pow(10, (double) (loserScore - winnerScore  ) / 1000));
+    double expectedLoserChange = 1.0 / (1.0 + Math.pow(10, (double) (winnerScore -loserScore) / 1000));
+
+    logger.info("winner change:{}, loser change: {}", expectedWinnerChange, expectedLoserChange);
+    logger.info("winner real change:{}, loser real change: {}", diffFactor*winnerKFactor*(1-expectedWinnerChange), diffFactor*loserKFactor*(0-expectedLoserChange));
+
+    double updatedWinnerScore = winnerScore + diffFactor*winnerKFactor*(1-expectedWinnerChange);
+    double updatedLoserScore = loserScore + diffFactor*loserKFactor*(0-expectedLoserChange);
+
+    logger.info("updated winner score: {}, updated loser score: {}", updatedWinnerScore, updatedLoserScore);
+
+    int finalWinnerScore = roundScoreBoundary(updatedWinnerScore);
+    int finalLoserScore = roundScoreBoundary(updatedLoserScore);
+    logger.info("final winner score: {}, final loser score: {}", finalWinnerScore, finalLoserScore);
+    winnerEntity = winnerEntity.toBuilder().setScore(finalWinnerScore).build();
+    loserEntity = loserEntity.toBuilder().setScore(finalLoserScore).build();
+
+    characterService.updateCharacterEntity(winnerEntity);
+    characterService.updateCharacterEntity(loserEntity);
+  }
+
+  private int getKFactorOfCharacter(UUID characterId) {
+    int battleCount = battleDao.listBattlesByCharacterId(characterId).size();
+    if(battleCount<=10) {
+      return 320;
+    }
+    int newKFactor =  320 - (battleCount-10);
+    if (newKFactor < 160) {
+      newKFactor = 160;
+    }
+    return  newKFactor;
+  }
+
+  private double getDiffFactor(int winnerScore, int loserScore) {
+    var factor =  (double) (Math.abs(winnerScore - loserScore) * 5) /(winnerScore+loserScore);
+    if (factor < 1) {
+      return 1;
+    }
+    return factor;
+  }
+
+  private int roundScoreBoundary(double score) {
+    if (score<100) {
+      return 100;
+    }
+    return (int) Math.min(score, 10000);
   }
 
   private void scheduleFileGeneratingJob(UUID battleId, UUID userId, String email, String nickname, String roleName) {
