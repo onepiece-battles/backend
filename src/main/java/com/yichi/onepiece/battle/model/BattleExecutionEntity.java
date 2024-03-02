@@ -21,6 +21,10 @@ public interface BattleExecutionEntity {
 
   UUID getWinnerId();
 
+  Integer getWinnerScoreChange();
+
+  Integer getLoserScoreChange();
+
   Long getCreationTimestamp();
 
   Long getModificationTimestamp();

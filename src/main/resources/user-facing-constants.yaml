@@ -97,3 +97,7 @@ user:
       displayName:
         en-US: "Update Success!"
         zh-CN: "更新成功！"
+    CREATION_SUCCESS:
+      displayName:
+        en-US: "Creation Success!"
+        zh-CN: "创建成功！"

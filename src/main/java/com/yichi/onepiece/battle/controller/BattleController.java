@@ -31,7 +31,7 @@ public class BattleController implements BattleApi {
   }
 
   @Override
-  public ResponseEntity<Battle> addBattle(AddBattleRequest addBattleRequest) {
+  public ResponseEntity<CreateBattleResponse> createBattle(CreateBattleRequest addBattleRequest) {
     iamService.checkPermissionOfCurrentAccount(
         ResourceType.BATTLE, Set.of(Permission.CREATE, Permission.GET));
     var battle = battleService.createBattle(addBattleRequest);

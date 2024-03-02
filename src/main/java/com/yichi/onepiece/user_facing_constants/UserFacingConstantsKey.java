@@ -31,6 +31,8 @@ public class UserFacingConstantsKey {
   public static final String FRUIT_COUNT_REACH_LIMIT = "FRUIT_COUNT_REACH_LIMIT";
   public static final String FRUIT_EATEN_SUCCESS = "FRUIT_EATEN_SUCCESS";
   public static final String UPDATE_SUCCESS = "UPDATE_SUCCESS";
+  public static final String CREATION_SUCCESS = "CREATION_SUCCESS";
+
 
   public UserFacingConstantsKey() {}
 }
