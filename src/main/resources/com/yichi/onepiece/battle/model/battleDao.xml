@@ -7,6 +7,8 @@
         FROM `battle`
         LEFT JOIN `battle_execution` on `battle`.id = `battle_execution`.`battle_id`
         LEFT JOIN `action_lineage` on `battle`.`creation_record_id` = `action_lineage`.`id`
+        LEFT JOIN  `character` as starter on `battle`.`starter_id` = starter.id
+        LEFT JOIN  `character` as receiver on `battle`.`receiver_id` = receiver.id
         <include refid="battleFilter">
             <property name="battleFilter" value="battleFilter"/>
         </include>
@@ -20,6 +22,8 @@
         FROM `battle`
         LEFT JOIN `battle_execution` on `battle`.id = `battle_execution`.`battle_id`
         LEFT JOIN `action_lineage` on `battle`.`creation_record_id` = `action_lineage`.`id`
+        LEFT JOIN  `character` as starter on `battle`.`starter_id` = starter.id
+        LEFT JOIN  `character` as receiver on `battle`.`receiver_id` = receiver.id
         <include refid="battleFilter">
             <property name="battleFilter" value="battleFilter"/>
         </include>
@@ -27,7 +31,7 @@
 
     <!-- Construct where clause -->
     <sql id="battleFilter">
-        WHERE (`user_id` = #{userId} OR `system_resource` = true
+        WHERE (`user_id` = #{userId} OR `battle`.`system_resource` = true
             <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
                 OR
                 `battle`.id IN
@@ -43,15 +47,15 @@
             AND `role_id` = #{battleFilter.roleId}
         </if>
         <if test="battleFilter.onlySystem != null">
-            AND `system_resource` = #{battleFilter.onlySystem}
+            AND `battle`.`system_resource` = #{battleFilter.onlySystem}
         </if>
         <if test="battleFilter.starterName != null and battleFilter.starterName != ''">
             <bind name="starterKeyLike" value="'%' + battleFilter.starterName + '%'" />
-            AND JSON_EXTRACT(starter_name, CONCAT('$.', #{battleFilter.languageCode})) LIKE #{starterKeyLike}
+            AND JSON_EXTRACT(`starter`.`name`, CONCAT('$.', #{battleFilter.languageCode})) LIKE #{starterKeyLike}
         </if>
         <if test="battleFilter.receiverName != null and battleFilter.receiverName != ''">
             <bind name="receiverKeyLike" value="'%' + battleFilter.receiverName + '%'" />
-            AND JSON_EXTRACT(receiver_name, CONCAT('$.', #{battleFilter.languageCode})) LIKE #{receiverKeyLike}
+            AND JSON_EXTRACT(`receiver`.`name`, CONCAT('$.', #{battleFilter.languageCode})) LIKE #{receiverKeyLike}
         </if>
         <if test="battleFilter.battleTypes != null and !battleFilter.battleTypes.isEmpty">
             AND type IN
@@ -73,7 +77,7 @@
     <sql id="orderClause">
         <choose>
             <when test="sortList == null or sortList.isEmpty">
-                creation_record_id DESC
+                `battle`.`creation_record_id` DESC
             </when>
             <otherwise>
                 <foreach item="item" collection="sortList" separator=",">
