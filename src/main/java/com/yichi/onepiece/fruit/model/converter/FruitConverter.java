@@ -48,7 +48,7 @@ public interface FruitConverter {
 
   default Byte[] stringToBlob(String string) {
     if (string == null) {
-      return new Byte[]{};
+      return null;
     }
     return ArrayUtils.toObject(EncryptHelper.base64Decode(string));
   }
