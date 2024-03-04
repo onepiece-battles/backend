@@ -15,6 +15,10 @@ public interface BattleEntity {
 
   UUID getReceiverId();
 
+  UUID getPreviousBattleId();
+
+  UUID getNextBattleId();
+
   Long getCreationRecordId();
 
   Long getModificationRecordId();

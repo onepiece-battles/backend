@@ -83,6 +83,10 @@ public class GroupService {
 
   public GroupFullView getGroupFullView(GetGroupRequest getGroupRequest) {
     var groupFullView = groupDao.getFullViewById(getGroupRequest.getId()).orElseThrow();
+    groupFullView = groupFullView.toBuilder()
+            .setNextGroupId(getNextId(groupFullView.getCreationRecord().getId()))
+            .setPreviousGroupId(getPreviousId(groupFullView.getCreationRecord().getId()))
+            .build();
     return GroupConverter.INSTANCE.toGroupFullView(groupFullView);
   }
 
@@ -106,5 +110,21 @@ public class GroupService {
     return response.result(
             UserFacingConstants.getConstant(UserFacingConstantsKey.UPDATE_SUCCESS)
                     .getDisplayName()).success(Boolean.TRUE);
+  }
+
+  public UUID getPreviousId(Long currentCreationRecordId) {
+    var groupList =  groupDao.getPreviousGroupId(currentCreationRecordId);
+    if (groupList.isEmpty()) {
+      return null;
+    }
+    return groupList.get(0);
+  }
+
+  public UUID getNextId(Long currentCreationRecordId) {
+    var groupList =  groupDao.getNextGroupId(currentCreationRecordId);
+    if (groupList.isEmpty()) {
+      return null;
+    }
+    return groupList.get(0);
   }
 }

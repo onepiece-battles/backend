@@ -114,6 +114,10 @@ public class BattleService {
   public BattleFullView getBattleFullView(GetBattleFullViewRequest request) {
     UUID battleId = request.getBattleId();
     var battleFullViewEntity = battleDao.getBattleFullView(battleId).orElseThrow();
+    battleFullViewEntity = battleFullViewEntity.toBuilder()
+            .setNextBattleId(getNextId(battleFullViewEntity.getCreationRecord().getId()))
+            .setPreviousBattleId(getPreviousId(battleFullViewEntity.getCreationRecord().getId()))
+            .build();
     return BattleConverter.INSTANCE.toBattleFullView(battleFullViewEntity);
   }
 
@@ -313,5 +317,21 @@ public class BattleService {
 
   public BattleEntity findBattleById(UUID battleId) {
     return battleDao.findById(battleId).orElseThrow();
+  }
+
+  public UUID getPreviousId(Long currentCreationRecordId) {
+    var battleList =  battleDao.getPreviousBattleId(currentCreationRecordId);
+    if (battleList.isEmpty()) {
+      return null;
+    }
+    return battleList.get(0);
+  }
+
+  public UUID getNextId(Long currentCreationRecordId) {
+    var battleList =  battleDao.getNextBattleId(currentCreationRecordId);
+    if (battleList.isEmpty()) {
+      return null;
+    }
+    return battleList.get(0);
   }
 }
