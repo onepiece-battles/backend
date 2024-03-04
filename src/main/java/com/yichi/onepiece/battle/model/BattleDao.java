@@ -38,4 +38,14 @@ public interface BattleDao extends BaseDao<BattleEntity, UUID> {
 
   // result map is defined in battleDao.xml
   Optional<BattleFullView> getBattleFullView(@Param("id") UUID id);
+
+  // note: next mean the character creates before the current Character
+  @Select("select `id` from `battle` where creation_record_id < #{creationRecordId} order by creation_record_id DESC")
+  List<UUID> getNextBattleId(
+          @Param("creationRecordId") Long currentCreationRecordId);
+
+  // note: previous mean the character creates after the current Character
+  @Select("select `id` from `battle` where creation_record_id > #{creationRecordId} order by creation_record_id ASC")
+  List<UUID> getPreviousBattleId(
+          @Param("creationRecordId") Long currentCreationRecordId);
 }

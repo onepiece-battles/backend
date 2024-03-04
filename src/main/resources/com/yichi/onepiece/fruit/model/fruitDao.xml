@@ -36,7 +36,7 @@
         />
     </resultMap>
 
-    <resultMap id="fruitFullView" type="com.yichi.onepiece.fruit.model.FruitFullView" autoMapping="true">
+    <resultMap id="fruitFullView" type="com.yichi.onepiece.fruit.model.FruitFullView" autoMapping="true" extends="fruitListView">
         <result column="id" property="id"/>
         <association column="id" property="characters"
                      select="com.yichi.onepiece.character.model.dao.CharacterToFruitDao.listCharacterInFruitViewByFruitId"

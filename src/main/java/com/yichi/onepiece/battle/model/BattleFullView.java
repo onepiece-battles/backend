@@ -10,4 +10,6 @@ public interface BattleFullView extends BattleListView {
   List<BattleProcessDetailEntity> getBattleProcessDetails();
 
   List<BattleStatusDetailEntity> getBattleStatusDetails();
+
+  BattleFullViewBuilder toBuilder();
 }

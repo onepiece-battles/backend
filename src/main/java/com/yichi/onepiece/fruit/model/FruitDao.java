@@ -37,4 +37,14 @@ public interface FruitDao extends BaseDao<FruitEntity, UUID> {
       @Param("userId") UUID userId,
       @Param("fruitFilter") FruitFilter fruitFilter,
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
+
+  // note: next mean the character creates before the current Character
+  @Select("select `id` from `fruit` where creation_record_id < #{creationRecordId} order by creation_record_id DESC")
+  List<UUID> getNextFruitId(
+          @Param("creationRecordId") Long currentCreationRecordId);
+
+  // note: previous mean the character creates after the current Character
+  @Select("select `id` from `fruit` where creation_record_id > #{creationRecordId} order by creation_record_id ASC")
+  List<UUID> getPreviousFruitId(
+          @Param("creationRecordId") Long currentCreationRecordId);
 }

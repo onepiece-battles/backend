@@ -59,6 +59,10 @@ public class FruitService {
 
   public FruitFullView getFruit(GetFruitRequest request) {
     var fruitFullView  = fruitDao.getFruitFullViewById(request.getFruitId()).orElseThrow();
+    fruitFullView = fruitFullView.toBuilder()
+            .setPreviousFruitId(getPreviousId(fruitFullView.getCreationRecord().getId()))
+            .setNextFruitId(getNextId(fruitFullView.getCreationRecord().getId()))
+            .build();
     return FruitConverter.INSTANCE.toFruitFullView(fruitFullView);
   }
 
@@ -138,5 +142,21 @@ public class FruitService {
             .findById(fruitId)
             .orElseThrow(ExceptionUtils.notFound("fruit with id %s not found", fruitId));
     return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(fruit.getProfileImage()));
+  }
+
+  public UUID getPreviousId(Long currentCreationRecordId) {
+    var fruitList =  fruitDao.getPreviousFruitId(currentCreationRecordId);
+    if (fruitList.isEmpty()) {
+      return null;
+    }
+    return fruitList.get(0);
+  }
+
+  public UUID getNextId(Long currentCreationRecordId) {
+    var fruitList =  fruitDao.getNextFruitId(currentCreationRecordId);
+    if (fruitList.isEmpty()) {
+      return null;
+    }
+    return fruitList.get(0);
   }
 }

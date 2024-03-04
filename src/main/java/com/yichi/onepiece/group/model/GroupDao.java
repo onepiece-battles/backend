@@ -49,4 +49,12 @@ public interface GroupDao extends BaseDao<GroupEntity, UUID> {
           + " `character_to_group`.`group_id` where `character_to_group`.`character_id` ="
           + " #{characterId}")
   List<GroupEntity> listGroupsByCharacterId(@Param("characterId") UUID characterId);
+
+  // note: next mean the character creates before the current Character
+  @Select("select `id` from `group` where creation_record_id < #{creationRecordId} order by creation_record_id DESC")
+  List<UUID> getNextGroupId(@Param("creationRecordId") Long currentCreationRecordId);
+
+  // note: previous mean the character creates after the current Character
+  @Select("select `id` from `group` where creation_record_id > #{creationRecordId} order by creation_record_id ASC")
+  List<UUID> getPreviousGroupId(@Param("creationRecordId") Long currentCreationRecordId);
 }
