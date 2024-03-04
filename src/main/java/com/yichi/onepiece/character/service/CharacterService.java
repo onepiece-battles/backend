@@ -127,8 +127,8 @@ public class CharacterService {
     var characterFullView = characterDao.getFullViewById(characterId).orElseThrow();
     // add next and previous id
     characterFullView = characterFullView.toBuilder()
-            .setPreviousCharacterId(getPreviousCharacterId(characterFullView.getCreationRecord().getId()))
-            .setNextCharacterId(getNextCharacterId(characterFullView.getCreationRecord().getId()))
+            .setPreviousCharacter(getPreviousCharacter(characterFullView.getCreationRecord().getId()))
+            .setNextCharacter(getNextCharacter(characterFullView.getCreationRecord().getId()))
             .build();
     return CharacterEntityConverter.INSTANCE.toCharacterFullView(characterFullView);
   }
@@ -247,19 +247,20 @@ public class CharacterService {
                     .getDisplayName()).success(Boolean.TRUE);
   }
 
-  public UUID getPreviousCharacterId(Long currentCreationRecordId) {
+  public CharacterEntity getPreviousCharacter(Long currentCreationRecordId) {
     var characterIdList =  characterDao.getPreviousCharacterId(currentCreationRecordId);
     if (characterIdList.isEmpty()) {
       return null;
     }
-    return characterIdList.get(0);
+    return characterDao.findById(characterIdList.get(0)).orElseThrow() ;
   }
 
-  public UUID getNextCharacterId(Long currentCreationRecordId) {
+  public CharacterEntity getNextCharacter(Long currentCreationRecordId) {
     var characterIdList =  characterDao.getNextCharacterId(currentCreationRecordId);
     if (characterIdList.isEmpty()) {
       return null;
     }
-    return characterIdList.get(0);
+    return characterDao.findById(characterIdList.get(0)).orElseThrow() ;
   }
 }
+

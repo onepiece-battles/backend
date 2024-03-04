@@ -3,6 +3,7 @@ package com.yichi.onepiece.battle.service;
 import com.yichi.onepiece.battle.core.Battlefield;
 import com.yichi.onepiece.battle.core.CharacterInBattle;
 import com.yichi.onepiece.battle.model.*;
+import com.yichi.onepiece.battle.model.BattleListView;
 import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.fruit.service.FruitService;
@@ -115,8 +116,8 @@ public class BattleService {
     UUID battleId = request.getBattleId();
     var battleFullViewEntity = battleDao.getBattleFullView(battleId).orElseThrow();
     battleFullViewEntity = battleFullViewEntity.toBuilder()
-            .setNextBattleId(getNextId(battleFullViewEntity.getCreationRecord().getId()))
-            .setPreviousBattleId(getPreviousId(battleFullViewEntity.getCreationRecord().getId()))
+            .setNextBattle(getNext(battleFullViewEntity.getCreationRecord().getId()))
+            .setPreviousBattle(getPrevious(battleFullViewEntity.getCreationRecord().getId()))
             .build();
     return BattleConverter.INSTANCE.toBattleFullView(battleFullViewEntity);
   }
@@ -319,19 +320,19 @@ public class BattleService {
     return battleDao.findById(battleId).orElseThrow();
   }
 
-  public UUID getPreviousId(Long currentCreationRecordId) {
+  public BattleListView getPrevious(Long currentCreationRecordId) {
     var battleList =  battleDao.getPreviousBattleId(currentCreationRecordId);
     if (battleList.isEmpty()) {
       return null;
     }
-    return battleList.get(0);
+    return battleDao.getBattleListView(battleList.get(0)).orElseThrow();
   }
 
-  public UUID getNextId(Long currentCreationRecordId) {
+  public BattleListView getNext(Long currentCreationRecordId) {
     var battleList =  battleDao.getNextBattleId(currentCreationRecordId);
     if (battleList.isEmpty()) {
       return null;
     }
-    return battleList.get(0);
+    return battleDao.getBattleListView(battleList.get(0)).orElseThrow();
   }
 }

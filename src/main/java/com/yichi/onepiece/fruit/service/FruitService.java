@@ -60,8 +60,8 @@ public class FruitService {
   public FruitFullView getFruit(GetFruitRequest request) {
     var fruitFullView  = fruitDao.getFruitFullViewById(request.getFruitId()).orElseThrow();
     fruitFullView = fruitFullView.toBuilder()
-            .setPreviousFruitId(getPreviousId(fruitFullView.getCreationRecord().getId()))
-            .setNextFruitId(getNextId(fruitFullView.getCreationRecord().getId()))
+            .setPreviousFruit(getPreviousFruit(fruitFullView.getCreationRecord().getId()))
+            .setNextFruit(getNextFruit(fruitFullView.getCreationRecord().getId()))
             .build();
     return FruitConverter.INSTANCE.toFruitFullView(fruitFullView);
   }
@@ -144,19 +144,19 @@ public class FruitService {
     return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(fruit.getProfileImage()));
   }
 
-  public UUID getPreviousId(Long currentCreationRecordId) {
+  public FruitEntity getPreviousFruit(Long currentCreationRecordId) {
     var fruitList =  fruitDao.getPreviousFruitId(currentCreationRecordId);
     if (fruitList.isEmpty()) {
       return null;
     }
-    return fruitList.get(0);
+    return fruitDao.findById(fruitList.get(0)).orElseThrow();
   }
 
-  public UUID getNextId(Long currentCreationRecordId) {
+  public FruitEntity getNextFruit(Long currentCreationRecordId) {
     var fruitList =  fruitDao.getNextFruitId(currentCreationRecordId);
     if (fruitList.isEmpty()) {
       return null;
     }
-    return fruitList.get(0);
+    return fruitDao.findById(fruitList.get(0)).orElseThrow();
   }
 }
