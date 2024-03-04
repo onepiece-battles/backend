@@ -9,8 +9,8 @@ import java.util.UUID;
 @Entity
 public interface GroupFullView extends GroupListView {
 
-  UUID getNextGroupId();
-  UUID getPreviousGroupId();
+  GroupEntity getNextGroup();
+  GroupEntity getPreviousGroup();
   List<CharacterInGroupView> getCharacters();
   GroupFullViewBuilder toBuilder();
 }

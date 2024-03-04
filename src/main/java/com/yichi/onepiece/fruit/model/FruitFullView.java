@@ -7,8 +7,8 @@ import java.util.UUID;
 
 @Entity
 public interface FruitFullView extends FruitListView{
-    UUID getPreviousFruitId();
-    UUID getNextFruitId();
+    FruitEntity getPreviousFruit();
+    FruitEntity getNextFruit();
     List<CharacterInFruitView> getCharacters();
 
     FruitFullViewBuilder toBuilder();

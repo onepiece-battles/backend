@@ -9,8 +9,8 @@ import java.util.UUID;
 
 @Entity
 public interface CharacterFullView extends CharacterListView {
-  UUID getPreviousCharacterId();
-  UUID getNextCharacterId();
+  CharacterEntity getPreviousCharacter();
+  CharacterEntity getNextCharacter();
   List<BattleListView> getBattles();
 
   List<FruitListView> getFruits();

@@ -1,13 +1,10 @@
 package com.yichi.onepiece.group.service;
 
 import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.GROUP_CREATION_SUCCESS;
-
-import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.group.model.GroupConverter;
 import com.yichi.onepiece.group.model.GroupDao;
 import com.yichi.onepiece.group.model.GroupEntity;
 import com.yichi.onepiece.group.model.GroupEntityBuilder;
-import com.yichi.onepiece.iam.service.RoleService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.user.UserHelper;
@@ -42,7 +39,6 @@ public class GroupService {
 
   public CreateGroupResponse create(CreateGroupRequest request) {
     var actionRecord = actionRecordService.create();
-    var user = UserHelper.getCurrentUserDetail();
     GroupEntity groupEntity =
         GroupEntityBuilder.newBuilder()
             .setName(request.getName())
@@ -84,8 +80,8 @@ public class GroupService {
   public GroupFullView getGroupFullView(GetGroupRequest getGroupRequest) {
     var groupFullView = groupDao.getFullViewById(getGroupRequest.getId()).orElseThrow();
     groupFullView = groupFullView.toBuilder()
-            .setNextGroupId(getNextId(groupFullView.getCreationRecord().getId()))
-            .setPreviousGroupId(getPreviousId(groupFullView.getCreationRecord().getId()))
+            .setPreviousGroup(getPreviousGroup(groupFullView.getCreationRecord().getId()))
+            .setNextGroup(getNextGroup(groupFullView.getCreationRecord().getId()))
             .build();
     return GroupConverter.INSTANCE.toGroupFullView(groupFullView);
   }
@@ -112,19 +108,19 @@ public class GroupService {
                     .getDisplayName()).success(Boolean.TRUE);
   }
 
-  public UUID getPreviousId(Long currentCreationRecordId) {
+  public GroupEntity getPreviousGroup(Long currentCreationRecordId) {
     var groupList =  groupDao.getPreviousGroupId(currentCreationRecordId);
     if (groupList.isEmpty()) {
       return null;
     }
-    return groupList.get(0);
+    return groupDao.findById(groupList.get(0)).orElseThrow();
   }
 
-  public UUID getNextId(Long currentCreationRecordId) {
+  public GroupEntity getNextGroup(Long currentCreationRecordId) {
     var groupList =  groupDao.getNextGroupId(currentCreationRecordId);
     if (groupList.isEmpty()) {
       return null;
     }
-    return groupList.get(0);
+    return groupDao.findById(groupList.get(0)).orElseThrow();
   }
 }
