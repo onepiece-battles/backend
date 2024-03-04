@@ -5,9 +5,12 @@ import com.yichi.onepiece.battle.model.BattleListView;
 import com.yichi.onepiece.fruit.model.FruitListView;
 import com.yichi.onepiece.group.model.GroupEntity;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 public interface CharacterFullView extends CharacterListView {
+  UUID getPreviousCharacterId();
+  UUID getNextCharacterId();
   List<BattleListView> getBattles();
 
   List<FruitListView> getFruits();
