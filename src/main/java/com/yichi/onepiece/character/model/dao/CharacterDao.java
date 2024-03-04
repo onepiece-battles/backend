@@ -29,6 +29,18 @@ public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
       // current user.
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
 
+
+
+  // note: next mean the character creates before the current Character
+  @Select("select `id` from `character` where creation_record_id < #{creationRecordId} order by creation_record_id DESC")
+  List<UUID> getNextCharacterId(
+          @Param("creationRecordId") Long currentCharacterCreationRecordId);
+
+  // note: previous mean the character creates after the current Character
+  @Select("select `id` from `character` where creation_record_id > #{creationRecordId} order by creation_record_id ASC")
+  List<UUID> getPreviousCharacterId(
+          @Param("creationRecordId") Long currentCharacterCreationRecordId);
+
   // see sql definition in characterDao.xml
   Optional<CharacterFullView> getFullViewById(@Param("id") UUID id);
 

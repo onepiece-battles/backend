@@ -125,6 +125,11 @@ public class CharacterService {
 
   public CharacterFullView getCharacterFullView(UUID characterId) {
     var characterFullView = characterDao.getFullViewById(characterId).orElseThrow();
+    // add next and previous id
+    characterFullView = characterFullView.toBuilder()
+            .setPreviousCharacterId(getPreviousCharacterId(characterFullView.getCreationRecord().getId()))
+            .setNextCharacterId(getNextCharacterId(characterFullView.getCreationRecord().getId()))
+            .build();
     return CharacterEntityConverter.INSTANCE.toCharacterFullView(characterFullView);
   }
 
@@ -240,5 +245,21 @@ public class CharacterService {
     return response.result(
             UserFacingConstants.getConstant(UserFacingConstantsKey.UPDATE_SUCCESS)
                     .getDisplayName()).success(Boolean.TRUE);
+  }
+
+  public UUID getPreviousCharacterId(Long currentCreationRecordId) {
+    var characterIdList =  characterDao.getPreviousCharacterId(currentCreationRecordId);
+    if (characterIdList.isEmpty()) {
+      return null;
+    }
+    return characterIdList.get(0);
+  }
+
+  public UUID getNextCharacterId(Long currentCreationRecordId) {
+    var characterIdList =  characterDao.getNextCharacterId(currentCreationRecordId);
+    if (characterIdList.isEmpty()) {
+      return null;
+    }
+    return characterIdList.get(0);
   }
 }
