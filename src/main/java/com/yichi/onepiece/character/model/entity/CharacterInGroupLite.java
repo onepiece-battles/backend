@@ -1,6 +1,7 @@
 package com.yichi.onepiece.character.model.entity;
 
 import com.yichi.infra.support.entity.Entity;
+import com.yichi.onepiece.model.GroupPosition;
 import com.yichi.onepiece.model.I18nText;
 import java.util.UUID;
 
@@ -10,7 +11,7 @@ public interface CharacterInGroupLite {
   Byte[] getProfileImage();
   I18nText getName();
 
-  String getPosition();
+  GroupPosition getPosition();
 
   Boolean getOnceBelongedTo();
 }
