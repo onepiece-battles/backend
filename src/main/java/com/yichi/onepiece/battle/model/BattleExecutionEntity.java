@@ -25,6 +25,14 @@ public interface BattleExecutionEntity {
 
   Integer getLoserScoreChange();
 
+  Integer getStarterScoreBefore();
+
+  Integer getStarterScoreAfter();
+
+  Integer getReceiverScoreBefore();
+
+  Integer getReceiverScoreAfter();
+
   Long getCreationTimestamp();
 
   Long getModificationTimestamp();

@@ -6,9 +6,12 @@ import com.yichi.onepiece.lineage.model.ActionRecordEntity;
 import com.yichi.onepiece.lineage.model.ActionRecordEntityBuilder;
 import com.yichi.onepiece.model.UserRole;
 import com.yichi.onepiece.user.UserHelper;
+import com.yichi.onepiece.user.model.UserDao;
+import com.yichi.onepiece.user.model.UserDetailImpl;
 import com.yichi.onepiece.user.model.UserEntity;
 import io.micrometer.core.annotation.Timed;
 import java.time.Clock;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -16,14 +19,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class ActionRecordService {
   private final RoleService roleService;
+  private final UserDao userDao;
   private final ActionRecordDao actionRecordDao;
   private final Clock clock;
 
   public ActionRecordService(
-      RoleService roleService,
-      ActionRecordDao actionRecordDao,
-      @Qualifier("onepieceClock") Clock clock) {
+          RoleService roleService, UserDao userDao,
+          ActionRecordDao actionRecordDao,
+          @Qualifier("onepieceClock") Clock clock) {
     this.roleService = roleService;
+    this.userDao = userDao;
     this.actionRecordDao = actionRecordDao;
     this.clock = clock;
   }
@@ -39,8 +44,9 @@ public class ActionRecordService {
     return entity;
   }
 
-  public ActionRecordEntity createWithUser(UserEntity userEntity) {
-    var roleEntity = roleService.getRoleByName(userEntity.getLoginRole());
+  public ActionRecordEntity createWithUserIdAndLoginRole(UUID userId, UserRole userRole) {
+    var userEntity = userDao.getById(userId).orElseThrow();
+    var roleEntity = roleService.getRoleByName(userRole);
     ActionRecordEntity actionRecordEntity =
         ActionRecordEntityBuilder.newBuilder()
             .setUserId(userEntity.getId())
