@@ -13,6 +13,8 @@ import com.yichi.onepiece.model.BattleFullView;
 import com.yichi.onepiece.quartz.jobs.ReportGeneratingJob;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
+
+import java.time.Clock;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,6 +42,7 @@ public class BattleService {
   private final BattleProcessDetailDao battleProcessDetailDao;
   private final BattleStatusDetailDao battleStatusDetailDao;
   private final UserService userService;
+  private final Clock clock;
 
   public BattleService(
           BattleDao battleDao,
@@ -49,7 +52,7 @@ public class BattleService {
           ActionRecordService actionRecordService,
           BattleProcessDetailDao battleProcessDetailDao,
           BattleStatusDetailDao battleStatusDetailDao,
-          UserService userService) {
+          UserService userService, Clock clock) {
     this.battleDao = battleDao;
     this.battleExecutionDao = battleExecutionDao;
     this.schedulerFactoryBean = schedulerFactoryBean;
@@ -59,6 +62,7 @@ public class BattleService {
     this.battleProcessDetailDao = battleProcessDetailDao;
     this.battleStatusDetailDao = battleStatusDetailDao;
     this.userService = userService;
+      this.clock = clock;
   }
 
   public CreateBattleResponse createBattle(CreateBattleRequest request) {
@@ -153,6 +157,7 @@ public class BattleService {
   }
 
   public void startBattle(UUID battleId, UUID userId, String email, String nickname, String roleName) {
+    var battleEntity = battleDao.findById(battleId).orElseThrow();
     var battlefield = createBattleField(battleId);
     while (battlefield.allAlive()) {
       battlefield.checkReverse();
@@ -165,18 +170,34 @@ public class BattleService {
     logger.info("Battle finish");
     var winner = battlefield.getWinner();
     var loser = battlefield.getLoser();
-    var scores = updateCharacterScores(winner, loser);
+    // pair of [winner score, loser score]
+    var scores = calculateCharacterScores(winner, loser);
     var battleExecution = battleExecutionDao.findByBattleId(battleId).orElseThrow();
-    battleExecution = battleExecution.toBuilder()
+    var battleExecutionBuilder = battleExecution.toBuilder()
             .setBattleStatus(BattleStatus.FINISHED)
-            .setWinnerScoreChange(scores.getLeft())
-            .setLoserScoreChange(scores.getRight())
-            .setWinnerId(winner.getCharacterId())
-            .build();
+            .setModificationTimestamp(clock.millis())
+            .setWinnerId(winner.getCharacterId());
+    if (battleEntity.getStarterId().equals(winner.getCharacterId())) {
+      battleExecutionBuilder.setStarterScoreBefore(winner.getScore()).setStarterScoreAfter(scores.getLeft())
+              .setReceiverScoreBefore(loser.getScore()).setReceiverScoreAfter(scores.getRight());
+    } else {
+      battleExecutionBuilder.setStarterScoreBefore(loser.getScore()).setStarterScoreAfter(scores.getRight())
+              .setReceiverScoreBefore(winner.getScore()).setReceiverScoreAfter(scores.getLeft());
+    }
+    battleExecutionBuilder.setWinnerScoreChange(scores.getLeft()- winner.getScore());
+    battleExecutionBuilder.setLoserScoreChange(scores.getRight()- loser.getScore());
+    battleExecution = battleExecutionBuilder.build();
     battleExecutionDao.update(battleExecution);
-    logger.info("Winner is {}", winner.getName());
-    logger.info("Loser is {}", loser.getName());
+    updateCharacter(winner.getCharacterId(), scores.getLeft(), userId, UserRole.fromValue(roleName));
+    updateCharacter(loser.getCharacterId(), scores.getRight(), userId, UserRole.fromValue(roleName));
     scheduleFileGeneratingJob(battleId, userId, email, nickname, roleName);
+  }
+
+  private void updateCharacter(UUID characterId, int newScore, UUID userId, UserRole loginRole) {
+    var record = actionRecordService.createWithUserIdAndLoginRole(userId, loginRole);
+    var character = characterService.findByCharacterId(characterId);
+    character = character.toBuilder().setScore(newScore).setModificationRecordId(record.getId()).build();
+    characterService.updateCharacterEntity(character);
   }
 
   /**
@@ -190,17 +211,14 @@ public class BattleService {
    *
    * @param winner Winner of the battle
    * @param loser Loser of the battle
-   * @return pair of [winner real change of score, loser real change of score]
+   * @return pair of [winner final score, loser final score]
    */
-  private Pair<Integer, Integer> updateCharacterScores(CharacterInBattle winner, CharacterInBattle loser) {
-    var winnerEntity = characterService.findByCharacterId(winner.getCharacterId());
-    var loserEntity = characterService.findByCharacterId(loser.getCharacterId());
-
+  private Pair<Integer, Integer> calculateCharacterScores(CharacterInBattle winner, CharacterInBattle loser) {
     int winnerKFactor = getKFactorOfCharacter(winner.getCharacterId());
     int loserKFactor = getKFactorOfCharacter(loser.getCharacterId());
 
-    int winnerScore = winnerEntity.getScore();
-    int loserScore = loserEntity.getScore();
+    int winnerScore = winner.getScore();
+    int loserScore = loser.getScore();
 
     double expectedWinnerChange = 1.0 / (1.0 + Math.pow(10, (double) (loserScore - winnerScore) / 3000));
     double expectedLoserChange = 1.0 / (1.0 + Math.pow(10, (double) (winnerScore -loserScore) / 3000));
@@ -208,25 +226,13 @@ public class BattleService {
     int winnerRealChange = (int) (winnerKFactor*(1-expectedWinnerChange));
     int loserRealChange = (int) (loserKFactor*(0-expectedLoserChange));
 
-    logger.info("winner expected change:{}, loser expected change:{}",expectedWinnerChange, expectedLoserChange);
-    logger.info("winner real change:{}, loser real change:{}",winnerRealChange, loserRealChange);
-
-
     int updatedWinnerScore = winnerScore + winnerRealChange;
     int updatedLoserScore = loserScore + loserRealChange;
-
-
 
     int finalWinnerScore = roundScoreBoundary(updatedWinnerScore);
     int finalLoserScore = roundScoreBoundary(updatedLoserScore);
 
-    winnerEntity = winnerEntity.toBuilder().setScore(finalWinnerScore).build();
-    loserEntity = loserEntity.toBuilder().setScore(finalLoserScore).build();
-
-    characterService.updateCharacterEntity(winnerEntity);
-    characterService.updateCharacterEntity(loserEntity);
-
-    return Pair.of(finalWinnerScore-winnerScore, finalLoserScore - loserScore);
+    return Pair.of(finalWinnerScore, finalLoserScore);
   }
 
   private int getKFactorOfCharacter(UUID characterId) {

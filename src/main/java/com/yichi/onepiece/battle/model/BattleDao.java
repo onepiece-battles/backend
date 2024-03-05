@@ -32,8 +32,9 @@ public interface BattleDao extends BaseDao<BattleEntity, UUID> {
 
   @ResultMap("battleListView")
   @Select(
-      "select * from `battle` where #{characterId} in (battle.starter_id,"
-          + " battle.receiver_id)")
+      "select * from `battle` left join `battle_execution` on `battle`.`id` = `battle_execution`.`battle_id` " +
+              "where #{characterId} in (battle.starter_id, battle.receiver_id) " +
+              "order by `battle_execution`.`modification_timestamp` DESC")
   List<BattleListView> listBattlesByCharacterId(@Param("characterId") UUID characterId);
 
   // result map is defined in battleDao.xml

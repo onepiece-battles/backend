@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 public class CharacterInBattle {
   Logger logger = LoggerFactory.getLogger(CharacterInBattle.class);
+  private final int score;
   private static final int DEFAULT_ENERGY_CONSUME = 2;
   private int minimumFruitEnergy;
   private final UUID characterId;
@@ -36,6 +37,7 @@ public class CharacterInBattle {
     this.reversed = false;
     this.smarter = false;
     this.characterId = baseEntity.getId();
+    this.score = baseEntity.getScore();
     initWithFruit(baseEntity);
     initAttackEntity();
   }
@@ -84,6 +86,8 @@ public class CharacterInBattle {
   public boolean isAlive() {
     return !defeated;
   }
+
+  public int getScore() {return score;}
 
   public int getBlood() {
     return currentCharacterEntity.getBlood();
