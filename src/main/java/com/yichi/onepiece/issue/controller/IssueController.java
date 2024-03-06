@@ -41,6 +41,16 @@ public class IssueController implements IssueApi {
   }
 
   @Override
+  public ResponseEntity<IssueFullView> getIssueFullView(GetIssueFullViewRequest getIssueFullViewRequest) {
+    iamService.checkPermissionOfCurrentAccount(
+            ResourceType.ISSUE,
+            Set.of(
+                    Permission.GET));
+    var response = issueService.getIssueFullView(getIssueFullViewRequest);
+    return ResponseEntity.ok(response);
+  }
+
+  @Override
   public ResponseEntity<ListIssueResponse> listIssue(ListIssueRequest request) {
     iamService.checkPermissionOfCurrentAccount(
         ResourceType.ISSUE, Set.of(Permission.LIST));

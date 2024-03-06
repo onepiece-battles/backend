@@ -5,6 +5,7 @@ import com.yichi.onepiece.model.IssueFilter;
 import com.yichi.onepiece.model.IssueSortableField;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -13,7 +14,7 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface IssueDao extends BaseDao<IssueEntity, UUID> {
 
-  // sql defined in userDao.xml
+  // sql defined in issueDao.xml
   int searchCount(@Param("issueFilter") IssueFilter issueFilter);
 
   List<IssueListView> listIssues(
@@ -22,13 +23,14 @@ public interface IssueDao extends BaseDao<IssueEntity, UUID> {
       @Param("offset") int offset,
       @Param("size") int size);
 
-  // note: next mean the character creates before the current Character
+  // note: next mean the issue creates before the current Character
   @Select("select `id` from `issue` where creation_record_id < #{creationRecordId} order by creation_record_id DESC")
-  List<UUID> getNextIssueId(
-          @Param("creationRecordId") Long currentCreationRecordId);
+  List<UUID> getNextIssueId(@Param("creationRecordId") Long currentCreationRecordId);
 
-  // note: previous mean the character creates after the current Character
+  // note: previous mean the issue creates after the current Character
   @Select("select `id` from `issue` where creation_record_id > #{creationRecordId} order by creation_record_id ASC")
-  List<UUID> getPreviousIssueId(
-          @Param("creationRecordId") Long currentCreationRecordId);
+  List<UUID> getPreviousIssueId(@Param("creationRecordId") Long currentCreationRecordId);
+
+  // sql defined in issueDao.xml
+  Optional<IssueFullView> getIssueFullView(@Param("id") UUID id);
 }

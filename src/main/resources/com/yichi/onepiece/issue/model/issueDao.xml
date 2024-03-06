@@ -21,6 +21,12 @@
         </include>
     </select>
 
+    <select id="getIssueFullView" resultType="com.yichi.onepiece.issue.model.IssueFullView" resultMap="issueFullView">
+        SELECT * FROM `issue`
+        LEFT JOIN `action_lineage` on `issue`.`creation_record_id` = `action_lineage`.`id`
+        WHERE `issue`.id = #{id}
+    </select>
+
     <resultMap id="issueListView" type="com.yichi.onepiece.issue.model.IssueListView" autoMapping="true">
         <result column="id" property="id"/>
         <association column="creation_record_id" property="creationRecord"
@@ -28,6 +34,12 @@
         />
         <association column="modification_record_id" property="modificationRecord"
                      select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
+        />
+    </resultMap>
+
+    <resultMap id="issueFullView" type="com.yichi.onepiece.issue.model.IssueFullView" autoMapping="true" extends="issueListView">
+        <association column="user_id" property="issueCreator"
+                     select="com.yichi.onepiece.user.model.UserDao.findById"
         />
     </resultMap>
 
