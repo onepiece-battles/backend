@@ -36,7 +36,7 @@ public interface CharacterEntity {
 
   Double getHeight();
 
-  Date getDateOfBirth();
+  String getDateOfBirth();
 
   String getBirthPlace();
 
