@@ -2,12 +2,14 @@ package com.yichi.onepiece.issue.service;
 
 import com.yichi.onepiece.issue.model.IssueConverter;
 import com.yichi.onepiece.issue.model.IssueDao;
+import com.yichi.onepiece.issue.model.IssueEntity;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import java.time.Clock;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,5 +69,30 @@ public class IssueService {
             .collect(Collectors.toList());
     logger.info("filter:{}", request.getIssueFilter());
     return new ListIssueResponse().issues(issues).totalSize(totalSize);
+  }
+
+  public IssueFullView getIssueFullView(GetIssueFullViewRequest request) {
+    var issueFullView = issueDao.getIssueFullView(request.getId()).orElseThrow();
+    issueFullView = issueFullView.toBuilder()
+            .setPreviousIssue(getPreviousIssue(issueFullView.getCreationRecordId()))
+            .setNextIssue(getNextIssue(issueFullView.getCreationRecordId()))
+            .build();
+    return IssueConverter.INSTANCE.toIssueFullView(issueFullView);
+  }
+
+  private IssueEntity getPreviousIssue(Long creationRecordId) {
+    var issueId = issueDao.getPreviousIssueId(creationRecordId);
+    if (issueId.isEmpty()) {
+      return null;
+    }
+    return issueDao.findById(issueId.get(0)).orElseThrow();
+  }
+
+  private IssueEntity getNextIssue(Long creationRecordId) {
+    var issueId = issueDao.getNextIssueId(creationRecordId);
+    if (issueId.isEmpty()) {
+      return null;
+    }
+    return issueDao.findById(issueId.get(0)).orElseThrow();
   }
 }
