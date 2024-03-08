@@ -146,6 +146,7 @@ public class UserService {
   }
 
   public LoginResponse login(LoginRequest request) {
+    logger.info("start login");
     var email = request.getEmail();
     var password = request.getPassword();
     var userDetail = userDao.getUserByUsername(email);
