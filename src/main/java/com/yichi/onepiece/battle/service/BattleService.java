@@ -67,6 +67,8 @@ public class BattleService {
 
   public CreateBattleResponse createBattle(CreateBattleRequest request) {
     var actionRecord = actionRecordService.create();
+    var starter = characterService.getCharacterEntityById(request.getStarterId());
+    var receiver = characterService.getCharacterEntityById(request.getReceiverId());
     BattleEntity battleEntity =
         BattleEntityBuilder.newBuilder()
             // this service focus on
@@ -82,6 +84,8 @@ public class BattleService {
         BattleExecutionEntityBuilder.newBuilder()
             .setBattleId(battleEntity.getId())
             .setBattleStatus(BattleStatus.CREATED)
+            .setStarterScoreBefore(starter.getScore())
+            .setReceiverScoreBefore(receiver.getScore())
             .setBattleReportStage(BattleReportStage.WAITING)
             .creationTimestamp(actionRecord.getActionTimestamp())
             .modificationTimestamp(actionRecord.getActionTimestamp())
