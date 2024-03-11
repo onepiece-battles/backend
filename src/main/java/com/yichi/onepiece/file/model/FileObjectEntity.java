@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 public interface FileObjectEntity {
   UUID getId();
   String getFileName();
+  // if not null, resource id is id of the onepiece-battles resources: [character, battle, fruit, group]
   @Nullable
   UUID getResourceId();
   UUID getCreatorId();

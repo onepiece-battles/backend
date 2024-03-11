@@ -1,8 +1,11 @@
 package com.yichi.onepiece.file.controller;
 
+import com.aliyuncs.utils.Base64Helper;
 import com.yichi.onepiece.api.FileApi;
 import com.yichi.onepiece.file.service.FileService;
 import com.yichi.onepiece.model.DownloadFileRequest;
+import com.yichi.onepiece.model.DownloadFileResponse;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +20,9 @@ public class FileController implements FileApi {
   }
 
   @Override
-  public ResponseEntity<byte[]> downloadFile(DownloadFileRequest downloadFileRequest) {
+  public ResponseEntity<DownloadFileResponse> downloadFile(DownloadFileRequest downloadFileRequest) {
     // todo(yichi): add permission control here.
-    byte[] resource = fileService.downloadFile(downloadFileRequest.getId());
-    if (resource==null) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    } else {
-      return ResponseEntity.ok(resource);
-    }
+    var response = fileService.downloadFile(downloadFileRequest.getId());
+    return ResponseEntity.ok(response);
   }
 }

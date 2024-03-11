@@ -39,7 +39,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       @NonNull HttpServletResponse response,
       @NonNull FilterChain filterChain)
       throws ServletException, IOException {
-    logger.info("start handle request");
     String authentication = request.getHeader(JwtConstants.HTTP_HEADER_AUTH);
     if (authentication == null
         || !authentication.startsWith(JwtConstants.HTTP_HEADER_AUTH_SCHEME)) {
@@ -52,8 +51,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
       UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-      logger.info("user detail is: {}", userDetails);
-      logger.info("start finding valid token");
       var hasValidToken =
           tokenDao
               .findByTokenValue(jwt)
