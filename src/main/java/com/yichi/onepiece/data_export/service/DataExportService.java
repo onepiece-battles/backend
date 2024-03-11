@@ -1,13 +1,10 @@
 package com.yichi.onepiece.data_export.service;
 
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.yichi.onepiece.alicloud.AliCloudObjectStorage;
 import com.yichi.onepiece.battle.service.BattleService;
+import com.yichi.onepiece.character.model.entity.CharacterEntity;
 import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.file.model.FileCategory;
 import com.yichi.onepiece.file.model.FileObjectEntityBuilder;
@@ -68,13 +65,13 @@ public class DataExportService {
       logger.info("start creating files");
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
       Rectangle rectangle = new Rectangle(PageSize.A4);
-      rectangle.setBackgroundColor(BaseColor.GRAY);
+      rectangle.setBackgroundColor(BaseColor.WHITE);
       Document doc = new Document(rectangle);
       PdfWriter writer = PdfWriter.getInstance(doc, outputStream);
       doc.addTitle("battle");
       doc.addAuthor(String.format("%s %s", userEmail, userNickname));
       doc.addSubject("battle details");
-      doc.addCreator("onepiece-battles");
+      doc.addCreator(String.format("%s %s", userEmail, userNickname));
       doc.setMargins(30, 30, 30, 30);
       doc.open();
       for (var status: statusList) {
@@ -90,11 +87,12 @@ public class DataExportService {
           AliCloudObjectStorage.putFileStream(new ByteArrayInputStream(outputStream.toByteArray()));
       logger.info("finish uploading to alicloud oss");
       var actionRecordEntity = actionRecordService.createWithUserAndRole(userEntity, UserRole.fromValue(roleName));
+      // use en_US as detail component of file name
       var fileObjectEntity =
           FileObjectEntityBuilder.newBuilder()
               .setFileName(
                   getFileName(
-                      userEmail, starterCharacter.getName(), receiverCharacter.getName(), battleId))
+                           starterCharacter.getName().getEnUS(), receiverCharacter.getName().getEnUS(), battleId))
               .setFileCategory(FileCategory.SINGLE_BATTLE_DETAIL)
               .setHttpMimeType("application/pdf")
               .setCreatorId(userId)
@@ -112,10 +110,9 @@ public class DataExportService {
     }
   }
 
-  private String getFileName(
-      String userEmail, I18nText starterCharacter, I18nText receiverCharacter, UUID battleId) {
+  private String getFileName(String starterCharacter, String receiverCharacter, UUID battleId) {
     return String.format(
-        "Created By %s, %s to %s, %s",
-        userEmail, starterCharacter, receiverCharacter, battleId);
+        "%s_%s_%s",
+            battleId, starterCharacter, receiverCharacter);
   }
 }
