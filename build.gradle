@@ -86,7 +86,7 @@ dependencies {
     implementation "org.springframework:spring-webmvc"
 
     // pdf
-    implementation 'com.itextpdf:itextpdf:5.5.13.3'
+    implementation 'com.itextpdf:itext7-core:8.0.2'
 
     // common
     implementation "org.apache.commons:commons-lang3:$apache_commons_version"
