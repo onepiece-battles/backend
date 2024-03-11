@@ -1,29 +1,42 @@
 package com.yichi.onepiece.data_export.service;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.kernel.geom.Rectangle;
+import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
+import com.itextpdf.layout.Canvas;
+import com.itextpdf.layout.element.*;
+import com.itextpdf.layout.Document;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.element.Image;
+import com.itextpdf.layout.properties.HorizontalAlignment;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
 import com.yichi.onepiece.alicloud.AliCloudObjectStorage;
 import com.yichi.onepiece.battle.service.BattleService;
-import com.yichi.onepiece.character.model.entity.CharacterEntity;
 import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.file.model.FileCategory;
 import com.yichi.onepiece.file.model.FileObjectEntityBuilder;
 import com.yichi.onepiece.file.service.FileObjectService;
-import com.yichi.onepiece.iam.service.RoleService;
-import com.yichi.onepiece.lineage.model.ActionRecordEntityBuilder;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.BattleReportStage;
-import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.UserRole;
-import com.yichi.onepiece.user.UserHelper;
+
+import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
-
 import com.yichi.onepiece.user.service.UserService;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -64,23 +77,62 @@ public class DataExportService {
     try {
       logger.info("start creating files");
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-      Rectangle rectangle = new Rectangle(PageSize.A4);
-      rectangle.setBackgroundColor(BaseColor.WHITE);
-      Document doc = new Document(rectangle);
-      PdfWriter writer = PdfWriter.getInstance(doc, outputStream);
-      doc.addTitle("battle");
-      doc.addAuthor(String.format("%s %s", userEmail, userNickname));
-      doc.addSubject("battle details");
-      doc.addCreator(String.format("%s %s", userEmail, userNickname));
-      doc.setMargins(30, 30, 30, 30);
-      doc.open();
-      for (var status: statusList) {
-        doc.add(new Paragraph(status.toString()));
-      }
-      for (var process: processList) {
-        doc.add(new Paragraph(process.toString()));
-      }
-      doc.close();
+      PdfWriter writer = new PdfWriter(outputStream);
+      PdfDocument pdfDocument = new PdfDocument(writer);
+      Document document = new Document(pdfDocument);
+
+      // title
+      Paragraph title = new Paragraph("Onepiece Battles")
+              .setTextAlignment(TextAlignment.CENTER)
+              .setFontSize(24);
+      document.add(title);
+      // create image
+      ImageData starterImageData = ImageDataFactory.create(ArrayUtils.toPrimitive(starterCharacter.getProfileImage()));
+      Image starterImage = new Image(starterImageData)
+              .scaleToFit(100, 100).setHorizontalAlignment(HorizontalAlignment.CENTER);
+      ImageData receiverImageData = ImageDataFactory.create(ArrayUtils.toPrimitive(receiverCharacter.getProfileImage()));
+      Image receiverImage = new Image(receiverImageData)
+              .scaleToFit(100, 100).setHorizontalAlignment(HorizontalAlignment.CENTER);
+      String starterName = starterCharacter.getName().getZhCN();
+      String receiverName = receiverCharacter.getName().getZhCN();
+      Paragraph starter = new Paragraph(starterName)
+              .setTextAlignment(TextAlignment.CENTER);
+      Paragraph receiver = new Paragraph(receiverName)
+              .setTextAlignment(TextAlignment.CENTER);
+
+      // Create a Div to hold images
+      Div imageDiv = new Div();
+      imageDiv.add(starterImage);
+      // Add space between images
+      imageDiv.add(new Div().setWidth(UnitValue.createPercentValue(5)));
+      imageDiv.add(receiverImage);
+      // Set the horizontal alignment of the Div containing images to center
+      imageDiv.setHorizontalAlignment(HorizontalAlignment.CENTER);
+
+
+      Div nameDiv = new Div();
+      nameDiv.add(starter);
+      nameDiv.add(new Div().setWidth(UnitValue.createPercentValue(5)));
+      nameDiv.add(receiver);
+      nameDiv.setHorizontalAlignment(HorizontalAlignment.CENTER);
+
+
+      document.add(imageDiv);
+      document.add(nameDiv);
+      document.add(starter).setTextAlignment(TextAlignment.CENTER);
+      document.add(receiver).setTextAlignment(TextAlignment.CENTER);
+      document.add(starterImage);
+      document.add(new Paragraph()); // Empty paragraph for spacing
+      document.add(receiverImage);
+      // add footer
+      DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+      LocalDateTime now = LocalDateTime.now();
+      Paragraph footer = new Paragraph("Generated by "+ userEmail+ " at " + dtf.format(now))
+              .setTextAlignment(TextAlignment.CENTER)
+              .setFontSize(10);
+      document.add(footer);
+      document.setMargins(30, 30, 30, 30);
+      document.close();
       writer.close();
       logger.info("start writing files to alicloud");
       String uri =
