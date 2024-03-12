@@ -17,6 +17,7 @@ import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.properties.HorizontalAlignment;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
+import com.lowagie.text.Row;
 import com.yichi.onepiece.alicloud.AliCloudObjectStorage;
 import com.yichi.onepiece.battle.service.BattleService;
 import com.yichi.onepiece.character.service.CharacterService;
@@ -103,27 +104,17 @@ public class DataExportService {
       // Create a Div to hold images
       Div imageDiv = new Div();
       imageDiv.add(starterImage);
-      // Add space between images
       imageDiv.add(new Div().setWidth(UnitValue.createPercentValue(5)));
       imageDiv.add(receiverImage);
-      // Set the horizontal alignment of the Div containing images to center
-      imageDiv.setHorizontalAlignment(HorizontalAlignment.CENTER);
 
 
       Div nameDiv = new Div();
       nameDiv.add(starter);
       nameDiv.add(new Div().setWidth(UnitValue.createPercentValue(5)));
       nameDiv.add(receiver);
-      nameDiv.setHorizontalAlignment(HorizontalAlignment.CENTER);
-
 
       document.add(imageDiv);
       document.add(nameDiv);
-      document.add(starter).setTextAlignment(TextAlignment.CENTER);
-      document.add(receiver).setTextAlignment(TextAlignment.CENTER);
-      document.add(starterImage);
-      document.add(new Paragraph()); // Empty paragraph for spacing
-      document.add(receiverImage);
       // add footer
       DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
       LocalDateTime now = LocalDateTime.now();
