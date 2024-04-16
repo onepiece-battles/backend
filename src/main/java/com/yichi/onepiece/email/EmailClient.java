@@ -8,12 +8,16 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.util.ByteArrayDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 @Service
 public class EmailClient {
@@ -24,7 +28,7 @@ public class EmailClient {
     this.javaMailSender = mailSender;
   }
 
-  public void sendMail(String receiverEmailAddress, String body, String subject) throws MessagingException {
+  public void sendMail(String receiverEmailAddress, String body, String subject) throws MessagingException, IOException {
     MimeMessage mimeMessage = javaMailSender.createMimeMessage();
     // body part to save img
     MimeMultipart multipart = getMimeMultipart(body);
@@ -40,10 +44,11 @@ public class EmailClient {
     }
   }
 
-  private static MimeMultipart getMimeMultipart(String body) throws MessagingException {
+  private static MimeMultipart getMimeMultipart(String body) throws MessagingException, IOException {
     MimeBodyPart picturePart = new MimeBodyPart();
+    ClassPathResource classPathResource = new ClassPathResource("/email_resources/sunny.png");
     DataHandler dataHandler =
-        new DataHandler(new FileDataSource("src/test/resources/email_resources/sunny.png"));
+        new DataHandler(new ByteArrayDataSource(classPathResource.getInputStream(), "image/png"));
     picturePart.setDataHandler(dataHandler);
     picturePart.setContentID("sunnyPicture");
     MimeBodyPart textPart = new MimeBodyPart();
