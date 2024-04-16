@@ -78,6 +78,5 @@
         <association column="modification_record_id" property="modificationRecord"
                      select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
         />
-
     </resultMap>
 </mapper>

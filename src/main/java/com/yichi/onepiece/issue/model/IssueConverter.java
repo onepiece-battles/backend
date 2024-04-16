@@ -10,7 +10,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = {EntityBuilder.class, UserConverter.class})
+@Mapper(uses = {EntityBuilder.class, UserConverter.class,})
 public interface IssueConverter {
   IssueConverter INSTANCE = Mappers.getMapper(IssueConverter.class);
 

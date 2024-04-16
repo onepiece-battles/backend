@@ -38,31 +38,7 @@ public interface UserDao extends BaseDao<UserEntity, UUID> {
   @Select("select * from `user` where `user`.`username` = #{username}")
   Optional<UserEntity> getByUsername(@Param("username") String username);
 
-  @Results(
-      id = "UserDetailView",
-      value = {
-        @Result(
-            property = "creationRecord",
-            column = "creation_record_id",
-            one = @One(select = ActionRecordDao.FIND_BY_ID)),
-        @Result(
-            property = "modificationRecord",
-            column = "modification_record_id",
-            one = @One(select = ActionRecordDao.FIND_BY_ID)),
-        @Result(
-            property = "userRoles",
-            column = "id",
-            many = @Many(select = RoleDao.LIST_ROLES_BY_USER_ID)),
-        @Result(
-            property = "tokens",
-            column = "id",
-            many = @Many(select = TokenDao.LIST_TOKENS_BY_USER_ID)),
-        @Result(property = "id", column = "id"),
-        @Result(property = "creationRecordId", column = "creation_record_id"),
-        @Result(property = "modificationRecordId", column = "modification_record_id"),
-        @Result(property = "loginRole", column = "login_role"),
-        @Result(property = "loginRoleId", column = "login_role_id")
-      })
+  @ResultMap("userDetailView")
   @Select("SELECT * FROM user WHERE username=#{userName}")
   Optional<UserDetailImpl> getUserByUsername(@Param("userName") String userName);
 }
