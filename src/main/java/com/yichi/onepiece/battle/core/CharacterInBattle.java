@@ -14,12 +14,14 @@ import org.slf4j.LoggerFactory;
 public class CharacterInBattle {
   Logger logger = LoggerFactory.getLogger(CharacterInBattle.class);
   private final int score;
-  private static final int DEFAULT_ENERGY_CONSUME = 2;
+
+  // energy consume for character's ordinary attack without and fruit.
+  private static final int DEFAULT_ENERGY_CONSUME = 1;
   private int minimumFruitEnergy;
   private final UUID characterId;
   private final I18nText name;
   private int intelligence;
-  private int energyConsume = 2;
+  private int energyConsume = 1;
   private boolean defeated;
   private boolean smarter;
   private boolean reversed;

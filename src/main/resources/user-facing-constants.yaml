@@ -101,3 +101,7 @@ user:
       displayName:
         en-US: "Creation Success!"
         zh-CN: "创建成功！"
+    SAME_STARTER_AND_RECEIVER:
+      displayName:
+        en-US: "Starter and Receiver can not be the same character!"
+        zh-CN: "战斗发起者和接受者不能是同一个人！"

@@ -27,7 +27,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
 import static com.yichi.onepiece.constants.OnepieceConstants.*;
-import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.CREATION_SUCCESS;
+import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.*;
 
 @Service
 public class BattleService {
@@ -67,6 +67,11 @@ public class BattleService {
 
   public CreateBattleResponse createBattle(CreateBattleRequest request) {
     var actionRecord = actionRecordService.create();
+    if (request.getStarterId().equals(request.getReceiverId())) {
+      return new CreateBattleResponse().result(Boolean.FALSE).notification(
+              UserFacingConstants.getConstant(SAME_STARTER_AND_RECEIVER).getDisplayName()
+      );
+    }
     var starter = characterService.getCharacterEntityById(request.getStarterId());
     var receiver = characterService.getCharacterEntityById(request.getReceiverId());
     BattleEntity battleEntity =
@@ -160,6 +165,25 @@ public class BattleService {
     throw new RuntimeException("battle can not go to next process");
   }
 
+  /**
+   * This is the function where battle started to execute.
+   * <p>
+   * Step1: A battlefield will be created based on the two sides of participants.
+   * Step2: A battle will get started when the starter initiate its attack.
+   * Step3: Battle ends when energy/blood of any participant reaches 0, or less than 0.
+   * Step4: If the energy of any participant is less than 10% and this character has eaten any fruit, this fruit will
+   * not have any effect. Note: Paramecia fruit cost extra energy for every turn, the extra energy.
+   * depends on the fruit itself.
+   * Step5: Attacker and defender is interchangeable, who the character with  intelligence got more chances to attack
+   * and character with higher speed get more chances of hiding from attack.
+   * Step6: If battle ends, the battle score will change based on the battle result.
+   *
+   * @param battleId ID of battle.
+   * @param userId User id of battle creator.
+   * @param email Email address of creator.
+   * @param nickname Nickname of creator.
+   * @param roleName RoleName of creator.
+   */
   public void startBattle(UUID battleId, UUID userId, String email, String nickname, String roleName) {
     var battleEntity = battleDao.findById(battleId).orElseThrow();
     var battlefield = createBattleField(battleId);

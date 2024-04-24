@@ -43,6 +43,17 @@ public interface CharacterEntity {
   Integer getBounty();
 
   // some characters are better when fighting in a group
+  Integer getBaseGroupGain();
+
+  Integer getBaseAttack();
+
+  Integer getBaseDefense();
+
+  Integer getBaseIntelligence();
+
+  Integer getBaseBlood();
+
+  Integer getBaseSpeed();
   Integer getGroupGain();
 
   Integer getAttack();
