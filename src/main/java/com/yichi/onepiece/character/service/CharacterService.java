@@ -240,7 +240,32 @@ public class CharacterService {
   }
 
   public UpdateCharacterResponse updateCharacter(Character character) {
-    characterDao.update(CharacterEntityConverter.INSTANCE.toCharacterEntity(character));
+    var characterUpdated =CharacterEntityConverter.INSTANCE.toCharacterEntity(character);
+    var fruits = fruitService.listByCharacterId(character.getId());
+    int attack = character.getAttack();
+    int defense = character.getDefense();
+    int intelligence = character.getIntelligence();
+    int speed = character.getSpeed();
+    int groupGain = character.getGroupGain();
+    int blood = character.getBlood();
+    for(var fruit: fruits) {
+      attack =  attack * fruit.getAttackStrengthen().intValue();
+      defense = defense * fruit.getDefenseStrengthen().intValue();
+      intelligence = intelligence * fruit.getIntelligenceStrengthen().intValue();
+      speed = speed * fruit.getSpeedStrengthen().intValue();
+      groupGain = groupGain * fruit.getGroupGainStrengthen().intValue();
+      blood = blood * fruit.getBloodStrengthen().intValue();
+    }
+    characterUpdated = characterUpdated
+            .toBuilder()
+            .setAttack(attack)
+            .setDefense(defense)
+            .setBlood(blood)
+            .setBaseGroupGain(groupGain)
+            .setSpeed(speed)
+            .setIntelligence(intelligence)
+            .build();
+    characterDao.update(characterUpdated);
     var response = new UpdateCharacterResponse();
     return response.result(
             UserFacingConstants.getConstant(UserFacingConstantsKey.UPDATE_SUCCESS)

@@ -19,6 +19,8 @@ import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import com.yichi.onepiece.utils.EncryptHelper;
 import com.yichi.onepiece.utils.JwtHelper;
 import com.yichi.onepiece.utils.RandomGenerator;
+
+import java.io.IOException;
 import java.time.Clock;
 import java.util.*;
 import java.util.function.Function;
@@ -29,6 +31,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -95,7 +98,7 @@ public class UserService {
       String username,
       String confirmedPassword,
       OnepieceLocale onepieceLocale,
-      @Nullable UserRole userRole) {
+      @Nullable UserRole userRole)  {
     if (!userDao.listByNickName(nickName).isEmpty()) {
       return UserFacingConstantsKey.DUPLICATE_USER_NAME;
     }
@@ -108,21 +111,24 @@ public class UserService {
     if (!password.equals(confirmedPassword)) {
       return UserFacingConstantsKey.PASSWORD_CONFIRMATION;
     }
-    var defaultImage =
-        ImageUtil.loadImageFromDisk(OnepieceConstants.USER_DEFAULT_PROFILE_PATH, "PNG");
-    var encryptedPassword = passwordEncoder.encode(password);
-    UserEntity user =
-        UserEntityBuilder.newBuilder()
-            .setNickname(nickName)
-            .setAccountStatus(AccountStatus.LOGGED_OUT)
-            .setEncryptedPassword(encryptedPassword)
-            .setUsername(username)
-            .setEmailVerified(false)
-            .setLocale(onepieceLocale)
-            .setLoginRole(null)
-            .setLoginRoleId(null)
-            .setProfileImage(ArrayUtils.toObject(defaultImage))
-            .build();
+    UserEntity user;
+    try {
+      var defaultImage =  new ClassPathResource("/images/user_default_profile.png").getContentAsByteArray();
+      var encryptedPassword = passwordEncoder.encode(password);
+      user = UserEntityBuilder.newBuilder()
+                      .setNickname(nickName)
+                      .setAccountStatus(AccountStatus.LOGGED_OUT)
+                      .setEncryptedPassword(encryptedPassword)
+                      .setUsername(username)
+                      .setEmailVerified(false)
+                      .setLocale(onepieceLocale)
+                      .setLoginRole(null)
+                      .setLoginRoleId(null)
+                      .setProfileImage(ArrayUtils.toObject(defaultImage))
+                      .build();
+    } catch (IOException e) {
+      throw new RuntimeException();
+    }
     userDao.insert(user);
     // new user are default to be created by NIKA
     var actionRecord = actionRecordService.createWithUserAndRole(user, UserRole.NIKA);

@@ -1,0 +1,12 @@
+alter table `character` add column base_attack int;
+alter table `character` add column base_defense int;
+alter table `character` add column base_intelligence int;
+alter table `character` add column base_speed int;
+alter table `character` add column base_blood int;
+alter table `character` add column base_group_gain int;
+update `character` set `character`.base_attack=attack;
+update `character` set `character`.base_defense=defense;
+update `character` set `character`.base_intelligence=intelligence;
+update `character` set `character`.base_speed=speed;
+update `character` set `character`.base_blood=blood;
+update `character` set `character`.base_group_gain=group_gain;

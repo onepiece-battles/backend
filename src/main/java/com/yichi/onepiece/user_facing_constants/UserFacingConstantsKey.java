@@ -32,6 +32,7 @@ public class UserFacingConstantsKey {
   public static final String FRUIT_EATEN_SUCCESS = "FRUIT_EATEN_SUCCESS";
   public static final String UPDATE_SUCCESS = "UPDATE_SUCCESS";
   public static final String CREATION_SUCCESS = "CREATION_SUCCESS";
+  public static final String SAME_STARTER_AND_RECEIVER = "SAME_STARTER_AND_RECEIVER";
 
 
   public UserFacingConstantsKey() {}
