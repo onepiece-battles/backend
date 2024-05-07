@@ -66,6 +66,11 @@ public class PermissionDefinition {
   }
 
   private static List<Pair<ResourceType, Permission>> getVisitorUserPermissions() {
-    return getNormalUserPermissions().stream().filter(rp-> rp.getValue()!=Permission.UPDATE&&rp.getValue()!=Permission.BATCH_UPDATE).toList();
+    return getNormalUserPermissions().stream().filter(
+            rp-> rp.getValue()!=Permission.UPDATE
+                    &&rp.getValue()!=Permission.BATCH_UPDATE
+            && rp.getValue()!=Permission.CREATE
+
+    ).toList();
   }
 }
