@@ -138,9 +138,8 @@ public class UserService {
             .setModificationRecordId(actionRecord.getId())
             .build();
     userDao.update(updatedUser);
-    // newly registered users are default to have role: "NIKA", "NORMAL", "ADMIN" and "VISITOR"
-    // will be changed in the future
-    var roleEntities = roleDao.listRoleByRoleNames(Arrays.stream(UserRole.values()).toList());
+    // newly registered users are default to have role: "NORMAL".
+    var roleEntities = roleDao.listRoleByRoleNames(List.of(UserRole.NORMAL));
     roleEntities.forEach(
         roleEntity ->
             userRoleDao.insert(
