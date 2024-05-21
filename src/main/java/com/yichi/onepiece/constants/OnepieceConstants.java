@@ -22,4 +22,7 @@ public class OnepieceConstants {
   public static final String SUBJECT = "SUBJECT";
   public static final String BODY = "BODY";
   public static final String RECEIVER_EMAIL_ADDRESS = "RECEIVER_EMAIL_ADDRESS";
+
+  // battle digits boundary
+  public static final int BATTLE_INDEX_MINIMUM = 0;
 }

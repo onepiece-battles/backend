@@ -28,7 +28,7 @@ public class CharacterController implements CharacterApi {
   public ResponseEntity<Character> addCharacter(CreateCharacterRequest addCharacterRequest) {
     iamService.checkPermissionOfCurrentAccount(
         ResourceType.CHARACTER, Set.of(Permission.CREATE, Permission.GET));
-    var characterEntity = characterService.addCharacter(addCharacterRequest);
+    var characterEntity = characterService.createCharacter(addCharacterRequest);
     return ResponseEntity.ok(characterEntity);
   }
 

@@ -47,7 +47,7 @@ public class JwtHelper {
         .setClaims(new HashMap<>())
         .setSubject(user.getUsername())
         .setIssuedAt(new Date(System.currentTimeMillis()))
-        .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_PERIOD))
+        .setExpiration(new Date(System.currentTimeMillis() + expirationPeriod))
         .signWith(getSignInKey(), SignatureAlgorithm.HS256)
         .compact();
   }
