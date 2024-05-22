@@ -22,7 +22,7 @@ public class FruitController implements FruitApi {
   public ResponseEntity<Fruit> addFruit(CreateFruitRequest addFruitRequest) {
     iamService.checkPermissionOfCurrentAccount(
         ResourceType.FRUIT, Set.of(Permission.CREATE, Permission.GET));
-    return ResponseEntity.ok(fruitService.addFruit(addFruitRequest));
+    return ResponseEntity.ok(fruitService.createFruit(addFruitRequest));
   }
 
   @Override

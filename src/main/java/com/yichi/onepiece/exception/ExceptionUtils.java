@@ -33,4 +33,8 @@ public class ExceptionUtils {
       String baseMessage, String imagePath, String imageFormat) {
     return new ImageFormatException(Strings.lenientFormat(baseMessage, imagePath, imageFormat));
   }
+
+  public static ValueExceedsBoundException valueExceedsBound(String baseMessage) {
+    return new ValueExceedsBoundException(baseMessage);
+  }
 }

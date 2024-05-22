@@ -41,7 +41,7 @@ public class FruitService {
     this.userService = userService;
   }
 
-  public Fruit addFruit(CreateFruitRequest request) {
+  public Fruit createFruit(CreateFruitRequest request) {
     var actionRecord = actionRecordService.create();
     var fruitEntity =
         FruitConverter.INSTANCE.toFruitEntity(request).toBuilder()
@@ -64,6 +64,10 @@ public class FruitService {
             .setNextFruit(getNextFruit(fruitFullView.getCreationRecord().getId()))
             .build();
     return FruitConverter.INSTANCE.toFruitFullView(fruitFullView);
+  }
+
+  public FruitEntity findById(UUID fruitId) {
+    return fruitDao.findById(fruitId).orElseThrow();
   }
 
   public ListFruitResponse listFruit(ListFruitRequest request) {
@@ -108,14 +112,6 @@ public class FruitService {
             UserFacingConstants.getConstant(UserFacingConstantsKey.UPDATE_SUCCESS)
                     .getDisplayName()).success(Boolean.TRUE);
   }
-
-  public List<FruitEntity> getFruitsByIds(List<UUID> fruitIds) {
-    if (fruitIds.isEmpty()) {
-      return List.of();
-    }
-    return fruitDao.batchFindById(fruitIds);
-  }
-
   public List<FruitListView> listByCharacterId(UUID characterId) {
     return fruitDao.listByCharacterId(characterId);
   }

@@ -3,7 +3,6 @@ package com.yichi.onepiece.battle.core;
 import com.yichi.onepiece.battle.model.CurrentCharacterEntityBuilder;
 import com.yichi.onepiece.battle.model.CurrentCharacterEntityImpl;
 import com.yichi.onepiece.character.model.entity.CharacterEntity;
-import com.yichi.onepiece.fruit.model.FruitEntity;
 import com.yichi.onepiece.fruit.model.FruitListView;
 import com.yichi.onepiece.model.I18nText;
 import java.util.List;
@@ -52,17 +51,6 @@ public class CharacterInBattle {
     int defense = baseEntity.getDefense();
     int intelligence = baseEntity.getIntelligence();
     int speed = baseEntity.getSpeed();
-    // add fruit strengthen if this character eats fruits.
-    if (!fruitEntities.isEmpty()) {
-      energyConsume = fruitEntities.stream().mapToInt(FruitEntity::getEnergyConsume).sum();
-      for (FruitEntity fruit : fruitEntities) {
-        blood = (int) (blood * fruit.getBloodStrengthen());
-        attack = (int) (attack * fruit.getAttackStrengthen());
-        intelligence = (int) (intelligence * fruit.getIntelligenceStrengthen());
-        defense = (int) (defense * fruit.getDefenseStrengthen());
-        speed = (int) (speed * fruit.getSpeedStrengthen());
-      }
-    }
     this.intelligence = intelligence;
     this.currentCharacterEntity =
         (CurrentCharacterEntityImpl)
@@ -70,6 +58,7 @@ public class CharacterInBattle {
                 .setAttack(attack)
                 .setBlood(blood)
                 .setDefense(defense)
+                    .setIntelligence(intelligence)
                 .setCurrentEnergy(baseEntity.getEnergy())
                 .setCurrentEnergyConsume(energyConsume)
                 .setSpeed(speed)
