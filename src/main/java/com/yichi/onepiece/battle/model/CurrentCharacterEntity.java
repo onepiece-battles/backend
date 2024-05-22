@@ -12,6 +12,8 @@ public interface CurrentCharacterEntity {
 
   Integer getAttack();
 
+  Integer getIntelligence();
+
   Integer getDefense();
 
   Integer getSpeed();

@@ -39,7 +39,7 @@ public interface CharacterEntityConverter {
   @Mapping(target = "baseSpeed", source = "speed")
   @Mapping(target = "baseBlood", source = "blood")
   @Mapping(target = "baseGroupGain", source = "groupGain")
-  CharacterEntity toCharacterEntity(CreateCharacterRequest addCharacterRequest);
+  CharacterEntity toCharacterEntity(CreateCharacterRequest createCharacterRequest);
 
   @Mapping(target = "creationRecordId", ignore = true)
   @Mapping(target = "modificationRecordId", ignore = true)

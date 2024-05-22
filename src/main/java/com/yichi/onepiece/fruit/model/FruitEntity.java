@@ -24,17 +24,25 @@ public interface FruitEntity {
   // Paramecia fruits consume positive extra energy and other fruits consumes no extra energy
   Integer getEnergyConsume();
 
-  Double getGroupGainStrengthen();
+  Double getGroupGainSlope();
 
-  Double getAttackStrengthen();
+  Integer getGroupGainIntercept();
 
-  Double getDefenseStrengthen();
+  Double getAttackSlope();
 
-  Double getIntelligenceStrengthen();
+  Integer getAttackIntercept();
 
-  Double getBloodStrengthen();
+  Double getDefenseSlope();
+  Integer getDefenseIntercept();
 
-  Double getSpeedStrengthen();
+  Double getIntelligenceSlope();
+  Integer getIntelligenceIntercept();
+
+  Double getBloodSlope();
+  Integer getBloodIntercept();
+
+  Double getSpeedSlope();
+  Integer getSpeedIntercept();
 
   Long getCreationRecordId();
 
