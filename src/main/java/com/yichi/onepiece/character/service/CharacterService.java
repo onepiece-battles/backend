@@ -83,8 +83,15 @@ public class CharacterService {
     }
 
     private int calculateInitialScore(CharacterEntity characterEntity) {
-        return  (characterEntity.getAttack() * 10 + characterEntity.getDefense() * 10 + characterEntity.getBlood())/3 *
-                ( characterEntity.getSpeed() / 200 + characterEntity.getIntelligence()/260);
+        int score =   (characterEntity.getAttack() * 10 + characterEntity.getDefense() * 10 + characterEntity.getBlood())/3
+                + (characterEntity.getSpeed()-20) *  5 + (characterEntity.getIntelligence()-100) * 5;
+        if (score<100) {
+            return 100;
+        }
+        if (score > 10000) {
+            return 10000;
+        }
+        return score;
     }
 
     private void createHakis(List<Haki> hakis, UUID characterId) {
