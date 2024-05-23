@@ -50,11 +50,7 @@ public class FruitService {
             .setSystemResource(UserHelper.hasNikaPermission())
             .build();
     fruitDao.insert(fruitEntity);
-    var characterNames =
-        characterHelper.listByFruitId(fruitEntity.getId()).stream()
-            .map(CharacterEntity::getName)
-            .toList();
-    return FruitConverter.INSTANCE.toFruit(fruitEntity).fruitHolders(characterNames);
+    return FruitConverter.INSTANCE.toFruit(fruitEntity);
   }
 
   public FruitFullView getFruit(GetFruitRequest request) {
@@ -107,6 +103,13 @@ public class FruitService {
             .setModificationRecordId(modificationRecord.getId())
             .build();
     fruitDao.update(fruitEntity);
+    // update character battle indexes that has eaten this fruit
+    var characters = characterHelper.listByFruitId(fruitEntity.getId());
+    for (var character :  characters) {
+      var fruits = listByCharacterId(character.getId());
+      characterHelper.calculateCharacterBattleIndex(character, fruits);
+    }
+
     var response = new UpdateFruitResponse();
     return response.result(
             UserFacingConstants.getConstant(UserFacingConstantsKey.UPDATE_SUCCESS)
