@@ -87,8 +87,7 @@ public class CharacterService {
                 + (characterEntity.getSpeed()-20) *  5 + (characterEntity.getIntelligence()-100) * 5;
         if (score<100) {
             return 100;
-        }
-        if (score > 10000) {
+        } else if (score > 10000) {
             return 10000;
         }
         return score;
