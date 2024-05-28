@@ -58,7 +58,7 @@
             AND JSON_EXTRACT(`receiver`.`name`, CONCAT('$.', #{battleFilter.languageCode})) LIKE #{receiverKeyLike}
         </if>
         <if test="battleFilter.battleTypes != null and !battleFilter.battleTypes.isEmpty">
-            AND type IN
+            AND `type` IN
             <foreach item="battleType" collection="battleFilter.battleTypes" open="("
                      separator="," close=")">
                 #{battleType}
