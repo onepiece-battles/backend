@@ -16,6 +16,5 @@ alter table fruit drop column blood_strengthen;
 alter table fruit drop column group_gain_strengthen;
 alter table fruit drop column speed_strengthen;
 alter table fruit drop column intelligence_strengthen;
-alter table fruit drop column frui;
 
 
