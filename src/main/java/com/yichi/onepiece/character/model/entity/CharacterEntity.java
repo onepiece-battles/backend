@@ -7,6 +7,7 @@ import com.yichi.onepiece.model.BattleStyle;
 import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.Race;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -40,7 +41,7 @@ public interface CharacterEntity {
 
   String getBirthPlace();
 
-  Integer getBounty();
+  BigInteger getBounty();
 
   // some characters are better when fighting in a group
   Integer getBaseGroupGain();

@@ -1,0 +1,1 @@
+alter table `character` modify `bounty` bigint;
