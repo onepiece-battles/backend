@@ -369,7 +369,7 @@ public class CharacterService {
                 .setAttack(attack)
                 .setDefense(defense)
                 .setBlood(blood)
-                .setBaseGroupGain(groupGain)
+                .setGroupGain(groupGain)
                 .setSpeed(speed)
                 .setIntelligence(intelligence)
                 .build();
