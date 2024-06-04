@@ -4,11 +4,15 @@ import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.geom.Rectangle;
+import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
+import com.itextpdf.kernel.pdf.colorspace.PdfColorSpace;
 import com.itextpdf.layout.Canvas;
+import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.Document;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -17,7 +21,11 @@ import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.properties.HorizontalAlignment;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
+import com.itextpdf.layout.properties.VerticalAlignment;
+import com.itextpdf.layout.renderer.DocumentRenderer;
+import com.itextpdf.layout.renderer.DrawContext;
 import com.lowagie.text.Row;
+import com.itextpdf.kernel.colors.Color;
 import com.yichi.onepiece.alicloud.AliCloudObjectStorage;
 import com.yichi.onepiece.battle.service.BattleService;
 import com.yichi.onepiece.character.service.CharacterService;
@@ -76,6 +84,7 @@ public class DataExportService {
     var starterCharacter = characterService.findByCharacterId(battleEntity.getStarterId());
     var receiverCharacter = characterService.findByCharacterId(battleEntity.getReceiverId());
     try {
+      float imageWidth = 100;
       logger.info("start creating files");
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
       PdfWriter writer = new PdfWriter(outputStream);
@@ -87,6 +96,7 @@ public class DataExportService {
               .setTextAlignment(TextAlignment.CENTER)
               .setFontSize(24);
       document.add(title);
+
       // create image
       ImageData starterImageData = ImageDataFactory.create(ArrayUtils.toPrimitive(starterCharacter.getProfileImage()));
       Image starterImage = new Image(starterImageData)
@@ -96,25 +106,45 @@ public class DataExportService {
               .scaleToFit(100, 100).setHorizontalAlignment(HorizontalAlignment.CENTER);
       String starterName = starterCharacter.getName().getZhCN();
       String receiverName = receiverCharacter.getName().getZhCN();
-      Paragraph starter = new Paragraph(starterName)
-              .setTextAlignment(TextAlignment.CENTER);
-      Paragraph receiver = new Paragraph(receiverName)
-              .setTextAlignment(TextAlignment.CENTER);
 
-      // Create a Div to hold images
-      Div imageDiv = new Div();
-      imageDiv.add(starterImage);
-      imageDiv.add(new Div().setWidth(UnitValue.createPercentValue(5)));
-      imageDiv.add(receiverImage);
+      // Add space at the top of the table
+      Paragraph space = new Paragraph("\n"); // Empty paragraph for space
+      space.setHeight(180); // Set desired space before the table
+      document.add(space);
+
+      Table table = new Table(3);
+      Cell cell1 = new Cell();
+      cell1.add(starterImage.setWidth(imageWidth).setHeight(imageWidth).setTextAlignment(TextAlignment.CENTER));
+      cell1.add(new Paragraph(starterName).setTextAlignment(TextAlignment.CENTER)
+              .setFontSize(15)
+              .setFontColor(new DeviceRgb(16, 85, 154),255)
+              .setVerticalAlignment(VerticalAlignment.BOTTOM));
+      cell1.setBorder(Border.NO_BORDER);
+      table.addCell(cell1);
+
+      Cell cell3 = new Cell();
+      cell3.add(new Paragraph("VS").setWidth(100)
+                      .setFontSize(30)
+                      .setFontColor(new DeviceRgb(16, 85, 154),255)
+              .setHeight(imageWidth).setTextAlignment(TextAlignment.CENTER)
+              .setVerticalAlignment(VerticalAlignment.MIDDLE));
+      cell3.setTextAlignment(TextAlignment.CENTER);
+      cell3.setBorder(Border.NO_BORDER);
+      table.addCell(cell3);
 
 
-      Div nameDiv = new Div();
-      nameDiv.add(starter);
-      nameDiv.add(new Div().setWidth(UnitValue.createPercentValue(5)));
-      nameDiv.add(receiver);
+      Cell cell2 = new Cell();
+      cell2.add(receiverImage.setWidth(imageWidth).setHeight(imageWidth).setTextAlignment(TextAlignment.CENTER));
+      cell2.add(new Paragraph(receiverName).setTextAlignment(TextAlignment.CENTER)
+              .setFontSize(15)
+              .setFontColor(new DeviceRgb(16, 85, 154),255)
+              .setVerticalAlignment(VerticalAlignment.BOTTOM));
+      cell2.setBorder(Border.NO_BORDER);
+      table.addCell(cell2);
 
-      document.add(imageDiv);
-      document.add(nameDiv);
+      table.setHorizontalAlignment(HorizontalAlignment.CENTER);
+      document.add(table);
+
       // add footer
       DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
       LocalDateTime now = LocalDateTime.now();
