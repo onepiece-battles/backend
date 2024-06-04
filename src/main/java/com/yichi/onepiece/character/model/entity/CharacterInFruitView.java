@@ -5,6 +5,7 @@ import com.yichi.infra.support.mybatis.annotations.Column;
 import com.yichi.onepiece.model.I18nText;
 
 import javax.annotation.Nullable;
+import java.math.BigInteger;
 
 @Entity
 public interface CharacterInFruitView extends CharacterToFruitEntity {
@@ -13,7 +14,7 @@ public interface CharacterInFruitView extends CharacterToFruitEntity {
     @Nullable
     Byte[] getProfileImage();
     Integer getMaximumFruitCount();
-    Integer getBounty();
+    BigInteger getBounty();
 
     // battle info
     Integer getGroupGain();
