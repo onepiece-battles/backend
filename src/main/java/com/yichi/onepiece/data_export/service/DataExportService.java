@@ -21,15 +21,14 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.element.Image;
-import com.itextpdf.layout.properties.HorizontalAlignment;
-import com.itextpdf.layout.properties.TextAlignment;
-import com.itextpdf.layout.properties.UnitValue;
-import com.itextpdf.layout.properties.VerticalAlignment;
+import com.itextpdf.layout.properties.*;
 import com.itextpdf.layout.renderer.DocumentRenderer;
 import com.itextpdf.layout.renderer.DrawContext;
 import com.lowagie.text.Row;
 import com.itextpdf.kernel.colors.Color;
 import com.yichi.onepiece.alicloud.AliCloudObjectStorage;
+import com.yichi.onepiece.battle.model.BattleProcessDetailEntity;
+import com.yichi.onepiece.battle.model.BattleStatusDetailEntity;
 import com.yichi.onepiece.battle.service.BattleService;
 import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.file.model.FileCategory;
@@ -37,6 +36,8 @@ import com.yichi.onepiece.file.model.FileObjectEntityBuilder;
 import com.yichi.onepiece.file.service.FileObjectService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.BattleReportStage;
+import com.yichi.onepiece.model.I18nText;
+import com.yichi.onepiece.model.OnepieceLocale;
 import com.yichi.onepiece.model.UserRole;
 
 import java.awt.*;
@@ -46,10 +47,16 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+
+import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
+import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
+import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
+import com.yichi.onepiece.utils.I18nHelper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -79,7 +86,7 @@ public class DataExportService {
    *
    * @param battleId id of battle that will be analyzed.
    */
-  public void generateBattleResultPdf(UUID battleId, String userEmail, String userNickname, UUID userId, String roleName) {
+  public void generateBattleResultPdf(UUID battleId, String userEmail, String locale, UUID userId, String roleName) {
     logger.info("start getting source data for report generation");
     var battleEntity = battleService.findBattleById(battleId);
     var userEntity = userService.getUserEntityById(userId);
@@ -111,8 +118,10 @@ public class DataExportService {
       ImageData receiverImageData = ImageDataFactory.create(ArrayUtils.toPrimitive(receiverCharacter.getProfileImage()));
       Image receiverImage = new Image(receiverImageData)
               .scaleToFit(100, 100).setHorizontalAlignment(HorizontalAlignment.CENTER);
-      String starterName = starterCharacter.getName().getZhCN();
-      String receiverName = receiverCharacter.getName().getZhCN();
+      String starterName = locale.equals(OnepieceLocale.ZH_CN.getValue())?
+              starterCharacter.getName().getZhCN():starterCharacter.getName().getEnUS();
+      String receiverName = locale.equals(OnepieceLocale.ZH_CN.getValue())?
+              receiverCharacter.getName().getZhCN():starterCharacter.getName().getEnUS();
 
       // Add space at the top of the table
       Paragraph space = new Paragraph("\n"); // Empty paragraph for space
@@ -151,6 +160,15 @@ public class DataExportService {
 
       table.setHorizontalAlignment(HorizontalAlignment.CENTER);
       document.add(table);
+      document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+      var leftAlign = true;
+      int i = 0;
+      for (; i < processList.size(); i++) {
+        document.add(getBattleStatusBlock(leftAlign, statusList.get(i), locale));
+        document.add(getBattleProcessBlock(processList.get(i), locale));
+        leftAlign = !leftAlign;
+      }
+      document.add(getBattleStatusBlock(leftAlign, statusList.get(i), locale));
       document.setMargins(10, 20, 10, 20);
       document.close();
       writer.close();
@@ -238,5 +256,49 @@ public class DataExportService {
             TextAlignment.CENTER, VerticalAlignment.BOTTOM, 0);
 
     }
+  }
+
+  private Paragraph getBattleStatusBlock(Boolean leftAlign, BattleStatusDetailEntity battleStatusDetailEntity, String locale) {
+    Paragraph paragraph = new Paragraph();
+    paragraph.add(String.format("%s %s \n",I18nHelper.getTextByLocal(
+                    new I18nText().zhCN("回合").enUS("Round"),locale) ,
+            battleStatusDetailEntity.getBattleStatusRoundNumber()));
+//    paragraph.add(I18nHelper.getTextByLocal(battleStatusDetailEntity.getAttackSide(), locale));
+    paragraph.add(String.format("%s %s \n",I18nHelper.getTextByLocal(
+                    new I18nText().zhCN("进攻方当前血量").enUS("Attacker current blood"), locale),
+            battleStatusDetailEntity.getAttacker().getBlood()));
+    paragraph.add(String.format("%s %s \n",I18nHelper.getTextByLocal(
+                    new I18nText().zhCN("进攻方当前能量").enUS("Attacker current energy"), locale),
+            battleStatusDetailEntity.getAttacker().getCurrentEnergy()));
+    paragraph.add(String.format("%s %s \n",I18nHelper.getTextByLocal(
+                    new I18nText().zhCN("防守方当前血量").enUS("Defender current blood"), locale),
+            battleStatusDetailEntity.getDefender().getBlood()));
+    paragraph.add(String.format("%s %s \n",I18nHelper.getTextByLocal(
+                    new I18nText().zhCN("防守方当前能量").enUS("Defender current energy"), locale),
+            battleStatusDetailEntity.getDefender().getCurrentEnergy()));
+    paragraph.setTextAlignment(leftAlign? TextAlignment.LEFT: TextAlignment.RIGHT)
+            .setFontSize(12)
+            .setFontColor(new DeviceRgb(16, 85, 154),255)
+            .setHorizontalAlignment(leftAlign? HorizontalAlignment.LEFT: HorizontalAlignment.RIGHT);
+    return paragraph;
+  }
+
+  private Paragraph getBattleProcessBlock(BattleProcessDetailEntity battleProcessDetail, String locale) {
+    Paragraph paragraph = new Paragraph();
+    if (battleProcessDetail.getAttackMissed()) {
+      paragraph.add(String.format("%s \n",I18nHelper.getTextByLocal(
+              new I18nText().zhCN("进攻被躲避").enUS("Attack missed"), locale)));
+    }
+    paragraph.add(String.format("%s %s \n",I18nHelper.getTextByLocal(
+                    new I18nText().zhCN("进攻者能量损失").enUS("Attacker energy loss"), locale),
+            battleProcessDetail.getAttackerEnergyLoss()));
+    paragraph.add(String.format("%s %s \n",I18nHelper.getTextByLocal(
+                    new I18nText().zhCN("防守者血量损失").enUS("Defender blood loss"), locale),
+            battleProcessDetail.getDefenderBloodLoss()));
+    paragraph.setTextAlignment(TextAlignment.CENTER)
+            .setFontSize(12)
+            .setFontColor(new DeviceRgb(16, 85, 154),255)
+            .setHorizontalAlignment( HorizontalAlignment.CENTER);
+    return paragraph;
   }
 }

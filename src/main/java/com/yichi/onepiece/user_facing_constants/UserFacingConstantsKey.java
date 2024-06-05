@@ -33,6 +33,12 @@ public class UserFacingConstantsKey {
   public static final String UPDATE_SUCCESS = "UPDATE_SUCCESS";
   public static final String CREATION_SUCCESS = "CREATION_SUCCESS";
   public static final String SAME_STARTER_AND_RECEIVER = "SAME_STARTER_AND_RECEIVER";
+  public static final String ROUND = "ROUND";
+  public static final String BLOOD = "BLOOD";
+  public static final String ENERGY = "ENERGY";
+  public static final String ATTACK_MISSED = "ATTACK_MISSED";
+  public static final String ATTACKER_ENERGY_LOSS = "ATTACKER_ENERGY_LOSS";
+  public static final String DEFENDER_BLOOD_LOSS = "DEFENDER_BLOOD_LOSS";
 
 
   public UserFacingConstantsKey() {}

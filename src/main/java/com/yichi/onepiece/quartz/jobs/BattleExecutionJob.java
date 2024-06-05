@@ -30,7 +30,8 @@ public class BattleExecutionJob extends QuartzJobBean {
       String email = jobExecutionContext.getJobDetail().getJobDataMap().getString(USER_EMAIL);
       String nickname = jobExecutionContext.getJobDetail().getJobDataMap().getString(USER_NICKNAME);
       String roleName = jobExecutionContext.getJobDetail().getJobDataMap().getString(ROLE_NAME);
-      battleService.startBattle(UUID.fromString(battleId), UUID.fromString(userId), email, nickname, roleName);
+      String locale = jobExecutionContext.getJobDetail().getJobDataMap().getString(LOCALE);
+      battleService.startBattle(UUID.fromString(battleId), UUID.fromString(userId), email, nickname, roleName, locale);
     } catch (Exception e) {
       logger.error(e.toString());
     }
