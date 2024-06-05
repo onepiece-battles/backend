@@ -184,7 +184,7 @@ public class BattleService {
    * @param nickname Nickname of creator.
    * @param roleName RoleName of creator.
    */
-  public void startBattle(UUID battleId, UUID userId, String email, String nickname, String roleName) {
+  public void startBattle(UUID battleId, UUID userId, String email, String nickname, String roleName, String locale) {
     var battleEntity = battleDao.findById(battleId).orElseThrow();
     var battlefield = createBattleField(battleId);
     while (battlefield.allAlive()) {
@@ -218,7 +218,7 @@ public class BattleService {
     battleExecutionDao.update(battleExecution);
     updateCharacter(winner.getCharacterId(), scores.getLeft(), userId, UserRole.fromValue(roleName));
     updateCharacter(loser.getCharacterId(), scores.getRight(), userId, UserRole.fromValue(roleName));
-    scheduleFileGeneratingJob(battleId, userId, email, nickname, roleName);
+    scheduleFileGeneratingJob(battleId, userId, email, nickname, roleName, locale);
   }
 
   private void updateCharacter(UUID characterId, int newScore, UUID userId, UserRole loginRole) {
@@ -282,7 +282,7 @@ public class BattleService {
     return Math.min(score, 10000);
   }
 
-  private void scheduleFileGeneratingJob(UUID battleId, UUID userId, String email, String nickname, String roleName) {
+  private void scheduleFileGeneratingJob(UUID battleId, UUID userId, String email, String nickname, String roleName, String locale) {
     try {
       logger.info("start generating report");
       JobDataMap jobDataMap = new JobDataMap();
@@ -291,6 +291,7 @@ public class BattleService {
       jobDataMap.put(USER_EMAIL, email);
       jobDataMap.put(USER_NICKNAME, nickname);
       jobDataMap.put(ROLE_NAME, roleName);
+      jobDataMap.put(LOCALE, locale);
       JobDetail reportGeneratingJob = JobBuilder.newJob(ReportGeneratingJob.class)
               .setJobData(jobDataMap)
               .withIdentity(UUID.randomUUID().toString(), BATTLE_JOB_GROUP)

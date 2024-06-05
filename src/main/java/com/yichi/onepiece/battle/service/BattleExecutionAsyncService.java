@@ -45,11 +45,13 @@ public class BattleExecutionAsyncService {
     battleExecution = battleExecution.toBuilder().setModificationTimestamp(
         actionRecord.getActionTimestamp()).setBattleStatus(BattleStatus.IN_PROGRESS).build();
     JobDataMap jobDataMap = new JobDataMap();
+    logger.info("current user: {}", UserHelper.getCurrentUserDetail().toString());
     jobDataMap.put(BATTLE_ID, battleId.toString());
     jobDataMap.put(USER_ID, UserHelper.getCurrentUserId().toString());
     jobDataMap.put(USER_EMAIL, UserHelper.getCurrentUserDetail().getUsername());
     jobDataMap.put(USER_NICKNAME, UserHelper.getCurrentUserDetail().getNickname());
     jobDataMap.put(ROLE_NAME, UserHelper.getCurrentUserDetail().getLoginRole().toString());
+    jobDataMap.put(LOCALE, UserHelper.getCurrentUserDetail().getLocale().toString());
     JobDetail battleStartJob = JobBuilder.newJob(BattleExecutionJob.class)
             .setJobData(jobDataMap)
             .withIdentity(UUID.randomUUID().toString(), BATTLE_JOB_GROUP)

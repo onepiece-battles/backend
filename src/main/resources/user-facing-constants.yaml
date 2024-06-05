@@ -105,3 +105,27 @@ user:
       displayName:
         en-US: "Starter and Receiver can not be the same character!"
         zh-CN: "战斗发起者和接受者不能是同一个人！"
+    ROUND:
+      displayName:
+        en-US: "Round"
+        zh-CN: "回合"
+    BLOOD:
+      displayName:
+        en-US: "Blood"
+        zh-CN: "血量"
+    ENERGY:
+      displayName:
+        en-US: "Energy"
+        zh-CN: "能量"
+    ATTACK_MISSED:
+      displayName:
+        en-US: "Attack Missed"
+        zh-CN: "攻击被闪避"
+    ATTACKER_ENERGY_LOSS:
+      displayName:
+        en-US: "Attacker energy loss"
+        zh-CN: "进攻者能量损耗"
+    DEFENDER_BLOOD_LOSS:
+      displayName:
+        en-US: "Defender blood loss"
+        zh-CN: "防守方血量损耗"
