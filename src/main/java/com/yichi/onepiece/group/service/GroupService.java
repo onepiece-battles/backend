@@ -49,6 +49,7 @@ public class GroupService {
             .build();
     groupDao.insert(groupEntity);
     return new CreateGroupResponse()
+            .name(request.getName())
         .result(UserFacingConstants.getConstant(GROUP_CREATION_SUCCESS).getDisplayName())
         .id(groupEntity.getId());
   }
