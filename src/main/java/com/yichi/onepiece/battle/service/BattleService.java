@@ -96,7 +96,7 @@ public class BattleService {
             .modificationTimestamp(actionRecord.getActionTimestamp())
             .build();
     battleExecutionDao.insert(battleExecutionEntity);
-    return new CreateBattleResponse().result(true).notification(
+    return new CreateBattleResponse().battleId(battleEntity.getId()).result(true).notification(
             UserFacingConstants.getConstant(CREATION_SUCCESS).getDisplayName()
     );
   }
