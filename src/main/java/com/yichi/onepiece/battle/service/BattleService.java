@@ -254,6 +254,14 @@ public class BattleService {
     int winnerRealChange = (int) (winnerKFactor*(1-expectedWinnerChange));
     int loserRealChange = (int) (loserKFactor*(0-expectedLoserChange));
 
+    if (Math.abs(winnerRealChange) <5) {
+      winnerRealChange = 0;
+    }
+
+    if (Math.abs(loserRealChange) <5) {
+      loserRealChange = 0;
+    }
+
     int updatedWinnerScore = winnerScore + winnerRealChange;
     int updatedLoserScore = loserScore + loserRealChange;
 

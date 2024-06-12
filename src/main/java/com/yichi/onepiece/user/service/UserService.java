@@ -142,7 +142,8 @@ public class UserService {
     var roleEntities = roleDao.listRoleByRoleNames(List.of(UserRole.NORMAL));
     // make nika account to be onepiecebattles@163.com
     if (username.equals("onepiecebattles@163.com")) {
-       roleEntities = roleDao.listRoleByRoleNames(List.of(UserRole.NIKA, UserRole.ADMIN, UserRole.NORMAL, UserRole.VISITOR));
+       roleEntities = roleDao.listRoleByRoleNames(
+               List.of(UserRole.NIKA, UserRole.ADMIN, UserRole.NORMAL, UserRole.VISITOR));
     }
     roleEntities.forEach(
         roleEntity ->
