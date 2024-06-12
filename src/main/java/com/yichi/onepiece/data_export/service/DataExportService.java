@@ -1,5 +1,6 @@
 package com.yichi.onepiece.data_export.service;
 
+import com.itextpdf.io.font.PdfEncodings;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
@@ -59,6 +60,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Nullable;
+
 @Service
 public class DataExportService {
   private final Logger logger = LoggerFactory.getLogger(DataExportService.class);
@@ -97,6 +100,9 @@ public class DataExportService {
     try {
       float imageWidth = 100;
       float imageHeight = 100;
+      String fontPath = "/font/NotoSansCJKsc-Regular.otf";
+      PdfFont font = PdfFontFactory.createFont(fontPath, PdfEncodings.IDENTITY_H);
+      PdfFont fontBold = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
       logger.info("start creating files");
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
       PdfWriter writer = new PdfWriter(outputStream);
@@ -127,36 +133,21 @@ public class DataExportService {
       Paragraph space = new Paragraph("\n"); // Empty paragraph for space
       space.setHeight(180); // Set desired space before the table
       document.add(space);
-
       Table table = new Table(3);
-      Cell cell1 = new Cell();
-      cell1.add(starterImage.setWidth(imageWidth).setHeight(imageHeight).setTextAlignment(TextAlignment.CENTER));
-      cell1.add(new Paragraph(starterName).setTextAlignment(TextAlignment.CENTER)
-              .setFontSize(20)
-              .setFontColor(new DeviceRgb(16, 85, 154),255)
-              .setVerticalAlignment(VerticalAlignment.BOTTOM));
-      cell1.setBorder(Border.NO_BORDER);
-      table.addCell(cell1);
+      var starterImageCell = createImageCell(starterImage, imageWidth, imageHeight);
+      var startNameCell = createTextCell(starterName,20, new DeviceRgb(16, 85, 154), font);
+      var receiverImageCell = createImageCell(receiverImage, imageWidth, imageHeight);
+      var receiverNameCell = createTextCell(receiverName,20, new DeviceRgb(16, 85, 154), font);
+      var vsCell =  createTextCell("VS",30, new DeviceRgb(16, 85, 154), font);
+      var emptyCell = createTextCell("",20, new DeviceRgb(16, 85, 154), font);
 
-      Cell cell3 = new Cell();
-      cell3.add(new Paragraph("VS").setWidth(100)
-                      .setFontSize(30)
-                      .setFontColor(new DeviceRgb(16, 85, 154),255)
-              .setHeight(imageHeight).setTextAlignment(TextAlignment.CENTER)
-              .setVerticalAlignment(VerticalAlignment.MIDDLE));
-      cell3.setTextAlignment(TextAlignment.CENTER);
-      cell3.setBorder(Border.NO_BORDER);
-      table.addCell(cell3);
+      table.addCell(starterImageCell)
+              .addCell(vsCell)
+              .addCell(receiverImageCell)
+              .addCell(startNameCell)
+              .addCell(emptyCell)
+              .addCell(receiverNameCell);
 
-
-      Cell cell2 = new Cell();
-      cell2.add(receiverImage.setWidth(imageWidth).setHeight(imageHeight).setTextAlignment(TextAlignment.CENTER));
-      cell2.add(new Paragraph(receiverName).setTextAlignment(TextAlignment.CENTER)
-              .setFontSize(20)
-              .setFontColor(new DeviceRgb(16, 85, 154),255)
-              .setVerticalAlignment(VerticalAlignment.BOTTOM));
-      cell2.setBorder(Border.NO_BORDER);
-      table.addCell(cell2);
 
       table.setHorizontalAlignment(HorizontalAlignment.CENTER);
       document.add(table);
@@ -164,11 +155,11 @@ public class DataExportService {
       var leftAlign = true;
       int i = 0;
       for (; i < processList.size(); i++) {
-        document.add(getBattleStatusBlock(leftAlign, statusList.get(i), locale));
-        document.add(getBattleProcessBlock(processList.get(i), locale));
+        document.add(getBattleStatusBlock(leftAlign, statusList.get(i), locale, font));
+        document.add(getBattleProcessBlock(processList.get(i), locale, font));
         leftAlign = !leftAlign;
       }
-      document.add(getBattleStatusBlock(leftAlign, statusList.get(i), locale));
+      document.add(getBattleStatusBlock(leftAlign, statusList.get(i), locale, font));
       document.setMargins(10, 20, 10, 20);
       document.close();
       writer.close();
@@ -199,6 +190,30 @@ public class DataExportService {
       logger.error(e.toString());
     }
   }
+
+  private Cell createTextCell(String text, float fontSize, DeviceRgb fontColor, PdfFont font) {
+    Cell cell = new Cell();
+    cell.add(new Paragraph(text)
+                    .setFont(font)
+                    .setHeight(100)
+                    .setWidth(100)
+            .setFontSize(fontSize)
+            .setFontColor(fontColor, 255)
+           .setTextAlignment(TextAlignment.CENTER)
+            .setVerticalAlignment(VerticalAlignment.MIDDLE));
+    cell.setTextAlignment(TextAlignment.CENTER);
+    cell.setBorder(Border.NO_BORDER);
+    return cell;
+  }
+
+  private Cell createImageCell(Image image, float imageWidth, float imageHeight) {
+    Cell cell = new Cell();
+    cell.add(image.setWidth(imageWidth).setHeight(imageHeight));
+    cell.setBorder(Border.NO_BORDER);
+    return cell;
+  }
+
+
 
   private String getFileName(String starterCharacter, String receiverCharacter, UUID battleId) {
     return String.format(
@@ -258,8 +273,10 @@ public class DataExportService {
     }
   }
 
-  private Paragraph getBattleStatusBlock(Boolean leftAlign, BattleStatusDetailEntity battleStatusDetailEntity, String locale) {
+  private Paragraph getBattleStatusBlock(
+          Boolean leftAlign, BattleStatusDetailEntity battleStatusDetailEntity, String locale, PdfFont font) {
     Paragraph paragraph = new Paragraph();
+    paragraph.setFont(font);
     paragraph.add(String.format("%s %s \n",I18nHelper.getTextByLocal(
                     new I18nText().zhCN("回合").enUS("Round"),locale) ,
             battleStatusDetailEntity.getBattleStatusRoundNumber()));
@@ -283,8 +300,10 @@ public class DataExportService {
     return paragraph;
   }
 
-  private Paragraph getBattleProcessBlock(BattleProcessDetailEntity battleProcessDetail, String locale) {
+  private Paragraph getBattleProcessBlock(
+          BattleProcessDetailEntity battleProcessDetail, String locale, PdfFont font) {
     Paragraph paragraph = new Paragraph();
+    paragraph.setFont(font);
     if (battleProcessDetail.getAttackMissed()) {
       paragraph.add(String.format("%s \n",I18nHelper.getTextByLocal(
               new I18nText().zhCN("进攻被躲避").enUS("Attack missed"), locale)));
