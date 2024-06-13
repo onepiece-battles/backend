@@ -188,6 +188,7 @@ public class Battlefield {
         BattleProcessDetailEntityBuilder.newBuilder();
     battleProcessDetailEntityBuilder
         .setBattleId(battleId)
+            .setAttackerId(attackSide.getCurrentCharacterEntity().getCharacterId())
         .setAttackerEnergyLoss(1)
         .setBattleProcessRoundNumber(battleProcessCount)
         .setAttackerEnergyLoss(attackSide.getEnergyConsume())

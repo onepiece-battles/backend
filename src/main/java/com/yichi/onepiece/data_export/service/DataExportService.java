@@ -55,6 +55,7 @@ import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import com.yichi.onepiece.utils.I18nHelper;
 import org.apache.commons.lang3.ArrayUtils;
+import org.checkerframework.checker.units.qual.C;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.parameters.P;
@@ -100,6 +101,8 @@ public class DataExportService {
     try {
       float imageWidth = 100;
       float imageHeight = 100;
+      float smallImageWidth = 30;
+      float smallImageHeight = 30;
       String fontPath = "/font/NotoSansCJKsc-Regular.otf";
       PdfFont font = PdfFontFactory.createFont(fontPath, PdfEncodings.IDENTITY_H);
       PdfFont fontBold = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
@@ -141,6 +144,9 @@ public class DataExportService {
       var vsCell =  createTextCell("VS",30, new DeviceRgb(16, 85, 154), font);
       var emptyCell = createTextCell("",20, new DeviceRgb(16, 85, 154), font);
 
+      var smallStarterImageCell = createImageCell(starterImage, smallImageWidth, smallImageHeight);
+      var smallReceiverImageCell = createImageCell(receiverImage, smallImageWidth, smallImageHeight);
+
       table.addCell(starterImageCell)
               .addCell(vsCell)
               .addCell(receiverImageCell)
@@ -152,14 +158,12 @@ public class DataExportService {
       table.setHorizontalAlignment(HorizontalAlignment.CENTER);
       document.add(table);
       document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-      var leftAlign = true;
       int i = 0;
       for (; i < processList.size(); i++) {
-        document.add(getBattleStatusBlock(leftAlign, statusList.get(i), locale, font));
+        document.add(getBattleStatusBlock(starterCharacter.getId(),smallStarterImageCell, smallReceiverImageCell, statusList.get(i), locale, font));
         document.add(getBattleProcessBlock(processList.get(i), locale, font));
-        leftAlign = !leftAlign;
       }
-      document.add(getBattleStatusBlock(leftAlign, statusList.get(i), locale, font));
+      document.add(getBattleStatusBlock(starterCharacter.getId(),smallStarterImageCell, smallReceiverImageCell, statusList.get(i), locale, font));
       document.setMargins(10, 20, 10, 20);
       document.close();
       writer.close();
@@ -204,6 +208,10 @@ public class DataExportService {
     cell.setTextAlignment(TextAlignment.CENTER);
     cell.setBorder(Border.NO_BORDER);
     return cell;
+  }
+
+  private Cell createEmptyCell() {
+    return new Cell().setBorder(Border.NO_BORDER);
   }
 
   private Cell createImageCell(Image image, float imageWidth, float imageHeight) {
@@ -273,31 +281,40 @@ public class DataExportService {
     }
   }
 
-  private Paragraph getBattleStatusBlock(
-          Boolean leftAlign, BattleStatusDetailEntity battleStatusDetailEntity, String locale, PdfFont font) {
-    Paragraph paragraph = new Paragraph();
-    paragraph.setFont(font);
-    paragraph.add(String.format("%s %s \n",I18nHelper.getTextByLocal(
-                    new I18nText().zhCN("回合").enUS("Round"),locale) ,
-            battleStatusDetailEntity.getBattleStatusRoundNumber()));
-//    paragraph.add(I18nHelper.getTextByLocal(battleStatusDetailEntity.getAttackSide(), locale));
-    paragraph.add(String.format("%s %s \n",I18nHelper.getTextByLocal(
-                    new I18nText().zhCN("进攻方当前血量").enUS("Attacker current blood"), locale),
-            battleStatusDetailEntity.getAttacker().getBlood()));
-    paragraph.add(String.format("%s %s \n",I18nHelper.getTextByLocal(
-                    new I18nText().zhCN("进攻方当前能量").enUS("Attacker current energy"), locale),
-            battleStatusDetailEntity.getAttacker().getCurrentEnergy()));
-    paragraph.add(String.format("%s %s \n",I18nHelper.getTextByLocal(
-                    new I18nText().zhCN("防守方当前血量").enUS("Defender current blood"), locale),
-            battleStatusDetailEntity.getDefender().getBlood()));
-    paragraph.add(String.format("%s %s \n",I18nHelper.getTextByLocal(
-                    new I18nText().zhCN("防守方当前能量").enUS("Defender current energy"), locale),
-            battleStatusDetailEntity.getDefender().getCurrentEnergy()));
-    paragraph.setTextAlignment(leftAlign? TextAlignment.LEFT: TextAlignment.RIGHT)
-            .setFontSize(12)
-            .setFontColor(new DeviceRgb(16, 85, 154),255)
-            .setHorizontalAlignment(leftAlign? HorizontalAlignment.LEFT: HorizontalAlignment.RIGHT);
-    return paragraph;
+  private Table getBattleStatusBlock(
+          UUID starterId,
+          Cell starterImageCell,
+          Cell receiverImageCell, BattleStatusDetailEntity battleStatusDetailEntity, String locale, PdfFont font) {
+    Table table = new Table(4);
+    var starter = battleStatusDetailEntity.getAttacker();
+    var receiver = battleStatusDetailEntity.getDefender();
+    if (starter.getCharacterId()!=starterId) {
+      receiver = starter;
+      starter = battleStatusDetailEntity.getDefender();
+    }
+
+
+    var starterBlood = createTextCell(String.format("%s %s \n",I18nHelper.getTextByLocal(
+                    new I18nText().zhCN("剩余血量").enUS("Remaining blood volume"), locale),
+            starter.getBlood()), 20, new DeviceRgb(16, 85, 154), font);
+    var receiverBlood = createTextCell(String.format("%s %s \n",I18nHelper.getTextByLocal(
+                    new I18nText().zhCN("剩余血量").enUS("Remaining blood volume"), locale),
+            receiver.getBlood()), 20, new DeviceRgb(16, 85, 154), font);
+
+    var starterEnergy = createTextCell(String.format("%s %s \n",I18nHelper.getTextByLocal(
+                    new I18nText().zhCN("剩余能量").enUS("Remaining energy volume"), locale),
+            starter.getCurrentEnergy()), 20, new DeviceRgb(16, 85, 154), font);
+    var receiverEnergy = createTextCell(String.format("%s %s \n",I18nHelper.getTextByLocal(
+                    new I18nText().zhCN("剩余能量").enUS("Remaining energy volume"), locale),
+            receiver.getCurrentEnergy()), 20, new DeviceRgb(16, 85, 154), font);
+
+    table.addCell(starterImageCell).addCell(createEmptyCell()).addCell(createEmptyCell()).addCell(receiverImageCell);
+
+    table.addCell(starterBlood).addCell(createEmptyCell()).addCell(createEmptyCell()).addCell(receiverBlood);
+    table.addCell(starterEnergy).addCell(createEmptyCell()).addCell(createEmptyCell()).addCell(receiverEnergy);
+
+    table.setTextAlignment(TextAlignment.CENTER);
+    return table;
   }
 
   private Paragraph getBattleProcessBlock(
