@@ -7,6 +7,7 @@ import java.util.UUID;
 public interface BattleProcessDetailEntity {
   UUID getId();
   UUID getBattleId();
+  UUID getAttackerId();
   Integer getBattleProcessRoundNumber();
   Boolean getAttackMissed();
   Integer getAttackerEnergyLoss();

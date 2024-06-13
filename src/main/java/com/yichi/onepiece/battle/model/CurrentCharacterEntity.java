@@ -2,8 +2,11 @@ package com.yichi.onepiece.battle.model;
 
 import com.yichi.infra.support.entity.Entity;
 
+import java.util.UUID;
+
 @Entity
 public interface CurrentCharacterEntity {
+  UUID getCharacterId();
   Integer getBlood();
 
   Integer getCurrentEnergy();
