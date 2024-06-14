@@ -32,6 +32,7 @@ import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.*;
 @Service
 public class BattleService {
   private static final ResourceType RESOURCE_TYPE = ResourceType.CHARACTER;
+  private static final int BATTLE_MAXIMUM_TURNS = 120;
   Logger logger = LoggerFactory.getLogger(BattleService.class);
   private final BattleDao battleDao;
   private final BattleExecutionDao battleExecutionDao;
@@ -170,10 +171,11 @@ public class BattleService {
    * <p>
    * Step1: A battlefield will be created based on the two sides of participants.
    * Step2: A battle will get started when the starter initiate its attack.
-   * Step3: Battle ends when energy/blood of any participant reaches 0, or less than 0.
-   * Step4: If the energy of any participant is less than 10% and this character has eaten any fruit, this fruit will
-   * not have any effect. Note: Paramecia fruit cost extra energy for every turn, the extra energy.
-   * depends on the fruit itself.
+   * Step3: A battle ends when energy/blood of any participant reaches 0, or less than 0.
+   * Step4:
+   *  - If the energy of any participant is less than 10% and this character has eaten any fruit, this fruit will
+   *    not have any effect. Note: Paramecia fruit cost extra energy for every turn, the extra energy.
+   *  - Paramecia may have defect on its component, this functionality will be added IN THE FUTURE.
    * Step5: Attacker and defender is interchangeable, who the character with  intelligence got more chances to attack
    * and character with higher speed get more chances of hiding from attack.
    * Step6: If battle ends, the battle score will change based on the battle result.
@@ -187,10 +189,39 @@ public class BattleService {
   public void startBattle(UUID battleId, UUID userId, String email, String nickname, String roleName, String locale) {
     var battleEntity = battleDao.findById(battleId).orElseThrow();
     var battlefield = createBattleField(battleId);
+    int currentBattleTurn = 0;
     while (battlefield.allAlive()) {
+      if (currentBattleTurn>BATTLE_MAXIMUM_TURNS) {
+        var battleExecution = battleExecutionDao.findByBattleId(battleId).orElseThrow();
+        var battleExecutionBuilder = battleExecution.toBuilder()
+                .setBattleStatus(BattleStatus.FINISHED)
+                .setModificationTimestamp(clock.millis())
+                .setWinnerId(battlefield.getAttackSide().getBlood()>battlefield.getDefenseSide().getBlood()?
+                        battlefield.getAttackSide().getCharacterId():
+                        battlefield.getDefenseSide().getCharacterId());
+        if (battleEntity.getStarterId().equals(battlefield.getAttackSide().getCharacterId())) {
+          battleExecutionBuilder.setStarterScoreBefore(
+                  battlefield.getAttackSide().getScore()).setStarterScoreAfter(battlefield.getAttackSide().getScore())
+                  .setReceiverScoreBefore(
+                          battlefield.getDefenseSide().getScore())
+                  .setReceiverScoreAfter(battlefield.getDefenseSide().getScore());
+        } else {
+          battleExecutionBuilder.setStarterScoreBefore(
+                          battlefield.getDefenseSide().getScore()).setStarterScoreAfter(battlefield.getDefenseSide().getScore())
+                  .setReceiverScoreBefore(
+                          battlefield.getAttackSide().getScore())
+                  .setReceiverScoreAfter(battlefield.getAttackSide().getScore());
+        }
+        battleExecutionBuilder.setWinnerScoreChange(0);
+        battleExecutionBuilder.setLoserScoreChange(0);
+        battleExecutionBuilder.setBattleStatus(BattleStatus.FAILED);
+        battleExecution = battleExecutionBuilder.build();
+        battleExecutionDao.update(battleExecution);
+      }
       battlefield.checkReverse();
       battlefield.processBattle();
-      battlefield.attackReset();
+      battlefield.refreshAttackSide();
+      currentBattleTurn ++;
     }
     battlefield.completeFinalStatus();
     battleStatusDetailDao.batchInsert(battlefield.getBattleStatusDetailEntities());

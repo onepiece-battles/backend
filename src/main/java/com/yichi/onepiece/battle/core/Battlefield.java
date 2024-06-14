@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 public class Battlefield {
   private static final Logger logger = LoggerFactory.getLogger(Battlefield.class);
-  private static final int DEFAULT_ENERGY_CONSUME = 2;
   private static final int MAXIMUM_INTELLIGENCE = 260;
   private static final int MINIMUM_INTELLIGENCE = 70;
   private static final int MAXIMUM_SPEED = 200;
@@ -25,16 +24,19 @@ public class Battlefield {
   // hide index is speed and intelligence related and 100 based.
   private int MAX_HIDE_INDEX_DIFF;
   private Map<UUID, Integer> hideIndexMap;
-  // attack index is intelligence related and 100 based.
-  private int attackRepeatIndex;
-  private List<UUID> battleParticipantsIds;
   private Map<UUID, CharacterInBattle> idToCharacterMap;
   private Map<UUID, Boolean> characterReverseMap;
   private final UUID battleId;
   private final CharacterInBattle characterInit;
   private final CharacterInBattle characterReceive;
+  private final List<UUID> characterIds;
   private List<BattleStatusDetailEntity> battleStatusDetailEntities;
   private List<BattleProcessDetailEntity> battleProcessDetailEntities;
+
+  private UUID currentAttackerId;
+  private UUID currentDefenderId;
+
+  private Map<UUID, Integer> attackLikelihoodMap;
 
   private int battleStatusCount;
   private int battleProcessCount;
@@ -44,32 +46,29 @@ public class Battlefield {
     this.characterInit = characterInit;
     this.characterReceive = characterReceive;
     this.battleId = battleId;
-    initBattle();
+    this.currentAttackerId = characterInit.getCharacterId();
+    this.currentDefenderId = characterReceive.getCharacterId();
+    characterIds = List.of(characterInit.getCharacterId(), characterReceive.getCharacterId());
+    initBattle(characterInit, characterReceive);
   }
 
-  private void initBattle() {
-    logger.info("add id to character map");
+  private void initBattle(CharacterInBattle characterInit, CharacterInBattle characterReceive) {
+    characterReverseMap = new HashMap<>();
     idToCharacterMap = new HashMap<>();
-    idToCharacterMap.put(characterInit.getCharacterId(), characterInit);
-    idToCharacterMap.put(characterReceive.getCharacterId(), characterReceive);
     logger.info("create attack member list");
     battleStatusDetailEntities = new ArrayList<>();
     battleProcessDetailEntities = new ArrayList<>();
     battleStatusCount = 0;
     battleProcessCount = 0;
-    battleParticipantsIds = new ArrayList<>(2);
-    battleParticipantsIds.addAll(
-        List.of(characterInit.getCharacterId(), characterReceive.getCharacterId()));
     logger.info("create character reverse map");
-    characterReverseMap = new HashMap<>();
     characterReverseMap.put(characterInit.getCharacterId(), Boolean.FALSE);
     characterReverseMap.put(characterReceive.getCharacterId(), Boolean.FALSE);
+    idToCharacterMap.put(characterInit.getCharacterId(), characterInit);
+    idToCharacterMap.put(characterReceive.getCharacterId(), characterReceive);
     logger.info("create hide index map");
-    this.MAX_HIDE_INDEX_DIFF =
-        MAXIMUM_INTELLIGENCE + MAXIMUM_SPEED - MINIMUM_SPEED - MINIMUM_INTELLIGENCE;
+    this.MAX_HIDE_INDEX_DIFF = MAXIMUM_SPEED - MINIMUM_SPEED;
     calculateHideIndex();
-    logger.info("calculate attack repeat index");
-    calculateAttackRepeatIndex();
+    calculateAttackLikelihood();
   }
 
   private void calculateHideIndex() {
@@ -102,27 +101,21 @@ public class Battlefield {
     hideIndexMap.put(receiveId, receiveHideIndex);
   }
 
-  private void calculateAttackRepeatIndex() {
+  private void calculateAttackLikelihood() {
+    attackLikelihoodMap = new HashMap<>();
+    int attackEnhance =
+            (int)
+                    (200
+                            * ((double)
+                            Math.abs(
+                                    characterInit.getIntelligence() - characterReceive.getIntelligence())
+                            / MAXIMUM_INTELLIGENCE));
     if (characterInit.getIntelligence() > characterReceive.getIntelligence()) {
-      characterInit.setSmarter(true);
-      characterReceive.setSmarter(false);
-    }
-    if (characterInit.getIntelligence() < characterReceive.getIntelligence()) {
-      characterInit.setSmarter(false);
-      characterReceive.setSmarter(true);
-    }
-    // intelligence advantage expands the opportunity to attack.
-    if (characterInit.getSmarter() || characterReceive.getSmarter()) {
-      this.attackRepeatIndex =
-          (int)
-              (100
-                  * ((double)
-                          Math.abs(
-                              characterInit.getIntelligence() - characterReceive.getIntelligence())
-                      / MAXIMUM_INTELLIGENCE));
-      logger.info("attack repeat index is set to {}", this.attackRepeatIndex);
+      attackLikelihoodMap.put(characterInit.getCharacterId(), attackEnhance);
+      attackLikelihoodMap.put(characterReceive.getCharacterId(), 100);
     } else {
-      this.attackRepeatIndex = 0;
+      attackLikelihoodMap.put(characterInit.getCharacterId(), 100);
+      attackLikelihoodMap.put(characterReceive.getCharacterId(), attackEnhance);
     }
   }
 
@@ -168,7 +161,6 @@ public class Battlefield {
   }
 
   public void processBattle() {
-    // TODO: 2023/8/25 check energy condition before next battle
     logger.info("--------------------new battle process start----------------------------");
     battleStatusCount++;
     battleProcessCount++;
@@ -188,8 +180,7 @@ public class Battlefield {
         BattleProcessDetailEntityBuilder.newBuilder();
     battleProcessDetailEntityBuilder
         .setBattleId(battleId)
-            .setAttackerId(attackSide.getCurrentCharacterEntity().getCharacterId())
-        .setAttackerEnergyLoss(1)
+        .setAttackerId(currentAttackerId)
         .setBattleProcessRoundNumber(battleProcessCount)
         .setAttackerEnergyLoss(attackSide.getEnergyConsume())
         .setAttackSkill("");
@@ -212,52 +203,47 @@ public class Battlefield {
 
   public void checkReverse() {
     if (characterInit.getReversed() && !characterReverseMap.get(characterInit.getCharacterId())) {
-      reverseBattlefield(characterInit.getCharacterId());
+      updateBattleIndex();
       characterReverseMap.put(characterInit.getCharacterId(), Boolean.TRUE);
     }
     if (characterReceive.getReversed()
         && !characterReverseMap.get(characterReceive.getCharacterId())) {
-      reverseBattlefield(characterReceive.getCharacterId());
+      updateBattleIndex();
       characterReverseMap.put(characterReceive.getCharacterId(), Boolean.TRUE);
     }
   }
 
-  public void attackReset() {
-    // if the attack side get the chance to attack again:
-    if (idToCharacterMap.get(battleParticipantsIds.get(0)).getSmarter()) {
-      if (RandomGenerator.generateInteger(1, 100) <= attackRepeatIndex) {
-        logger.info("attack/defense continue...");
-        return;
-      }
+  // this function is used to determine which character got the chance to attack.
+  // |------------attack---------|----defend----| which zone the number locate in determines which side got the chance
+  // to attack.
+  public void refreshAttackSide() {
+    int value = RandomGenerator.generateInteger(
+            1,
+            attackLikelihoodMap.get(characterInit.getCharacterId())+ attackLikelihoodMap.get(characterReceive.getCharacterId()));
+    if (value<=attackLikelihoodMap.get(characterInit.getCharacterId())) {
+      currentAttackerId = characterInit.getCharacterId();
+      currentDefenderId = characterReceive.getCharacterId();
+    } else {
+      currentDefenderId = characterInit.getCharacterId();
+      currentAttackerId = characterReceive.getCharacterId();
     }
-    // otherwise swap the attack and defense
-    var temp = battleParticipantsIds.get(0);
-    battleParticipantsIds.set(0, battleParticipantsIds.get(1));
-    battleParticipantsIds.set(1, temp);
-    logger.info("attack/defense reverse...");
   }
 
   private boolean hideSuccess() {
-    int hideIndex = hideIndexMap.get(battleParticipantsIds.get(1));
+    int hideIndex = hideIndexMap.get(characterIds.get(1));
     return RandomGenerator.generateInteger(1, 100) < hideIndex;
   }
 
-  private void reverseBattlefield(UUID characterId) {
-    String name = idToCharacterMap.get(characterId).getName().toString();
-    logger.info("{} is reversed, reverse battle field", name);
-    logger.info("recalculate hide index...");
+  private void updateBattleIndex() {
     calculateHideIndex();
-    logger.info("hide index has been reset to be {}", hideIndexMap.get(characterId));
-    logger.info("recalculate attack repeat index...");
-    calculateAttackRepeatIndex();
-    logger.info("attack repeat index has been reset to be {}", attackRepeatIndex);
+    calculateAttackLikelihood();
   }
 
   public CharacterInBattle getAttackSide() {
-    return idToCharacterMap.get(battleParticipantsIds.get(0));
+    return idToCharacterMap.get(currentAttackerId);
   }
 
   public CharacterInBattle getDefenseSide() {
-    return idToCharacterMap.get(battleParticipantsIds.get(1));
+    return idToCharacterMap.get(currentDefenderId);
   }
 }

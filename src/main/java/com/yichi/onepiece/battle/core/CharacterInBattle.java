@@ -3,6 +3,7 @@ package com.yichi.onepiece.battle.core;
 import com.yichi.onepiece.battle.model.CurrentCharacterEntityBuilder;
 import com.yichi.onepiece.battle.model.CurrentCharacterEntityImpl;
 import com.yichi.onepiece.character.model.entity.CharacterEntity;
+import com.yichi.onepiece.fruit.model.FruitEntity;
 import com.yichi.onepiece.fruit.model.FruitListView;
 import com.yichi.onepiece.model.I18nText;
 import java.util.List;
@@ -14,19 +15,16 @@ public class CharacterInBattle {
   Logger logger = LoggerFactory.getLogger(CharacterInBattle.class);
   private final int score;
 
-  // energy consume for character's ordinary attack without and fruit.
-  private static final int DEFAULT_ENERGY_CONSUME = 1;
+  // energy consume for character's ordinary attack without any fruit.
+  private static final int DEFAULT_ENERGY_CONSUME = 2;
+  private static final int DEFENDING_ENERGY_CONSUME = 1;
   private int minimumFruitEnergy;
   private final UUID characterId;
   private final I18nText name;
-  private int intelligence;
-  private int energyConsume = 1;
   private boolean defeated;
-  private boolean smarter;
   private boolean reversed;
-  private AttackEntity attackEntity;
   private final CharacterEntity baseEntity;
-  private CurrentCharacterEntityImpl currentCharacterEntity;
+  private CurrentCharacterEntityImpl currentCharacter;
 
   List<FruitListView> fruitEntities;
 
@@ -36,72 +34,49 @@ public class CharacterInBattle {
     this.name = baseEntity.getName();
     this.defeated = false;
     this.reversed = false;
-    this.smarter = false;
     this.characterId = baseEntity.getId();
     this.score = baseEntity.getScore();
-    initWithFruit(baseEntity);
-    initAttackEntity();
+    initCurrentCharacter(baseEntity);
   }
 
-  private void initWithFruit(CharacterEntity baseEntity) {
+  private void initCurrentCharacter(CharacterEntity baseEntity) {
     minimumFruitEnergy = baseEntity.getEnergy()/10;
-    energyConsume = DEFAULT_ENERGY_CONSUME;
-    int blood = baseEntity.getBlood();
-    int attack = baseEntity.getAttack();
-    int defense = baseEntity.getDefense();
-    int intelligence = baseEntity.getIntelligence();
-    int speed = baseEntity.getSpeed();
-    this.intelligence = intelligence;
-    this.currentCharacterEntity =
-        (CurrentCharacterEntityImpl)
-            CurrentCharacterEntityBuilder.newBuilder()
-                .setAttack(attack)
-                .setBlood(blood)
-                .setDefense(defense)
-                    .setIntelligence(intelligence)
-                .setCurrentEnergy(baseEntity.getEnergy())
-                .setCurrentEnergyConsume(energyConsume)
-                .setSpeed(speed)
-                .build();
+    this.currentCharacter =
+            (CurrentCharacterEntityImpl)
+                    CurrentCharacterEntityBuilder.newBuilder()
+                            .setAttack(baseEntity.getAttack())
+                            .setBlood(baseEntity.getBlood())
+                            .setDefense(baseEntity.getDefense())
+                            .setIntelligence(baseEntity.getIntelligence())
+                            .setCurrentEnergy(baseEntity.getEnergy())
+                            .setCurrentEnergyConsume(
+                                    DEFAULT_ENERGY_CONSUME +
+                                            fruitEntities.stream().mapToInt(FruitEntity::getEnergyConsume).sum())
+                            .setSpeed(baseEntity.getSpeed())
+                            .build();
   }
-
-  private void initAttackEntity() {
-    this.attackEntity =
-        AttackEntityBuilder.newBuilder().setAttack(currentCharacterEntity.getAttack()).build();
-  }
-
   public boolean getReversed() {
     return reversed;
   }
-
   public boolean isAlive() {
     return !defeated;
   }
 
   public int getScore() {return score;}
-
-  public int getBlood() {
-    return currentCharacterEntity.getBlood();
-  }
-
-  public int getSpeed() {
-    return currentCharacterEntity.getSpeed();
-  }
-
   public I18nText getName() {
     return name;
   }
 
-  public boolean getSmarter() {
-    return smarter;
+  public int getBlood() {
+    return currentCharacter.getBlood();
+  }
+
+  public int getSpeed() {
+    return currentCharacter.getSpeed();
   }
 
   public int getEnergyConsume() {
-    return energyConsume;
-  }
-
-  public void setSmarter(boolean smarter) {
-    this.smarter = smarter;
+    return currentCharacter.getCurrentEnergyConsume();
   }
 
   public UUID getCharacterId() {
@@ -109,52 +84,48 @@ public class CharacterInBattle {
   }
 
   public int getIntelligence() {
-    return intelligence;
+    return currentCharacter.getIntelligence();
   }
 
   public AttackEntity attack() {
-    if(currentCharacterEntity.getCurrentEnergy()<energyConsume) {
+    if(currentCharacter.getCurrentEnergy()<currentCharacter.getCurrentEnergyConsume()
+            || currentCharacter.getBlood()<=0) {
       defeated = true;
     }
-    if (currentCharacterEntity.getCurrentEnergy() < minimumFruitEnergy && !reversed) {
+    if (currentCharacter.getCurrentEnergy() < minimumFruitEnergy && !reversed) {
       reverseCharacter();
       reversed = true;
-      logger.info("run out of magic, reverse {}", name);
     }
-    currentCharacterEntity.setCurrentEnergy(currentCharacterEntity.getCurrentEnergy()-energyConsume);
-    logger.info("{} attack with power {}", name, currentCharacterEntity.getCurrentEnergy());
-    return attackEntity;
+    return AttackEntityBuilder.newBuilder()
+            .setAttack(currentCharacter.getAttack()).build();
   }
 
   // the order of return list is: blood loss, and energy loss.
   public List<Integer> defend(AttackEntity attackEntity) {
-    if (!reversed) {
-      reverseCharacter();
-      reversed = true;
-    }
-    int blood = currentCharacterEntity.getBlood();
+    int blood = currentCharacter.getBlood();
     if (blood <= 0) {
       this.defeated = true;
       return List.of(0, 0);
     }
-    int bloodLoss = Math.max(attackEntity.getAttack() - currentCharacterEntity.getDefense(), 0);
-    currentCharacterEntity.setBlood(blood - bloodLoss);
-    return List.of(bloodLoss, 0);
+    int bloodLoss = Math.max(attackEntity.getAttack() - currentCharacter.getDefense(), 0);
+    currentCharacter.setBlood(blood - bloodLoss);
+    return List.of(bloodLoss, DEFENDING_ENERGY_CONSUME);
   }
 
   public CurrentCharacterEntityImpl getCurrentCharacterEntity() {
-    return currentCharacterEntity;
+    return currentCharacter;
   }
 
   private void reverseCharacter() {
-    // blood strengthen can not be reversed.
-    logger.info("{} is reversed, attack, defense, intelligence, speed are reset", name);
-    currentCharacterEntity.setAttack(baseEntity.getAttack());
-    currentCharacterEntity.setDefense(baseEntity.getDefense());
-    currentCharacterEntity.setSpeed(baseEntity.getSpeed());
-    currentCharacterEntity.setCurrentEnergyConsume(DEFAULT_ENERGY_CONSUME);
-    this.intelligence = baseEntity.getIntelligence();
-    // refresh attackEntity
-    attackEntity = attackEntity.toBuilder().setAttack(currentCharacterEntity.getAttack()).build();
+    currentCharacter = (CurrentCharacterEntityImpl)
+            CurrentCharacterEntityBuilder.newBuilder()
+                    .setAttack(baseEntity.getBaseAttack())
+                    .setBlood(currentCharacter.getBlood())
+                    .setDefense(baseEntity.getBaseDefense())
+                    .setIntelligence(baseEntity.getBaseIntelligence())
+                    .setCurrentEnergy(currentCharacter.getCurrentEnergy())
+                    .setCurrentEnergyConsume(DEFAULT_ENERGY_CONSUME)
+                    .setSpeed(baseEntity.getBaseSpeed())
+                    .build();
   }
 }
