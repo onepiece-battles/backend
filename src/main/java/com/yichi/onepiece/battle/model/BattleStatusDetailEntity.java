@@ -12,11 +12,9 @@ public interface BattleStatusDetailEntity {
 
   Integer getBattleStatusRoundNumber();
 
-  I18nText getAttackSide();
+  CurrentCharacterEntity getInitSide();
 
-  CurrentCharacterEntity getAttacker();
-
-  CurrentCharacterEntity getDefender();
+  CurrentCharacterEntity getReceiveSide();
 
   BattleStatusDetailEntityBuilder toBuilder();
 }

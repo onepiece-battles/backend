@@ -1,21 +1,16 @@
 package com.yichi.onepiece.data_export.service;
 
 import com.itextpdf.io.font.PdfEncodings;
-import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
-import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.events.IEventHandler;
 import com.itextpdf.kernel.events.PdfDocumentEvent;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
-import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
-import com.itextpdf.kernel.pdf.colorspace.PdfColorSpace;
-import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.Document;
@@ -23,13 +18,10 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.properties.*;
-import com.itextpdf.layout.renderer.DocumentRenderer;
-import com.itextpdf.layout.renderer.DrawContext;
-import com.lowagie.text.Row;
-import com.itextpdf.kernel.colors.Color;
 import com.yichi.onepiece.alicloud.AliCloudObjectStorage;
 import com.yichi.onepiece.battle.model.BattleProcessDetailEntity;
 import com.yichi.onepiece.battle.model.BattleStatusDetailEntity;
+import com.yichi.onepiece.battle.model.CurrentCharacterEntity;
 import com.yichi.onepiece.battle.service.BattleService;
 import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.file.model.FileCategory;
@@ -40,28 +32,18 @@ import com.yichi.onepiece.model.BattleReportStage;
 import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.OnepieceLocale;
 import com.yichi.onepiece.model.UserRole;
-
-import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
-
-import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
-import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
-import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import com.yichi.onepiece.utils.I18nHelper;
 import org.apache.commons.lang3.ArrayUtils;
-import org.checkerframework.checker.units.qual.C;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Nullable;
 
 @Service
 public class DataExportService {
@@ -93,6 +75,7 @@ public class DataExportService {
   public void generateBattleResultPdf(UUID battleId, String userEmail, String locale, UUID userId, String roleName) {
     logger.info("start getting source data for report generation");
     var battleEntity = battleService.findBattleById(battleId);
+    var battleExecutionEntity = battleService.getBattleExecution(battleId);
     var userEntity = userService.getUserEntityById(userId);
     var statusList = battleService.listBattleStatusDetailByBattleId(battleId);
     var processList = battleService.listBattleProcessDetailByBattleId(battleId);
@@ -105,7 +88,7 @@ public class DataExportService {
       float smallImageHeight = 30;
       String fontPath = "/font/NotoSansCJKsc-Regular.otf";
       PdfFont font = PdfFontFactory.createFont(fontPath, PdfEncodings.IDENTITY_H);
-      PdfFont fontBold = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+//      PdfFont fontBold = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
       logger.info("start creating files");
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
       PdfWriter writer = new PdfWriter(outputStream);
@@ -123,14 +106,19 @@ public class DataExportService {
       // create image
       ImageData starterImageData = ImageDataFactory.create(ArrayUtils.toPrimitive(starterCharacter.getProfileImage()));
       Image starterImage = new Image(starterImageData)
-              .scaleToFit(100, 100).setHorizontalAlignment(HorizontalAlignment.CENTER);
+              .scaleToFit(imageWidth, imageHeight).setHorizontalAlignment(HorizontalAlignment.CENTER);
       ImageData receiverImageData = ImageDataFactory.create(ArrayUtils.toPrimitive(receiverCharacter.getProfileImage()));
       Image receiverImage = new Image(receiverImageData)
-              .scaleToFit(100, 100).setHorizontalAlignment(HorizontalAlignment.CENTER);
+              .scaleToFit(imageWidth, imageHeight).setHorizontalAlignment(HorizontalAlignment.CENTER);
+
+      Image starterImageSmall = new Image(starterImageData)
+              .scaleToFit(smallImageWidth, smallImageHeight).setHorizontalAlignment(HorizontalAlignment.CENTER);
+      Image receiverImageSmall = new Image(receiverImageData)
+              .scaleToFit(smallImageWidth, smallImageHeight).setHorizontalAlignment(HorizontalAlignment.CENTER);
       String starterName = locale.equals(OnepieceLocale.ZH_CN.getValue())?
               starterCharacter.getName().getZhCN():starterCharacter.getName().getEnUS();
       String receiverName = locale.equals(OnepieceLocale.ZH_CN.getValue())?
-              receiverCharacter.getName().getZhCN():starterCharacter.getName().getEnUS();
+              receiverCharacter.getName().getZhCN():receiverCharacter.getName().getEnUS();
 
       // Add space at the top of the table
       Paragraph space = new Paragraph("\n"); // Empty paragraph for space
@@ -138,32 +126,48 @@ public class DataExportService {
       document.add(space);
       Table table = new Table(3);
       var starterImageCell = createImageCell(starterImage, imageWidth, imageHeight);
-      var startNameCell = createTextCell(starterName,20, new DeviceRgb(16, 85, 154), font);
+      var startNameCell = createTextCell(starterName,20, new DeviceRgb(16, 85, 154), font, 100, 60);
       var receiverImageCell = createImageCell(receiverImage, imageWidth, imageHeight);
-      var receiverNameCell = createTextCell(receiverName,20, new DeviceRgb(16, 85, 154), font);
-      var vsCell =  createTextCell("VS",30, new DeviceRgb(16, 85, 154), font);
+      var receiverNameCell = createTextCell(receiverName,20, new DeviceRgb(16, 85, 154), font, 100, 60);
+      var vsCell =  createTextCell("VS",30, new DeviceRgb(16, 85, 154), font, 100, 60);
       var emptyCell = createTextCell("",20, new DeviceRgb(16, 85, 154), font);
+      var winnerImageCell = battleExecutionEntity.getWinnerId() == battleEntity.getStarterId()?
+              createImageCell(starterImage, imageWidth, imageHeight):
+              createImageCell(receiverImage, imageWidth, imageHeight);
+      var winnerCell =  createTextCell(locale.equals(OnepieceLocale.ZH_CN.getValue())?
+              "获胜者":"WINNER",30, new DeviceRgb(16, 85, 154), font, 100, 60);
 
-      var smallStarterImageCell = createImageCell(starterImage, smallImageWidth, smallImageHeight);
-      var smallReceiverImageCell = createImageCell(receiverImage, smallImageWidth, smallImageHeight);
+      var smallStarterImageCell = createImageCell(starterImageSmall, smallImageWidth, smallImageHeight);
+      var smallReceiverImageCell = createImageCell(receiverImageSmall, smallImageWidth, smallImageHeight);
 
       table.addCell(starterImageCell)
               .addCell(vsCell)
               .addCell(receiverImageCell)
               .addCell(startNameCell)
               .addCell(emptyCell)
-              .addCell(receiverNameCell);
-
+              .addCell(receiverNameCell)
+              .addCell(createEmptyCell(100,100))
+              .addCell(emptyCell)
+              .addCell(emptyCell)
+              .addCell(emptyCell)
+              .addCell(winnerCell)
+              .addCell(emptyCell)
+              .addCell(emptyCell)
+              .addCell(winnerImageCell)
+              .addCell(emptyCell);
 
       table.setHorizontalAlignment(HorizontalAlignment.CENTER);
       document.add(table);
       document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+      document.add(new Paragraph(locale.equals(OnepieceLocale.ZH_CN.getValue())?
+              "战斗详情":"BATTLE DETAILS").setFont(font).setFontSize(25))
+              .setHorizontalAlignment(HorizontalAlignment.CENTER).setTextAlignment(TextAlignment.CENTER);
       int i = 0;
       for (; i < processList.size(); i++) {
-        document.add(getBattleStatusBlock(starterCharacter.getId(),smallStarterImageCell, smallReceiverImageCell, statusList.get(i), locale, font));
-        document.add(getBattleProcessBlock(processList.get(i), locale, font));
+        document.add(getBattleStatusBlock(smallStarterImageCell, smallReceiverImageCell, statusList.get(i), locale, font));
+        document.add(getBattleProcessBlock(processList.get(i), locale, font, starterCharacter.getId()));
       }
-      document.add(getBattleStatusBlock(starterCharacter.getId(),smallStarterImageCell, smallReceiverImageCell, statusList.get(i), locale, font));
+      document.add(getBattleStatusBlock(smallStarterImageCell, smallReceiverImageCell, statusList.get(i), locale, font));
       document.setMargins(10, 20, 10, 20);
       document.close();
       writer.close();
@@ -195,23 +199,47 @@ public class DataExportService {
     }
   }
 
-  private Cell createTextCell(String text, float fontSize, DeviceRgb fontColor, PdfFont font) {
+  private Cell createTextCell(String text,
+                              float fontSize,
+                              DeviceRgb fontColor,
+                              PdfFont font) {
     Cell cell = new Cell();
     cell.add(new Paragraph(text)
                     .setFont(font)
-                    .setHeight(100)
+                    .setHeight(30)
                     .setWidth(100)
             .setFontSize(fontSize)
             .setFontColor(fontColor, 255)
            .setTextAlignment(TextAlignment.CENTER)
             .setVerticalAlignment(VerticalAlignment.MIDDLE));
-    cell.setTextAlignment(TextAlignment.CENTER);
+    cell.setTextAlignment(TextAlignment.LEFT);
+    cell.setVerticalAlignment(VerticalAlignment.TOP);
     cell.setBorder(Border.NO_BORDER);
     return cell;
   }
 
-  private Cell createEmptyCell() {
-    return new Cell().setBorder(Border.NO_BORDER);
+  private Cell createTextCell(String text, float fontSize, DeviceRgb fontColor, PdfFont font, float width, float height) {
+    Cell cell = new Cell();
+    cell.add(new Paragraph(text)
+            .setFont(font)
+            .setHeight(height)
+            .setWidth(width)
+            .setFontSize(fontSize)
+            .setFontColor(fontColor, 255)
+            .setTextAlignment(TextAlignment.CENTER)
+            .setVerticalAlignment(VerticalAlignment.MIDDLE));
+    cell.setTextAlignment(TextAlignment.LEFT);
+    cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
+    cell.setBorder(Border.NO_BORDER);
+    return cell;
+  }
+
+  private Cell createEmptyCell(float width) {
+    return new Cell().setBorder(Border.NO_BORDER).setWidth(width);
+  }
+
+  private Cell createEmptyCell(float width, float height) {
+    return new Cell().setBorder(Border.NO_BORDER).setWidth(width).setHeight(height);
   }
 
   private Cell createImageCell(Image image, float imageWidth, float imageHeight) {
@@ -282,45 +310,72 @@ public class DataExportService {
   }
 
   private Table getBattleStatusBlock(
-          UUID starterId,
           Cell starterImageCell,
-          Cell receiverImageCell, BattleStatusDetailEntity battleStatusDetailEntity, String locale, PdfFont font) {
-    Table table = new Table(4);
-    var starter = battleStatusDetailEntity.getAttacker();
-    var receiver = battleStatusDetailEntity.getDefender();
-    if (starter.getCharacterId()!=starterId) {
-      receiver = starter;
-      starter = battleStatusDetailEntity.getDefender();
-    }
+          Cell receiverImageCell,
+          BattleStatusDetailEntity battleStatusDetailEntity,
+          String locale,
+          PdfFont font) {
+    Table table = new Table(6);
+    CurrentCharacterEntity starter = battleStatusDetailEntity.getInitSide();
+    CurrentCharacterEntity receiver = battleStatusDetailEntity.getReceiveSide();
+
+    Paragraph starterBlood = new Paragraph(String.format("%s %s \n",I18nHelper.getTextByLocal(
+                    new I18nText().zhCN("剩余血量").enUS("Blood left"), locale),
+            starter.getBlood())).setFont(font)
+            .setFontSize(8)
+            .setTextAlignment(TextAlignment.LEFT);;
+    Paragraph starterEnergy = new Paragraph(String.format("%s %s \n",I18nHelper.getTextByLocal(
+                    new I18nText().zhCN("剩余能量").enUS("Energy left"), locale),
+            starter.getCurrentEnergy())).setFont(font)
+            .setFontSize(8)
+            .setTextAlignment(TextAlignment.LEFT);;
+
+    Paragraph receiverBlood = new Paragraph(String.format("%s %s \n",I18nHelper.getTextByLocal(
+                    new I18nText().zhCN("剩余血量").enUS("Blood left"), locale), receiver.getBlood())).setFont(font)
+            .setFontSize(8)
+            .setTextAlignment(TextAlignment.RIGHT);;
+    Paragraph receiverEnergy = new Paragraph(String.format("%s %s \n",I18nHelper.getTextByLocal(
+                    new I18nText().zhCN("剩余能量").enUS("Energy left"), locale), receiver.getCurrentEnergy())).setFont(font)
+            .setFontSize(8)
+            .setTextAlignment(TextAlignment.RIGHT);;
+
+    Cell starterCell = new Cell()
+            .setHeight(30).setWidth(300)
+            .setFont(font).setFontColor(new DeviceRgb(16, 85, 154)).setFontSize(10).setBorder(Border.NO_BORDER);
+    starterCell.add(starterBlood);
+    starterCell.add(starterEnergy);
+
+    Cell receiverCell = new Cell()
+            .setHeight(30).setWidth(300)
+            .setFont(font).setFontColor(new DeviceRgb(16, 85, 154)).setFontSize(10).setBorder(Border.NO_BORDER);
+    receiverCell.add(receiverBlood);
+    receiverCell.add(receiverEnergy);
 
 
-    var starterBlood = createTextCell(String.format("%s %s \n",I18nHelper.getTextByLocal(
-                    new I18nText().zhCN("剩余血量").enUS("Remaining blood volume"), locale),
-            starter.getBlood()), 20, new DeviceRgb(16, 85, 154), font);
-    var receiverBlood = createTextCell(String.format("%s %s \n",I18nHelper.getTextByLocal(
-                    new I18nText().zhCN("剩余血量").enUS("Remaining blood volume"), locale),
-            receiver.getBlood()), 20, new DeviceRgb(16, 85, 154), font);
-
-    var starterEnergy = createTextCell(String.format("%s %s \n",I18nHelper.getTextByLocal(
-                    new I18nText().zhCN("剩余能量").enUS("Remaining energy volume"), locale),
-            starter.getCurrentEnergy()), 20, new DeviceRgb(16, 85, 154), font);
-    var receiverEnergy = createTextCell(String.format("%s %s \n",I18nHelper.getTextByLocal(
-                    new I18nText().zhCN("剩余能量").enUS("Remaining energy volume"), locale),
-            receiver.getCurrentEnergy()), 20, new DeviceRgb(16, 85, 154), font);
-
-    table.addCell(starterImageCell).addCell(createEmptyCell()).addCell(createEmptyCell()).addCell(receiverImageCell);
-
-    table.addCell(starterBlood).addCell(createEmptyCell()).addCell(createEmptyCell()).addCell(receiverBlood);
-    table.addCell(starterEnergy).addCell(createEmptyCell()).addCell(createEmptyCell()).addCell(receiverEnergy);
-
+    table.addCell(starterImageCell)
+            .addCell(starterCell)
+            .addCell(createEmptyCell(200))
+            .addCell(createEmptyCell(200))
+            .addCell(receiverCell)
+            .addCell(receiverImageCell);
     table.setTextAlignment(TextAlignment.CENTER);
     return table;
   }
 
   private Paragraph getBattleProcessBlock(
-          BattleProcessDetailEntity battleProcessDetail, String locale, PdfFont font) {
+          BattleProcessDetailEntity battleProcessDetail, String locale, PdfFont font, UUID starterId) {
     Paragraph paragraph = new Paragraph();
     paragraph.setFont(font);
+    paragraph.add(String.format("%s \n",I18nHelper.getTextByLocal(
+            new I18nText().zhCN(String.format("第 %s 回合", battleProcessDetail.getBattleProcessRoundNumber()))
+                    .enUS(String.format("Round %s", battleProcessDetail.getBattleProcessRoundNumber())), locale)));
+    if (battleProcessDetail.getAttackerId().equals(starterId)) {
+      paragraph.add(String.format("%s \n",I18nHelper.getTextByLocal(
+              new I18nText().zhCN(">>> 进攻 >>>").enUS(">>> ATTACK >>>"), locale)));
+    } else {
+      paragraph.add(String.format("%s \n",I18nHelper.getTextByLocal(
+              new I18nText().zhCN("<<< 进攻 <<<").enUS("<<< ATTACK <<<"), locale)));
+    }
     if (battleProcessDetail.getAttackMissed()) {
       paragraph.add(String.format("%s \n",I18nHelper.getTextByLocal(
               new I18nText().zhCN("进攻被躲避").enUS("Attack missed"), locale)));
