@@ -144,9 +144,9 @@ public class BattleService {
     battleExecutionDao.update(battleExecutionEntity);
   }
 
-  public BattleExecution getBattleExecution(GetBattleExecutionRequest request) {
+  public BattleExecution getBattleExecution(UUID battleId) {
     var battleExecutionEntity =
-        battleExecutionDao.findByBattleId(request.getBattleId()).orElseThrow();
+        battleExecutionDao.findByBattleId(battleId).orElseThrow();
     return BattleConverter.INSTANCE.toBattleExecution(battleExecutionEntity);
   }
 
@@ -217,6 +217,7 @@ public class BattleService {
         battleExecutionBuilder.setBattleStatus(BattleStatus.FAILED);
         battleExecution = battleExecutionBuilder.build();
         battleExecutionDao.update(battleExecution);
+        return;
       }
       battlefield.checkReverse();
       battlefield.processBattle();

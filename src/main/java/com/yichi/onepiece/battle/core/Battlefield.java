@@ -145,9 +145,8 @@ public class Battlefield {
         BattleStatusDetailEntityBuilder.newBuilder()
             .setBattleId(battleId)
             .setBattleStatusRoundNumber(battleStatusCount)
-            .setAttackSide(new I18nText())
-            .setAttacker(characterInit.getCurrentCharacterEntity())
-            .setDefender(characterReceive.getCurrentCharacterEntity())
+            .setInitSide(characterInit.getCurrentCharacterEntity())
+            .setReceiveSide(characterReceive.getCurrentCharacterEntity())
             .build();
     battleStatusDetailEntities.add(battleStatusDetailEntity);
   }
@@ -161,7 +160,6 @@ public class Battlefield {
   }
 
   public void processBattle() {
-    logger.info("--------------------new battle process start----------------------------");
     battleStatusCount++;
     battleProcessCount++;
     var attackSide = getAttackSide();
@@ -170,12 +168,10 @@ public class Battlefield {
         BattleStatusDetailEntityBuilder.newBuilder()
             .setBattleId(battleId)
             .setBattleStatusRoundNumber(battleStatusCount)
-            .setAttackSide(attackSide.getName())
-            .setAttacker(attackSide.getCurrentCharacterEntity())
-            .setDefender(defenseSide.getCurrentCharacterEntity())
+            .setInitSide(characterInit.getCurrentCharacterEntity())
+            .setReceiveSide(characterReceive.getCurrentCharacterEntity())
             .build();
     battleStatusDetailEntities.add(battleStatusDetailEntity);
-    logger.info("attack side: {}, defense side: {}", attackSide.getName(), defenseSide.getName());
     BattleProcessDetailEntityBuilder battleProcessDetailEntityBuilder =
         BattleProcessDetailEntityBuilder.newBuilder();
     battleProcessDetailEntityBuilder
@@ -184,8 +180,8 @@ public class Battlefield {
         .setBattleProcessRoundNumber(battleProcessCount)
         .setAttackerEnergyLoss(attackSide.getEnergyConsume())
         .setAttackSkill("");
-
     var attackEntity = attackSide.attack();
+    // update attacker information
     if (!hideSuccess()) {
       battleProcessDetailEntityBuilder.setAttackMissed(Boolean.FALSE);
       // the order of return list is: blood loss, magic loss and energy loss.
@@ -195,10 +191,8 @@ public class Battlefield {
           .setDefenderEnergyLoss(defenseResult.get(1));
     } else {
       battleProcessDetailEntityBuilder.setAttackMissed(Boolean.TRUE).setDefenderBloodLoss(0).setDefenderEnergyLoss(0);
-      logger.info("{} hide SUCCESS, no damage is casted", defenseSide.getName());
     }
     battleProcessDetailEntities.add(battleProcessDetailEntityBuilder.build());
-    logger.info("---------------------new battle process end-----------------------------");
   }
 
   public void checkReverse() {
@@ -221,9 +215,11 @@ public class Battlefield {
             1,
             attackLikelihoodMap.get(characterInit.getCharacterId())+ attackLikelihoodMap.get(characterReceive.getCharacterId()));
     if (value<=attackLikelihoodMap.get(characterInit.getCharacterId())) {
+      logger.info("init");
       currentAttackerId = characterInit.getCharacterId();
       currentDefenderId = characterReceive.getCharacterId();
     } else {
+      logger.info("receive");
       currentDefenderId = characterInit.getCharacterId();
       currentAttackerId = characterReceive.getCharacterId();
     }

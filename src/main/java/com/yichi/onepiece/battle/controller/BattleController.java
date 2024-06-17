@@ -54,7 +54,7 @@ public class BattleController implements BattleApi {
   public ResponseEntity<BattleExecution> getBattleExecution(
       GetBattleExecutionRequest getBattleLiteRequest) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.BATTLE, Set.of(Permission.GET));
-    return ResponseEntity.ok(battleService.getBattleExecution(getBattleLiteRequest));
+    return ResponseEntity.ok(battleService.getBattleExecution(getBattleLiteRequest.getBattleId()));
   }
 
   @Override

@@ -96,6 +96,7 @@ public class CharacterInBattle {
       reverseCharacter();
       reversed = true;
     }
+    currentCharacter.setCurrentEnergy(currentCharacter.getCurrentEnergy()-currentCharacter.getCurrentEnergyConsume());
     return AttackEntityBuilder.newBuilder()
             .setAttack(currentCharacter.getAttack()).build();
   }
@@ -108,7 +109,8 @@ public class CharacterInBattle {
       return List.of(0, 0);
     }
     int bloodLoss = Math.max(attackEntity.getAttack() - currentCharacter.getDefense(), 0);
-    currentCharacter.setBlood(blood - bloodLoss);
+    currentCharacter.setBlood(currentCharacter.getBlood() - bloodLoss);
+    currentCharacter.setCurrentEnergy(currentCharacter.getCurrentEnergy() - DEFENDING_ENERGY_CONSUME);
     return List.of(bloodLoss, DEFENDING_ENERGY_CONSUME);
   }
 
