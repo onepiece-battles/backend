@@ -34,6 +34,16 @@
     <if test="groupFilter.userId != null">
       AND `user_id` = #{groupFilter.userId}
     </if>
+    <if test="groupFilter.noFather != null">
+      AND `father_group_id` is  null
+    </if>
+    <if test="groupFilter.excludedGroupIds != null and !groupFilter.excludedGroupIds.isEmpty">
+      AND `group`.`id` not in
+      <foreach item="excludedId" collection="groupFilter.excludedGroupIds" open="("
+               separator="," close=")">
+        #{excludedId}
+      </foreach>
+    </if>
     <if test="groupFilter.roleId != null">
       AND `role_id` = #{groupFilter.roleId}
     </if>

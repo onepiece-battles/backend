@@ -46,6 +46,13 @@
         <if test="characterFilter.userId != null">
             AND `user_id` = #{characterFilter.userId}
         </if>
+        <if test="characterFilter.excludedCharacterIds != null and !characterFilter.excludedCharacterIds.isEmpty">
+            AND `character`.`id` not in
+            <foreach item="excludedId" collection="characterFilter.excludedCharacterIds" open="("
+                     separator="," close=")">
+                #{excludedId}
+            </foreach>
+        </if>
         <if test="characterFilter.roleId != null">
             AND `role_id` = #{characterFilter.roleId}
         </if>
