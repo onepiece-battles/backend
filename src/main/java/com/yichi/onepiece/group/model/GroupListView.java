@@ -13,4 +13,6 @@ public interface GroupListView extends GroupEntity {
   ActionRecordEntity getModificationRecord();
 
   List<CharacterInGroupLite> getCharacterInGroup();
+
+  List<GroupEntity> getSubGroups();
 }
