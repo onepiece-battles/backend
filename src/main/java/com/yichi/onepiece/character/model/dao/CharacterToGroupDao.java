@@ -56,4 +56,16 @@ public interface CharacterToGroupDao extends BaseDao<CharacterToGroupEntity, UUI
 
   @Select("select * from character_to_group where character_id = #{characterId}")
   List<CharacterToGroupEntity> findByCharacterId(@Param("characterId") UUID characterId);
+
+  @Select({
+          "<script>",
+          "SELECT * ",
+          "FROM `character_to_group` ",
+          "WHERE `character_to_group`.`character_id` IN ",
+          "<foreach item='item' collection='characterIds' open='(' separator=',' close=')'>",
+          "  #{item}",
+          "</foreach>",
+          "</script>"
+  })
+  List<CharacterToGroupEntity> listByCharacterIds(@Param("characterIds") List<UUID> characterIds);
 }

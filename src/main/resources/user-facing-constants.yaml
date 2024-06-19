@@ -129,3 +129,7 @@ user:
       displayName:
         en-US: "Defender blood loss"
         zh-CN: "防守方血量损耗"
+    WRONG_MEMBER_TYPE:
+      displayName:
+        en-US: "This type of resource can not join this group"
+        zh-CN: "此类型资源无法加入这个团队"

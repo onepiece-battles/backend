@@ -72,6 +72,9 @@
     <association column="id" property="characterInGroup"
       select="com.yichi.onepiece.character.model.dao.CharacterToGroupDao.listCharacterInGroupLiteByGroupId"
     />
+    <association column="id" property="subGroups"
+                 select="com.yichi.onepiece.group.model.GroupDao.listChildGroups"
+    />
     <association column="creation_record_id" property="creationRecord"
                  select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
     />

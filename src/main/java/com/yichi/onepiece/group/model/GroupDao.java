@@ -27,6 +27,22 @@ public interface GroupDao extends BaseDao<GroupEntity, UUID> {
       // current user.
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
 
+
+  @Select({
+          "<script>",
+          "SELECT *",
+          "FROM group ",
+          "WHERE group.`id` IN ",
+          "<foreach item='item' collection='groupIds' open='(' separator=',' close=')'>",
+          "  #{item}",
+          "</foreach>",
+          "</script>"
+  })
+  List<GroupEntity> listByIds(@Param("groupIds") List<UUID> groupIds);
+
+  @Select("select * from `group` where `group`.`father_group_id` = #{id}")
+  List<GroupEntity> listChildGroups(@Param("id") UUID id);
+
   int count(
       @Param("groupFilter") GroupFilter groupFilter,
       @Param("userId") UUID userId,

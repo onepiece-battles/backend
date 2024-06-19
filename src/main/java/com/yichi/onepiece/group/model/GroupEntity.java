@@ -23,6 +23,8 @@ public interface GroupEntity {
 
   Long getModificationRecordId();
 
+  UUID getFatherGroupId();
+
   Boolean getSystemResource();
 
   GroupEntityBuilder toBuilder();

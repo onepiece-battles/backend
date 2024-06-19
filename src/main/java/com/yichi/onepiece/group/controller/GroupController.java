@@ -19,6 +19,22 @@ public class GroupController implements GroupApi {
   }
 
   @Override
+  public ResponseEntity<AddCharacterResponse> addCharacter(AddCharacterRequest addCharacterRequest) {
+    iamService.checkPermissionOfCurrentAccount(
+            ResourceType.GROUP, Set.of(Permission.UPDATE));
+    var response = groupService.addCharacter(addCharacterRequest);
+    return ResponseEntity.ok(response);
+  }
+
+  @Override
+  public ResponseEntity<AddGroupResponse> addGroup(AddGroupRequest addGroupRequest) {
+    iamService.checkPermissionOfCurrentAccount(
+            ResourceType.GROUP, Set.of(Permission.UPDATE));
+    var response = groupService.addGroup(addGroupRequest);
+    return ResponseEntity.ok(response);
+  }
+
+  @Override
   public ResponseEntity<CreateGroupResponse> createGroup(CreateGroupRequest createGroupRequest) {
     iamService.checkPermissionOfCurrentAccount(
         ResourceType.GROUP, Set.of(Permission.CREATE));

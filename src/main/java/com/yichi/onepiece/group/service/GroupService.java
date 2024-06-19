@@ -1,6 +1,10 @@
 package com.yichi.onepiece.group.service;
 
 import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.GROUP_CREATION_SUCCESS;
+
+import com.yichi.onepiece.character.model.dao.CharacterToGroupDao;
+import com.yichi.onepiece.character.model.entity.CharacterToGroupEntity;
+import com.yichi.onepiece.character.model.entity.CharacterToGroupEntityBuilder;
 import com.yichi.onepiece.group.model.GroupConverter;
 import com.yichi.onepiece.group.model.GroupDao;
 import com.yichi.onepiece.group.model.GroupEntity;
@@ -22,17 +26,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class GroupService {
   Logger logger = LoggerFactory.getLogger(GroupService.class);
-
   private static final ResourceType RESOURCE_TYPE = ResourceType.GROUP;
   private final GroupDao groupDao;
+  private final CharacterToGroupDao characterToGroupDao;
   private final ActionRecordService actionRecordService;
   private final UserService userService;
 
   public GroupService(
       GroupDao groupDao,
+      CharacterToGroupDao characterToGroupDao,
       ActionRecordService actionRecordService,
       UserService userService) {
     this.groupDao = groupDao;
+    this.characterToGroupDao = characterToGroupDao;
     this.actionRecordService = actionRecordService;
     this.userService = userService;
   }
@@ -77,6 +83,83 @@ public class GroupService {
             .toList();
     return new ListGroupResponse().totalSize(totalSize).groups(groupList);
   }
+
+  public AddCharacterResponse addCharacter(AddCharacterRequest request) {
+    // check whether this group can have character
+    var group = groupDao.findById(request.getGroupId()).orElseThrow();
+    if (GroupCategory.GROUP.equals(group.getGroupCategory())) {
+      return new AddCharacterResponse()
+              .result(Boolean.FALSE)
+              .notification(UserFacingConstants.getConstant(UserFacingConstantsKey.WRONG_MEMBER_TYPE)
+                      .getDisplayName());
+    }
+    UUID groupId = request.getGroupId();
+    List<UUID> characters = request.getCharacterIds();
+    var characterToGroups = characterToGroupDao.listByCharacterIds(request.getCharacterIds());
+    var currentPairs = characterToGroups.stream()
+            .filter(characterToGroupEntity -> !characterToGroupEntity.getOnceBelongedTo()).toList();
+    // exit current group if present
+    for (var item : currentPairs) {
+      item = item.toBuilder().setOnceBelongedTo(true).build();
+      characterToGroupDao.update(item);
+    }
+    // update original groups
+    var groupMatchEntities = characterToGroups
+            .stream()
+            .filter(characterToGroupEntity ->
+                    characterToGroupEntity.getGroupId().equals(request.getGroupId())
+            ).toList();
+    var newCharacterGroupPairs = characters.stream()
+            .filter(character->!characterToGroups.stream()
+                    .map(CharacterToGroupEntity::getCharacterId).toList()
+                    .contains(character))
+            .toList();
+
+    for (var existingPair: groupMatchEntities) {
+      existingPair = existingPair.toBuilder().setOnceBelongedTo(false).build();
+      characterToGroupDao.update(existingPair);
+    }
+    for (var newPair: newCharacterGroupPairs) {
+      CharacterToGroupEntity characterToGroupEntity = CharacterToGroupEntityBuilder.newBuilder()
+              .setCharacterId(newPair)
+              .setGroupId(groupId)
+              .position(GroupPosition.MEMBER)
+              .onceBelongedTo(false)
+              .build();
+      characterToGroupDao.insert(characterToGroupEntity);
+    }
+    return new AddCharacterResponse()
+            .result(Boolean.TRUE)
+            .notification(UserFacingConstants.getConstant(UserFacingConstantsKey.GROUP_JOIN_SUCCESS)
+                    .getDisplayName());
+  }
+
+  public AddGroupResponse addGroup(AddGroupRequest request) {
+    UUID fatherGroupId = request.getFatherGroupId();
+    List<UUID> childGroupIds = request.getChildGroupIds();
+    var group = groupDao.findById(fatherGroupId).orElseThrow();
+    if (GroupCategory.GROUP.equals(group.getGroupCategory())) {
+      return new AddGroupResponse()
+              .result(Boolean.FALSE)
+              .notification(UserFacingConstants.getConstant(UserFacingConstantsKey.WRONG_MEMBER_TYPE)
+                      .getDisplayName());
+    }
+    var childGroups = groupDao.listByIds(childGroupIds);
+
+    var updatedGroups = childGroups
+            .stream()
+            .map(groupEntity -> groupEntity.toBuilder().setFatherGroupId(fatherGroupId).build())
+            .toList();
+    for (var newGroup: updatedGroups) {
+      groupDao.update(newGroup);
+    }
+    return new AddGroupResponse()
+            .result(Boolean.FALSE)
+            .notification(UserFacingConstants.getConstant(UserFacingConstantsKey.GROUP_JOIN_SUCCESS)
+                    .getDisplayName());
+  }
+
+
 
   public GroupFullView getGroupFullView(GetGroupRequest getGroupRequest) {
     var groupFullView = groupDao.getFullViewById(getGroupRequest.getId()).orElseThrow();
