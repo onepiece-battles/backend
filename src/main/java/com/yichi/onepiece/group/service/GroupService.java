@@ -138,7 +138,7 @@ public class GroupService {
     UUID fatherGroupId = request.getFatherGroupId();
     List<UUID> childGroupIds = request.getChildGroupIds();
     var group = groupDao.findById(fatherGroupId).orElseThrow();
-    if (GroupCategory.GROUP.equals(group.getGroupCategory())) {
+    if (!GroupCategory.GROUP.equals(group.getGroupCategory())) {
       return new AddGroupResponse()
               .result(Boolean.FALSE)
               .notification(UserFacingConstants.getConstant(UserFacingConstantsKey.WRONG_MEMBER_TYPE)
@@ -154,7 +154,7 @@ public class GroupService {
       groupDao.update(newGroup);
     }
     return new AddGroupResponse()
-            .result(Boolean.FALSE)
+            .result(Boolean.TRUE)
             .notification(UserFacingConstants.getConstant(UserFacingConstantsKey.GROUP_JOIN_SUCCESS)
                     .getDisplayName());
   }

@@ -31,8 +31,8 @@ public interface GroupDao extends BaseDao<GroupEntity, UUID> {
   @Select({
           "<script>",
           "SELECT *",
-          "FROM group ",
-          "WHERE group.`id` IN ",
+          "FROM `group` ",
+          "WHERE `group`.`id` IN ",
           "<foreach item='item' collection='groupIds' open='(' separator=',' close=')'>",
           "  #{item}",
           "</foreach>",
