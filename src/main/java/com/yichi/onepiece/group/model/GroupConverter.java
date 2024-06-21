@@ -1,6 +1,8 @@
 package com.yichi.onepiece.group.model;
 
 import com.yichi.infra.support.EntityBuilder;
+import com.yichi.onepiece.character.model.entity.CharacterInFruitView;
+import com.yichi.onepiece.model.CharacterInGroupView;
 import com.yichi.onepiece.model.Group;
 import com.yichi.onepiece.model.GroupFullView;
 import com.yichi.onepiece.utils.EncryptHelper;
@@ -20,6 +22,10 @@ public interface GroupConverter {
 
   @Mapping(target = "systemResource", ignore = true)
   GroupEntity toGroupEntity(Group group);
+
+  Group toGroup(GroupEntity group);
+
+  CharacterInGroupView toCharacterInGroupView(com.yichi.onepiece.character.model.entity.CharacterInGroupView characterInGroupView);
 
   default String blobToString(Byte[] profileByteArray) {
     if (profileByteArray == null) {
