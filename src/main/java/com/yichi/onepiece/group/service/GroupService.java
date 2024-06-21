@@ -2,6 +2,7 @@ package com.yichi.onepiece.group.service;
 
 import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.GROUP_CREATION_SUCCESS;
 
+import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
 import com.yichi.onepiece.character.model.dao.CharacterToGroupDao;
 import com.yichi.onepiece.character.model.entity.CharacterToGroupEntity;
 import com.yichi.onepiece.character.model.entity.CharacterToGroupEntityBuilder;
@@ -84,6 +85,18 @@ public class GroupService {
     return new ListGroupResponse().totalSize(totalSize).groups(groupList);
   }
 
+  public ListChildCharactersResponse listChildCharacters(ListChildCharactersRequest request) {
+   var childEntities =  characterToGroupDao.listCharacterInGroupViewByGroupId(request.getGroupId());
+    var childList = childEntities.stream().map(GroupConverter.INSTANCE::toCharacterInGroupView).toList();
+    return new ListChildCharactersResponse().childCharacters(childList);
+  }
+
+  public ListChildGroupsResponse listChildGroups(ListChildGroupsRequest request) {
+    var groupEntities = groupDao.listChildGroups(request.getGroupId());
+    var groups = groupEntities.stream().map(GroupConverter.INSTANCE::toGroup).toList();
+    return new ListChildGroupsResponse().childGroups(groups);
+  }
+
   public AddCharacterResponse addCharacter(AddCharacterRequest request) {
     // check whether this group can have character
     var group = groupDao.findById(request.getGroupId()).orElseThrow();
@@ -163,9 +176,17 @@ public class GroupService {
 
   public GroupFullView getGroupFullView(GetGroupRequest getGroupRequest) {
     var groupFullView = groupDao.getFullViewById(getGroupRequest.getId()).orElseThrow();
+    var fatherGroupIds = new java.util.ArrayList<>(groupDao.listAllFatherGroups(getGroupRequest.getId()).stream()
+            .map(GroupEntity::getId).toList());
+    var fatherGroups = groupDao.listByIds(fatherGroupIds);
+    // remove current group
+    if (!fatherGroups.isEmpty()) {
+      fatherGroups.remove(0);
+    }
     groupFullView = groupFullView.toBuilder()
             .setPreviousGroup(getPreviousGroup(groupFullView.getCreationRecord().getId()))
             .setNextGroup(getNextGroup(groupFullView.getCreationRecord().getId()))
+            .setFatherGroups(fatherGroups)
             .build();
     return GroupConverter.INSTANCE.toGroupFullView(groupFullView);
   }

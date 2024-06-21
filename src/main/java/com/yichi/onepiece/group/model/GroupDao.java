@@ -2,6 +2,7 @@ package com.yichi.onepiece.group.model;
 
 import com.yichi.infra.support.mybatis.annotations.Dao;
 import com.yichi.infra.support.mybatis.dao.BaseDao;
+import com.yichi.onepiece.character.model.entity.CharacterEntity;
 import com.yichi.onepiece.model.GroupFilter;
 import com.yichi.onepiece.model.GroupSortableField;
 import com.yichi.onepiece.model.I18nText;
@@ -42,6 +43,27 @@ public interface GroupDao extends BaseDao<GroupEntity, UUID> {
 
   @Select("select * from `group` where `group`.`father_group_id` = #{id}")
   List<GroupEntity> listChildGroups(@Param("id") UUID id);
+
+  List<CharacterEntity> listChildCharacters(@Param("id") UUID id);
+
+
+
+  // this function list all the father groups of this group, including this group itself.
+  @Select({
+          "<script>",
+          "WITH RECURSIVE `GroupHierarchy` AS (",
+          "   SELECT id, father_group_id, 0 AS level",
+          "   FROM `group`",
+          "   WHERE id = #{id}",
+          "   UNION ALL",
+          "   SELECT g.id, g.father_group_id, gh.level + 1",
+          "   FROM `group` g",
+          "   JOIN GroupHierarchy gh ON g.id = gh.father_group_id",
+          ")",
+          "SELECT * FROM `GroupHierarchy`",
+          "</script>"
+  })
+  List<GroupEntity> listAllFatherGroups(@Param("id") UUID id);
 
   int count(
       @Param("groupFilter") GroupFilter groupFilter,

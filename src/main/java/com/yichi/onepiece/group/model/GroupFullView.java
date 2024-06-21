@@ -10,6 +10,7 @@ import java.util.UUID;
 public interface GroupFullView extends GroupListView {
   GroupEntity getNextGroup();
   GroupEntity getPreviousGroup();
+  List<GroupEntity> getFatherGroups();
   List<CharacterInGroupView> getCharacters();
   GroupFullViewBuilder toBuilder();
 }
