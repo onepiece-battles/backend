@@ -176,9 +176,8 @@ public class GroupService {
 
   public GroupFullView getGroupFullView(GetGroupRequest getGroupRequest) {
     var groupFullView = groupDao.getFullViewById(getGroupRequest.getId()).orElseThrow();
-    var fatherGroupIds = new java.util.ArrayList<>(groupDao.listAllFatherGroups(getGroupRequest.getId()).stream()
-            .map(GroupEntity::getId).toList());
-    var fatherGroups = groupDao.listByIds(fatherGroupIds);
+    var fatherGroups = new java.util.ArrayList<>(groupDao.listAllFatherGroups(
+            getGroupRequest.getId()).stream().map(e -> groupDao.findById(e.getId()).orElseThrow()).toList());
     // remove current group
     if (!fatherGroups.isEmpty()) {
       fatherGroups.remove(0);
