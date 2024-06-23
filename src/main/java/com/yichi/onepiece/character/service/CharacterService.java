@@ -280,6 +280,7 @@ public class CharacterService {
         if (offset >= totalSize || offset < 0) {
             return new ListCharacterResponse().characters(List.of()).totalSize(totalSize);
         }
+        logger.info("filter: {}", request.getCharacterFilter().toString());
         var characterList =
                 characterDao
                         .list(

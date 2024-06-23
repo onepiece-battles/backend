@@ -2,7 +2,6 @@ package com.yichi.onepiece.group.service;
 
 import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.GROUP_CREATION_SUCCESS;
 
-import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
 import com.yichi.onepiece.character.model.dao.CharacterToGroupDao;
 import com.yichi.onepiece.character.model.entity.CharacterToGroupEntity;
 import com.yichi.onepiece.character.model.entity.CharacterToGroupEntityBuilder;
