@@ -16,7 +16,8 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface CharacterToGroupDao extends BaseDao<CharacterToGroupEntity, UUID> {
   String CHARACTER_FIELDS =
-       "character.name, "
+          "character.id, "
+      + "character.name, "
       + "character.profile_image, "
       + "character.system_resource ";
 
@@ -27,7 +28,7 @@ public interface CharacterToGroupDao extends BaseDao<CharacterToGroupEntity, UUI
       + "group.group_category as category ";
 
   @Select({
-      "select character_to_group.*, ",
+      "select `character_to_group`.`position`, `character_to_group`.`once_belonged_to`, ",
       CHARACTER_FIELDS,
       "from character_to_group ",
       "left join `character` on `character`.`id` = character_to_group.character_id ",
