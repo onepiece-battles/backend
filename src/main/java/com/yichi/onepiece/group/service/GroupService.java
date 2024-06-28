@@ -106,7 +106,7 @@ public class GroupService {
                       .getDisplayName());
     }
     UUID groupId = request.getGroupId();
-    List<UUID> characters = request.getCharacterIds();
+    List<UUID> characterIds = request.getCharacterIds();
     var characterToGroups = characterToGroupDao.listByCharacterIds(request.getCharacterIds());
     var currentPairs = characterToGroups.stream()
             .filter(characterToGroupEntity -> !characterToGroupEntity.getOnceBelongedTo()).toList();
@@ -116,22 +116,20 @@ public class GroupService {
       characterToGroupDao.update(item);
     }
     // update original groups
-    var groupMatchEntities = characterToGroups
-            .stream()
-            .filter(characterToGroupEntity ->
-                    characterToGroupEntity.getGroupId().equals(request.getGroupId())
-            ).toList();
-    var newCharacterGroupPairs = characters.stream()
-            .filter(character->!characterToGroups.stream()
+    var groupMatchEntities = characterToGroupDao.listByGroupId(groupId);
+    var existingCharactersGroupPairs = groupMatchEntities.stream()
+            .filter(groupMatch->characterIds.contains(groupMatch.getCharacterId())).toList();
+    var newCharacterIds = characterIds.stream()
+            .filter(character->!groupMatchEntities.stream()
                     .map(CharacterToGroupEntity::getCharacterId).toList()
                     .contains(character))
             .toList();
 
-    for (var existingPair: groupMatchEntities) {
+    for (var existingPair: existingCharactersGroupPairs) {
       existingPair = existingPair.toBuilder().setOnceBelongedTo(false).build();
       characterToGroupDao.update(existingPair);
     }
-    for (var newPair: newCharacterGroupPairs) {
+    for (var newPair: newCharacterIds) {
       CharacterToGroupEntity characterToGroupEntity = CharacterToGroupEntityBuilder.newBuilder()
               .setCharacterId(newPair)
               .setGroupId(groupId)

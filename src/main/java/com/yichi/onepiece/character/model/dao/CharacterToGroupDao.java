@@ -69,4 +69,8 @@ public interface CharacterToGroupDao extends BaseDao<CharacterToGroupEntity, UUI
           "</script>"
   })
   List<CharacterToGroupEntity> listByCharacterIds(@Param("characterIds") List<UUID> characterIds);
+
+
+  @Select("select * from character_to_group where group_id = #{groupId}")
+  List<CharacterToGroupEntity> listByGroupId(@Param("groupId") UUID groupId);
 }
