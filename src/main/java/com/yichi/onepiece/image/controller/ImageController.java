@@ -23,8 +23,8 @@ public class ImageController implements ImageApi {
 
   @Override
   public ResponseEntity<UploadImageResponse> uploadImage(UploadImageRequest request) {
-    var encodedImage = imageService.uploadImage(request.getResourceId(), request.getType(), request.getImage());
-    return ResponseEntity.ok(new UploadImageResponse().image(encodedImage));
+    var result = imageService.uploadImage(request.getResourceId(), request.getType(), request.getImage());
+    return ResponseEntity.ok(new UploadImageResponse().result(result));
   }
 
   @Override

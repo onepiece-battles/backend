@@ -119,8 +119,7 @@ public class FruitService {
     return fruitDao.listByCharacterId(characterId);
   }
 
-  public String updateProfile(UUID fruitId, String profile) {
-    Byte[] profileByte = ArrayUtils.toObject(EncryptHelper.base64Decode(profile));
+  public void updateProfile(UUID fruitId, String uri) {
     var modificationRecord = actionRecordService.create();
     var fruit =
         fruitDao
@@ -129,10 +128,9 @@ public class FruitService {
     var updatedFruit =
         fruit.toBuilder()
             .setModificationRecordId(modificationRecord.getId())
-            .setProfileImage(profileByte)
+            .setImageUri(uri)
             .build();
     fruitDao.update(updatedFruit);
-    return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(updatedFruit.getProfileImage()));
   }
 
   public String getProfile(UUID fruitId) {

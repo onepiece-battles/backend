@@ -324,15 +324,14 @@ public class UserService {
     return new ListUsersResponse().users(users).totalSize(totalSize);
   }
 
-  public String updateProfile(UUID userId, String profile) {
-    Byte[] profileByte = ArrayUtils.toObject(EncryptHelper.base64Decode(profile));
+  public void updateProfile(UUID userId, String uri) {
+    var modificationRecord = actionRecordService.create();
     var user =
         userDao
             .findById(userId)
             .orElseThrow(ExceptionUtils.notFound("user with id %s not found", userId));
-    var updatedUser = user.toBuilder().setProfileImage(profileByte).build();
+    var updatedUser = user.toBuilder().setImageUri(uri).setModificationRecordId(modificationRecord.getId()).build();
     userDao.update(updatedUser);
-    return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(updatedUser.getProfileImage()));
   }
 
   public String getProfile(UUID userId) {

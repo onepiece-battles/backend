@@ -133,3 +133,11 @@ user:
       displayName:
         en-US: "This type of resource can not join this group"
         zh-CN: "此类型资源无法加入这个团队"
+    IMAGE_UPLOAD_SUCCESS:
+      displayName:
+        en-US: "Image upload success"
+        zh-CN: "图片上传成功"
+    IMAGE_UPLOAD_FAILED:
+      displayName:
+        en-US: "Image upload failed"
+        zh-CN: "图片上传失败"

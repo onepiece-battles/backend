@@ -109,8 +109,7 @@ public class CharacterService {
         hakiDao.batchInsert(hakiEntities);
     }
 
-    public String updateProfile(UUID characterId, String profile) {
-        Byte[] profileByte = ArrayUtils.toObject(EncryptHelper.base64Decode(profile));
+    public void updateProfile(UUID characterId, String uri) {
         var modificationRecord = actionRecordService.create();
         var character =
                 characterDao
@@ -119,10 +118,9 @@ public class CharacterService {
         var updatedCharacter =
                 character.toBuilder()
                         .setModificationRecordId(modificationRecord.getId())
-                        .setProfileImage(profileByte)
+                        .setImageUri(uri)
                         .build();
         characterDao.update(updatedCharacter);
-        return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(updatedCharacter.getProfileImage()));
     }
 
     public String getProfile(UUID characterId) {

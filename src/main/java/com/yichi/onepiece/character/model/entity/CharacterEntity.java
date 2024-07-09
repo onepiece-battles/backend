@@ -30,6 +30,8 @@ public interface CharacterEntity {
   @Nullable
   Byte[] getProfileImage();
 
+  String getImageUri();
+
   // default to be 1, unless special characters.
   Integer getMaximumFruitCount();
 

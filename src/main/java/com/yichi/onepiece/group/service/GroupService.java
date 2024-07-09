@@ -187,17 +187,15 @@ public class GroupService {
     return GroupConverter.INSTANCE.toGroupFullView(groupFullView);
   }
 
-  public String updateGroupImage(UUID groupId, String image) {
-    Byte[] profileByte = ArrayUtils.toObject(EncryptHelper.base64Decode(image));
+  public void updateGroupImage(UUID groupId, String uri) {
     var modificationRecord = actionRecordService.create();
     var group = groupDao.findById(groupId).orElseThrow();
     var updatedGroup =
         group.toBuilder()
-            .setProfileImage(profileByte)
+            .setImageUri(uri)
             .setModificationRecordId(modificationRecord.getId())
             .build();
     groupDao.update(updatedGroup);
-    return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(updatedGroup.getProfileImage()));
   }
 
   public UpdateGroupResponse update(Group group) {

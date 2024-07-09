@@ -19,6 +19,8 @@ public interface GroupEntity {
   @Nullable
   Byte[] getProfileImage();
 
+  String getImageUri();
+
   Long getCreationRecordId();
 
   Long getModificationRecordId();
