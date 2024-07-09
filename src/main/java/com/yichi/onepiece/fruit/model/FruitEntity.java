@@ -19,6 +19,8 @@ public interface FruitEntity {
   @Nullable
   Byte[] getProfileImage();
 
+  String getImageUri();
+
   FruitType getFruitType();
 
   // Paramecia fruits consume positive extra energy and other fruits consumes no extra energy

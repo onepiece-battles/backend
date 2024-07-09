@@ -36,5 +36,7 @@ public interface UserEntity {
   @Nullable
   Byte[] getProfileImage();
 
+  String getImageUri();
+
   UserEntityBuilder toBuilder();
 }

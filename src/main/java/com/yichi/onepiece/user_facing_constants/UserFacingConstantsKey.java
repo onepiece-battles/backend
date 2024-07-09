@@ -18,6 +18,8 @@ public class UserFacingConstantsKey {
   public static final String GROUP_CREATION_FAILED = "GROUP_CREATION_FAILED";
 
   public static final String GROUP_JOIN_SUCCESS = "GROUP_JOIN_SUCCESS";
+  public static final String IMAGE_UPLOAD_SUCCESS = "IMAGE_UPLOAD_SUCCESS";
+  public static final String IMAGE_UPLOAD_FAILED = "IMAGE_UPLOAD_FAILED";
 
   public static final String WRONG_MEMBER_TYPE = "WRONG_MEMBER_TYPE";
 
