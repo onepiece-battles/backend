@@ -46,8 +46,8 @@ public interface CharacterToGroupDao extends BaseDao<CharacterToGroupEntity, UUI
   List<GroupForCharacterView> listGroupForCharacterViewByCharacterId(@Param("characterId") UUID characterId);
 
   @Select("select `character_to_group`.`position`, `character_to_group`.`once_belonged_to`, "
-      + " `character`.`name`, `character`.`id`, `character`.`profile_image` from `character_to_group` left join `character` "
-      + "on character_to_group.character_id = `character`.`id` "
+      + " `character`.`name`, `character`.`image_uri`, `character`.`id` from `character_to_group` left join `character` "
+      + "on `character_to_group`.`character_id` = `character`.`id` "
       + "where `character_to_group`.`group_id` = #{groupId}")
   List<CharacterInGroupLite> listCharacterInGroupLiteByGroupId(@Param("groupId") UUID groupId);
 

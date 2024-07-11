@@ -11,8 +11,7 @@ import java.math.BigInteger;
 public interface CharacterInFruitView extends CharacterToFruitEntity {
     @Column(json = true)
     I18nText getName();
-    @Nullable
-    Byte[] getProfileImage();
+    String getImageUri();
     Integer getMaximumFruitCount();
     BigInteger getBounty();
 

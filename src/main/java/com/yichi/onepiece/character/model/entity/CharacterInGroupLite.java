@@ -8,7 +8,7 @@ import java.util.UUID;
 @Entity
 public interface CharacterInGroupLite {
   UUID getId();
-  Byte[] getProfileImage();
+  String getImageUri();
   I18nText getName();
 
   GroupPosition getPosition();
