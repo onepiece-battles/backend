@@ -112,6 +112,9 @@ public class UserDetailImpl extends UserEntityImpl
     sb.append("  modificationRecordId: ")
         .append(toIndentedString(getModificationRecordId()))
         .append("\n");
+    sb.append("  imageUri: ")
+            .append(toIndentedString(getImageUri()))
+            .append("\n");
     sb.append("  loginRole: ").append(toIndentedString(getLoginRole())).append("\n");
     sb.append("  profileImage: ").append(toIndentedString(getProfileImage())).append("\n");
     sb.append("  userRoles: ").append(toIndentedString(getUserRoles())).append("\n");

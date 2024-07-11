@@ -379,9 +379,9 @@ public class CharacterService {
                         .getDisplayName()).success(Boolean.TRUE);
     }
 
-
-
-
+    public List<CharacterEntity> listNoUriCharacters() {
+        return characterDao.listNoUriCharacters();
+    }
 
     public CharacterEntity getPreviousCharacter(Long currentCreationRecordId) {
         var characterIdList = characterDao.getPreviousCharacterId(currentCreationRecordId);

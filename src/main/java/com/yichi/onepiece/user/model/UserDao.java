@@ -38,6 +38,10 @@ public interface UserDao extends BaseDao<UserEntity, UUID> {
   @Select("select * from `user` where `user`.`username` = #{username}")
   Optional<UserEntity> getByUsername(@Param("username") String username);
 
+
+  @Select("select * from `user` where `user`.`image_uri` is null")
+  List<UserEntity> listEmptyUriUsers();
+
   @ResultMap("userDetailView")
   @Select("SELECT * FROM user WHERE username=#{userName}")
   Optional<UserDetailImpl> getUserByUsername(@Param("userName") String userName);

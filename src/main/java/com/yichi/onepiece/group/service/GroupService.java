@@ -222,4 +222,8 @@ public class GroupService {
     }
     return groupDao.findById(groupList.get(0)).orElseThrow();
   }
+
+  public List<GroupEntity> listNoUriGroups() {
+    return groupDao.listNoUriGroups();
+  }
 }

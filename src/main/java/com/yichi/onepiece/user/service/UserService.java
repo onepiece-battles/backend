@@ -314,6 +314,10 @@ public class UserService {
     if (offset >= totalSize || offset < 0) {
       return new ListUsersResponse().users(List.of()).totalSize(totalSize);
     }
+    var userTemp = userDao
+            .listUsers(
+                    request.getUserFilter(), request.getSortKeys(), offset, request.getPageSize());
+    logger.info(userTemp.toString());
     var users =
         userDao
             .listUsers(
@@ -332,6 +336,10 @@ public class UserService {
             .orElseThrow(ExceptionUtils.notFound("user with id %s not found", userId));
     var updatedUser = user.toBuilder().setImageUri(uri).setModificationRecordId(modificationRecord.getId()).build();
     userDao.update(updatedUser);
+  }
+
+  public List<UserEntity> listNoUriUsers() {
+    return userDao.listEmptyUriUsers();
   }
 
   public String getProfile(UUID userId) {

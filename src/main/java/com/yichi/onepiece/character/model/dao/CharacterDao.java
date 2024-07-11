@@ -55,4 +55,8 @@ public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
 
   List<CharacterListView> listCharactersByGroupId(@Param("groupId") UUID groupId);
+
+
+  @Select("select * from `character` where `character`.`image_uri` is null")
+  List<CharacterEntity> listNoUriCharacters();
 }

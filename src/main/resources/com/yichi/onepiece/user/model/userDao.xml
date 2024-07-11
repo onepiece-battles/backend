@@ -7,7 +7,7 @@
             `id`,
             `nickname`,
             `username`, `login_role`, `encrypted_password`, `account_status`, `profile_image`,
-            `locale`, `email_verified`, `creation_record_id`, `modification_record_id`
+            `locale`, `email_verified`, `creation_record_id`, `modification_record_id`, `image_uri`
         FROM `user`
         <include refid="userFilter">
             <property name="userFilter" value="userFilter"/>
@@ -63,6 +63,7 @@
         <result property="creationRecordId" column="creation_record_id"/>
         <result property="modificationRecordId" column="modification_record_id"/>
         <result property="loginRole" column="login_role"/>
+        <result property="imageUri" column="image_uri"/>
         <association column="login_role" property="loginRoleResources"
                      select="com.yichi.onepiece.iam.model.RoleDao.listResourceTypeByRoleName"
         />
