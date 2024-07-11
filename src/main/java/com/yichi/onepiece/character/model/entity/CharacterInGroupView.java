@@ -7,8 +7,7 @@ import javax.annotation.Nullable;
 @Entity
 public interface CharacterInGroupView extends CharacterToGroupEntity {
   I18nText getName();
-  @Nullable
-  Byte[] getProfileImage();
+  String getImageUri();
   Boolean getSystemResource();
 
   CharacterInGroupViewBuilder toBuilder();

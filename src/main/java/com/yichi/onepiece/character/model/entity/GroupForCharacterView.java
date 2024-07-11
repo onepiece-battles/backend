@@ -8,8 +8,7 @@ import javax.annotation.Nullable;
 
 @Entity
 public interface GroupForCharacterView extends CharacterToGroupEntity {
-  @Nullable
-  Byte[] getProfileImage();
+  String getImageUri();
   @Column(json = true)
   I18nText getName();
   GroupCategory getCategory();
