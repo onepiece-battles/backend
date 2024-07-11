@@ -5,5 +5,6 @@ public enum FileCategory {
   TEAM_BATTLE_DETAIL,
   CHARACTER_IMAGE,
   USER_IMAGE,
-  GROUP_IMAGE
+  GROUP_IMAGE,
+  FRUIT_IMAGE,
 }
