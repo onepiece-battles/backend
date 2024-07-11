@@ -3,6 +3,9 @@ package com.yichi.onepiece.user.service;
 import static com.yichi.onepiece.constants.OnepieceConstants.*;
 import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.*;
 
+import com.aliyuncs.utils.Base64Helper;
+import com.yichi.onepiece.exception.FileStorageException;
+import com.yichi.onepiece.image.service.ImageService;
 import com.yichi.onepiece.quartz.jobs.EmailJob;
 import com.yichi.onepiece.constants.OnepieceConstants;
 import com.yichi.onepiece.exception.ExceptionUtils;
@@ -49,6 +52,7 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
   private final UserResourceDao userResourceDao;
   private final ActionRecordService actionRecordService;
+  private final ImageService imageService;
   private final SchedulerFactoryBean schedulerFactoryBean;
   private final RoleService roleService;
 
@@ -63,7 +67,7 @@ public class UserService {
           UserRoleDao userRoleDao,
           PasswordEncoder passwordEncoder,
           UserResourceDao userResourceDao,
-          ActionRecordService actionRecordService,
+          ActionRecordService actionRecordService, ImageService imageService,
           SchedulerFactoryBean schedulerFactoryBean,
           RoleService roleService,
           EmailVerificationDao emailVerificationDao,
@@ -76,6 +80,7 @@ public class UserService {
     this.passwordEncoder = passwordEncoder;
     this.userResourceDao = userResourceDao;
     this.actionRecordService = actionRecordService;
+    this.imageService = imageService;
     this.schedulerFactoryBean = schedulerFactoryBean;
     this.roleService = roleService;
     this.emailVerificationDao = emailVerificationDao;
@@ -115,6 +120,7 @@ public class UserService {
     try {
       var defaultImage =  new ClassPathResource("/images/user_default_profile.png").getContentAsByteArray();
       var encryptedPassword = passwordEncoder.encode(password);
+      var uri = imageService.uploadImage(Base64Helper.encode(defaultImage));
       user = UserEntityBuilder.newBuilder()
                       .setNickname(nickName)
                       .setAccountStatus(AccountStatus.LOGGED_OUT)
@@ -124,12 +130,15 @@ public class UserService {
                       .setLocale(onepieceLocale)
                       .setLoginRole(null)
                       .setLoginRoleId(null)
+                      .setImageUri(uri)
                       .setProfileImage(ArrayUtils.toObject(defaultImage))
                       .build();
     } catch (IOException e) {
       throw new RuntimeException();
+    } catch (FileStorageException e) {
+        throw new RuntimeException(e);
     }
-    userDao.insert(user);
+      userDao.insert(user);
     // new user are default to be created by NIKA
     var actionRecord = actionRecordService.createWithUserAndRole(user, UserRole.NIKA);
     var updatedUser =

@@ -18,12 +18,12 @@ public interface CharacterToGroupDao extends BaseDao<CharacterToGroupEntity, UUI
   String CHARACTER_FIELDS =
           "character.id, "
       + "character.name, "
-      + "character.profile_image, "
+      + "character.image_uri, "
       + "character.system_resource ";
 
   String GROUP_FIELDS =
        "group.name, "
-      + "group.profile_image, "
+      + "group.image_uri, "
       + "group.system_resource, "
       + "group.group_category as category ";
 

@@ -94,7 +94,7 @@ public class ImageService {
             .getDisplayName();
   }
 
-  // encode image with base64 and upload this image to alicloud.
+  // encode image with base64 and upload this image to alicloud. the return value is the URI of this image
   public String uploadImage(String profileImage) throws FileStorageException {
     return AliCloudObjectStorage.putFileStream(new ByteArrayInputStream(EncryptHelper.base64Decode(profileImage)));
   }
