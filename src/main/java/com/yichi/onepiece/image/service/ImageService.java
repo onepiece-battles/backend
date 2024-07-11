@@ -3,12 +3,19 @@ package com.yichi.onepiece.image.service;
 import com.yichi.onepiece.alicloud.AliCloudObjectStorage;
 import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.exception.FileStorageException;
+import com.yichi.onepiece.file.model.FileCategory;
+import com.yichi.onepiece.file.model.FileObjectEntityBuilder;
+import com.yichi.onepiece.file.service.FileObjectService;
 import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.group.service.GroupService;
+import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.ResourceType;
+import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.util.Map;
 import java.util.UUID;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
@@ -24,16 +31,28 @@ public class ImageService {
   private final FruitService fruitService;
   private final UserService userService;
   private final GroupService groupService;
+  private final FileObjectService fileObjectService;
+
+  private final ActionRecordService actionRecordService;
+
+  private static final Map<ResourceType, FileCategory> map = Map.of(
+          ResourceType.CHARACTER, FileCategory.CHARACTER_IMAGE,
+          ResourceType.USER, FileCategory.USER_IMAGE,
+          ResourceType.FRUIT, FileCategory.FRUIT_IMAGE,
+          ResourceType.GROUP, FileCategory.CHARACTER_IMAGE
+  );
 
   public ImageService(
-      CharacterService characterService,
-      FruitService fruitService,
-      UserService userService,
-      GroupService groupService) {
+          CharacterService characterService,
+          FruitService fruitService,
+          UserService userService,
+          GroupService groupService, FileObjectService fileObjectService, ActionRecordService actionRecordService) {
     this.characterService = characterService;
     this.fruitService = fruitService;
     this.userService = userService;
     this.groupService = groupService;
+    this.fileObjectService = fileObjectService;
+    this.actionRecordService = actionRecordService;
   }
 
   public I18nText uploadImage(UUID targetId, ResourceType resourceType, String profileImage)  {
@@ -53,6 +72,19 @@ public class ImageService {
            groupService.updateGroupImage(targetId, uri);
         }
       }
+      var creationRecord = actionRecordService.create();
+      File imageFile = new File(uri);
+      var fileObjectEntity =
+              FileObjectEntityBuilder.newBuilder()
+                      .setFileName(imageFile.getName())
+                      .setFileCategory(map.get(resourceType))
+                      .setHttpMimeType("application/image")
+                      .setCreatorId(UserHelper.getCurrentUserId())
+                      .setCreationRecordId(creationRecord.getId())
+                      .setOssUri(uri)
+                      .setResourceId(targetId)
+                      .build();
+      fileObjectService.add(fileObjectEntity);
       return UserFacingConstants.getConstant(UserFacingConstantsKey.IMAGE_UPLOAD_SUCCESS)
               .getDisplayName();
     } catch (Exception e) {
@@ -67,17 +99,11 @@ public class ImageService {
     return AliCloudObjectStorage.putFileStream(new ByteArrayInputStream(EncryptHelper.base64Decode(profileImage)));
   }
 
-  public String getImage(UUID resourceId, ResourceType resourceType) {
-    switch (resourceType) {
-      case USER -> {
-        return userService.getProfile(resourceId);
-      }
-      case FRUIT -> {
-        return fruitService.getProfile(resourceId);
-      }
-      case CHARACTER -> {
-        return characterService.getProfile(resourceId);
-      }
+  public String getImage(String uri) {
+    try {
+      return EncryptHelper.base64Encode(AliCloudObjectStorage.getFileStream(uri).readAllBytes());
+    } catch (Exception e) {
+      logger.error(e.toString());
     }
     throw new RuntimeException("file retrieval failed");
   }
