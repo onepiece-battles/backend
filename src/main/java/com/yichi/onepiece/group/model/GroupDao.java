@@ -95,4 +95,7 @@ public interface GroupDao extends BaseDao<GroupEntity, UUID> {
   // note: previous mean the character creates after the current Character
   @Select("select `id` from `group` where creation_record_id > #{creationRecordId} order by creation_record_id ASC")
   List<UUID> getPreviousGroupId(@Param("creationRecordId") Long currentCreationRecordId);
+
+  @Select("select * from `group` where `group`.`image_uri` is null")
+  List<GroupEntity> listNoUriGroups();
 }
