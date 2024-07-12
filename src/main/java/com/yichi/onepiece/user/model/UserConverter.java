@@ -22,6 +22,7 @@ public interface UserConverter {
   UserEntity toUserEntity(User user);
 
   @Mapping(target = "loginRoleResourcesPermissionMap", ignore = true)
+  @Mapping(target = "profileImage", ignore = true)
   User toUser(UserDetailImpl userDetail);
 
   default String blobToString(Byte[] profileByteArray) {
