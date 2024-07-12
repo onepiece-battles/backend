@@ -104,10 +104,10 @@ public class DataExportService {
               new FooterEventHandler(document, userEmail));
 
       // create image
-      ImageData starterImageData = ImageDataFactory.create(ArrayUtils.toPrimitive(starterCharacter.getProfileImage()));
+      ImageData starterImageData = ImageDataFactory.create(AliCloudObjectStorage.getFileStream(starterCharacter.getImageUri()).readAllBytes());
       Image starterImage = new Image(starterImageData)
               .scaleToFit(imageWidth, imageHeight).setHorizontalAlignment(HorizontalAlignment.CENTER);
-      ImageData receiverImageData = ImageDataFactory.create(ArrayUtils.toPrimitive(receiverCharacter.getProfileImage()));
+      ImageData receiverImageData = ImageDataFactory.create(AliCloudObjectStorage.getFileStream(receiverCharacter.getImageUri()).readAllBytes());
       Image receiverImage = new Image(receiverImageData)
               .scaleToFit(imageWidth, imageHeight).setHorizontalAlignment(HorizontalAlignment.CENTER);
 
@@ -135,7 +135,7 @@ public class DataExportService {
               createImageCell(starterImage, imageWidth, imageHeight):
               createImageCell(receiverImage, imageWidth, imageHeight);
       var winnerCell =  createTextCell(locale.equals(OnepieceLocale.ZH_CN.getValue())?
-              "获胜者":"WINNER",30, new DeviceRgb(16, 85, 154), font, 100, 60);
+              "获胜者":"WINNER",30, new DeviceRgb(16, 85, 154), font, 150, 60);
 
       var smallStarterImageCell = createImageCell(starterImageSmall, smallImageWidth, smallImageHeight);
       var smallReceiverImageCell = createImageCell(receiverImageSmall, smallImageWidth, smallImageHeight);
