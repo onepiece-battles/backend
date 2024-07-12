@@ -62,4 +62,17 @@ public class RoleService {
     roleToResourcePermissionDao.batchInsert(roleToResourcePermissionEntities);
     return new AssignResourcePermissionsToRoleResponse().result(new I18nText().enUS("success").zhCN("成功"));
   }
+
+  public List<ResourcePermissionMap> getPermissionMapByRoleName(UserRole userRole) {
+    var roleId = roleDao.findByRoleName(userRole).orElseThrow().getId();
+    return getResourcePermissionMapByRoleId(roleId).entrySet().stream()
+            .map(
+                    entry -> {
+                      var resourcePermissionMap = new ResourcePermissionMap();
+                      resourcePermissionMap.setResourceType(entry.getKey());
+                      resourcePermissionMap.setPermissions(entry.getValue());
+                      return resourcePermissionMap;
+                    })
+            .toList();
+  }
 }

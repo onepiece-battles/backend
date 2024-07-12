@@ -4,6 +4,7 @@ import static com.yichi.onepiece.constants.OnepieceConstants.SUCCESS;
 import com.yichi.onepiece.api.UserApi;
 import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.*;
+import com.yichi.onepiece.user.service.UserAccountService;
 import com.yichi.onepiece.user.service.UserService;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import java.util.Set;
@@ -16,11 +17,13 @@ import org.springframework.stereotype.Controller;
 public class UserController implements UserApi {
   private final Logger logger = LoggerFactory.getLogger(UserController.class);
   private final UserService userService;
+  private final UserAccountService userAccountService;
   private final IamService iamService;
 
-  public UserController(UserService userService, IamService iamService) {
+  public UserController(UserService userService, UserAccountService userAccountService, IamService iamService) {
     this.userService = userService;
-    this.iamService = iamService;
+      this.userAccountService = userAccountService;
+      this.iamService = iamService;
   }
 
   @Override
@@ -48,21 +51,21 @@ public class UserController implements UserApi {
 
   @Override
   public ResponseEntity<LoginResponse> login(LoginRequest loginRequest) {
-    var loginResponse = userService.login(loginRequest);
+    var loginResponse = userAccountService.login(loginRequest);
     return ResponseEntity.ok(loginResponse);
   }
 
   @Override
   public ResponseEntity<LogoutResponse> logout(LogoutRequest logoutRequest) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
-    var response = userService.logout(logoutRequest.getUserId());
+    var response = userAccountService.logout(logoutRequest.getUserId());
     return ResponseEntity.ok(response);
   }
 
   @Override
   public ResponseEntity<RegisterResponse> register(RegisterRequest registerRequest) {
     var verificationKey =
-        userService.register(
+            userAccountService.register(
             registerRequest.getNickname(),
             registerRequest.getPassword(),
             registerRequest.getUsername(),
@@ -77,21 +80,6 @@ public class UserController implements UserApi {
                 registerSuccess
                     ? null
                     : UserFacingConstants.getConstant(verificationKey).getDisplayName()));
-  }
-
-  @Override
-  public ResponseEntity<PasswordRetrievalResponse> sendRetrievalEmail(
-          PasswordRetrievalRequest passwordRetrievalRequest) {
-    var response =  userService.sendRetrievalEmail(passwordRetrievalRequest);
-    return ResponseEntity.ok(response);
-  }
-
-  @Override
-  public ResponseEntity<VerifyEmailAddressResponse> verifyEmailAddress(
-      VerifyEmailAddressRequest verifyEmailAddressRequest) {
-    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
-    var response = userService.verifyEmailAddress(verifyEmailAddressRequest);
-    return ResponseEntity.ok(response);
   }
 
   @Override
