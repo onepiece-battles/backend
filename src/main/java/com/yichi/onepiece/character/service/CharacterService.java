@@ -123,14 +123,6 @@ public class CharacterService {
         characterDao.update(updatedCharacter);
     }
 
-    public String getProfile(UUID characterId) {
-        var character =
-                characterDao
-                        .findById(characterId)
-                        .orElseThrow(ExceptionUtils.notFound("character with id %s not found", characterId));
-        return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(character.getProfileImage()));
-    }
-
     public CharacterFullView getCharacterFullView(UUID characterId) {
         var characterFullView = characterDao.getFullViewById(characterId).orElseThrow();
         // add next and previous id

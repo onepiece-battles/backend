@@ -28,7 +28,6 @@ public interface CharacterEntityConverter {
       com.yichi.onepiece.character.model.entity.GroupForCharacterView groupForCharacterView);
 
   @Mapping(target = "id", ignore = true)
-  @Mapping(target = "profileImage", ignore = true)
   @Mapping(target = "systemResource", ignore = true)
   @Mapping(target = "creationRecordId", ignore = true)
   @Mapping(target = "modificationRecordId", ignore = true)
@@ -40,6 +39,7 @@ public interface CharacterEntityConverter {
   @Mapping(target = "baseBlood", source = "blood")
   @Mapping(target = "baseGroupGain", source = "groupGain")
   @Mapping(target = "imageUri", ignore = true)
+  @Mapping(target = "profileImage", ignore = true)
   CharacterEntity toCharacterEntity(CreateCharacterRequest createCharacterRequest);
 
   @Mapping(target = "creationRecordId", ignore = true)
@@ -51,5 +51,6 @@ public interface CharacterEntityConverter {
   @Mapping(target = "blood", ignore = true)
   @Mapping(target = "groupGain", ignore = true)
   @Mapping(target = "imageUri", ignore = true)
+  @Mapping(target = "profileImage", ignore = true)
   CharacterEntity toCharacterEntity(Character character);
 }

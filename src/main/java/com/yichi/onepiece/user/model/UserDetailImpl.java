@@ -116,7 +116,7 @@ public class UserDetailImpl extends UserEntityImpl
             .append(toIndentedString(getImageUri()))
             .append("\n");
     sb.append("  loginRole: ").append(toIndentedString(getLoginRole())).append("\n");
-    sb.append("  profileImage: ").append(toIndentedString(getProfileImage())).append("\n");
+    sb.append("  imageUri: ").append(toIndentedString(getImageUri())).append("\n");
     sb.append("  userRoles: ").append(toIndentedString(getUserRoles())).append("\n");
     sb.append("  tokens: ").append(toIndentedString(getTokens())).append("\n");
     sb.append("  creationRecord: ").append(toIndentedString(getCreationRecord())).append("\n");
