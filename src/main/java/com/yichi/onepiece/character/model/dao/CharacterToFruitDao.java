@@ -13,18 +13,10 @@ import org.apache.ibatis.annotations.Select;
 @Dao
 @Mapper
 public interface CharacterToFruitDao extends BaseDao<CharacterToFruitEntity, UUID> {
-
-  String CHARACTER_IN_FRUIT_PROPERTIES =
-          "`character`.`name`, `character`.`image_uri`, `character`.`bounty`, `character`.`group_gain`, " +
-          "`character`.`attack`, `character`.`defense`, `character`.`intelligence`, `character`.`blood`, " +
-          "`character`.`speed`, `character`.`energy` ";
-
-
   @Select("select * from character_to_fruit where character_to_fruit.character_id = #{characterId}")
   List<CharacterToFruitEntity> listByCharacterId(@Param("characterId") UUID characterId);
 
-  @Select("select character_to_fruit.*, " +
-          CHARACTER_IN_FRUIT_PROPERTIES +
+  @Select("select character_to_fruit.`wake_up`, `character`.* " +
           "from character_to_fruit " +
           "left join `character` on `character_to_fruit`.`character_id` = `character`.`id` " +
           "where `character_to_fruit`.`fruit_id` = #{fruitId} ")

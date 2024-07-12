@@ -32,13 +32,12 @@ public interface FruitConverter {
   @Mapping(target = "imageUri", ignore = true)
   FruitEntity toFruitEntity(UpdateFruitRequest request);
 
-  @Mapping(target = "fruitHolders", ignore = true)
+
+  @Mapping(target = "characters", ignore = true)
   Fruit toFruit(FruitEntity entity);
 
-  @Mapping(target = "fruitHolders", ignore = true)
   FruitFullView toFruitFullView(com.yichi.onepiece.fruit.model.FruitFullView fruitFullView);
 
-  @Mapping(target = "fruitHolders", ignore = true)
   com.yichi.onepiece.model.FruitListView toFruitListView(FruitListView fruitListView);
 
   default String blobToString(Byte[] profileByteArray) {

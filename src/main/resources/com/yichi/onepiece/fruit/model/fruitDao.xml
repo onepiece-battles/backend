@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.fruit.model.FruitDao">
-    <select id="listFruits" resultType="com.yichi.onepiece.fruit.model.FruitListView">
+    <select id="listFruits" resultType="com.yichi.onepiece.fruit.model.FruitListView" resultMap="fruitListView">
         SELECT * FROM `fruit`
         LEFT JOIN `action_lineage` on `fruit`.`creation_record_id` = `action_lineage`.`id`
         <include refid="fruitFilter">
@@ -28,6 +28,9 @@
 
     <resultMap id="fruitListView" type="com.yichi.onepiece.fruit.model.FruitListView" autoMapping="true">
         <result column="id" property="id"/>
+        <association column="id" property="characters"
+                     select="com.yichi.onepiece.character.model.dao.CharacterToFruitDao.listCharacterInFruitViewByFruitId"
+        />
         <association column="creation_record_id" property="creationRecord"
                      select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
         />
