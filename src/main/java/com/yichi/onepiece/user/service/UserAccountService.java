@@ -12,6 +12,7 @@ import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.user.model.*;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
+import com.yichi.onepiece.utils.EncryptHelper;
 import com.yichi.onepiece.utils.JwtHelper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
@@ -197,6 +198,7 @@ public class UserAccountService {
                 .user(
                         UserConverter.INSTANCE
                                 .toUser(user)
+                                .profileImage(EncryptHelper.base64Encode(ArrayUtils.toPrimitive(user.getProfileImage())))
                                 .loginRoleResourcesPermissionMap(resourcePermissionMaps)
                                 .userRoles(roleNames)
                                 .tokens(tokens));
