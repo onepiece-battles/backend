@@ -3,6 +3,7 @@ package com.yichi.onepiece.user.service;
 import static com.yichi.onepiece.constants.OnepieceConstants.*;
 import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.*;
 
+import com.aliyuncs.utils.Base64Helper;
 import com.yichi.onepiece.email.EmailService;
 import com.yichi.onepiece.quartz.jobs.EmailJob;
 import com.yichi.onepiece.exception.ExceptionUtils;
@@ -19,6 +20,9 @@ import java.time.Clock;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+
+import com.yichi.onepiece.utils.EncryptHelper;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -86,13 +90,15 @@ public class UserService {
     }
   }
 
-  public void updateProfile(UUID userId, String uri) {
+  public void updateProfile(UUID userId, String uri, String image) {
     var modificationRecord = actionRecordService.create();
     var user =
             userDao
                     .findById(userId)
                     .orElseThrow(ExceptionUtils.notFound("user with id %s not found", userId));
-    var updatedUser = user.toBuilder().setImageUri(uri).setModificationRecordId(modificationRecord.getId()).build();
+    var updatedUser = user.toBuilder()
+            .setProfileImage(ArrayUtils.toObject(EncryptHelper.base64Decode(image)))
+            .setImageUri(uri).setModificationRecordId(modificationRecord.getId()).build();
     userDao.update(updatedUser);
   }
 
@@ -163,6 +169,7 @@ public class UserService {
   public User getUserById(UUID userId) {
     var user = userDao.getById(userId).orElseThrow();
     return UserConverter.INSTANCE.toUser(user)
+            .profileImage(EncryptHelper.base64Encode(ArrayUtils.toPrimitive(user.getProfileImage())))
             .loginRoleResourcesPermissionMap(roleService.getPermissionMapByRoleName(user.getLoginRole()));
   }
 
