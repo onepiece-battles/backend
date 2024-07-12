@@ -18,6 +18,7 @@ public interface UserConverter {
   @Mapping(target = "modificationRecordId", ignore = true)
   @Mapping(target = "encryptedPassword", ignore = true)
   @Mapping(target = "imageUri", ignore = true)
+  @Mapping(target = "profileImage", ignore = true)
   UserEntity toUserEntity(User user);
 
   @Mapping(target = "loginRoleResourcesPermissionMap", ignore = true)

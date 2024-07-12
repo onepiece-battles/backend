@@ -15,7 +15,7 @@ import org.apache.ibatis.annotations.Select;
 public interface CharacterToFruitDao extends BaseDao<CharacterToFruitEntity, UUID> {
 
   String CHARACTER_IN_FRUIT_PROPERTIES =
-          "`character`.`name`, `character`.`profile_image`, `character`.`bounty`, `character`.`group_gain`, " +
+          "`character`.`name`, `character`.`image_uri`, `character`.`bounty`, `character`.`group_gain`, " +
           "`character`.`attack`, `character`.`defense`, `character`.`intelligence`, `character`.`blood`, " +
           "`character`.`speed`, `character`.`energy` ";
 
