@@ -365,10 +365,10 @@ public class BattleService {
     UUID receiverId = battle.getReceiverId();
     // prepare start character
     var startCharacter = characterService.getCharacterEntityById(starterId);
-    var startFruits = fruitService.listByCharacterId(startCharacter.getId());
+    var startFruits = fruitService.listFruitEntityByCharacterId(startCharacter.getId());
     // prepare receive character
     var receiveCharacter = characterService.getCharacterEntityById(receiverId);
-    var receiveFruits = fruitService.listByCharacterId(receiveCharacter.getId());
+    var receiveFruits = fruitService.listFruitEntityByCharacterId(receiveCharacter.getId());
     // create characterInBattle object and battlefield object
     var characterInBattleInit = new CharacterInBattle(startCharacter, startFruits);
     var characterInBattleReceive = new CharacterInBattle(receiveCharacter, receiveFruits);

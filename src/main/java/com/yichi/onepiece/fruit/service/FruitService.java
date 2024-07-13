@@ -106,17 +106,16 @@ public class FruitService {
     // update character battle indexes that has eaten this fruit
     var characters = characterHelper.listByFruitId(fruitEntity.getId());
     for (var character :  characters) {
-      var fruits = listByCharacterId(character.getId());
+      var fruits = listFruitEntityByCharacterId(character.getId());
       characterHelper.calculateCharacterBattleIndex(character, fruits);
     }
-
     var response = new UpdateFruitResponse();
     return response.result(
             UserFacingConstants.getConstant(UserFacingConstantsKey.UPDATE_SUCCESS)
                     .getDisplayName()).success(Boolean.TRUE);
   }
-  public List<FruitListView> listByCharacterId(UUID characterId) {
-    return fruitDao.listByCharacterId(characterId);
+  public List<FruitEntity> listFruitEntityByCharacterId(UUID characterId) {
+    return fruitDao.listFruitEntityByCharacterId(characterId);
   }
 
   public void updateProfile(UUID fruitId, String uri) {
