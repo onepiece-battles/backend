@@ -26,9 +26,9 @@ public class CharacterInBattle {
   private final CharacterEntity baseEntity;
   private CurrentCharacterEntityImpl currentCharacter;
 
-  List<FruitListView> fruitEntities;
+  List<FruitEntity> fruitEntities;
 
-  public CharacterInBattle(CharacterEntity baseEntity, List<FruitListView> fruitEntities) {
+  public CharacterInBattle(CharacterEntity baseEntity, List<FruitEntity> fruitEntities) {
     this.baseEntity = baseEntity;
     this.fruitEntities = fruitEntities;
     this.name = baseEntity.getName();

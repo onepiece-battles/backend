@@ -1,5 +1,6 @@
 package com.yichi.onepiece.character.service;
 
+import com.yichi.onepiece.character.helper.CharacterHelper;
 import com.yichi.onepiece.character.model.converter.CharacterEntityConverter;
 import com.yichi.onepiece.character.model.dao.CharacterDao;
 import com.yichi.onepiece.character.model.dao.CharacterToFruitDao;
@@ -39,6 +40,7 @@ public class CharacterService {
     private final CharacterToGroupDao characterToGroupDao;
     private final HakiDao hakiDao;
     private final FruitService fruitService;
+    private final CharacterHelper characterHelper;
 
     private final CharacterToFruitDao characterToFruitDao;
     private final ActionRecordService actionRecordService;
@@ -47,7 +49,7 @@ public class CharacterService {
     public CharacterService(
             CharacterDao CharacterDao,
             CharacterToGroupDao characterToGroupDao, HakiDao hakiDao,
-            FruitService fruitService,
+            FruitService fruitService, CharacterHelper characterHelper,
             CharacterToFruitDao characterToFruitDao,
             ActionRecordService actionRecordService,
             UserService userService) {
@@ -55,6 +57,7 @@ public class CharacterService {
         this.characterToGroupDao = characterToGroupDao;
         this.hakiDao = hakiDao;
         this.fruitService = fruitService;
+        this.characterHelper = characterHelper;
         this.characterToFruitDao = characterToFruitDao;
         this.actionRecordService = actionRecordService;
         this.userService = userService;
@@ -178,7 +181,7 @@ public class CharacterService {
         }
         var character = characterEntityOptional.get();
         int fruitLimit = character.getMaximumFruitCount();
-        var fruits = fruitService.listByCharacterId(characterId);
+        var fruits = fruitService.listFruitEntityByCharacterId(characterId);
         EatFruitResponse response = new EatFruitResponse();
         if (fruits.size() == fruitLimit) {
             // fruit count exceeds the maximum permitted count.
@@ -187,6 +190,7 @@ public class CharacterService {
                             .getDisplayName());
         }
         var fruit = fruitService.findById(fruitId);
+        characterHelper.calculateCharacterBattleIndex(character, List.of(fruit));
 
         // this character can take more fruit
         var characterToFruitEntity =
@@ -195,66 +199,6 @@ public class CharacterService {
                         .setFruitId(fruitId)
                         .setWakeUp(false)
                         .build();
-
-        Integer attack = character.getBaseAttack();
-        Integer defense = character.getBaseDefense();
-        Integer intelligence = character.getBaseIntelligence();
-        Integer speed = character.getBaseSpeed();
-        Integer groupGain = character.getBaseGroupGain();
-        Integer blood = character.getBlood();
-        attack = (int) (attack * fruit.getAttackSlope() + fruit.getAttackIntercept());
-        defense = (int) (defense * fruit.getDefenseSlope() + fruit.getDefenseIntercept());
-        intelligence = (int) (intelligence * fruit.getIntelligenceSlope() + fruit.getIntelligenceIntercept());
-        speed = (int) (speed * fruit.getSpeedSlope() + fruit.getSpeedIntercept());
-        groupGain = (int) (groupGain * fruit.getGroupGainSlope() + fruit.getGroupGainIntercept());
-        blood = (int) (blood * fruit.getBloodSlope() + fruit.getBloodIntercept());
-        // normalize battle index
-        if (attack<OnepieceConstants.ATTACK_MIN) {
-            attack = OnepieceConstants.ATTACK_MIN;
-        }
-        if (attack>OnepieceConstants.ATTACK_MAX) {
-            attack = OnepieceConstants.ATTACK_MAX;
-        }
-        if (defense<OnepieceConstants.DEFENSE_MAX) {
-            defense = OnepieceConstants.DEFENSE_MAX;
-        }
-        if (defense>OnepieceConstants.DEFENSE_MIN) {
-            defense = OnepieceConstants.DEFENSE_MIN;
-        }
-        if (intelligence>OnepieceConstants.INTELLIGENCE_MAX) {
-            intelligence = OnepieceConstants.INTELLIGENCE_MAX;
-        }
-        if (intelligence<OnepieceConstants.INTELLIGENCE_MIN) {
-            intelligence = OnepieceConstants.INTELLIGENCE_MIN;
-        }
-        if (speed>OnepieceConstants.SPEED_MAX) {
-            speed = OnepieceConstants.SPEED_MAX;
-        }
-        if (speed<OnepieceConstants.SPEED_MIN) {
-            speed = OnepieceConstants.SPEED_MIN;
-        }
-        if (blood>OnepieceConstants.BLOOD_MAX) {
-            blood = OnepieceConstants.BLOOD_MAX;
-        }
-        if (blood<OnepieceConstants.BLOOD_MIN) {
-            blood = OnepieceConstants.BLOOD_MIN;
-        }
-        if (groupGain>OnepieceConstants.GROUP_GAIN_MAX) {
-            groupGain = OnepieceConstants.GROUP_GAIN_MAX;
-        }
-        if (groupGain<OnepieceConstants.GROUP_GAIN_MIN) {
-            groupGain = OnepieceConstants.GROUP_GAIN_MIN;
-        }
-        character = character
-                .toBuilder()
-                .setAttack(attack)
-                .setDefense(defense)
-                .setBlood(blood)
-                .setBaseGroupGain(groupGain)
-                .setSpeed(speed)
-                .setIntelligence(intelligence)
-                .build();
-        characterDao.update(character);
         characterToFruitDao.insert(characterToFruitEntity);
         return response.fruitMessage(
                 UserFacingConstants.getConstant(UserFacingConstantsKey.FRUIT_EATEN_SUCCESS)
@@ -303,68 +247,9 @@ public class CharacterService {
 
     public UpdateCharacterResponse updateCharacter(Character character) {
         var characterUpdated = CharacterEntityConverter.INSTANCE.toCharacterEntity(character);
-        var fruits = fruitService.listByCharacterId(character.getId());
-        Integer attack = character.getBaseAttack();
-        Integer defense = character.getBaseDefense();
-        Integer intelligence = character.getBaseIntelligence();
-        Integer speed = character.getBaseSpeed();
-        Integer groupGain = character.getBaseGroupGain();
-        Integer blood = character.getBlood();
-        for (var fruit : fruits) {
-            attack = (int) (attack * fruit.getAttackSlope() + fruit.getAttackIntercept());
-            defense = (int) (defense * fruit.getDefenseSlope() + fruit.getDefenseIntercept());
-            intelligence = (int) (intelligence * fruit.getIntelligenceSlope() + fruit.getIntelligenceIntercept());
-            speed = (int) (speed * fruit.getSpeedSlope() + fruit.getSpeedIntercept());
-            groupGain = (int) (groupGain * fruit.getGroupGainSlope() + fruit.getGroupGainIntercept());
-            blood = (int) (blood * fruit.getBloodSlope() + fruit.getBloodIntercept());
-        }
-        // normalize battle index
-        if (attack<OnepieceConstants.ATTACK_MIN) {
-            attack = OnepieceConstants.ATTACK_MIN;
-        }
-        if (attack>OnepieceConstants.ATTACK_MAX) {
-            attack = OnepieceConstants.ATTACK_MAX;
-        }
-        if (defense<OnepieceConstants.DEFENSE_MAX) {
-            defense = OnepieceConstants.DEFENSE_MAX;
-        }
-        if (defense>OnepieceConstants.DEFENSE_MIN) {
-            defense = OnepieceConstants.DEFENSE_MIN;
-        }
-        if (intelligence>OnepieceConstants.INTELLIGENCE_MAX) {
-            intelligence = OnepieceConstants.INTELLIGENCE_MAX;
-        }
-        if (intelligence<OnepieceConstants.INTELLIGENCE_MIN) {
-            intelligence = OnepieceConstants.INTELLIGENCE_MIN;
-        }
-        if (speed>OnepieceConstants.SPEED_MAX) {
-            speed = OnepieceConstants.SPEED_MAX;
-        }
-        if (speed<OnepieceConstants.SPEED_MIN) {
-            speed = OnepieceConstants.SPEED_MIN;
-        }
-        if (blood>OnepieceConstants.BLOOD_MAX) {
-            blood = OnepieceConstants.BLOOD_MAX;
-        }
-        if (blood<OnepieceConstants.BLOOD_MIN) {
-            blood = OnepieceConstants.BLOOD_MIN;
-        }
-        if (groupGain>OnepieceConstants.GROUP_GAIN_MAX) {
-            groupGain = OnepieceConstants.GROUP_GAIN_MAX;
-        }
-        if (groupGain<OnepieceConstants.GROUP_GAIN_MIN) {
-            groupGain = OnepieceConstants.GROUP_GAIN_MIN;
-        }
-        characterUpdated = characterUpdated
-                .toBuilder()
-                .setAttack(attack)
-                .setDefense(defense)
-                .setBlood(blood)
-                .setGroupGain(groupGain)
-                .setSpeed(speed)
-                .setIntelligence(intelligence)
-                .build();
-        characterDao.update(characterUpdated);
+        var fruits = fruitService.listFruitEntityByCharacterId(character.getId());
+        characterHelper.calculateCharacterBattleIndex(characterUpdated, fruits);
+
         var response = new UpdateCharacterResponse();
         return response.result(
                 UserFacingConstants.getConstant(UserFacingConstantsKey.UPDATE_SUCCESS)

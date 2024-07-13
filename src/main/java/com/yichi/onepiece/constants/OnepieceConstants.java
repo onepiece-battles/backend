@@ -22,18 +22,4 @@ public class OnepieceConstants {
   public static final String BODY = "BODY";
   public static final String RECEIVER_EMAIL_ADDRESS = "RECEIVER_EMAIL_ADDRESS";
 
-  // battle digits boundary
-  public static final Integer ATTACK_MIN = 10;
-  public static final Integer ATTACK_MAX = 1500;
-  public static final Integer DEFENSE_MIN = 10;
-  public static final Integer DEFENSE_MAX = 1400;
-  public static final Integer BLOOD_MIN = 100;
-  public static final Integer BLOOD_MAX = 18000;
-  public static final Integer SPEED_MIN = 10;
-  public static final Integer SPEED_MAX = 300;
-  public static final Integer GROUP_GAIN_MIN = 80;
-  public static final Integer GROUP_GAIN_MAX = 300;
-  public static final Integer INTELLIGENCE_MIN = 50;
-  public static final Integer INTELLIGENCE_MAX = 300;
-
 }
