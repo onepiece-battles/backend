@@ -44,12 +44,12 @@ public interface CharacterEntityConverter {
 
   @Mapping(target = "creationRecordId", ignore = true)
   @Mapping(target = "modificationRecordId", ignore = true)
-  @Mapping(target = "attack", ignore = true)
-  @Mapping(target = "defense", ignore = true)
-  @Mapping(target = "intelligence", ignore = true)
-  @Mapping(target = "speed", ignore = true)
-  @Mapping(target = "blood", ignore = true)
-  @Mapping(target = "groupGain", ignore = true)
+  @Mapping(target = "attack", source = "baseAttack")
+  @Mapping(target = "defense", source = "baseDefense")
+  @Mapping(target = "intelligence", source = "baseIntelligence")
+  @Mapping(target = "speed", source = "baseSpeed")
+  @Mapping(target = "blood", source = "baseBlood")
+  @Mapping(target = "groupGain", source = "baseGroupGain")
   @Mapping(target = "imageUri", ignore = true)
   @Mapping(target = "profileImage", ignore = true)
   CharacterEntity toCharacterEntity(Character character);

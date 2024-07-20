@@ -241,7 +241,6 @@ public class CharacterService {
     }
 
     public void updateCharacterEntity(CharacterEntity characterEntity) {
-        logger.info("updating score: {}", characterEntity.getScore());
         characterDao.update(characterEntity);
     }
 
