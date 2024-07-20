@@ -5,12 +5,16 @@ import com.yichi.onepiece.character.model.entity.CharacterEntity;
 import java.util.List;
 import java.util.UUID;
 
+import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.fruit.model.FruitEntity;
 import com.yichi.onepiece.fruit.model.FruitListView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CharacterHelper {
+  Logger logger = LoggerFactory.getLogger(CharacterHelper.class);
   public static final Integer ATTACK_MIN = 10;
   public static final Integer ATTACK_MAX = 1500;
   public static final Integer DEFENSE_MIN = 10;
@@ -92,6 +96,7 @@ public class CharacterHelper {
                         .build();
       }
     }
+    logger.info("character update {}", character);
     characterDao.update(character);
   }
 
