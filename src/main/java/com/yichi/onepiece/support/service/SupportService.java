@@ -2,17 +2,23 @@ package com.yichi.onepiece.support.service;
 
 
 import com.yichi.onepiece.character.service.CharacterService;
+import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.group.service.GroupService;
 import com.yichi.onepiece.image.service.ImageService;
-import com.yichi.onepiece.model.ResourceType;
-import com.yichi.onepiece.model.UpdateUriResponse;
+import com.yichi.onepiece.model.*;
+import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import com.yichi.onepiece.utils.EncryptHelper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Service;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 import javax.annotation.Nullable;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.UUID;
 
 @Service
@@ -21,12 +27,14 @@ public class SupportService {
     private final CharacterService characterService;
     private final ImageService imageService;
     private final GroupService groupService;
+    private final FruitService fruitService;
 
-    public SupportService(UserService userService, CharacterService characterService, ImageService imageService, GroupService groupService) {
+    public SupportService(UserService userService, CharacterService characterService, ImageService imageService, GroupService groupService, FruitService fruitService) {
         this.userService = userService;
         this.characterService = characterService;
         this.imageService = imageService;
         this.groupService = groupService;
+        this.fruitService = fruitService;
     }
 
     public UpdateUriResponse updateUri(ResourceType resourceType, @Nullable UUID resourceId) {
@@ -55,6 +63,39 @@ public class SupportService {
             }
         }
         return new UpdateUriResponse().result(UserFacingConstants.getConstant(UserFacingConstantsKey.IMAGE_UPLOAD_SUCCESS)
+                .getDisplayName());
+    }
+
+    public BatchCreateFruitResponse batchCreateFruit(BatchCreateFruitRequest request) {
+        String csvFile = "fruit.csv"; // Change to your file path
+        try {
+            Reader in = new FileReader(csvFile);
+            Iterable<CSVRecord> records = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(in);
+            // Print records
+            for (CSVRecord record : records) {
+                CreateFruitRequest createFruitRequest = new CreateFruitRequest();
+                createFruitRequest.name(new I18nText().enUS(record.get(0).trim()).zhCN(record.get(1).trim()))
+                        .userId(UserHelper.getCurrentUserId())
+                        .fruitType(FruitType.valueOf(record.get(2).trim()))
+                        .energyConsume(Integer.valueOf(record.get(3).trim()))
+                        .attackSlope(Double.valueOf(record.get(4).trim()))
+                        .defenseSlope(Double.valueOf(record.get(5).trim()))
+                        .intelligenceSlope(Double.valueOf(record.get(6).trim()))
+                        .groupGainSlope(Double.valueOf(record.get(7).trim()))
+                        .bloodSlope(Double.valueOf(record.get(8).trim()))
+                        .attackIntercept(Integer.valueOf(record.get(9).trim()))
+                        .defenseIntercept(Integer.valueOf(record.get(10).trim()))
+                        .speedIntercept(Integer.valueOf(record.get(11).trim()))
+                        .intelligenceIntercept(Integer.valueOf(record.get(12).trim()))
+                        .groupGainIntercept(Integer.valueOf(record.get(13).trim()))
+                        .bloodIntercept(Integer.valueOf(record.get(14).trim()))
+                        .speedSlope(Double.valueOf(record.get(15).trim()));
+                fruitService.createFruit(createFruitRequest);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new BatchCreateFruitResponse().result(UserFacingConstants.getConstant(UserFacingConstantsKey.FRUIT_BATCH_CREATE_SUCCESS)
                 .getDisplayName());
     }
 }

@@ -1,6 +1,8 @@
 package com.yichi.onepiece.support.controller;
 import com.yichi.onepiece.api.SupportApi;
 import com.yichi.onepiece.exception.PermissionDeniedException;
+import com.yichi.onepiece.model.BatchCreateFruitRequest;
+import com.yichi.onepiece.model.BatchCreateFruitResponse;
 import com.yichi.onepiece.model.UpdateUriRequest;
 import com.yichi.onepiece.model.UpdateUriResponse;
 import com.yichi.onepiece.support.service.SupportService;
@@ -15,6 +17,15 @@ public class SupportController implements SupportApi {
 
     public SupportController(SupportService service) {
         this.supportService = service;
+    }
+
+    @Override
+    public ResponseEntity<BatchCreateFruitResponse> batchCreateFruit(BatchCreateFruitRequest batchCreateFruitRequest) {
+        if (!UserHelper.hasAdminPermission()) {
+            throw new PermissionDeniedException("Access Denied");
+        }
+        var response = supportService.batchCreateFruit(batchCreateFruitRequest);
+        return ResponseEntity.ok(response);
     }
 
     @Override

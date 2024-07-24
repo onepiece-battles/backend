@@ -1,0 +1,141 @@
+en,zh,type,energy,attack slope ,defense slope,intelligence slope,group gain slope,blood slope,attack intercept ,defense intercept,speed intercept,intelligence intercept,group gain intercept,blood intercept,speed slope
+Human-Human Fruit Model Nika,人人果实太阳神尼卡形态,MYTHICAL_ZOAN,2,1.4,1.4,1.2,1.3,1.5,0,0,0,0,0,1000,1.1
+Smooth-Smooth Fruit,滑嫩果实,PARAMECIA,1,1.05,1.05,1,1,1,0,0,0,0,0,0,1
+Boom-Boom Fruit,炸弹果实,PARAMECIA,3,1,1,1,1,1,100,0,0,0,0,0,1
+Float-Float Fruit,轻飘飘果实,PARAMECIA,2,1,1,1,1,1,30,0,10,0,0,0,1
+Flower-Flower Fruit,花花果实,PARAMECIA,2,1,1,1,1,1,35,30,0,10,30,0,1
+Wax-Wax Fruit ,融化果实,PARAMECIA,2,1,1,1,1,1,35,45,0,0,20,0,1
+Munch-Munch Fruit,吞吞果实,PARAMECIA,2,1,1,1,1,1,35,0,0,0,30,0,1
+Clone-Clone Fruit,模仿果实,PARAMECIA,2,1,1,1,1,1,0,0,0,0,0,0,1
+Dice-Dice Fruit,快斩果实,PARAMECIA,2,1,1,1,1,1,100,30,0,0,3,0,1
+Spike-Spike Fruit ,荆棘果实,PARAMECIA,2,1,1,1,1,1,60,0,0,0,0,0,1
+Bind-Bind Fruit,槛槛果实,PARAMECIA,2,1,1,1,1,1,40,30,0,0,18,0,1
+Boing-Boing Fruit ,弹簧果实,PARAMECIA,2,1,1,1,1,1,30,0,0,0,10,0,1
+String-String Fruit ,线线果实,PARAMECIA,2,1,1,1,1,1,40,10,20,0,25,100,1
+Slow-Slow Fruit,迟缓果实,PARAMECIA,2,1,1,1,1,1,25,25,40,0,0,0,1
+Door-Door Fruit,门门果实,PARAMECIA,3,1,1,1,1,1,30,30,60,10,30,0,1
+Bubble-Bubble Fruit,泡泡果实,PARAMECIA,2,1,1,1,1,1,20,20,0,0,0,0,1
+Berry-Berry Fruit ,散落果实,PARAMECIA,2,1,1,1,1,1,20,0,0,0,0,0,1
+Rust-Rust Fruit,腐蚀果实,PARAMECIA,2,1,1,1,1,1,30,20,0,0,0,0,1
+Wheel-Wheel Fruit,车轮果实,PARAMECIA,2,1,1,1,1,1,10,0,20,0,0,0,1
+Revive-Revive Fruit,黄泉果实,PARAMECIA,1,1,1,1,1,1,30,10,0,0,20,700,1
+Hollow-Hollow Fruit,鬼魂果实,PARAMECIA,2,1,1,1,1,1,30,30,0,0,20,0,1
+Clear-Clear Fruit,透明果实,PARAMECIA,2,1,1,1,1,1,30,0,0,0,20,0,1
+Shadow-Shadow Fruit,影子果实,PARAMECIA,2,1,1,1,1,1,40,30,0,0,20,0,1
+Paw-Paw Fruit,肉球果实,PARAMECIA,2,1,1,1,1,1,120,30,40,0,30,0,1
+Jewelry Bonney's unnamed Paramecia Fruit,岁岁果实,PARAMECIA,2,1,1,1,1,1,10,0,0,0,40,0,1
+Magnet-Magnet Fruit ,磁力果实,PARAMECIA,1,1,1,1,1,1,50,40,0,0,30,0,1
+Ope-Ope Fruit,手术果实,PARAMECIA,3,1,1,1,1,1,80,60,60,0,0,0,1
+Castle-Castle Frui,坚城果实,PARAMECIA,3,1,1,1,1,1,40,100,0,0,30,0,1
+Straw-Straw Fruit,稻草果实,PARAMECIA,3,1,1,1,1,1,80,20,0,0,20,1000,1
+Tone-Tone Fruit,音音果实,PARAMECIA,2,1,1,1,1,1,70,30,0,0,10,0,1
+Love-Love Fruit,迷恋果实,PARAMECIA,2,1,1,1,1,1,50,0,0,0,40,0,1
+Venom-Venom Fruit,毒毒果实,PARAMECIA,2,1,1,1,1,1,120,30,0,0,30,0,1
+Horm-Horm Fruit,荷尔蒙果实,PARAMECIA,2,1,1,1,1,1,50,0,0,0,20,0,1
+Snip-Snip Fruit,剪剪果实,PARAMECIA,2,1,1,1,1,1,30,0,0,0,10,0,1
+Tremor-Tremor Fruit ,震动果实,PARAMECIA,1,1.3,1.2,1,1,1,250,0,0,0,40,0,1
+Twinkle-Twinkle Fruit ,闪亮果实,PARAMECIA,2,1,1,1,1,1,30,150,0,0,0,500,1
+Pocket-Pocket Fruit ,口袋果实,PARAMECIA,2,1,1,1,1,1,40,10,0,0,0,0,1
+Wash-Wash Fruit,洗洗果实,PARAMECIA,2,1,1,1,1,1,0,0,0,40,0,0,1
+Mark-Mark Fruit,标的果实,PARAMECIA,2,1,1,1,1,1,70,0,0,0,0,0,1
+Garb-Garb Fruit,服装果实,PARAMECIA,2,1,1,1,1,1,0,0,0,0,10,0,1
+Arms-Arms Fruit ,武器果实,PARAMECIA,2,1,1,1,1,1,0,50,0,0,0,0,1
+Spin-Spin Fruit ,旋转果实,PARAMECIA,2,1,1,1,1,1,0,30,10,0,0,0,1
+Kilo-Kilo Fruit,沉重果实,PARAMECIA,2,1,1,1,1,1,0,35,0,0,0,0,1
+Barrier-Barrier Fruit,护罩果实,PARAMECIA,2,1,1,1,1,1,50,700,0,0,20,0,1
+Stitch-Stitch Fruit ,缝缝果实,PARAMECIA,2,1,1,1,1,1,30,0,0,0,30,0,1
+Glare-Glare Frui,凝视果实,PARAMECIA,2,1,1,1,1,1,0,0,0,0,30,0,1
+Art-Art Fruit,艺术果实,PARAMECIA,2,1,1,1,1,1,20,0,0,0,20,0,1
+Jacket-Jacket Fruit,外衣果实,PARAMECIA,1,1,1,1,1,1,20,0,0,0,30,0,1
+Pop-Pop Fruit,爆裂果实,PARAMECIA,2,1,1,1,1,1,60,0,0,0,0,0,1
+Hobby-Hobby Fruit,童趣果实,PARAMECIA,2,1,1,1,1,1,0,0,0,0,70,0,1
+Swim-Swim Fruit,游泳果实,PARAMECIA,2,1,1,1,1,1,30,10,10,0,0,0,1
+Ton-Ton Fruit,重吨果实,PARAMECIA,2,1,1,1,1,1,30,0,0,0,0,0,1
+Ripple-Ripple Fruit,飘扬果实,PARAMECIA,2,1,1,1,1,1,40,0,0,0,20,0,1
+Stone-Stone Fruit,岩石果实,PARAMECIA,2,1,1,1,1,1,40,20,0,0,0,600,1
+Brush-Brush Fruit,毛笔果实,PARAMECIA,2,1,1,1,1,1,30,0,0,0,40,0,1
+Calm-Calm Fruit,宁静果实,PARAMECIA,2,1,1,1,1,1,0,0,0,0,50,0,1
+Heal-Heal Fruit ,治愈果实,PARAMECIA,2,1,1,1,1,1,0,0,0,0,40,500,1
+Scroll-Scroll Fruit,卷轴果实,PARAMECIA,2,1,1,1,1,1,30,0,0,0,30,100,1
+Soul-Soul Fruit,灵魂果实,PARAMECIA,2,1,1,1,1,1,80,40,0,10,60,0,1
+Mirror-Mirror Fruit,镜面果实,PARAMECIA,1,1,1,1,1,1,0,0,30,0,30,0,1
+Lick-Lick Fruit,舔舔果实,PARAMECIA,2,1,1,1,1,1,40,0,0,0,10,0,1
+Bis-Bis Fruit,饼干果实,PARAMECIA,2,1,1,1,1,1,0,0,0,0,10,1200,1
+Butter-Butter Fruit,黄油果实,PARAMECIA,2,1,1,1,1,1,0,0,0,0,10,0,1
+Book-Book Fruit,书本果实,PARAMECIA,2,1,1,1,1,1,0,30,0,0,30,0,1
+Cream-Cream Fruit,奶油果实,PARAMECIA,2,1,1,1,1,1,10,0,0,0,0,0,1
+Wring-Wring Fruit ,拧挤果实,PARAMECIA,2,1,1,1,1,1,30,0,0,0,0,0,1
+Memo-Memo Fruit,记忆果实,PARAMECIA,1,1,1,1,1,1,0,0,0,0,50,0,1
+Stick-Stick Fruit ,黏滞果实,PARAMECIA,2,1,1,1,1,1,10,0,0,0,0,0,1
+Puff-Puff Fruit,热气果实,PARAMECIA,2,1,1,1,1,1,40,0,0,0,0,0,1
+Heat-Heat Fruit,热量果实,PARAMECIA,2,1,1,1,1,1,50,0,0,0,0,0,1
+Cook-Cook Fruit,食食果实,PARAMECIA,2,1,1,1,1,1,10,0,0,0,0,0,1
+Pile-Pile Fruit,混杂果实,PARAMECIA,2,1,1,1,1,1,10,0,0,0,0,0,1
+Push-Push Fruit,推挤果实,PARAMECIA,2,1,1,1,1,1,30,0,0,0,40,0,1
+Pump-Pump Fruit,鼓舞果实,PARAMECIA,1,1,1,1,1,1,10,10,0,0,120,0,1
+Mochi-Mochi Fruit,糯米丸果实,PARAMECIA,2,1,1,1,1,1,70,40,0,0,40,400,1
+Time-Time Fruit,时空果实,PARAMECIA,2,1,1,1,1,1,0,0,0,0,60,0,1
+Ripe-Ripe Fruit,成熟果实,PARAMECIA,2,1,1,1,1,1,0,0,0,0,40,0,1
+Sick-Sick Fruit,病菌果实,PARAMECIA,2,1,1,1,1,1,40,0,0,0,0,0,1
+Warp-Warp Fruit,空间移动果实,PARAMECIA,1,1,1,1,1,1,0,0,80,0,0,0,1
+Strong-Strong Fruit,怪力果实,PARAMECIA,2,1,1,1,1,1,70,0,0,0,0,0,1
+Brain-Brain Fruit,脑脑果实,PARAMECIA,1,1,1,1,1,1,0,0,0,120,20,0,1
+Isle-Isle Fruit,岛岛果实,PARAMECIA,2,1,1,1,1,1,30,40,0,0,30,0,1
+Wine-Wine Fruit,酒酒果实,PARAMECIA,2,1,1,1,1,1,10,0,0,0,0,0,1
+Huge-Huge Fruit,巨大果实,PARAMECIA,2,1,1,1,1,1,50,50,0,0,30,700,1
+Whip-Whip Fruit,鞭鞭果实,PARAMECIA,2,1,1,1,1,1,30,0,0,0,0,0,1
+Glorp-Glorp Fruit,黏土果实,PARAMECIA,2,1,1,1,1,1,30,0,0,0,0,0,1
+Ride-Ride Fruit,骑骑果实,PARAMECIA,2,1,1,1,1,1,0,0,30,0,0,0,1
+Ox-Ox Fruit Model: Bison,牛牛果实野牛形态,ZOAN,1,1.12,1.1,1.1,1.1,1.1,0,0,0,0,0,0,1.1
+Human-Human Fruit,人人果实,ZOAN,1,1.1,1.1,1.1,1.1,1.1,0,0,0,20,0,0,1.1
+Bird-Bird Fruit Model Falcon,鸟鸟果实隼形态,ZOAN,1,1.1,1.1,1.1,1.1,1.1,0,0,0,0,0,0,1.25
+Diggy Diggy Fruit Model Mole,鼹鼠果实,ZOAN,1,1.1,1.1,1.1,1.2,1.1,0,0,0,0,0,0,1.1
+Dog-Dog Fruit Model Dachsund,犬犬果实腊肠狗形态,ZOAN,1,1.1,1.1,1.1,1.1,1.1,0,0,0,0,0,0,1.1
+Dog-Dog Fruit Model Jackal ,犬犬果实胡狼形态,ZOAN,1,1.15,1.1,1.1,1.1,1.1,0,0,0,0,0,0,1.1
+Horse-Horse Fruit ,马马果实,ZOAN,1,1.1,1.1,1.1,1.1,1.1,0,0,0,0,0,0,1.2
+Cat-Cat Fruit Model Jackal,猫猫果实豹形态,ZOAN,1,1.1,1.1,1.1,1.1,1.1,0,0,0,0,0,0,1.25
+Dog-Dog Fruit Model Wolf,犬犬果实狼形态,ZOAN,1,1.15,1.1,1.1,1.1,1.1,0,0,0,0,0,0,1.1
+Elephant-Elephant Fruit,象象果实,ZOAN,1,1.2,1.1,1.1,1.1,1.2,0,0,0,0,0,0,1.1
+Ox-Ox Fruit Model: Giraffe,牛牛果实长颈鹿形态,ZOAN,1,1.15,1.1,1.1,1.1,1.1,0,0,0,0,0,0,1.1
+Snake-Snake Fruit Model Anaconda,蛇蛇果实蟒蛇形态,ZOAN,1,1.15,1.1,1.1,1.1,1.1,0,0,0,0,0,0,1.1
+Snake-Snake Fruit Model King Cobra,蛇蛇果实眼镜蛇形态,ZOAN,1,1.15,1.1,1.1,1.1,1.1,0,0,0,0,0,0,1.1
+Dog-Dog Fruit Dalmatinac,犬犬果实斑点狗型态,ZOAN,1,1.1,1.1,1.1,1.1,1.1,0,0,0,0,0,0,1.1
+Turtle Turtle Fruit,龟龟果实,ZOAN,1,1.1,1.2,1.1,1.1,1.1,0,0,0,0,0,0,0.8
+Sala-Sala Fruit Model Axolotl,蝾螈果实六角恐龙形态,ZOAN,1,1.18,1.1,1.1,1.1,1.1,0,0,0,0,0,0,1.1
+Bug-Bug Fruit Model Rhinoceros Beetle,虫虫果实独角仙形态,ZOAN,1,1.1,1.1,1.1,1.1,1.1,0,0,0,0,0,0,1.1
+Bug-Bug Fruit Model Hornet,虫虫果实胡蜂形态,ZOAN,1,1.1,1.1,1.1,1.1,1.1,0,0,0,0,0,0,1.1
+Egg-Egg Fruit ,蛋蛋果实,ZOAN,1,1.1,1.1,1.1,1.1,1.1,0,0,0,0,0,0,1.1
+Bird-Bird Fruit Model Albatross,鸟鸟果实信天翁形态,ZOAN,1,1.1,1.1,1.1,1.1,1.1,0,0,0,0,0,0,1.28
+Dog-Dog Fruit Model Tanuki ,犬犬果实狸猫型态,ZOAN,1,1.1,1.1,1.1,1.1,1.1,0,0,0,0,0,0,1.1
+Dragon-Dragon Fruit Model Allosaurus,龙龙果实异特龙形态,ANCIENT_ZOAN,1,1.2,1.2,1.1,1.2,1.2,0,0,0,0,0,300,1.2
+Elephant-Elephant Fruit Model Mammoth,象象果实长毛象型态,ANCIENT_ZOAN,1,1.2,1.2,1.1,1.2,1.2,0,0,0,0,0,300,1.2
+Dragon-Dragon Fruit Model Spinosaurus,龙龙果实棘背龙形态,ANCIENT_ZOAN,1,1.2,1.2,1.1,1.2,1.2,0,0,0,0,0,300,1.2
+Dragon-Dragon Fruit Model Pteranodon,龙龙果实无齿翼龙形态,ANCIENT_ZOAN,1,1.2,1.2,1.1,1.2,1.2,0,0,0,0,0,300,1.2
+Dragon-Dragon Fruit Model Brachiosaurus ,龙龙果实腕龙形态,ANCIENT_ZOAN,1,1.2,1.2,1.1,1.2,1.2,0,0,0,0,0,300,1.2
+Dragon-Dragon Fruit Model Pachycephalosaurus,龙龙果实厚头龙形态,ANCIENT_ZOAN,1,1.2,1.2,1.1,1.2,1.2,0,0,0,0,0,300,1.2
+Dragon-Dragon Fruit Model Triceratops,龙龙果实三角龙形态,ANCIENT_ZOAN,1,1.2,1.2,1.1,1.2,1.2,0,0,0,0,0,300,1.2
+Cat-Cat Fruit Model Saber-Toothed Tiger,猫猫果实剑齿虎形态,ANCIENT_ZOAN,1,1.2,1.2,1.1,1.2,1.2,0,0,0,0,0,300,1.2
+Spider-Spider Fruit Model Rosamygale Grauvogeli,蜘蛛果实格氏玫瑰古狼蛛形态,ANCIENT_ZOAN,1,1.2,1.2,1.1,1.2,1.2,0,0,0,0,0,300,1.2
+Bird-Bird Fruit Model Phoenix,鸟鸟果实不死鸟型态,MYTHICAL_ZOAN,1,1.2,1.4,1.2,1.3,1.4,0,30,25,0,20,1000,1.4
+Human-Human Fruit Model Buddha,人人果实大佛型态,MYTHICAL_ZOAN,1,1.3,1.3,1.2,1.3,1.3,0,0,0,30,0,500,1.3
+Fish-Fish Fruit Model Azure Dragon,鱼鱼果实青龙型态,MYTHICAL_ZOAN,1,1.4,1.3,1.2,1.3,1.4,0,0,0,0,0,500,1.3
+Dog-Dog Fruit Model Nine-Tailed Fox,犬犬果实九尾狐型态,MYTHICAL_ZOAN,1,1.3,1.3,1.2,1.3,1.3,0,0,0,0,0,500,1.3
+Snake-Snake Fruit Model Yamata no Orochi ,蛇蛇果实八岐大蛇型态,MYTHICAL_ZOAN,1,1.3,1.2,1.2,1.3,1.4,0,0,0,0,0,500,1.3
+Human-Human Fruit Model Onyudo,人人果实大入道型态,MYTHICAL_ZOAN,1,1.3,1.3,1.2,1.3,1.3,0,0,0,25,0,500,1.3
+Dog-Dog Fruit Model Okuchi no Makami,犬犬果实大口真神形态,MYTHICAL_ZOAN,1,1.3,1.3,1.2,1.3,1.3,0,0,0,0,0,500,1.3
+Horse-Horse Fruit Model Pegasus,马马果实天马形态,MYTHICAL_ZOAN,1,1.3,1.2,1.2,1.2,1.2,0,0,0,0,0,500,1.36
+Smoke-Smoke Fruit,冒烟果实,LOGIA,0,1,1,1,1,1,0,20,0,0,5,0,1
+Sand-Sand Fruit,沙砾果实,LOGIA,0,1.05,1,1,1.1,1,0,20,0,0,5,0,1
+Flame-Flame Fruit ,火焰果实,LOGIA,0,1.15,1,1,1.1,1,70,20,0,0,5,0,1.2
+Rumble-Rumble Fruit,轰雷果实,LOGIA,0,1.2,1,1,1.1,1,20,20,30,0,5,0,1
+Ice-Ice Fruit,冷冷果实,LOGIA,0,1,1,1,1.2,1,160,20,0,0,5,0,1
+Dark-Dark Fruit ,黑暗果实,LOGIA,0,1.2,0.9,1,1.2,1,60,-40,0,0,5,0,1
+Glint-Glint Fruit,闪光果实,LOGIA,0,1.2,1,1,1.2,1,150,20,35,0,5,0,1.3
+Mag-Mag Fruit,岩浆果实,LOGIA,0,1.2,1,1,1.2,1,200,20,0,0,5,0,1
+Swamp-Swamp Fruit,沼泽果实,LOGIA,0,1,1,1,1,1,0,20,0,0,5,0,1
+Gas-Gas Fruit,气体果实,LOGIA,0,1,1,1,1,1,0,20,0,0,5,0,1
+Snow-Snow Fruit,下雪果实,LOGIA,0,1.1,1,1,1,1,0,20,0,0,5,0,1
+Soot-Soot Fruit,煤灰果实,LOGIA,0,1,1,1,1.4,1,0,20,0,0,5,0,1
+Woods-Woods Fruit,森森果实,LOGIA,0,1.1,1.3,1,1,1.2,30,30,0,0,5,0,1
+Press-Press Fruit,重力果实,PARAMECIA,2,1.1,1,1,1,1,120,30,0,0,60,0,1
+Millet-Millet Fruit,团子果实,PARAMECIA,2,1,1,1,1,1,0,0,0,0,40,0,1
