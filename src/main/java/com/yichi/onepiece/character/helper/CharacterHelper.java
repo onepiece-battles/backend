@@ -8,6 +8,8 @@ import java.util.UUID;
 import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.fruit.model.FruitEntity;
 import com.yichi.onepiece.fruit.model.FruitListView;
+import com.yichi.onepiece.user.UserHelper;
+import com.yichi.onepiece.utils.RandomGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -96,7 +98,10 @@ public class CharacterHelper {
                         .build();
       }
     }
-    logger.info("character update {}", character);
+    if (UserHelper.hasNikaPermission()) {
+      var score = RandomGenerator.calculateInitialScore(character);
+      character = character.toBuilder().setScore(score).build();
+    }
     characterDao.update(character);
   }
 

@@ -88,6 +88,10 @@ dependencies {
     // pdf
     implementation 'com.itextpdf:itext7-core:8.0.2'
 
+    //csv
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-csv
+    implementation 'org.apache.commons:commons-csv:1.9.0'
+
     // common
     implementation "org.apache.commons:commons-lang3:$apache_commons_version"
     implementation "com.google.guava:guava:$guava_version"

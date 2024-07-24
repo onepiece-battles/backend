@@ -16,6 +16,8 @@ import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import com.yichi.onepiece.utils.EncryptHelper;
 import java.util.List;
 import java.util.UUID;
+
+import com.yichi.onepiece.utils.RandomGenerator;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

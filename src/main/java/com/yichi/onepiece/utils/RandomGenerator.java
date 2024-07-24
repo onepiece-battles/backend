@@ -1,5 +1,7 @@
 package com.yichi.onepiece.utils;
 
+import com.yichi.onepiece.character.model.entity.CharacterEntity;
+
 import java.util.Random;
 
 public class RandomGenerator {
@@ -14,5 +16,16 @@ public class RandomGenerator {
       stringBuilder.append(generateInteger(0,9));
     }
     return stringBuilder.toString();
+  }
+
+  public static int calculateInitialScore(CharacterEntity characterEntity) {
+    int score =   (characterEntity.getAttack() * 10 + characterEntity.getDefense() * 10 + characterEntity.getBlood())/3
+            + (characterEntity.getSpeed()-20) *  5 + (characterEntity.getIntelligence()-100) * 5;
+    if (score<100) {
+      return 100;
+    } else if (score > 12000) {
+      return 12000;
+    }
+    return score;
   }
 }

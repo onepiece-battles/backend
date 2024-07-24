@@ -141,3 +141,7 @@ user:
       displayName:
         en-US: "Image upload failed"
         zh-CN: "图片上传失败"
+    FRUIT_BATCH_CREATE_SUCCESS:
+      displayName:
+        en-US: "Fruit batch create success"
+        zh-CN: "果实批量创建成功"

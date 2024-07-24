@@ -26,6 +26,7 @@ import com.yichi.onepiece.utils.EncryptHelper;
 
 import java.util.*;
 
+import com.yichi.onepiece.utils.RandomGenerator;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +73,7 @@ public class CharacterService {
                         .setCreationRecordId(actionRecord.getId())
                         .setModificationRecordId(actionRecord.getId())
                         .setSystemResource(UserHelper.hasNikaPermission())
-                        .setScore(calculateInitialScore(characterEntity))
+                        .setScore(RandomGenerator.calculateInitialScore(characterEntity))
                         .build();
         characterDao.insert(characterEntity);
         createHakis(request.getHakis(), characterEntity.getId());
@@ -83,17 +84,6 @@ public class CharacterService {
                                 ExceptionUtils.notFound(
                                         "Can not find inserted character with id %s", characterEntity.getId()));
         return CharacterEntityConverter.INSTANCE.toCharacter(insertedEntity);
-    }
-
-    private int calculateInitialScore(CharacterEntity characterEntity) {
-        int score =   (characterEntity.getAttack() * 10 + characterEntity.getDefense() * 10 + characterEntity.getBlood())/3
-                + (characterEntity.getSpeed()-20) *  5 + (characterEntity.getIntelligence()-100) * 5;
-        if (score<100) {
-            return 100;
-        } else if (score > 10000) {
-            return 10000;
-        }
-        return score;
     }
 
     private void createHakis(List<Haki> hakis, UUID characterId) {
@@ -191,7 +181,6 @@ public class CharacterService {
         }
         var fruit = fruitService.findById(fruitId);
         characterHelper.calculateCharacterBattleIndex(character, List.of(fruit));
-
         // this character can take more fruit
         var characterToFruitEntity =
                 CharacterToFruitEntityBuilder.newBuilder()
@@ -248,7 +237,6 @@ public class CharacterService {
         var characterUpdated = CharacterEntityConverter.INSTANCE.toCharacterEntity(character);
         var fruits = fruitService.listFruitEntityByCharacterId(character.getId());
         characterHelper.calculateCharacterBattleIndex(characterUpdated, fruits);
-
         var response = new UpdateCharacterResponse();
         return response.result(
                 UserFacingConstants.getConstant(UserFacingConstantsKey.UPDATE_SUCCESS)
