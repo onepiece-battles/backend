@@ -11,14 +11,14 @@ import com.yichi.onepiece.user.service.UserService;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import com.yichi.onepiece.utils.EncryptHelper;
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import javax.annotation.Nullable;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.util.UUID;
 
 @Service
@@ -67,12 +67,12 @@ public class SupportService {
     }
 
     public BatchCreateFruitResponse batchCreateFruit(BatchCreateFruitRequest request) {
+
         String csvFile = "fruit.csv"; // Change to your file path
-        try {
-            Reader in = new FileReader(csvFile);
-            Iterable<CSVRecord> records = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(in);
-            // Print records
-            for (CSVRecord record : records) {
+        ClassPathResource classPathResource = new ClassPathResource(csvFile);
+        try (InputStreamReader inputStreamReader = new InputStreamReader(classPathResource.getInputStream());
+             CSVParser csvParser = new CSVParser(inputStreamReader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
+                    for (CSVRecord record : csvParser) {
                 CreateFruitRequest createFruitRequest = new CreateFruitRequest();
                 createFruitRequest.name(new I18nText().enUS(record.get(0).trim()).zhCN(record.get(1).trim()))
                         .userId(UserHelper.getCurrentUserId())
