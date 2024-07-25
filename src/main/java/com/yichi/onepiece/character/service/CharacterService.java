@@ -102,6 +102,11 @@ public class CharacterService {
         hakiDao.batchInsert(hakiEntities);
     }
 
+    private void updateHaki(UUID characterId, List<Haki> hakis) {
+        hakiDao.deleteByCharacterId(characterId);
+        createHakis(hakis, characterId);
+    }
+
     public void updateProfile(UUID characterId, String uri) {
         var modificationRecord = actionRecordService.create();
         var character =
@@ -233,10 +238,11 @@ public class CharacterService {
         characterDao.update(characterEntity);
     }
 
-    public UpdateCharacterResponse updateCharacter(Character character) {
+    public UpdateCharacterResponse updateCharacter(UpdateCharacterRequest character) {
         var characterUpdated = CharacterEntityConverter.INSTANCE.toCharacterEntity(character);
         var fruits = fruitService.listFruitEntityByCharacterId(character.getId());
         characterHelper.calculateCharacterBattleIndex(characterUpdated, fruits);
+        updateHaki(character.getId(), character.getHakis());
         var response = new UpdateCharacterResponse();
         return response.result(
                 UserFacingConstants.getConstant(UserFacingConstantsKey.UPDATE_SUCCESS)

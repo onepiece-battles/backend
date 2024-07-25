@@ -15,4 +15,8 @@ import org.apache.ibatis.annotations.Select;
 public interface HakiDao extends BaseDao<HakiEntity, UUID> {
   @Select("select `haki` from `haki` where `haki`.`character_id` = #{characterId}")
   List<Haki> listByCharacterId(@Param("characterId") UUID characterId);
+
+
+  @Select("delete from `haki` where `haki`.`character_id` = #{characterId}")
+  void deleteByCharacterId(@Param("characterId") UUID characterId);
 }

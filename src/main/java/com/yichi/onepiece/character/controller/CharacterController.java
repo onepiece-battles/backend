@@ -77,7 +77,7 @@ public class CharacterController implements CharacterApi {
   }
 
   @Override
-  public ResponseEntity<UpdateCharacterResponse> updateCharacter(Character character) {
+  public ResponseEntity<UpdateCharacterResponse> updateCharacter(UpdateCharacterRequest character) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.CHARACTER, Set.of(Permission.UPDATE));
     logger.info("start updating character");
     var response = characterService.updateCharacter(character);
