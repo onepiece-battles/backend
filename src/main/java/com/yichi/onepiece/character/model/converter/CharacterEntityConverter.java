@@ -8,6 +8,7 @@ import com.yichi.onepiece.fruit.model.converter.FruitConverter;
 import com.yichi.onepiece.model.Character;
 import com.yichi.onepiece.model.CreateCharacterRequest;
 import com.yichi.onepiece.model.GroupForCharacterView;
+import com.yichi.onepiece.model.UpdateCharacterRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -53,4 +54,16 @@ public interface CharacterEntityConverter {
   @Mapping(target = "imageUri", ignore = true)
   @Mapping(target = "profileImage", ignore = true)
   CharacterEntity toCharacterEntity(Character character);
+
+  @Mapping(target = "creationRecordId", ignore = true)
+  @Mapping(target = "modificationRecordId", ignore = true)
+  @Mapping(target = "attack", source = "baseAttack")
+  @Mapping(target = "defense", source = "baseDefense")
+  @Mapping(target = "intelligence", source = "baseIntelligence")
+  @Mapping(target = "speed", source = "baseSpeed")
+  @Mapping(target = "blood", source = "baseBlood")
+  @Mapping(target = "groupGain", source = "baseGroupGain")
+  @Mapping(target = "imageUri", ignore = true)
+  @Mapping(target = "profileImage", ignore = true)
+  CharacterEntity toCharacterEntity(UpdateCharacterRequest updateCharacterRequest);
 }
