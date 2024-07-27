@@ -65,7 +65,7 @@
             </foreach>
         </if>
         <if test="battleFilter.battleStatuses != null and !battleFilter.battleStatuses.isEmpty">
-            AND `status` IN
+            AND `battle_status` IN
             <foreach item="battleStatus" collection="battleFilter.battleStatuses" open="("
                      separator="," close=")">
                 #{battleStatus}

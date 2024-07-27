@@ -39,7 +39,7 @@
 
     <resultMap id="issueFullView" type="com.yichi.onepiece.issue.model.IssueFullView" autoMapping="true" extends="issueListView">
         <association column="user_id" property="issueCreator"
-                     select="com.yichi.onepiece.user.model.UserDao.findById"
+                     select="com.yichi.onepiece.user.model.UserDao.getById"
         />
     </resultMap>
 

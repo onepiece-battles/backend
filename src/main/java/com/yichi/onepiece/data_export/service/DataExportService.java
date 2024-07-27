@@ -88,7 +88,6 @@ public class DataExportService {
       float smallImageHeight = 30;
       String fontPath = "/font/NotoSansCJKsc-Regular.otf";
       PdfFont font = PdfFontFactory.createFont(fontPath, PdfEncodings.IDENTITY_H);
-//      PdfFont fontBold = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
       logger.info("start creating files");
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
       PdfWriter writer = new PdfWriter(outputStream);
@@ -131,7 +130,7 @@ public class DataExportService {
       var receiverNameCell = createTextCell(receiverName,20, new DeviceRgb(16, 85, 154), font, 100, 60);
       var vsCell =  createTextCell("VS",30, new DeviceRgb(16, 85, 154), font, 100, 60);
       var emptyCell = createTextCell("",20, new DeviceRgb(16, 85, 154), font);
-      var winnerImageCell = battleExecutionEntity.getWinnerId() == battleEntity.getStarterId()?
+      var winnerImageCell = battleExecutionEntity.getWinnerId().equals(battleEntity.getStarterId())?
               createImageCell(starterImage, imageWidth, imageHeight):
               createImageCell(receiverImage, imageWidth, imageHeight);
       var winnerCell =  createTextCell(locale.equals(OnepieceLocale.ZH_CN.getValue())?

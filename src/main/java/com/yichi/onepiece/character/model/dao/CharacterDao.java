@@ -24,7 +24,6 @@ public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
       @Param("sortList") Collection<CharacterSortableField> sortList,
       @Param("offset") int offset,
       @Param("size") int size,
-      @Param("userId") UUID userId,
       // external resource ids means the ids of characters created by other users that are shared to
       // current user.
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
@@ -51,7 +50,6 @@ public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
 
   int count(
       @Param("characterFilter") CharacterFilter characterFilter,
-      @Param("userId") UUID userId,
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
 
   List<CharacterListView> listCharactersByGroupId(@Param("groupId") UUID groupId);

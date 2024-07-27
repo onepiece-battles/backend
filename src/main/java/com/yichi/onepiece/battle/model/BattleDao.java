@@ -20,13 +20,11 @@ public interface BattleDao extends BaseDao<BattleEntity, UUID> {
   List<BattleListView> list(
       @Param("battleFilter") BattleFilter battleFilter,
       @Param("sortList") Collection<BattleSortableField> sortList,
-      @Param("userId") UUID userId,
       @Param("externalResourceIds") Collection<UUID> externalResourceIds,
       @Param("offset") int offset,
       @Param("size") int size);
 
   int searchCount(
-      @Param("userId") UUID userId,
       @Param("battleFilter") BattleFilter battleFilter,
       @Param("externalResourceIds") Collection<UUID> externalResourceIds);
 
