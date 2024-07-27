@@ -105,7 +105,7 @@ public class BattleService {
   public ListBattleResponse list(ListBattleRequest request) {
     var userId = UserHelper.getCurrentUserId();
     var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
-    var totalSize = battleDao.searchCount(userId, request.getBattleFilter(), resourceIds);
+    var totalSize = battleDao.searchCount( request.getBattleFilter(), resourceIds);
     logger.info("total size {}", totalSize);
     var offset = (request.getPageIndex() - 1) * request.getPageSize();
     if (offset >= totalSize || offset < 0) {
@@ -116,7 +116,6 @@ public class BattleService {
             .list(
                 request.getBattleFilter(),
                 request.getSortKeys(),
-                userId,
                 resourceIds,
                 offset,
                 request.getPageSize())

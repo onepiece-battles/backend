@@ -202,7 +202,7 @@ public class CharacterService {
     public ListCharacterResponse listCharacters(ListCharacterRequest request) {
         var userId = UserHelper.getCurrentUserId();
         var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
-        var totalSize = characterDao.count(request.getCharacterFilter(), userId, resourceIds);
+        var totalSize = characterDao.count(request.getCharacterFilter(), resourceIds);
         // pageIndex is 1- based. offset is 0- based.
         var offset = (request.getPageIndex() - 1) * request.getPageSize();
         if (offset >= totalSize || offset < 0) {
@@ -216,7 +216,6 @@ public class CharacterService {
                                 request.getSortKeys(),
                                 offset,
                                 request.getPageSize(),
-                                userId,
                                 resourceIds)
                         .stream()
                         .map(CharacterEntityConverter.INSTANCE::toCharacterListView)
