@@ -318,7 +318,7 @@ public class BattleService {
     if (score<100) {
       return 100;
     }
-    return Math.min(score, 10000);
+    return Math.min(score, 12000);
   }
 
   private void scheduleFileGeneratingJob(UUID battleId, UUID userId, String email, String nickname, String roleName, String locale) {

@@ -91,6 +91,9 @@ public class CharacterInBattle {
     if(currentCharacter.getCurrentEnergy()<currentCharacter.getCurrentEnergyConsume()
             || currentCharacter.getBlood()<=0) {
       defeated = true;
+      // -1 means defeated
+      return AttackEntityBuilder.newBuilder()
+              .setAttack(-1).build();
     }
     if (currentCharacter.getCurrentEnergy() < minimumFruitEnergy && !reversed) {
       reverseCharacter();

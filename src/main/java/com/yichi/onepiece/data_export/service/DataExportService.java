@@ -167,6 +167,9 @@ public class DataExportService {
         document.add(getBattleProcessBlock(processList.get(i), locale, font, starterCharacter.getId()));
       }
       document.add(getBattleStatusBlock(smallStarterImageCell, smallReceiverImageCell, statusList.get(i), locale, font));
+      document.add(  new Paragraph(I18nHelper.getTextByLocal(
+              new I18nText().zhCN("战斗结束").enUS("Battle finished"), locale)).setFont(font).setFontSize(10)
+              .setTextAlignment(TextAlignment.CENTER));
       document.setMargins(10, 20, 10, 20);
       document.close();
       writer.close();
@@ -370,10 +373,10 @@ public class DataExportService {
                     .enUS(String.format("Round %s", battleProcessDetail.getBattleProcessRoundNumber())), locale)));
     if (battleProcessDetail.getAttackerId().equals(starterId)) {
       paragraph.add(String.format("%s \n",I18nHelper.getTextByLocal(
-              new I18nText().zhCN(">>> 进攻 >>>").enUS(">>> ATTACK >>>"), locale)));
+              new I18nText().zhCN("--- 进攻 --->").enUS("--- ATTACK --->"), locale)));
     } else {
       paragraph.add(String.format("%s \n",I18nHelper.getTextByLocal(
-              new I18nText().zhCN("<<< 进攻 <<<").enUS("<<< ATTACK <<<"), locale)));
+              new I18nText().zhCN("<--- 进攻 ---").enUS("<--- ATTACK ---"), locale)));
     }
     if (battleProcessDetail.getAttackMissed()) {
       paragraph.add(String.format("%s \n",I18nHelper.getTextByLocal(
@@ -386,7 +389,7 @@ public class DataExportService {
                     new I18nText().zhCN("防守者血量损失").enUS("Defender blood loss"), locale),
             battleProcessDetail.getDefenderBloodLoss()));
     paragraph.setTextAlignment(TextAlignment.CENTER)
-            .setFontSize(12)
+            .setFontSize(8)
             .setFontColor(new DeviceRgb(16, 85, 154),255)
             .setHorizontalAlignment( HorizontalAlignment.CENTER);
     return paragraph;
