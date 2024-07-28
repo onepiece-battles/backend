@@ -388,6 +388,12 @@ public class DataExportService {
     paragraph.add(String.format("%s %s \n",I18nHelper.getTextByLocal(
                     new I18nText().zhCN("防守者血量损失").enUS("Defender blood loss"), locale),
             battleProcessDetail.getDefenderBloodLoss()));
+    // defender energy loss is default to be 2
+    if (!battleProcessDetail.getAttackMissed()) {
+      paragraph.add(String.format("%s %s \n",I18nHelper.getTextByLocal(
+                      new I18nText().zhCN("防守者能量损失").enUS("Defender energy loss"), locale),
+              2));
+    }
     paragraph.setTextAlignment(TextAlignment.CENTER)
             .setFontSize(8)
             .setFontColor(new DeviceRgb(16, 85, 154),255)
