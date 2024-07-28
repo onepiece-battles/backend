@@ -6,15 +6,14 @@ import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.model.Character;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StopWatch;
 
 @Controller
 public class CharacterController implements CharacterApi {
-  Logger logger = LoggerFactory.getLogger(CharacterController.class);
+//  Logger logger = LoggerFactory.getLogger(CharacterController.class);
 
   private final CharacterService characterService;
   private final IamService iamService;
@@ -47,12 +46,8 @@ public class CharacterController implements CharacterApi {
     iamService.checkPermissionOfCurrentAccount(ResourceType.BATTLE, Set.of(Permission.GET));
     iamService.checkPermissionOfCurrentAccount(ResourceType.FRUIT, Set.of(Permission.GET));
     iamService.checkPermissionOfCurrentAccount(ResourceType.GROUP, Set.of(Permission.GET));
-    StopWatch watch = new StopWatch();
-    watch.start();
     var characterFullView =
         characterService.getCharacterFullView(getCharacterFullViewRequest.getCharacterId());
-    watch.stop();
-    logger.info("get character takes: {}", watch.getTotalTimeSeconds());
     return ResponseEntity.ok(characterFullView);
   }
 
@@ -66,20 +61,14 @@ public class CharacterController implements CharacterApi {
   @Override
   public ResponseEntity<ListCharacterResponse> listCharacters(
       ListCharacterRequest listCharacterRequest) {
-    logger.info("list character api");
     iamService.checkPermissionOfCurrentAccount(ResourceType.CHARACTER, Set.of(Permission.LIST));
-    StopWatch watch = new StopWatch();
-    watch.start();
     ListCharacterResponse response = characterService.listCharacters(listCharacterRequest);
-    watch.stop();
-    logger.info("list character takes: {}", watch.getTotalTimeSeconds());
     return ResponseEntity.ok(response);
   }
 
   @Override
   public ResponseEntity<UpdateCharacterResponse> updateCharacter(UpdateCharacterRequest character) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.CHARACTER, Set.of(Permission.UPDATE));
-    logger.info("start updating character");
     var response = characterService.updateCharacter(character);
     return ResponseEntity.ok(response);
   }

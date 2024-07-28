@@ -181,6 +181,9 @@ public class Battlefield {
         .setAttackerEnergyLoss(attackSide.getEnergyConsume())
         .setAttackSkill("");
     var attackEntity = attackSide.attack();
+    if (attackEntity.getAttack()==-1) {
+      return;
+    }
     // update attacker information
     if (!hideSuccess()) {
       battleProcessDetailEntityBuilder.setAttackMissed(Boolean.FALSE);

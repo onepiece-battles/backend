@@ -31,7 +31,7 @@
 
     <!-- Construct where clause -->
     <sql id="battleFilter">
-        WHERE (`user_id` = #{userId} OR `battle`.`system_resource` = true
+        WHERE (`battle`.`system_resource` = true
             <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
                 OR
                 `battle`.id IN
