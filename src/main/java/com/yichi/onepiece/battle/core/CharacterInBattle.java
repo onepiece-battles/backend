@@ -17,7 +17,7 @@ public class CharacterInBattle {
 
   // energy consume for character's ordinary attack without any fruit.
   private static final int DEFAULT_ENERGY_CONSUME = 2;
-  private static final int DEFENDING_ENERGY_CONSUME = 1;
+  private static final int DEFENDING_ENERGY_CONSUME = 2;
   private int minimumFruitEnergy;
   private final UUID characterId;
   private final I18nText name;

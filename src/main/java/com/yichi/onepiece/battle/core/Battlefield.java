@@ -111,11 +111,11 @@ public class Battlefield {
                                     characterInit.getIntelligence() - characterReceive.getIntelligence())
                             / MAXIMUM_INTELLIGENCE));
     if (characterInit.getIntelligence() > characterReceive.getIntelligence()) {
-      attackLikelihoodMap.put(characterInit.getCharacterId(), attackEnhance);
+      attackLikelihoodMap.put(characterInit.getCharacterId(), 100 + attackEnhance);
       attackLikelihoodMap.put(characterReceive.getCharacterId(), 100);
     } else {
       attackLikelihoodMap.put(characterInit.getCharacterId(), 100);
-      attackLikelihoodMap.put(characterReceive.getCharacterId(), attackEnhance);
+      attackLikelihoodMap.put(characterReceive.getCharacterId(), 100 + attackEnhance);
     }
   }
 
