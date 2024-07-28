@@ -62,7 +62,9 @@ public class PermissionDefinition {
   }
 
   private static List<Pair<ResourceType, Permission>> getNormalUserPermissions() {
-    return getAdminPermissions().stream().filter(rp-> rp.getKey()!=ResourceType.ISSUE).toList();
+    var permissionList = new ArrayList<>(getAdminPermissions().stream().filter(rp -> rp.getKey() != ResourceType.ISSUE).toList());
+    permissionList.add(Pair.of(ResourceType.ISSUE, Permission.CREATE));
+    return permissionList;
   }
 
   private static List<Pair<ResourceType, Permission>> getVisitorUserPermissions() {
