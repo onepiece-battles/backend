@@ -98,4 +98,9 @@ public class SupportService {
         return new BatchCreateFruitResponse().result(UserFacingConstants.getConstant(UserFacingConstantsKey.FRUIT_BATCH_CREATE_SUCCESS)
                 .getDisplayName());
     }
+
+
+    public void updateCharacterAgeHeightBounty() {
+        characterService.updateBountyAgeAndHeight();
+    }
 }
