@@ -266,5 +266,11 @@ public class CharacterService {
         }
         return characterDao.findById(characterIdList.get(0)).orElseThrow();
     }
+
+    public void updateBountyAgeAndHeight() {
+        characterDao.updateBounty();
+        characterDao.updateAge();
+        characterDao.updateHeight();
+    }
 }
 

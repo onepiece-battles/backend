@@ -7,6 +7,7 @@ import com.yichi.onepiece.model.UpdateUriRequest;
 import com.yichi.onepiece.model.UpdateUriResponse;
 import com.yichi.onepiece.support.service.SupportService;
 import com.yichi.onepiece.user.UserHelper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
@@ -26,6 +27,15 @@ public class SupportController implements SupportApi {
         }
         var response = supportService.batchCreateFruit(batchCreateFruitRequest);
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<Void> updateCharacterBasic() {
+        if (!UserHelper.hasAdminPermission()) {
+            throw new PermissionDeniedException("Access Denied");
+        }
+        supportService.updateCharacterAgeHeightBounty();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Override

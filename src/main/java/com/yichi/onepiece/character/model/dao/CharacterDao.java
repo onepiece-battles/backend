@@ -57,4 +57,13 @@ public interface CharacterDao extends BaseDao<CharacterEntity, UUID> {
 
   @Select("select * from `character` where `character`.`image_uri` is null")
   List<CharacterEntity> listNoUriCharacters();
+
+  @Update("UPDATE `character` SET bounty = NULL WHERE bounty = 10 ")
+  void updateBounty();
+
+  @Update("UPDATE `character` SET age = NULL WHERE age IN (0, 1)")
+  void updateAge();
+
+  @Update("UPDATE `character` SET height = NULL WHERE height IN (0, 1)")
+  void updateHeight();
 }
