@@ -31,47 +31,49 @@
 
     <!-- Construct where clause -->
     <sql id="battleFilter">
-        WHERE (`battle`.`system_resource` = true
-            <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
-                OR
-                `battle`.id IN
-                <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
-                    #{externalResourceId}
-                </foreach>
-            </if>
-        )
-        <if test="battleFilter.userId != null">
-            AND `user_id` = #{battleFilter.userId}
-        </if>
-        <if test="battleFilter.roleId != null">
-            AND `role_id` = #{battleFilter.roleId}
-        </if>
-        <if test="battleFilter.onlySystem != null">
-            AND `battle`.`system_resource` = #{battleFilter.onlySystem}
-        </if>
-        <if test="battleFilter.starterName != null and battleFilter.starterName != ''">
-            <bind name="starterKeyLike" value="'%' + battleFilter.starterName + '%'" />
-            AND JSON_EXTRACT(`starter`.`name`, CONCAT('$.', #{battleFilter.languageCode})) LIKE #{starterKeyLike}
-        </if>
-        <if test="battleFilter.receiverName != null and battleFilter.receiverName != ''">
-            <bind name="receiverKeyLike" value="'%' + battleFilter.receiverName + '%'" />
-            AND JSON_EXTRACT(`receiver`.`name`, CONCAT('$.', #{battleFilter.languageCode})) LIKE #{receiverKeyLike}
-        </if>
-        <if test="battleFilter.battleTypes != null and !battleFilter.battleTypes.isEmpty">
-            AND `type` IN
-            <foreach item="battleType" collection="battleFilter.battleTypes" open="("
-                     separator="," close=")">
-                #{battleType}
-            </foreach>
-        </if>
-        <if test="battleFilter.battleStatuses != null and !battleFilter.battleStatuses.isEmpty">
-            AND `battle_status` IN
-            <foreach item="battleStatus" collection="battleFilter.battleStatuses" open="("
-                     separator="," close=")">
-                #{battleStatus}
-            </foreach>
-        </if>
+        <where>
+            <trim prefixOverrides="AND">
+                <if test="battleFilter.userId != null or battleFilter.systemResource != null">
+                    (
+                    <trim prefixOverrides="OR">
+                        <if test="battleFilter.userId != null">
+                            `user_id` = #{battleFilter.userId}
+                        </if>
+                        <if test="battleFilter.systemResource != null">
+                            `battle`.`system_resource` = #{battleFilter.systemResource}
+                        </if>
+                    </trim>
+                    )
+                </if>
+                <if test="battleFilter.roleId != null">
+                    AND `role_id` = #{battleFilter.roleId}
+                </if>
+                <if test="battleFilter.starterName != null and battleFilter.starterName != ''">
+                    <bind name="starterKeyLike" value="'%' + battleFilter.starterName + '%'" />
+                    AND JSON_EXTRACT(`starter`.`name`, CONCAT('$.', #{battleFilter.languageCode})) LIKE #{starterKeyLike}
+                </if>
+                <if test="battleFilter.receiverName != null and battleFilter.receiverName != ''">
+                    <bind name="receiverKeyLike" value="'%' + battleFilter.receiverName + '%'" />
+                    AND JSON_EXTRACT(`receiver`.`name`, CONCAT('$.', #{battleFilter.languageCode})) LIKE #{receiverKeyLike}
+                </if>
+                <if test="battleFilter.battleTypes != null and !battleFilter.battleTypes.isEmpty">
+                    AND `type` IN
+                    <foreach item="battleType" collection="battleFilter.battleTypes" open="("
+                             separator="," close=")">
+                        #{battleType}
+                    </foreach>
+                </if>
+                <if test="battleFilter.battleStatuses != null and !battleFilter.battleStatuses.isEmpty">
+                    AND `battle_status` IN
+                    <foreach item="battleStatus" collection="battleFilter.battleStatuses" open="("
+                             separator="," close=")">
+                        #{battleStatus}
+                    </foreach>
+                </if>
+            </trim>
+        </where>
     </sql>
+
 
     <!-- Construct order by clause -->
     <sql id="orderClause">

@@ -33,61 +33,67 @@
         </include>
     </select>
 
-    <!-- Construct where clause -->
     <sql id="characterFilter">
-        WHERE ( `system_resource` is true
-        <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
-            OR
-            `character`.id IN
-            <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
-                #{externalResourceId}
-            </foreach>
-        </if>)
-        <if test="characterFilter.userId != null">
-            AND `user_id` = #{characterFilter.userId}
-        </if>
-        <if test="characterFilter.excludedCharacterIds != null and !characterFilter.excludedCharacterIds.isEmpty">
-            AND `character`.`id` not in
-            <foreach item="excludedId" collection="characterFilter.excludedCharacterIds" open="("
-                     separator="," close=")">
-                #{excludedId}
-            </foreach>
-        </if>
-        <if test="characterFilter.roleId != null">
-            AND `role_id` = #{characterFilter.roleId}
-        </if>
-        <if test="characterFilter.name != null and characterFilter.name != ''">
-            <bind name="keyLike" value="'%' + characterFilter.name + '%'" />
-            AND JSON_EXTRACT(name, CONCAT('$.', #{characterFilter.languageCode})) LIKE #{keyLike}
-        </if>
-        <if test="characterFilter.hasFruit != null">
-            AND (`character_to_fruit`.`fruit_id` IS NOT NULL) = #{characterFilter.hasFruit}
-        </if>
-        <if test="characterFilter.onlySystem != null">
-            AND `system_resource` = #{characterFilter.onlySystem}
-        </if>
-        <if test="characterFilter.battleStyles != null and !characterFilter.battleStyles.isEmpty">
-            AND `battle_style` in
-            <foreach item="battleStyle" collection="characterFilter.battleStyles" open="("
-                     separator="," close=")">
-                #{battleStyle}
-            </foreach>
-        </if>
-        <if test="characterFilter.races != null and !characterFilter.races.isEmpty">
-            AND `race` in
-            <foreach item="race" collection="characterFilter.races" open="("
-                     separator="," close=")">
-                #{race}
-            </foreach>
-        </if>
-        <if test="characterFilter.hakis != null and !characterFilter.hakis.isEmpty">
-            AND `haki`.`haki` in
-            <foreach item="haki" collection="characterFilter.hakis" open="("
-                     separator="," close=")">
-                #{haki}
-            </foreach>
-        </if>
+        <where>
+            <trim prefixOverrides="AND">
+                <if test="characterFilter.systemResource != null or characterFilter.userId != null or (externalResourceIds != null and externalResourceIds.size > 0)">
+                    (
+                    <trim prefixOverrides="OR">
+                        <if test="characterFilter.systemResource != null">
+                            `system_resource` = #{characterFilter.systemResource}
+                        </if>
+                        <if test="characterFilter.userId != null">
+                            `user_id` = #{characterFilter.userId}
+                        </if>
+                        <if test="externalResourceIds != null and externalResourceIds.size > 0">
+                            `character`.`id` IN
+                            <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator=","
+                                     close=")">
+                                #{externalResourceId}
+                            </foreach>
+                        </if>
+                    </trim>
+                    )
+                </if>
+                <if test="characterFilter.excludedCharacterIds != null and !characterFilter.excludedCharacterIds.isEmpty">
+                    AND `character`.`id` NOT IN
+                    <foreach item="excludedId" collection="characterFilter.excludedCharacterIds" open="(" separator="," close=")">
+                        #{excludedId}
+                    </foreach>
+                </if>
+                <if test="characterFilter.roleId != null">
+                    AND `role_id` = #{characterFilter.roleId}
+                </if>
+                <if test="characterFilter.name != null and characterFilter.name != ''">
+                    <bind name="keyLike" value="'%' + characterFilter.name + '%'" />
+                    AND JSON_EXTRACT(name, CONCAT('$.', #{characterFilter.languageCode})) LIKE #{keyLike}
+                </if>
+                <if test="characterFilter.hasFruit != null">
+                    AND (`character_to_fruit`.`fruit_id` IS NOT NULL) = #{characterFilter.hasFruit}
+                </if>
+                <if test="characterFilter.battleStyles != null and !characterFilter.battleStyles.isEmpty">
+                    AND `battle_style` IN
+                    <foreach item="battleStyle" collection="characterFilter.battleStyles" open="(" separator="," close=")">
+                        #{battleStyle}
+                    </foreach>
+                </if>
+                <if test="characterFilter.races != null and !characterFilter.races.isEmpty">
+                    AND `race` IN
+                    <foreach item="race" collection="characterFilter.races" open="(" separator="," close=")">
+                        #{race}
+                    </foreach>
+                </if>
+                <if test="characterFilter.hakis != null and !characterFilter.hakis.isEmpty">
+                    AND `haki`.`haki` IN
+                    <foreach item="haki" collection="characterFilter.hakis" open="(" separator="," close=")">
+                        #{haki}
+                    </foreach>
+                </if>
+            </trim>
+        </where>
     </sql>
+
+
 
     <!-- Construct order by clause -->
     <sql id="orderClause">
