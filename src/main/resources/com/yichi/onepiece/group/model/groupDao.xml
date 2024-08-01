@@ -22,46 +22,52 @@
   </select>
 
   <sql id="groupFilter">
-    WHERE  (`user_id` = #{userId} or `system_resource` = true
-    <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
-      OR
-      `group`.id IN
-      <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator=","
-               close=")">
-        #{externalResourceId}
-      </foreach>
-    </if>)
-    <if test="groupFilter.userId != null">
-      AND `user_id` = #{groupFilter.userId}
-    </if>
-    <if test="groupFilter.noFather != null">
-      AND `father_group_id` is  null
-    </if>
-    <if test="groupFilter.excludedGroupIds != null and !groupFilter.excludedGroupIds.isEmpty">
-      AND `group`.`id` not in
-      <foreach item="excludedId" collection="groupFilter.excludedGroupIds" open="("
-               separator="," close=")">
-        #{excludedId}
-      </foreach>
-    </if>
-    <if test="groupFilter.roleId != null">
-      AND `role_id` = #{groupFilter.roleId}
-    </if>
-    <if test="groupFilter.onlySystem != null">
-      AND `system_resource` = #{groupFilter.onlySystem}
-    </if>
-    <if test="groupFilter.groupCategories != null and !groupFilter.groupCategories.isEmpty">
-      AND `group_category` in
-      <foreach item="category" collection="groupFilter.groupCategories" open="("
-               separator="," close=")">
-        #{category}
-      </foreach>
-    </if>
-    <if test="groupFilter.name != null and groupFilter.name != ''">
-      <bind name="keyLike" value="'%' + groupFilter.name + '%'" />
-      AND JSON_EXTRACT(name, CONCAT('$.', #{groupFilter.languageCode})) LIKE #{keyLike}
-    </if>
+    <where>
+      <trim prefixOverrides="AND">
+        <if test="groupFilter.systemResource != null or groupFilter.userId != null or (externalResourceIds != null and externalResourceIds.size > 0)">
+          (
+          <trim prefixOverrides="OR">
+            <if test="groupFilter.systemResource != null">
+              `group`.`system_resource` = #{groupFilter.systemResource}
+            </if>
+            <if test="groupFilter.userId != null">
+              `user_id` = #{groupFilter.userId}
+            </if>
+            <if test="externalResourceIds != null and externalResourceIds.size > 0">
+              `group`.`id` IN
+              <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
+                #{externalResourceId}
+              </foreach>
+            </if>
+          </trim>
+          )
+        </if>
+        <if test="groupFilter.noFather != null">
+          AND `father_group_id` is null
+        </if>
+        <if test="groupFilter.excludedGroupIds != null and !groupFilter.excludedGroupIds.isEmpty">
+          AND `group`.`id` not in
+          <foreach item="excludedId" collection="groupFilter.excludedGroupIds" open="(" separator="," close=")">
+            #{excludedId}
+          </foreach>
+        </if>
+        <if test="groupFilter.roleId != null">
+          AND `role_id` = #{groupFilter.roleId}
+        </if>
+        <if test="groupFilter.groupCategories != null and !groupFilter.groupCategories.isEmpty">
+          AND `group_category` in
+          <foreach item="category" collection="groupFilter.groupCategories" open="(" separator="," close=")">
+            #{category}
+          </foreach>
+        </if>
+        <if test="groupFilter.name != null and groupFilter.name != ''">
+          <bind name="keyLike" value="'%' + groupFilter.name + '%'" />
+          AND JSON_EXTRACT(name, CONCAT('$.', #{groupFilter.languageCode})) LIKE #{keyLike}
+        </if>
+      </trim>
+    </where>
   </sql>
+
 
   <!-- Construct order by clause -->
   <sql id="orderClause">

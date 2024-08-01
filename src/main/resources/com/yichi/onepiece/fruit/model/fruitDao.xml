@@ -48,34 +48,41 @@
 
     <!-- Construct where clause -->
     <sql id="fruitFilter">
-        WHERE (
-        `user_id` = #{userId} or `fruit`.system_resource = true
-        <if test="externalResourceIds!=null and !externalResourceIds.isEmpty">
-            OR
-            id IN
-            <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
-                #{externalResourceId}
-            </foreach>
-        </if>
-        )
-        <if test="fruitFilter.userId != null">
-            AND `user_id` = #{fruitFilter.userId}
-        </if>
-        <if test="fruitFilter.onlySystem != null">
-            AND `system_resource` = #{fruitFilter.onlySystem}
-        </if>
-        <if test="fruitFilter.name != null and fruitFilter.name != ''">
-            <bind name="keyLike" value="'%' + fruitFilter.name + '%'" />
-            AND JSON_EXTRACT(name, CONCAT('$.', #{fruitFilter.languageCode})) LIKE #{keyLike}
-        </if>
-        <if test="fruitFilter.types != null and !fruitFilter.types.isEmpty">
-            AND `fruit_type` IN
-            <foreach item="type" collection="fruitFilter.types" open="("
-              separator="," close=")">
-                #{type}
-            </foreach>
-        </if>
+        <where>
+            <trim prefixOverrides="AND">
+                <if test="fruitFilter.systemResource != null or fruitFilter.userId != null or (externalResourceIds != null and externalResourceIds.size > 0)">
+                    (
+                    <trim prefixOverrides="OR">
+                        <if test="fruitFilter.systemResource != null">
+                            `fruit`.`system_resource` = #{fruitFilter.systemResource}
+                        </if>
+                        <if test="fruitFilter.userId != null">
+                            `user_id` = #{fruitFilter.userId}
+                        </if>
+                        <if test="externalResourceIds != null and externalResourceIds.size > 0">
+                            `fruit`.id IN
+                            <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator=","
+                                     close=")">
+                                #{externalResourceId}
+                            </foreach>
+                        </if>
+                    </trim>
+                    )
+                </if>
+                <if test="fruitFilter.name != null and fruitFilter.name != ''">
+                    <bind name="keyLike" value="'%' + fruitFilter.name + '%'" />
+                    AND JSON_EXTRACT(name, CONCAT('$.', #{fruitFilter.languageCode})) LIKE #{keyLike}
+                </if>
+                <if test="fruitFilter.types != null and !fruitFilter.types.isEmpty">
+                    AND `fruit_type` IN
+                    <foreach item="type" collection="fruitFilter.types" open="(" separator="," close=")">
+                        #{type}
+                    </foreach>
+                </if>
+            </trim>
+        </where>
     </sql>
+
 
     <!-- Construct order by clause -->
     <sql id="orderClause">
