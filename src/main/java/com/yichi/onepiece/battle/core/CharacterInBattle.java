@@ -59,6 +59,9 @@ public class CharacterInBattle {
     return reversed;
   }
   public boolean isAlive() {
+    if (currentCharacter.getCurrentEnergy()<=0 || currentCharacter.getBlood()<=0 ) {
+      defeated = true;
+    }
     return !defeated;
   }
 
@@ -88,13 +91,6 @@ public class CharacterInBattle {
   }
 
   public AttackEntity attack() {
-    if(currentCharacter.getCurrentEnergy()<currentCharacter.getCurrentEnergyConsume()
-            || currentCharacter.getBlood()<=0) {
-      defeated = true;
-      // -1 means defeated
-      return AttackEntityBuilder.newBuilder()
-              .setAttack(-1).build();
-    }
     if (currentCharacter.getCurrentEnergy() < minimumFruitEnergy && !reversed) {
       reverseCharacter();
       reversed = true;
