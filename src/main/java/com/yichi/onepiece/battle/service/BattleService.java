@@ -220,6 +220,9 @@ public class BattleService {
       }
       battlefield.checkReverse();
       battlefield.processBattle();
+      if(!battlefield.allAlive()) {
+        break;
+      }
       battlefield.refreshAttackSide();
       currentBattleTurn ++;
     }
