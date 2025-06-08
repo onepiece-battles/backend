@@ -1,7 +1,9 @@
-package com.yichi.onepiece.chatting;
+package com.yichi.onepiece.chatting.service;
 
 
 import com.yichi.onepiece.chatting.mapper.*;
+import com.yichi.onepiece.exception.FileStorageException;
+import com.yichi.onepiece.image.service.ImageService;
 import com.yichi.onepiece.lineage.model.ActionRecordConverter;
 import com.yichi.onepiece.lineage.model.ActionRecordEntity;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
@@ -9,7 +11,6 @@ import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.user.service.UserService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -17,17 +18,19 @@ import java.util.stream.Collectors;
 @Service
 public class ChattingService {
     private final ConversationDao conversationDao;
-    private final PhraseDao phraseDao;
+    private final MessageDao messageDao;
     private final UserConversationDao userConversationDao;
     private final ActionRecordService actionRecordService;
     private final UserService userService;
+    private final ImageService imageService;
 
-    public ChattingService(ConversationDao conversationDao, PhraseDao phraseDao, UserConversationDao userConversationDao, UserService userService, ActionRecordService actionRecordService) {
+    public ChattingService(ConversationDao conversationDao, MessageDao messageDao, UserConversationDao userConversationDao, UserService userService, ActionRecordService actionRecordService, ImageService imageService) {
         this.conversationDao = conversationDao;
-        this.phraseDao = phraseDao;
+        this.messageDao = messageDao;
         this.userConversationDao = userConversationDao;
         this.userService = userService;
         this.actionRecordService = actionRecordService;
+        this.imageService = imageService;
     }
 
     public Chat create(CreateChatRequest request) {
@@ -77,4 +80,39 @@ public class ChattingService {
                 .members(userService.listByUserIds(userIds));
     }
 
+    public SendMessageResponse sendMessage(SendMessageRequest request) {
+        MessageEntityBuilder messageEntityBuilder=MessageEntityBuilder.newBuilder();
+        var actionRecord = actionRecordService.create();
+        try {
+            if (request.getProfileImage()!=null) {
+                String uri = imageService.uploadImage(request.getProfileImage());
+                messageEntityBuilder.setImageContentUri(uri);
+            }
+            if (request.getVoice()!=null) {
+                String uri = imageService.uploadImage(request.getVoice());
+                messageEntityBuilder.setVoiceContentUri(uri);
+            }
+        } catch (FileStorageException e) {
+            e.printStackTrace();
+            return new SendMessageResponse().result(Boolean.FALSE);
+        }
+        MessageEntity messageEntity = messageEntityBuilder.setPreMessageId(request.getPreMessageId())
+                .setUserId(request.getUserId())
+                .setContent(request.getContent())
+                .setRetracted(Boolean.FALSE)
+                .setConversationId(request.getChatId())
+                .setImageContentUri(request.getProfileImage())
+                .setCreationRecordId(actionRecord.getId())
+                .setModificationRecordId(actionRecord.getId())
+                .build();
+        messageDao.insert(messageEntity);
+        return new SendMessageResponse().result(Boolean.TRUE);
+    }
+
+    public RetractMessageResponse retractMessage(RetractMessageRequest request) {
+        var message = messageDao.findById(request.getMessageId()).orElseThrow();
+        message = message.toBuilder().setRetracted(true).build();
+        messageDao.update(message);
+        return new RetractMessageResponse().result(Boolean.TRUE);
+    }
 }

@@ -2,7 +2,7 @@ package com.yichi.onepiece.chatting.controller;
 
 
 import com.yichi.onepiece.api.ChattingApi;
-import com.yichi.onepiece.chatting.ChattingService;
+import com.yichi.onepiece.chatting.service.ChattingService;
 import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.*;
 import org.springframework.http.ResponseEntity;
@@ -38,11 +38,11 @@ public class ChattingController implements ChattingApi {
 
     @Override
     public ResponseEntity<RetractMessageResponse> retractMessage(RetractMessageRequest retractMessageRequest) {
-        return null;
+        return ResponseEntity.ok(chattingService.retractMessage(retractMessageRequest));
     }
 
     @Override
     public ResponseEntity<SendMessageResponse> sendMessage(SendMessageRequest sendMessageRequest) {
-        return null;
+        return ResponseEntity.ok(chattingService.sendMessage(sendMessageRequest));
     }
 }

@@ -16,5 +16,5 @@ public interface MessageEntity {
     String getVoiceContentUri();
     Long getCreationRecordId();
     Long getModificationRecordId();
-
+    MessageEntityBuilder toBuilder();
 }
