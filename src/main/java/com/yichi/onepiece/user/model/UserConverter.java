@@ -25,6 +25,10 @@ public interface UserConverter {
   @Mapping(target = "profileImage", ignore = true)
   User toUser(UserDetailImpl userDetail);
 
+  @Mapping(target = "loginRoleResourcesPermissionMap", ignore = true)
+  @Mapping(target = "profileImage", ignore = true)
+  User toUser(UserEntity userEntity);
+
   default String blobToString(Byte[] profileByteArray) {
     if (profileByteArray == null) {
       return null;
