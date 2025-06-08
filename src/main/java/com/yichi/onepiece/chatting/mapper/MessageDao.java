@@ -8,5 +8,5 @@ import java.util.UUID;
 
 @Dao
 @Mapper
-public interface PhraseDao extends BaseDao<MessageEntity, UUID> {
+public interface MessageDao extends BaseDao<MessageEntity, UUID> {
 }
