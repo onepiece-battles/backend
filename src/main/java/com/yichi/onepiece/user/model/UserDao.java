@@ -32,6 +32,18 @@ public interface UserDao extends BaseDao<UserEntity, UUID> {
   @Select("SELECT * FROM user WHERE nickname = #{nickname}")
   List<UserEntity> listByNickName(@Param("nickname") String nickname);
 
+  @Select({
+          "<script>",
+          "SELECT *",
+          "FROM `user` ",
+          "WHERE `user`.`id` IN ",
+          "<foreach item='item' collection='ids' open='(' separator=',' close=')'>",
+          "  #{item}",
+          "</foreach>",
+          "</script>"
+  })
+  List<UserEntity> listByUserIds(@Param("ids") List<UUID> ids);
+
   @Select("SELECT * FROM user WHERE username= #{email}")
   List<UserEntity> listByEmailAddress(@Param("email") String email);
 

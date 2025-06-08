@@ -1,0 +1,1 @@
+alter table conversation add column `name` VARCHAR(255);

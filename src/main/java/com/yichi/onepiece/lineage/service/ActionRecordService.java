@@ -4,6 +4,7 @@ import com.yichi.onepiece.iam.service.RoleService;
 import com.yichi.onepiece.lineage.model.ActionRecordDao;
 import com.yichi.onepiece.lineage.model.ActionRecordEntity;
 import com.yichi.onepiece.lineage.model.ActionRecordEntityBuilder;
+import com.yichi.onepiece.model.ActionRecord;
 import com.yichi.onepiece.model.UserRole;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.model.UserDao;
@@ -13,6 +14,8 @@ import io.micrometer.core.annotation.Timed;
 import java.time.Clock;
 import java.util.UUID;
 import javax.annotation.Nullable;
+
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -96,5 +99,16 @@ public class ActionRecordService {
         .setRoleName(roleEntity.getName())
         .setActionTimestamp(clock.millis());
     return actionRecordEntityBuilder.build();
+  }
+
+  public ActionRecord convertActionRecord(ActionRecordEntity actionRecord) {
+    return new ActionRecord()
+            .actionTimestamp(actionRecord.getActionTimestamp())
+            .id(actionRecord.getId())
+            .nickname(actionRecord.getNickname())
+            .roleId(actionRecord.getRoleId())
+            .roleName(actionRecord.getRoleName())
+            .userId(actionRecord.getUserId())
+            .username(actionRecord.getUsername());
   }
 }

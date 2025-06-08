@@ -123,6 +123,13 @@ public class UserService {
     return new ListUsersResponse().users(users).totalSize(totalSize);
   }
 
+  public List<User> listByUserIds(List<UUID> ids) {
+      return userDao.listByUserIds(ids)
+              .stream()
+            .map(UserConverter.INSTANCE::toUser)
+            .toList();
+  }
+
 
   public List<UserEntity> listNoUriUsers() {
     return userDao.listEmptyUriUsers();
