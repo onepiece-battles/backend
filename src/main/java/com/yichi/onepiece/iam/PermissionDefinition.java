@@ -24,7 +24,8 @@ public class PermissionDefinition {
                   Map.entry(ResourceType.FRUIT, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet())),
                   Map.entry(ResourceType.ISSUE, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet())),
                   Map.entry(ResourceType.GROUP, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet())),
-                  Map.entry(ResourceType.ROLE, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet()))
+                  Map.entry(ResourceType.ROLE, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet())),
+                  Map.entry(ResourceType.CHATTING, Arrays.stream(Permission.values()).filter(value-> !value.equals(Permission.ASSIGN_ROLE)).collect(Collectors.toSet()))
           )
   );
 
@@ -72,7 +73,7 @@ public class PermissionDefinition {
             rp-> rp.getValue()!=Permission.UPDATE
                     &&rp.getValue()!=Permission.BATCH_UPDATE
             && rp.getValue()!=Permission.CREATE
-
+            && rp.getKey()!=ResourceType.CHATTING
     ).toList();
   }
 }

@@ -5,6 +5,7 @@ import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.*;
 
 import com.aliyuncs.utils.Base64Helper;
 import com.yichi.onepiece.email.EmailService;
+import com.yichi.onepiece.notification.service.NotificationService;
 import com.yichi.onepiece.quartz.jobs.EmailJob;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.iam.model.*;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
   private final Logger logger = LoggerFactory.getLogger(UserService.class);
   private final UserDao userDao;
+  private final FriendshipDao friendshipDao;
   private final TokenDao tokenDao;
   private final RoleDao roleDao;
   private final UserRoleDao userRoleDao;
@@ -39,12 +41,13 @@ public class UserService {
   private final UserResourceDao userResourceDao;
   private final ActionRecordService actionRecordService;
   private final RoleService roleService;
+  private final NotificationService notificationService;
 
   private final EmailVerificationDao emailVerificationDao;
   private final Clock clock;
 
   public UserService(
-          UserDao userDao,
+          UserDao userDao, FriendshipDao friendshipDao,
           TokenDao tokenDao,
           RoleDao roleDao,
           UserRoleDao userRoleDao,
@@ -52,18 +55,20 @@ public class UserService {
           UserResourceDao userResourceDao,
           ActionRecordService actionRecordService,
           EmailService emailService,
-          RoleService roleService,
+          RoleService roleService, NotificationService notificationService,
           EmailVerificationDao emailVerificationDao,
           Clock clock) {
     this.userDao = userDao;
-    this.tokenDao = tokenDao;
+      this.friendshipDao = friendshipDao;
+      this.tokenDao = tokenDao;
     this.roleDao = roleDao;
     this.userRoleDao = userRoleDao;
     this.passwordEncoder = passwordEncoder;
     this.userResourceDao = userResourceDao;
     this.actionRecordService = actionRecordService;
     this.roleService = roleService;
-    this.emailVerificationDao = emailVerificationDao;
+      this.notificationService = notificationService;
+      this.emailVerificationDao = emailVerificationDao;
     this.clock = clock;
   }
 
@@ -111,12 +116,12 @@ public class UserService {
     }
     var userTemp = userDao
             .listUsers(
-                    request.getUserFilter(), request.getSortKeys(), offset, request.getPageSize());
+                    request.getUserFilter(), request.getSortKeys(), offset, request.getPageSize(), null);
     logger.info(userTemp.toString());
     var users =
         userDao
             .listUsers(
-                request.getUserFilter(), request.getSortKeys(), offset, request.getPageSize())
+                request.getUserFilter(), request.getSortKeys(), offset, request.getPageSize(), null)
             .stream()
             .map(UserConverter.INSTANCE::toUser)
             .toList();
@@ -268,5 +273,38 @@ public class UserService {
       emailVerificationDao.markEmailAsUsed(userId, email);
     }
     return VERIFICATION_SUCCESS;
+  }
+
+  public AddFriendResponse addFriend(AddFriendRequest request) {
+    var actionRecord = actionRecordService.create();
+    FriendshipEntity friendshipEntity = FriendshipEntityBuilder.newBuilder()
+            .setCreationRecordId(actionRecord.getId())
+            .setModificationRecordId(actionRecord.getId())
+            .friendLeftId(UserHelper.getCurrentUserId())
+            .friendRightId(request.getFriendId())
+            .build();
+    friendshipDao.insert(friendshipEntity);
+    // send target message
+    CreateNotificationRequest notificationRequest = new CreateNotificationRequest()
+            .notificationType(NotificationType.FRIEND_REQUEST)
+                    .creatorId(UserHelper.getCurrentUserId())
+                            .receiverId(request.getFriendId())
+                                    .content(new I18nText().enUS("").zhCN(""));
+    notificationService.create(notificationRequest);
+    return new AddFriendResponse().result(true).notification(new I18nText().zhCN("成功").enUS("success"));
+  }
+
+  public AcceptFriendResponse acceptFriend(AcceptFriendRequest request) {
+    List<FriendshipEntity> friendships = friendshipDao.findFriendShipById(request.getFriendId(), UserHelper.getCurrentUserId());
+    if (!friendships.isEmpty()) {
+      friendships = friendships.stream().map(e-> e.toBuilder().setFriendshipStatus(FriendshipStatus.ACCEPTED).build()).toList();
+    }
+    for (var friend : friendships) {
+      friendshipDao.update(friend);
+    }
+    return new AcceptFriendResponse()
+            .result(true)
+            .notification(new I18nText().enUS("")
+                    .zhCN(""));
   }
 }

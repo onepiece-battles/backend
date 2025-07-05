@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.UUID;
 import org.apache.ibatis.annotations.*;
 
+import javax.annotation.Nullable;
+
 @Dao
 @Mapper
 public interface UserDao extends BaseDao<UserEntity, UUID> {
@@ -20,7 +22,8 @@ public interface UserDao extends BaseDao<UserEntity, UUID> {
       @Param("userFilter") UserFilter userFilter,
       @Param("sortList") Collection<UserSortableField> sortList,
       @Param("offset") int offset,
-      @Param("size") int size);
+      @Param("size") int size,
+      @Nullable @Param("userId") UUID userId);
 
 
   @ResultMap("userDetailView")
@@ -57,4 +60,7 @@ public interface UserDao extends BaseDao<UserEntity, UUID> {
   @ResultMap("userDetailView")
   @Select("SELECT * FROM user WHERE username=#{userName}")
   Optional<UserDetailImpl> getUserByUsername(@Param("userName") String userName);
+
+  @Select("select * from `user` left join `user_conversation` on `user`.`id` = `user_conversation`.`user_id` where `user_conversation`.`conversation_id` = #{conversationId}")
+  List<UserEntity> listByConversationId(@Param("conversationId") UUID conversationId);
 }

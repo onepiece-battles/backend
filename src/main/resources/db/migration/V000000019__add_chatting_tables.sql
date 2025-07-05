@@ -1,6 +1,7 @@
 CREATE TABLE `conversation`(
     `id` BINARY(16) NOT NULL,
     `group` BOOLEAN NOT NULL, # group chat is the chat when more than 3 people in it
+    `name` VARCHAR(255) NOT NULL,
     `private_group` BOOLEAN NOT NULL, # private chat is the chat that can not be search from public
     `creation_record_id` BIGINT,
     `modification_record_id` BIGINT

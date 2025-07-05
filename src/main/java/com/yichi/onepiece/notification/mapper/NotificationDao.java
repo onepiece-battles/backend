@@ -1,4 +1,4 @@
-package com.yichi.onepiece.chatting.mapper;
+package com.yichi.onepiece.notification.mapper;
 
 import com.yichi.infra.support.mybatis.annotations.Dao;
 import com.yichi.infra.support.mybatis.dao.BaseDao;
@@ -8,5 +8,5 @@ import java.util.UUID;
 
 @Dao
 @Mapper
-public interface MessageDao extends BaseDao<MessageEntity, UUID> {
+public interface NotificationDao extends BaseDao<NotificationEntity, UUID> {
 }

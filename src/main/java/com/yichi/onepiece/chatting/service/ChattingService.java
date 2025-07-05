@@ -1,7 +1,8 @@
 package com.yichi.onepiece.chatting.service;
 
 
-import com.yichi.onepiece.chatting.mapper.*;
+import com.yichi.onepiece.battle.service.BattleService;
+import com.yichi.onepiece.chatting.model.*;
 import com.yichi.onepiece.exception.FileStorageException;
 import com.yichi.onepiece.image.service.ImageService;
 import com.yichi.onepiece.lineage.model.ActionRecordConverter;
@@ -9,6 +10,8 @@ import com.yichi.onepiece.lineage.model.ActionRecordEntity;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.user.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +20,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ChattingService {
+    Logger logger = LoggerFactory.getLogger(ChattingService.class);
+
     private final ConversationDao conversationDao;
     private final MessageDao messageDao;
     private final UserConversationDao userConversationDao;
@@ -35,6 +40,12 @@ public class ChattingService {
 
     public Chat create(CreateChatRequest request) {
         List<User> users  = userService.listByUserIds(request.getIds());
+        logger.info("list user ids");
+        logger.info(request.getIds().toString());
+        List<ConversationEntity> conversationEntities = conversationDao.listByUserIds(request.getIds(), request.getIds().size());
+        if (!conversationEntities.isEmpty()) {
+            return ChatConverter.INSTANCE.toChat(conversationEntities.get(0));
+        }
         ActionRecordEntity actionRecordEntity = actionRecordService.create();
         ActionRecord actionRecord = actionRecordService.convertActionRecord(actionRecordEntity);
         String name = getChatName(users.stream().map(e->e.getNickname()).toList());
@@ -114,5 +125,10 @@ public class ChattingService {
         message = message.toBuilder().setRetracted(true).build();
         messageDao.update(message);
         return new RetractMessageResponse().result(Boolean.TRUE);
+    }
+
+    public List<Chat> list(ListChatRequest request) {
+        return conversationDao.listChat(request.getUserId()).stream()
+                .map(e->ChatConverter.INSTANCE.toChat(e)).toList();
     }
 }

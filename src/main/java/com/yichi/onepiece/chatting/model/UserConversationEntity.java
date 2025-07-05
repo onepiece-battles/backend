@@ -1,4 +1,4 @@
-package com.yichi.onepiece.chatting.mapper;
+package com.yichi.onepiece.chatting.model;
 
 import com.yichi.infra.support.entity.Entity;
 

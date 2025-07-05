@@ -27,6 +27,20 @@ public class UserController implements UserApi {
   }
 
   @Override
+  public ResponseEntity<AcceptFriendResponse> acceptFriend(AcceptFriendRequest acceptFriendRequest) {
+    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
+    var response = userService.acceptFriend(acceptFriendRequest);
+    return ResponseEntity.ok(response);
+  }
+
+  @Override
+  public ResponseEntity<AddFriendResponse> addFriend(AddFriendRequest addFriendRequest) {
+    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.CREATE));
+    var response = userService.addFriend(addFriendRequest);
+    return ResponseEntity.ok(response);
+  }
+
+  @Override
   public ResponseEntity<AssignRoleResponse> assignRole(AssignRoleRequest assignRoleRequest) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
     var roles =
