@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yichi.onepiece.chatting.model.ConversationDao">
+    <resultMap id="conversationFullView" type="com.yichi.onepiece.chatting.model.ConversationFullView" autoMapping="true">
+        <result column="id" property="id"/>
+        <association property="members" column="id"
+                     select="com.yichi.onepiece.user.model.dao.UserDao.listByConversationId"/>
+        <association column="creation_record_id" property="creationRecord"
+                     select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
+        />
+        <association column="modification_record_id" property="modificationRecord"
+                     select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
+        />
+    </resultMap>
+</mapper>

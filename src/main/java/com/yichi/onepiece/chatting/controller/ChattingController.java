@@ -8,6 +8,7 @@ import com.yichi.onepiece.model.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
+import java.util.List;
 import java.util.Set;
 
 @Controller
@@ -22,18 +23,23 @@ public class ChattingController implements ChattingApi {
 
     @Override
     public ResponseEntity<Chat> createChat(CreateChatRequest createChatRequest) {
-        // replace in the future
         iamService.checkPermissionOfCurrentAccount(
-                ResourceType.BATTLE, Set.of(Permission.CREATE, Permission.GET));
+                ResourceType.CHATTING, Set.of(Permission.CREATE, Permission.GET));
         return ResponseEntity.ok(chattingService.create(createChatRequest));
     }
 
     @Override
     public ResponseEntity<Chat> joinChat(JoinChatRequest joinChatRequest) {
-        // replace in the future
         iamService.checkPermissionOfCurrentAccount(
-                ResourceType.BATTLE, Set.of(Permission.CREATE, Permission.GET));
+                ResourceType.CHATTING, Set.of(Permission.UPDATE, Permission.GET));
         return ResponseEntity.ok(chattingService.joinChat(joinChatRequest));
+    }
+
+    @Override
+    public ResponseEntity<ListChatResponse> listChat(ListChatRequest listChatRequest) {
+        iamService.checkPermissionOfCurrentAccount(
+                ResourceType.CHATTING, Set.of(Permission.LIST));
+        return ResponseEntity.ok(new ListChatResponse().chats(chattingService.list(listChatRequest)));
     }
 
     @Override
