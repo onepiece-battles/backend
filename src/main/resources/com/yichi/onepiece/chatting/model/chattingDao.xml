@@ -5,7 +5,9 @@
     <resultMap id="conversationFullView" type="com.yichi.onepiece.chatting.model.ConversationFullView" autoMapping="true">
         <result column="id" property="id"/>
         <association property="members" column="id"
-                     select="com.yichi.onepiece.user.model.dao.UserDao.listByConversationId"/>
+                     select="com.yichi.onepiece.user.model.UserDao.listByConversationId"/>
+        <association property="message" column="id"
+                     select="com.yichi.onepiece.chatting.model.MessageDao.getMostRecentMessage"/>
         <association column="creation_record_id" property="creationRecord"
                      select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
         />

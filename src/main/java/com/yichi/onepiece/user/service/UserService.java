@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import com.yichi.onepiece.utils.EncryptHelper;
+import com.yichi.onepiece.utils.I18nHelper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -281,18 +282,21 @@ public class UserService {
             .setCreationRecordId(actionRecord.getId())
             .setModificationRecordId(actionRecord.getId())
             .friendLeftId(UserHelper.getCurrentUserId())
+            .friendshipStatus(FriendshipStatus.APPLIED)
             .friendRightId(request.getFriendId())
             .build();
     friendshipDao.insert(friendshipEntity);
     // send target message
+    UserEntity sender = userDao.findById(UserHelper.getCurrentUserId()).orElseThrow();
     CreateNotificationRequest notificationRequest = new CreateNotificationRequest()
             .notificationType(NotificationType.FRIEND_REQUEST)
                     .creatorId(UserHelper.getCurrentUserId())
                             .receiverId(request.getFriendId())
-                                    .content(new I18nText().enUS("").zhCN(""));
+                                    .content(I18nHelper.getFriendRequestMessage(sender));
     notificationService.create(notificationRequest);
-    return new AddFriendResponse().result(true).notification(new I18nText().zhCN("成功").enUS("success"));
+    return new AddFriendResponse().result(true).notification(I18nHelper.getSuccess());
   }
+
 
   public AcceptFriendResponse acceptFriend(AcceptFriendRequest request) {
     List<FriendshipEntity> friendships = friendshipDao.findFriendShipById(request.getFriendId(), UserHelper.getCurrentUserId());
@@ -300,11 +304,30 @@ public class UserService {
       friendships = friendships.stream().map(e-> e.toBuilder().setFriendshipStatus(FriendshipStatus.ACCEPTED).build()).toList();
     }
     for (var friend : friendships) {
+      // 更新朋友信息
       friendshipDao.update(friend);
+
+      UserEntity sender = userDao.findById(UserHelper.getCurrentUserId()).orElseThrow();
+      CreateNotificationRequest notificationRequest = new CreateNotificationRequest()
+              .notificationType(NotificationType.FRIEND_REQUEST)
+              .creatorId(UserHelper.getCurrentUserId())
+              .receiverId(request.getFriendId())
+              .content(I18nHelper.getFriendRequestMessage(sender));
+      notificationService.create(notificationRequest);
     }
     return new AcceptFriendResponse()
             .result(true)
-            .notification(new I18nText().enUS("")
-                    .zhCN(""));
+            .notification(I18nHelper.getSuccess());
+  }
+
+  public RejectFriendResponse rejectFriend(RejectFriendRequest request) {
+    UserEntity sender = userDao.findById(UserHelper.getCurrentUserId()).orElseThrow();
+    CreateNotificationRequest notificationRequest = new CreateNotificationRequest()
+            .notificationType(NotificationType.FRIEND_REQUEST)
+            .creatorId(UserHelper.getCurrentUserId())
+            .receiverId(request.getFriendId())
+            .content(I18nHelper.getFriendRejectMessage(sender));
+    notificationService.create(notificationRequest);
+    return new RejectFriendResponse().notification(I18nHelper.getSuccess()).result(true);
   }
 }

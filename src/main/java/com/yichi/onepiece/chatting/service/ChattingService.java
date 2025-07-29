@@ -131,4 +131,9 @@ public class ChattingService {
         return conversationDao.listChat(request.getUserId()).stream()
                 .map(e->ChatConverter.INSTANCE.toChat(e)).toList();
     }
+
+    public ListMessageResponse listMessage(ListMessageRequest request) {
+        var messages = messageDao.listMessageFullView(request.getChatId(), request.getLimit());
+        return new ListMessageResponse().chats(messages.stream().map(e->ChatConverter.INSTANCE.toMessage(e)).toList());
+    }
 }
