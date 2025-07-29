@@ -97,6 +97,12 @@ public class UserController implements UserApi {
   }
 
   @Override
+  public ResponseEntity<RejectFriendResponse> rejectFriend(RejectFriendRequest rejectFriendRequest) {
+    var response = userService.rejectFriend(rejectFriendRequest);
+    return ResponseEntity.ok(response);
+  }
+
+  @Override
   public ResponseEntity<ShareResourceResponse> shareResource(
       ShareResourceRequest shareResourceRequest) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));

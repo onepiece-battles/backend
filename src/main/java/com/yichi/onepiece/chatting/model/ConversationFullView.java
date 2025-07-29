@@ -11,4 +11,5 @@ public interface ConversationFullView extends ConversationEntity{
     List<UserEntity> getMembers();
     ActionRecordEntity getModificationRecord();
     ActionRecordEntity getCreationRecord();
+    MessageEntity getMessage();
 }

@@ -7,8 +7,6 @@ import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-
-import java.util.List;
 import java.util.Set;
 
 @Controller
@@ -40,6 +38,13 @@ public class ChattingController implements ChattingApi {
         iamService.checkPermissionOfCurrentAccount(
                 ResourceType.CHATTING, Set.of(Permission.LIST));
         return ResponseEntity.ok(new ListChatResponse().chats(chattingService.list(listChatRequest)));
+    }
+
+    @Override
+    public ResponseEntity<ListMessageResponse> listMessage(ListMessageRequest listMessageRequest) {
+        iamService.checkPermissionOfCurrentAccount(
+                ResourceType.CHATTING, Set.of(Permission.LIST));
+        return ResponseEntity.ok(chattingService.listMessage(listMessageRequest));
     }
 
     @Override
