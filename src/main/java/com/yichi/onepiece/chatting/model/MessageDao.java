@@ -21,4 +21,10 @@ public interface MessageDao extends BaseDao<MessageEntity, UUID> {
             one = @One(select = "findById"))
     @Select("select * from message where conversation_id = #{conversationId} ORDER BY creation_record_id DESC LIMIT #{limit}")
     List<MessageFullView> listMessageFullView(@Param("conversationId") UUID conversationId, @Param("limit") int limit);
+
+    @Result(property = "preMessage", column = "pre_message_id",
+            javaType = MessageEntity.class,
+            one = @One(select = "findById"))
+    @Select("select * from `message` where `message`.`conversation_id` = #{conversationId} and `message`.`creation_record_id` >= #{messageDigit}")
+    List<MessageFullView> listMessageFullViewByLastMessageId(@Param("conversationId") UUID conversationId, @Param("messageDigit") Long messageDigit);
 }

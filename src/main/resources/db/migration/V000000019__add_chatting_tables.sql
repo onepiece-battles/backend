@@ -9,16 +9,16 @@ CREATE TABLE `conversation`(
 ALTER TABLE `conversation` ADD CONSTRAINT PRIMARY KEY(`id`);
 
 CREATE TABLE IF NOT EXISTS `message`(
-                                        `id` BINARY(16) NOT NULL,
-                                        `user_id` BINARY(16) NOT NULL, # owner of this phrase
-                                        `conversation_id` BINARY(16) NOT NULL,
-                                        `pre_message_id` BINARY(16) NOT NULL,
-                                        `content` VARCHAR(255),
-                                        `retracted` BOOLEAN NOT NULL,
-                                        `image_content_uri` VARCHAR(255),
-                                        `voice_content_uri` VARCHAR(255),
-                                        `creation_record_id` BIGINT,
-                                        `modification_record_id` BIGINT
+    `id` BINARY(16) NOT NULL,
+    `user_id` BINARY(16) NOT NULL, # owner of this phrase
+    `conversation_id` BINARY(16) NOT NULL,
+    `pre_message_id` BINARY(16),
+    `content` VARCHAR(255),
+    `retracted` BOOLEAN NOT NULL,
+    `image_content_uri` VARCHAR(255),
+    `voice_content_uri` VARCHAR(255),
+    `creation_record_id` BIGINT,
+    `modification_record_id` BIGINT
 );
 ALTER TABLE `message` ADD CONSTRAINT PRIMARY KEY(`id`);
 ALTER TABLE `message` ADD CONSTRAINT `fk_message__user_id`
