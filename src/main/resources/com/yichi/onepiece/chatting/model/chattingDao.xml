@@ -4,6 +4,7 @@
 <mapper namespace="com.yichi.onepiece.chatting.model.ConversationDao">
     <resultMap id="conversationFullView" type="com.yichi.onepiece.chatting.model.ConversationFullView" autoMapping="true">
         <result column="id" property="id"/>
+        <association column="id" property="id"/>
         <association property="members" column="id"
                      select="com.yichi.onepiece.user.model.UserDao.listByConversationId"/>
         <association property="message" column="id"

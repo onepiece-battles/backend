@@ -39,21 +39,4 @@ public class ChattingController implements ChattingApi {
                 ResourceType.CHATTING, Set.of(Permission.LIST));
         return ResponseEntity.ok(new ListChatResponse().chats(chattingService.list(listChatRequest)));
     }
-
-    @Override
-    public ResponseEntity<ListMessageResponse> listMessage(ListMessageRequest listMessageRequest) {
-        iamService.checkPermissionOfCurrentAccount(
-                ResourceType.CHATTING, Set.of(Permission.LIST));
-        return ResponseEntity.ok(chattingService.listMessage(listMessageRequest));
-    }
-
-    @Override
-    public ResponseEntity<RetractMessageResponse> retractMessage(RetractMessageRequest retractMessageRequest) {
-        return ResponseEntity.ok(chattingService.retractMessage(retractMessageRequest));
-    }
-
-    @Override
-    public ResponseEntity<SendMessageResponse> sendMessage(SendMessageRequest sendMessageRequest) {
-        return ResponseEntity.ok(chattingService.sendMessage(sendMessageRequest));
-    }
 }

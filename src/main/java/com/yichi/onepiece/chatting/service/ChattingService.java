@@ -91,49 +91,14 @@ public class ChattingService {
                 .members(userService.listByUserIds(userIds));
     }
 
-    public SendMessageResponse sendMessage(SendMessageRequest request) {
-        MessageEntityBuilder messageEntityBuilder=MessageEntityBuilder.newBuilder();
-        var actionRecord = actionRecordService.create();
-        try {
-            if (request.getProfileImage()!=null) {
-                String uri = imageService.uploadImage(request.getProfileImage());
-                messageEntityBuilder.setImageContentUri(uri);
-            }
-            if (request.getVoice()!=null) {
-                String uri = imageService.uploadImage(request.getVoice());
-                messageEntityBuilder.setVoiceContentUri(uri);
-            }
-        } catch (FileStorageException e) {
-            e.printStackTrace();
-            return new SendMessageResponse().result(Boolean.FALSE);
-        }
-        MessageEntity messageEntity = messageEntityBuilder.setPreMessageId(request.getPreMessageId())
-                .setUserId(request.getUserId())
-                .setContent(request.getContent())
-                .setRetracted(Boolean.FALSE)
-                .setConversationId(request.getChatId())
-                .setImageContentUri(request.getProfileImage())
-                .setCreationRecordId(actionRecord.getId())
-                .setModificationRecordId(actionRecord.getId())
-                .build();
-        messageDao.insert(messageEntity);
-        return new SendMessageResponse().result(Boolean.TRUE);
-    }
 
-    public RetractMessageResponse retractMessage(RetractMessageRequest request) {
-        var message = messageDao.findById(request.getMessageId()).orElseThrow();
-        message = message.toBuilder().setRetracted(true).build();
-        messageDao.update(message);
-        return new RetractMessageResponse().result(Boolean.TRUE);
-    }
 
     public List<Chat> list(ListChatRequest request) {
         return conversationDao.listChat(request.getUserId()).stream()
                 .map(e->ChatConverter.INSTANCE.toChat(e)).toList();
     }
 
-    public ListMessageResponse listMessage(ListMessageRequest request) {
-        var messages = messageDao.listMessageFullView(request.getChatId(), request.getLimit());
-        return new ListMessageResponse().chats(messages.stream().map(e->ChatConverter.INSTANCE.toMessage(e)).toList());
+    public UUID getLastReadMessageId(UUID userId, UUID conversationId) {
+        return userConversationDao.findLastReadMessageId(userId, conversationId);
     }
 }
