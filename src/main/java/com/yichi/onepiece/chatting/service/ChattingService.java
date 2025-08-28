@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -100,5 +101,9 @@ public class ChattingService {
 
     public UUID getLastReadMessageId(UUID userId, UUID conversationId) {
         return userConversationDao.findLastReadMessageId(userId, conversationId);
+    }
+
+    public List<UserConversationEntity> listUserConversationByUserId(UUID userId) {
+        return userConversationDao.listByUserId(userId);
     }
 }
