@@ -74,4 +74,8 @@ public class MessageService {
         List<MessageFullView> messageFullViewList = messageDao.listMessageFullViewByLastMessageId(request.getConversationId(),messageEntity.getCreationRecordId());
         return new JumpToMessageResponse().messages(messageFullViewList.stream().map(e-> ChatConverter.INSTANCE.toMessage(e)).toList());
     }
+
+    public List<MessageFullView> getRecentMessage(UUID conversationId) {
+        return messageDao.listMessageFullView(conversationId, 20);
+    }
 }
