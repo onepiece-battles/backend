@@ -6,6 +6,9 @@ import com.yichi.onepiece.chatting.service.ChattingService;
 import com.yichi.onepiece.chatting.service.MessageService;
 import com.yichi.onepiece.model.Message;
 import com.yichi.onepiece.model.SendMessageRequest;
+import com.yichi.onepiece.user.UserHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -20,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
-
+    Logger logger = LoggerFactory.getLogger(ChattingWebSocketHandler.class);
     private final MessageService messageService;
     private final ChattingService chattingService;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -36,7 +39,8 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
 
 
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        UUID userId = (UUID) session.getAttributes().get("userId");
+        logger.info(session.getAttributes().toString());
+        UUID userId =  UUID.fromString(session.getAttributes().get("userId").toString());
         List<UUID> groupIds = chattingService.listUserConversationByUserId(userId).stream().map(e->e.getConversationId()).toList();
         for (UUID id: groupIds) {
             if(groupMaps.containsKey(id)) {
@@ -60,6 +64,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
     }
 
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        logger.info("connection closed");
         UUID userId = (UUID) session.getAttributes().get("userId");
         userSocketMap.remove(userId);
         List<UUID> groupIds = chattingService.listUserConversationByUserId(userId).stream().map(e->e.getConversationId()).toList();
