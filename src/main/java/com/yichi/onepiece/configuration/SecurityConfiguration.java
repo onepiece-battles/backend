@@ -36,10 +36,6 @@ public class SecurityConfiguration {
             httpSecurityCorsConfigurer -> {
               CorsConfiguration configuration = new CorsConfiguration();
               configuration.addAllowedOriginPattern("*");
-//              configuration.addAllowedOriginPattern("http://127.0.0.1:8081");
-//                configuration.addAllowedOriginPattern("http://onepiece-battles:8080");
-//                configuration.addAllowedOriginPattern("http://onepiece-battles.com");
-//                configuration.addAllowedOriginPattern("https://onepiece-battles.com");
               configuration.addAllowedMethod("*");
               configuration.addAllowedHeader("*");
               configuration.setAllowCredentials(true);
@@ -50,7 +46,7 @@ public class SecurityConfiguration {
         .authorizeHttpRequests(
             authorize -> {
               authorize
-                  .requestMatchers("/api/onepiece/user/**")
+                  .requestMatchers("/api/onepiece/user/**", "/chat")
                   .permitAll()
                   .anyRequest()
                   .authenticated();
