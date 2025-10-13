@@ -3,7 +3,6 @@ package com.yichi.onepiece.email;
 import static com.yichi.onepiece.constants.OnepieceConstants.FROM_EMAIL_ADDRESS;
 
 import jakarta.activation.DataHandler;
-import jakarta.activation.FileDataSource;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;

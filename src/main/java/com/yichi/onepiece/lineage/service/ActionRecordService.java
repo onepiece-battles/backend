@@ -63,6 +63,22 @@ public class ActionRecordService {
     return actionRecordEntity;
   }
 
+  public ActionRecordEntity createWithUserId(UUID userId) {
+    var userEntity = userDao.getById(userId).orElseThrow();
+    var roleEntity = roleService.getRoleByName(userEntity.getLoginRole());
+    ActionRecordEntity actionRecordEntity =
+            ActionRecordEntityBuilder.newBuilder()
+                    .setUserId(userEntity.getId())
+                    .setUsername(userEntity.getUsername())
+                    .setNickname(userEntity.getNickname())
+                    .setRoleId(roleEntity.getId())
+                    .setRoleName(roleEntity.getName())
+                    .setActionTimestamp(clock.millis())
+                    .build();
+    actionRecordDao.insert(actionRecordEntity);
+    return actionRecordEntity;
+  }
+
   public ActionRecordEntity createWithUserAndRole(UserEntity userEntity, UserRole userRole) {
     var roleEntity = roleService.getRoleByName(userRole);
     ActionRecordEntity actionRecordEntity =
