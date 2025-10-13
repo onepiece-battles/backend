@@ -100,6 +100,7 @@ dependencies {
     implementation "com.google.guava:guava:$guava_version"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jackson_dataformat_version"
 
+
     // --- test dependencies ---
     testImplementation "com.h2database:h2:$h2_database_version"
     testImplementation "org.mockito:mockito-testng:$mockito_testng_version"

@@ -1,10 +1,13 @@
 package com.yichi.onepiece.chatting.service;
 
 import com.yichi.onepiece.chatting.model.*;
+import com.yichi.onepiece.configuration.ChattingWebSocketHandler;
 import com.yichi.onepiece.exception.FileStorageException;
 import com.yichi.onepiece.image.service.ImageService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +15,8 @@ import java.util.UUID;
 
 @Service
 public class MessageService {
+    Logger logger = LoggerFactory.getLogger(MessageService.class);
+
     private final MessageDao messageDao;
     private final ChattingService chattingService;
     private final ActionRecordService actionRecordService;
@@ -37,8 +42,10 @@ public class MessageService {
     }
 
     public SendMessageResponse sendMessage(SendMessageRequest request) {
+        logger.info("sending message to db");
+        logger.info(request.toString());
         MessageEntityBuilder messageEntityBuilder=MessageEntityBuilder.newBuilder();
-        var actionRecord = actionRecordService.create();
+        var actionRecord = actionRecordService.createWithUserId(request.getUserId());
         try {
             if (request.getProfileImage()!=null) {
                 String uri = imageService.uploadImage(request.getProfileImage());

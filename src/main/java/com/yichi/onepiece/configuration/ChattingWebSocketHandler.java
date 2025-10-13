@@ -65,7 +65,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
 
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         logger.info("connection closed");
-        UUID userId = (UUID) session.getAttributes().get("userId");
+        UUID userId = UUID.fromString(session.getAttributes().get("userId").toString()) ;
         userSocketMap.remove(userId);
         List<UUID> groupIds = chattingService.listUserConversationByUserId(userId).stream().map(e->e.getConversationId()).toList();
         for(UUID id: groupIds) {
@@ -76,14 +76,10 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
 
 
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        UUID userId = (UUID) session.getAttributes().get("userId");
-        UUID groupId = (UUID) session.getAttributes().get("groupId");
-        UUID preMessageId = (UUID) session.getAttributes().get("preMessageId");
-        // handle image and voice message in the future
-        var response = messageService
-                .sendMessage(new SendMessageRequest().chatId(groupId).userId(userId).preMessageId(preMessageId).content(message.getPayload()));
+        SendMessageRequest request = objectMapper.readValue(message.getPayload(), SendMessageRequest.class);
+        var response = messageService.sendMessage(request);
         if (response.getResult()) {
-            List<WebSocketSession> sessions = groupMaps.get(groupId);
+            List<WebSocketSession> sessions = groupMaps.get(request.getChatId());
             for(WebSocketSession socketSession: sessions) {
                 socketSession.sendMessage(message);
             }
