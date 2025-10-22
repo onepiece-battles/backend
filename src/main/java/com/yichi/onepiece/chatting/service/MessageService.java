@@ -63,7 +63,7 @@ public class MessageService {
                 .setUserId(request.getUserId())
                 .setContent(request.getContent())
                 .setRetracted(Boolean.FALSE)
-                .setConversationId(request.getChatId())
+                .setConversationId(request.getConversationId())
                 .setImageContentUri(request.getProfileImage())
                 .setCreationRecordId(actionRecord.getId())
                 .setModificationRecordId(actionRecord.getId())
