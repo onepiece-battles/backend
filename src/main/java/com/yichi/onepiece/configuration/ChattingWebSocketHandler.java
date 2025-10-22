@@ -50,7 +50,9 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
             }
         }
         var conversationIds = chattingService.listUserConversationByUserId(userId).stream().map(e->e.getConversationId()).toList();
-        userSocketMap.put(userId, session);
+        if (userSocketMap.get(userId)==null) {
+            userSocketMap.put(userId, session);
+        }
         // collect recent messages
         List<Message> messageFullViewList = conversationIds
                 .stream().map(e-> messageService.getRecentMessage(e))
@@ -79,8 +81,9 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
         SendMessageRequest request = objectMapper.readValue(message.getPayload(), SendMessageRequest.class);
         var response = messageService.sendMessage(request);
         if (response.getResult()) {
-            List<WebSocketSession> sessions = groupMaps.get(request.getChatId());
+            List<WebSocketSession> sessions = groupMaps.get(request.getConversationId());
             for(WebSocketSession socketSession: sessions) {
+                logger.info( message.getPayload());
                 socketSession.sendMessage(message);
             }
         }
