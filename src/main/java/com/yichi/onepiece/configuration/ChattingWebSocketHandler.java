@@ -1,12 +1,12 @@
 package com.yichi.onepiece.configuration;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yichi.onepiece.chatting.model.ChatConverter;
+import com.yichi.onepiece.chatting.model.UserConversationEntity;
 import com.yichi.onepiece.chatting.service.ChattingService;
 import com.yichi.onepiece.chatting.service.MessageService;
-import com.yichi.onepiece.model.Message;
-import com.yichi.onepiece.model.SendMessageRequest;
-import com.yichi.onepiece.user.UserHelper;
+import com.yichi.onepiece.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -14,12 +14,9 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Component
 public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
@@ -40,25 +37,29 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
 
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         logger.info(session.getAttributes().toString());
+        logger.info("connection established");
         UUID userId =  UUID.fromString(session.getAttributes().get("userId").toString());
-        List<UUID> groupIds = chattingService.listUserConversationByUserId(userId).stream().map(e->e.getConversationId()).toList();
+        List<Chat> chats = chattingService.list(new ListChatRequest().userId(userId));
+        List<UUID> groupIds = chats.stream().map(Chat::getId).toList();
         for (UUID id: groupIds) {
             if(groupMaps.containsKey(id)) {
                 groupMaps.get(id).add(session);
             } else {
-                groupMaps.put(id, new ArrayList<>(Arrays.asList(session)));
+                groupMaps.put(id, new ArrayList<>(List.of(session)));
             }
         }
-        var conversationIds = chattingService.listUserConversationByUserId(userId).stream().map(e->e.getConversationId()).toList();
-        if (userSocketMap.get(userId)==null) {
-            userSocketMap.put(userId, session);
+        userSocketMap.putIfAbsent(userId, session);
+        // update chat list
+        for(Chat chat: chats) {
+            String stringMessage = objectMapper.writeValueAsString(chat);
+            session.sendMessage(new TextMessage(stringMessage));
         }
         // collect recent messages
-        List<Message> messageFullViewList = conversationIds
-                .stream().map(e-> messageService.getRecentMessage(e))
-                .toList().stream().flatMap(list->list.stream())
-                .map(e-> ChatConverter.INSTANCE.toMessage(e))
-                .collect(Collectors.toList());
+        List<Message> messageFullViewList = groupIds
+                .stream().map(messageService::getRecentMessage)
+                .toList().stream().flatMap(Collection::stream)
+                .map(ChatConverter.INSTANCE::toMessage)
+                .toList();
         for(Message message: messageFullViewList) {
             String stringMessage = objectMapper.writeValueAsString(message);
             session.sendMessage(new TextMessage(stringMessage));
@@ -69,7 +70,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
         logger.info("connection closed");
         UUID userId = UUID.fromString(session.getAttributes().get("userId").toString()) ;
         userSocketMap.remove(userId);
-        List<UUID> groupIds = chattingService.listUserConversationByUserId(userId).stream().map(e->e.getConversationId()).toList();
+        List<UUID> groupIds = chattingService.listUserConversationByUserId(userId).stream().map(UserConversationEntity::getConversationId).toList();
         for(UUID id: groupIds) {
             groupMaps.get(id).remove(session);
         }
@@ -78,14 +79,39 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
 
 
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        SendMessageRequest request = objectMapper.readValue(message.getPayload(), SendMessageRequest.class);
-        var response = messageService.sendMessage(request);
-        if (response.getResult()) {
-            List<WebSocketSession> sessions = groupMaps.get(request.getConversationId());
-            for(WebSocketSession socketSession: sessions) {
-                logger.info( message.getPayload());
-                socketSession.sendMessage(message);
+        String payload = message.getPayload();
+        JsonNode jsonNode = objectMapper.readTree(payload);
+        String messageType = jsonNode.has("type") ? jsonNode.get("type").asText() : null;
+        logger.info("message type: %s", messageType);
+        if (MessageType.SEND_MESSAGE.toString().equals(messageType)) {
+            logger.info("send message");
+            SendMessageRequest request = objectMapper.readValue(message.getPayload(), SendMessageRequest.class);
+            var response = messageService.sendMessage(request);
+            if (response.getResult()) {
+                sendMessages(request.getConversationId(), message);
             }
+        } else if (MessageType.JOIN_CHAT.toString().equals(messageType)) {
+            logger.info("join chat");
+            JoinChatRequest request = objectMapper.readValue(message.getPayload(), JoinChatRequest.class);
+            var chat = chattingService.joinChat(request);
+            if (chat!=null) {
+                sendMessages(chat.getId(), message);
+            }
+        } else if (MessageType.CREATE_CHAT.toString().equals(messageType)) {
+            logger.info("create chat");
+            CreateChatRequest request = objectMapper.readValue(message.getPayload(), CreateChatRequest.class);
+            var chat = chattingService.create(request);
+            if (chat!=null) {
+                sendMessages(chat.getId(), message);
+            }
+        }
+    }
+
+    void sendMessages(UUID conversationId, TextMessage message) throws IOException {
+        List<WebSocketSession> sessions = groupMaps.get(conversationId);
+        for(WebSocketSession socketSession: sessions) {
+            logger.info(message.getPayload());
+            socketSession.sendMessage(message);
         }
     }
 }
