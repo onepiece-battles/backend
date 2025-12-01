@@ -2,9 +2,11 @@ package com.yichi.onepiece.chatting.model;
 
 import com.yichi.infra.support.mybatis.annotations.Dao;
 import com.yichi.infra.support.mybatis.dao.BaseDao;
+import com.yichi.onepiece.lineage.model.ActionRecordEntity;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Dao
@@ -25,6 +27,25 @@ public interface MessageDao extends BaseDao<MessageEntity, UUID> {
     @Result(property = "preMessage", column = "pre_message_id",
             javaType = MessageEntity.class,
             one = @One(select = "findById"))
+    @Result(property = "creationRecord", column = "creation_record_id", javaType = ActionRecordEntity.class,
+            one = @One(select = "com.yichi.onepiece.lineage.model.ActionRecordDao.findById")
+    )
+    @Result(property = "modificationRecord", column = "modification_record_id", javaType = ActionRecordEntity.class,
+            one = @One(select = "com.yichi.onepiece.lineage.model.ActionRecordDao.findById")
+    )
     @Select("select * from `message` where `message`.`conversation_id` = #{conversationId} and `message`.`creation_record_id` >= #{messageDigit}")
     List<MessageFullView> listMessageFullViewByLastMessageId(@Param("conversationId") UUID conversationId, @Param("messageDigit") Long messageDigit);
+
+
+    @Result(property = "preMessage", column = "pre_message_id",
+            javaType = MessageEntity.class,
+            one = @One(select = "findById"))
+    @Result(property = "creationRecord", column = "creation_record_id", javaType = ActionRecordEntity.class,
+            one = @One(select = "com.yichi.onepiece.lineage.model.ActionRecordDao.findById")
+    )
+    @Result(property = "modificationRecord", column = "modification_record_id", javaType = ActionRecordEntity.class,
+            one = @One(select = "com.yichi.onepiece.lineage.model.ActionRecordDao.findById")
+    )
+    @Select("select * from `message` where `message`.`id` = #{id}")
+    Optional<MessageFullView> getMessageFullView(@Param("id") UUID id);
 }

@@ -88,7 +88,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
             SendMessageRequest request = objectMapper.readValue(message.getPayload(), SendMessageRequest.class);
             var response = messageService.sendMessage(request);
             if (response.getResult()) {
-                sendMessages(request.getConversationId(), message);
+                sendMessages(request.getConversationId(), new TextMessage(objectMapper.writeValueAsString(response.getMessage())));
             }
         } else if (MessageType.JOIN_CHAT.toString().equals(messageType)) {
             logger.info("join chat");
