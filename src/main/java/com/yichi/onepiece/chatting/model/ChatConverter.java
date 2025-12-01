@@ -14,5 +14,5 @@ public interface ChatConverter {
     Chat toChat(ConversationFullView conversationFullView);
     Chat toChat(ConversationEntity conversationEntity);
 
-    Message toMessage(MessageFullView messageFullView);
+    Message toMessage(MessageEntity messageFullView);
 }

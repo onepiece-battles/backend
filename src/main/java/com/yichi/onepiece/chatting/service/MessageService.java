@@ -69,7 +69,8 @@ public class MessageService {
                 .setModificationRecordId(actionRecord.getId())
                 .build();
         messageDao.insert(messageEntity);
-        return new SendMessageResponse().result(Boolean.TRUE);
+        var message = messageDao.getMessageFullView(messageEntity.getId()).orElseThrow();
+        return new SendMessageResponse().result(Boolean.TRUE).message(ChatConverter.INSTANCE.toMessage(message));
     }
 
     public JumpToMessageResponse jumpToMessage(JumpToMessageRequest request) {

@@ -7,7 +7,6 @@ import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.notification.service.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-
 import java.util.Set;
 
 @Controller
