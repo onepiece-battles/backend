@@ -62,6 +62,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
                 .toList();
         for(Message message: messageFullViewList) {
             String stringMessage = objectMapper.writeValueAsString(message);
+            logger.info(stringMessage);
             session.sendMessage(new TextMessage(stringMessage));
         }
     }
