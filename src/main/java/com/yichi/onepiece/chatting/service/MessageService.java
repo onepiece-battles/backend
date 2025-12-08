@@ -1,7 +1,6 @@
 package com.yichi.onepiece.chatting.service;
 
 import com.yichi.onepiece.chatting.model.*;
-import com.yichi.onepiece.configuration.ChattingWebSocketHandler;
 import com.yichi.onepiece.exception.FileStorageException;
 import com.yichi.onepiece.image.service.ImageService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
@@ -42,18 +41,18 @@ public class MessageService {
     }
 
     public SendMessageResponse sendMessage(SendMessageRequest request) {
-        logger.info("sending message to db");
-        logger.info(request.toString());
         MessageEntityBuilder messageEntityBuilder=MessageEntityBuilder.newBuilder();
         var actionRecord = actionRecordService.createWithUserId(request.getUserId());
+        String imageUri = "";
+        String voiceUri = "";
         try {
             if (request.getProfileImage()!=null) {
-                String uri = imageService.uploadImage(request.getProfileImage());
-                messageEntityBuilder.setImageContentUri(uri);
+                imageUri = imageService.uploadImage(request.getProfileImage());
+                messageEntityBuilder.setImageContentUri(imageUri);
             }
             if (request.getVoice()!=null) {
-                String uri = imageService.uploadImage(request.getVoice());
-                messageEntityBuilder.setVoiceContentUri(uri);
+                voiceUri = imageService.uploadImage(request.getVoice());
+                messageEntityBuilder.setVoiceContentUri(voiceUri);
             }
         } catch (FileStorageException e) {
             e.printStackTrace();
@@ -63,8 +62,9 @@ public class MessageService {
                 .setUserId(request.getUserId())
                 .setContent(request.getContent())
                 .setRetracted(Boolean.FALSE)
+                .setImageContentUri(imageUri.isEmpty()?null: imageUri)
+                .setVoiceContentUri(voiceUri.isEmpty()?null: voiceUri)
                 .setConversationId(request.getConversationId())
-                .setImageContentUri(request.getProfileImage())
                 .setCreationRecordId(actionRecord.getId())
                 .setModificationRecordId(actionRecord.getId())
                 .build();
