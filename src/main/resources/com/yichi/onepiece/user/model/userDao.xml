@@ -9,9 +9,6 @@
             `username`, `login_role`, `encrypted_password`, `account_status`, `profile_image`,
             `locale`, `email_verified`, `creation_record_id`, `modification_record_id`, `image_uri`
         FROM `user`
-        <if test="userFilter.friend != null and userFilter.friend != '' and userId != null and userId != ''">
-            inner join `friendship` on (`user`.`id` = `friendship`.`friend_left_id` or `user`.`id` = `friendship`.`friend_right_id`)
-        </if>
         <include refid="userFilter">
             <property name="userFilter" value="userFilter"/>
         </include>
@@ -33,9 +30,6 @@
         <if test="userFilter.nickname != null and userFilter.nickname != ''">
             <bind name="keyLike" value="'%' + userFilter.nickname + '%'"/>
             AND `nickname` like #{keyLike}
-        </if>
-        <if test="userFilter.friend != null and userFilter.friend != '' and userId != null and userId != ''">
-            AND `user_id` in (`friendship`.`friend_left_id`, `friendship`.`friend_right_id`)
         </if>
         <if test="userFilter.username != null and userFilter.username != ''">
             <bind name="keyLike" value="'%' + userFilter.username + '%'"/>

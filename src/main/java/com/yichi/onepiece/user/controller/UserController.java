@@ -57,6 +57,13 @@ public class UserController implements UserApi {
   }
 
   @Override
+  public ResponseEntity<ListFriendResponse> listFriend(ListFriendRequest listFriendRequest) {
+    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.LIST));
+    var response = userService.listFriend(listFriendRequest);
+    return ResponseEntity.ok(response);
+  }
+
+  @Override
   public ResponseEntity<ListUsersResponse> listUsers(ListUsersRequest listUsersRequest) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.LIST));
     var response = userService.list(listUsersRequest);

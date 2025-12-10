@@ -115,18 +115,30 @@ public class UserService {
     if (offset >= totalSize || offset < 0) {
       return new ListUsersResponse().users(List.of()).totalSize(totalSize);
     }
-    var userTemp = userDao
-            .listUsers(
-                    request.getUserFilter(), request.getSortKeys(), offset, request.getPageSize(), null);
-    logger.info(userTemp.toString());
     var users =
         userDao
             .listUsers(
-                request.getUserFilter(), request.getSortKeys(), offset, request.getPageSize(), null)
+                request.getUserFilter(), request.getSortKeys(), offset, request.getPageSize())
             .stream()
             .map(UserConverter.INSTANCE::toUser)
             .toList();
     return new ListUsersResponse().users(users).totalSize(totalSize);
+  }
+
+  public ListFriendResponse listFriend(ListFriendRequest request) {
+    List<FriendshipEntity> friendships = friendshipDao.listFriendshipsByUserId(request.getUserId(), FriendshipStatus.ACCEPTED);
+    logger.info(friendships.toString());
+    List<UUID> friendIds = new ArrayList<>();
+    for(var fs : friendships) {
+      if(request.getUserId().equals(fs.getFriendLeftId())) {
+        friendIds.add(fs.getFriendRightId());
+      } else {
+        friendIds.add(fs.getFriendLeftId());
+      }
+    }
+    logger.info(friendIds.toString());
+    List<UserEntity> userEntities = userDao.listByUserIds(friendIds);
+    return new ListFriendResponse().users(userEntities.stream().map(e->UserConverter.INSTANCE.toUser(e)).toList());
   }
 
   public List<User> listByUserIds(List<UUID> ids) {
@@ -298,6 +310,8 @@ public class UserService {
   }
 
 
+
+
   public AcceptFriendResponse acceptFriend(AcceptFriendRequest request) {
     List<FriendshipEntity> friendships = friendshipDao.findFriendShipById(request.getFriendId(), UserHelper.getCurrentUserId());
     if (!friendships.isEmpty()) {
@@ -306,10 +320,9 @@ public class UserService {
     for (var friend : friendships) {
       // 更新朋友信息
       friendshipDao.update(friend);
-
       UserEntity sender = userDao.findById(UserHelper.getCurrentUserId()).orElseThrow();
       CreateNotificationRequest notificationRequest = new CreateNotificationRequest()
-              .notificationType(NotificationType.FRIEND_REQUEST)
+              .notificationType(NotificationType.FRIEND_ACCEPTED)
               .creatorId(UserHelper.getCurrentUserId())
               .receiverId(request.getFriendId())
               .content(I18nHelper.getFriendRequestMessage(sender));

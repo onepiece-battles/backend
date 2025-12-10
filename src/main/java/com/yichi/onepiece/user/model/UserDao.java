@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.apache.ibatis.annotations.*;
+import org.springframework.security.core.parameters.P;
 
 import javax.annotation.Nullable;
 
@@ -22,8 +23,7 @@ public interface UserDao extends BaseDao<UserEntity, UUID> {
       @Param("userFilter") UserFilter userFilter,
       @Param("sortList") Collection<UserSortableField> sortList,
       @Param("offset") int offset,
-      @Param("size") int size,
-      @Nullable @Param("userId") UUID userId);
+      @Param("size") int size);
 
 
   @ResultMap("userDetailView")
