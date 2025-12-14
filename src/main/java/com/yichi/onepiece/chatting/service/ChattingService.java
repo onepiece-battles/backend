@@ -47,8 +47,7 @@ public class ChattingService {
         if (!conversationEntities.isEmpty()) {
             return ChatConverter.INSTANCE.toChat(conversationEntities.get(0));
         }
-        ActionRecordEntity actionRecordEntity = actionRecordService.create();
-        ActionRecord actionRecord = actionRecordService.convertActionRecord(actionRecordEntity);
+        ActionRecordEntity actionRecordEntity = actionRecordService.createWithUserId(request.getIds().get(0));
         String name = getChatName(users.stream().map(e->e.getNickname()).toList());
         ConversationEntity conversationEntity = ConversationEntityBuilder.newBuilder()
                 .setGroup(request.getIds().size()>=3)
@@ -59,11 +58,8 @@ public class ChattingService {
                 .build();
         conversationDao.insert(conversationEntity);
         createUserConversation(users.stream().map(e->e.getId()).toList(), conversationEntity.getId());
-        return new Chat()
-                .name(name)
-                .members(users)
-                .creationRecord(actionRecord)
-                .modificationRecord(actionRecord);
+        return ChatConverter.INSTANCE.toChat(
+                conversationDao.findChatFullVieById(conversationEntity.getId()).orElseThrow());
     }
 
     private void createUserConversation(List<UUID> userIds, UUID conversationId) {
@@ -81,15 +77,7 @@ public class ChattingService {
     public Chat joinChat(JoinChatRequest joinChatRequest) {
         createUserConversation(joinChatRequest.getIds(),joinChatRequest.getConversationId());
         var conversationEntity = conversationDao.findById(joinChatRequest.getConversationId()).orElseThrow();
-        var creationRecord = actionRecordService.findOrFail(conversationEntity.getCreationRecordId());
-        var modificationRecord = actionRecordService.findOrFail(conversationEntity.getModificationRecordId());
-        List<UUID> userIds = userConversationDao.listByConversationId(joinChatRequest.getConversationId())
-                .stream().map(e->e.getUserId()).toList();
-        return new Chat()
-                .creationRecord(ActionRecordConverter.INSTANCE.toActionRecord(creationRecord))
-                .modificationRecord(ActionRecordConverter.INSTANCE.toActionRecord(modificationRecord))
-                .name(conversationEntity.getName())
-                .members(userService.listByUserIds(userIds));
+        return  ChatConverter.INSTANCE.toChat(conversationDao.findChatFullVieById(conversationEntity.getId()).orElseThrow());
     }
 
 
