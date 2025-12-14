@@ -137,7 +137,12 @@ public class UserService {
       }
     }
     logger.info(friendIds.toString());
-    List<UserEntity> userEntities = userDao.listByUserIds(friendIds);
+    List<UserEntity> userEntities;
+    if (!friendIds.isEmpty()) {
+      userEntities = userDao.listByUserIds(friendIds);
+    } else {
+      userEntities = new ArrayList<>();
+    }
     return new ListFriendResponse().users(userEntities.stream().map(e->UserConverter.INSTANCE.toUser(e)).toList());
   }
 
@@ -325,7 +330,7 @@ public class UserService {
               .notificationType(NotificationType.FRIEND_ACCEPTED)
               .creatorId(UserHelper.getCurrentUserId())
               .receiverId(request.getFriendId())
-              .content(I18nHelper.getFriendRequestMessage(sender));
+              .content(I18nHelper.getFriendAcceptMessage(sender));
       notificationService.create(notificationRequest);
     }
     return new AcceptFriendResponse()

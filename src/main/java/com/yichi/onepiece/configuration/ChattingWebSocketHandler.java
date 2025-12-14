@@ -14,105 +14,201 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 @Component
 public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
-    Logger logger = LoggerFactory.getLogger(ChattingWebSocketHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(ChattingWebSocketHandler.class);
+
     private final MessageService messageService;
     private final ChattingService chattingService;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    // userSocketMap 以后可能存在一个用户对应多个session的情况
+
+    // 1:1 Mapping: Active User -> Latest Session
     private final ConcurrentHashMap<UUID, WebSocketSession> userSocketMap = new ConcurrentHashMap<>();
-    // 记录这个群组的哪些用户上线了
-    private final ConcurrentHashMap<UUID, List<WebSocketSession>> groupMaps = new ConcurrentHashMap<>();
+
+    // Group Mapping: Group ID -> Thread-Safe Set of Sessions
+    // We use CopyOnWriteArraySet because iteration happens often (sending msgs), but modification (join/leave) is less frequent.
+    private final ConcurrentHashMap<UUID, Set<WebSocketSession>> groupMaps = new ConcurrentHashMap<>();
 
     public ChattingWebSocketHandler(MessageService messageService, ChattingService chattingService) {
         this.messageService = messageService;
         this.chattingService = chattingService;
     }
 
-
+    @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        logger.info(session.getAttributes().toString());
-        logger.info("connection established");
-        UUID userId =  UUID.fromString(session.getAttributes().get("userId").toString());
+        Object userIdObj = session.getAttributes().get("userId");
+        if (userIdObj == null) {
+            logger.error("No userId found in session attributes, closing session");
+            session.close();
+            return;
+        }
+
+        UUID userId = UUID.fromString(userIdObj.toString());
+        logger.info("User id: {} established connection", userId);
+
+        // FIX: Always put the latest session.
+        // Note: If you want to support multiple devices per user, this map needs to be UUID -> Set<Session>
+        userSocketMap.put(userId, session);
+        logger.info("user socket map: {}", userSocketMap);
+
+        // Load user's chats
         List<Chat> chats = chattingService.list(new ListChatRequest().userId(userId));
         List<UUID> groupIds = chats.stream().map(Chat::getId).toList();
-        for (UUID id: groupIds) {
-            if(groupMaps.containsKey(id)) {
-                groupMaps.get(id).add(session);
-            } else {
-                groupMaps.put(id, new ArrayList<>(List.of(session)));
+
+        // FIX: Atomic computation to prevent race conditions
+        for (UUID groupId : groupIds) {
+            groupMaps.computeIfAbsent(groupId, k -> new CopyOnWriteArraySet<>()).add(session);
+        }
+
+        // Update chat list
+        for (Chat chat : chats) {
+            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(chat)));
+        }
+
+        // Collect recent messages
+        // Optimization: Use parallel stream if message volume is high, but keep sequential for ordering if needed
+        List<Message> messageFullViewList = groupIds.stream()
+                .map(messageService::getRecentMessage)
+                .flatMap(Collection::stream)
+                .map(ChatConverter.INSTANCE::toMessage)
+                .toList(); // Java 17 toList()
+
+        for (Message message : messageFullViewList) {
+            String stringMessage = objectMapper.writeValueAsString(message);
+            session.sendMessage(new TextMessage(stringMessage));
+        }
+    }
+
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        logger.info("Connection closed");
+        Object userIdObj = session.getAttributes().get("userId");
+        if (userIdObj != null) {
+            UUID userId = UUID.fromString(userIdObj.toString());
+
+            // FIX: Only remove if the map currently holds THIS specific session.
+            // This prevents removing the user's *new* tab if they opened a second one before closing the first.
+            logger.info("before removing: {}", userSocketMap);
+            logger.info("remove user: {} from user socket map", userId);
+            userSocketMap.remove(userId, session);
+            logger.info("after removing: {}", userSocketMap);
+            // Clean up group memberships
+            List<UserConversationEntity> conversations = chattingService.listUserConversationByUserId(userId);
+            if (conversations != null) {
+                for (UserConversationEntity conv : conversations) {
+                    Set<WebSocketSession> sessions = groupMaps.get(conv.getConversationId());
+                    if (sessions != null) {
+                        sessions.remove(session);
+                        // Optional: remove the group entry if empty to save memory
+                        if (sessions.isEmpty()) {
+                            groupMaps.remove(conv.getConversationId());
+                        }
+                    }
+                }
             }
         }
-        userSocketMap.putIfAbsent(userId, session);
-        // update chat list
-        for(Chat chat: chats) {
-            String stringMessage = objectMapper.writeValueAsString(chat);
-            session.sendMessage(new TextMessage(stringMessage));
-        }
-        // collect recent messages
-        List<Message> messageFullViewList = groupIds
-                .stream().map(messageService::getRecentMessage)
-                .toList().stream().flatMap(Collection::stream)
-                .map(ChatConverter.INSTANCE::toMessage)
-                .toList();
-        for(Message message: messageFullViewList) {
-            String stringMessage = objectMapper.writeValueAsString(message);
-            logger.info(stringMessage);
-            session.sendMessage(new TextMessage(stringMessage));
-        }
+        // No need to call session.close(status), the framework does it.
     }
 
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        logger.info("connection closed");
-        UUID userId = UUID.fromString(session.getAttributes().get("userId").toString()) ;
-        userSocketMap.remove(userId);
-        List<UUID> groupIds = chattingService.listUserConversationByUserId(userId).stream().map(UserConversationEntity::getConversationId).toList();
-        for(UUID id: groupIds) {
-            groupMaps.get(id).remove(session);
-        }
-        session.close(status);
-    }
-
-
+    @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
         JsonNode jsonNode = objectMapper.readTree(payload);
-        String messageType = jsonNode.has("type") ? jsonNode.get("type").asText() : null;
-        logger.info("message type: %s", messageType);
+        String messageType = jsonNode.has("type") ? jsonNode.get("type").asText() : "UNKNOWN";
+
         if (MessageType.SEND_MESSAGE.toString().equals(messageType)) {
-            logger.info("send message");
-            SendMessageRequest request = objectMapper.readValue(message.getPayload(), SendMessageRequest.class);
+            SendMessageRequest request = objectMapper.readValue(payload, SendMessageRequest.class);
             var response = messageService.sendMessage(request);
             if (response.getResult()) {
-                sendMessages(request.getConversationId(), new TextMessage(objectMapper.writeValueAsString(response.getMessage())));
+                sendMessagesToGroup(request.getConversationId(), new TextMessage(objectMapper.writeValueAsString(response.getMessage())));
             }
         } else if (MessageType.JOIN_CHAT.toString().equals(messageType)) {
-            logger.info("join chat");
-            JoinChatRequest request = objectMapper.readValue(message.getPayload(), JoinChatRequest.class);
+            JoinChatRequest request = objectMapper.readValue(payload, JoinChatRequest.class);
             var chat = chattingService.joinChat(request);
-            if (chat!=null) {
-                sendMessages(chat.getId(), message);
+            if (chat != null) {
+                // Logic for Join might also need to update groupMaps if the user wasn't in it before
+                registerUsersToGroup(new ArrayList<>(request.getIds()), chat.getId());
+                sendMessagesToUsers(new ArrayList<>(request.getIds()), new TextMessage(objectMapper.writeValueAsString(chat)));
             }
         } else if (MessageType.CREATE_CHAT.toString().equals(messageType)) {
-            logger.info("create chat");
-            CreateChatRequest request = objectMapper.readValue(message.getPayload(), CreateChatRequest.class);
+            CreateChatRequest request = objectMapper.readValue(payload, CreateChatRequest.class);
             var chat = chattingService.create(request);
-            if (chat!=null) {
-                sendMessages(chat.getId(), message);
+            if (chat != null) {
+                // 1. Send the New Chat Object to frontend (so they can render the chat box)
+                sendMessagesToUsers(request.getIds(), new TextMessage(objectMapper.writeValueAsString(chat)));
+
+                // --- FIX STARTS HERE ---
+                // 2. We must register the current active sessions to this NEW group ID in memory.
+                // Otherwise, 'sendMessagesToGroup' won't know who to send to.
+                registerUsersToGroup(request.getIds(), chat.getId());
+                // --- FIX ENDS HERE ---
+
+                var response = messageService.sendMessage(
+                        new SendMessageRequest()
+                                .conversationId(chat.getId())
+                                .type(MessageType.SEND_MESSAGE)
+                                .content("我通过了你的朋友验证请求，现在我们可以开始聊天了")
+                                .userId(request.getIds().get(1))); // Assuming index 1 is the sender or specific logic
+
+                if (response.getResult()) {
+                    logger.info("send message to new group");
+                    // 3. Now this will work because the map is updated
+                    sendMessagesToGroup(chat.getId(), new TextMessage(objectMapper.writeValueAsString(response.getMessage())));
+                }
             }
         }
     }
 
-    void sendMessages(UUID conversationId, TextMessage message) throws IOException {
-        List<WebSocketSession> sessions = groupMaps.get(conversationId);
-        for(WebSocketSession socketSession: sessions) {
-            logger.info(message.getPayload());
-            socketSession.sendMessage(message);
+    /**
+     * Helper method to bind active user sessions to a specific group ID.
+     */
+    private void registerUsersToGroup(List<UUID> userIds, UUID groupId) {
+        for (UUID userId : userIds) {
+            WebSocketSession userSession = userSocketMap.get(userId);
+            // Only add if the user is currently online (has a session)
+            if (userSession != null && userSession.isOpen()) {
+                groupMaps.computeIfAbsent(groupId, k -> new CopyOnWriteArraySet<>()).add(userSession);
+            }
+        }
+    }
+
+
+    private void sendMessagesToGroup(UUID conversationId, TextMessage message) {
+        Set<WebSocketSession> sessions = groupMaps.get(conversationId);
+        // FIX: Null check and isOpen check
+        if (sessions != null) {
+            for (WebSocketSession socketSession : sessions) {
+                sendMessageSafely(socketSession, message);
+            }
+        }
+    }
+
+    private void sendMessagesToUsers(List<UUID> userIds, TextMessage message) {
+        logger.info("users in socket: {}", userIds.stream()
+                .map(userSocketMap::get)
+                .filter(Objects::nonNull).toList());
+
+        // FIX: Handle nulls if user is offline
+        userIds.stream()
+                .map(userSocketMap::get)
+                .filter(Objects::nonNull) // Filter out offline users
+                .forEach(session -> sendMessageSafely(session, message));
+    }
+
+    private void sendMessageSafely(WebSocketSession session, TextMessage message) {
+        try {
+            if (session.isOpen()) {
+                logger.info("sending message: {}", message);
+                session.sendMessage(message);
+            }
+        } catch (IOException e) {
+            logger.error("Error sending message to session {}", session.getId(), e);
         }
     }
 }

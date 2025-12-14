@@ -6,8 +6,10 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.security.core.parameters.P;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Dao
@@ -19,6 +21,10 @@ public interface ConversationDao extends BaseDao<ConversationEntity, UUID> {
     @ResultMap("conversationFullView")
     @Select("select * from `conversation` left join `user_conversation` on `conversation`.`id` = `user_conversation`.`conversation_id` where `user_conversation`.`user_id` = #{userId} ")
     List<ConversationFullView> listChat(@Param("userId") UUID userId);
+
+    @ResultMap("conversationFullView")
+    @Select("select * from `conversation` where `id` =  #{id}")
+    Optional<ConversationFullView> findChatFullVieById(@Param("id")UUID id);
 
     // list all conversation that contains exactly the users in input param.
     @Select({"<script>",
