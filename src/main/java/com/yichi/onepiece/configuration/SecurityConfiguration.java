@@ -46,7 +46,7 @@ public class SecurityConfiguration {
         .authorizeHttpRequests(
             authorize -> {
               authorize
-                  .requestMatchers("/api/onepiece/user/**", "/chat")
+                  .requestMatchers("/api/onepiece/user/login", "/api/onepiece/user/register", "/chat")
                   .permitAll()
                   .anyRequest()
                   .authenticated();

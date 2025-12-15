@@ -2,6 +2,7 @@ package com.yichi.onepiece.user.service;
 
 
 import com.aliyuncs.utils.Base64Helper;
+import com.yichi.onepiece.configuration.ChattingWebSocketHandler;
 import com.yichi.onepiece.exception.ExceptionUtils;
 import com.yichi.onepiece.exception.FileStorageException;
 import com.yichi.onepiece.iam.model.*;
@@ -49,8 +50,9 @@ public class UserAccountService {
     private final PasswordEncoder passwordEncoder;
     private final ImageService imageService;
     private final ActionRecordService actionRecordService;
+    private final ChattingWebSocketHandler chattingWebSocketHandler;
 
-    public UserAccountService(AuthenticationManager authenticationManager, TokenDao tokenDao, UserDao userDao, RoleDao roleDao, UserRoleDao userRoleDao, RoleService roleService, PasswordEncoder passwordEncoder, ImageService imageService, ActionRecordService actionRecordService) {
+    public UserAccountService(AuthenticationManager authenticationManager, TokenDao tokenDao, UserDao userDao, RoleDao roleDao, UserRoleDao userRoleDao, RoleService roleService, PasswordEncoder passwordEncoder, ImageService imageService, ActionRecordService actionRecordService, ChattingWebSocketHandler chattingWebSocketHandler) {
         this.authenticationManager = authenticationManager;
         this.tokenDao = tokenDao;
         this.userDao = userDao;
@@ -60,6 +62,7 @@ public class UserAccountService {
         this.passwordEncoder = passwordEncoder;
         this.imageService = imageService;
         this.actionRecordService = actionRecordService;
+        this.chattingWebSocketHandler = chattingWebSocketHandler;
     }
 
     /**
@@ -208,11 +211,11 @@ public class UserAccountService {
     }
 
     public LogoutResponse logout(UUID userId) {
+        chattingWebSocketHandler.disconnectUser(userId);
         var userOptional = userDao.findById(userId);
         if (userOptional.isEmpty()) {
             return new LogoutResponse().logoutResult(NO_USER_FOUND);
         }
-
         var user = userOptional.get();
         var signedOutUser = user.toBuilder().setAccountStatus(AccountStatus.LOGGED_OUT).build();
         userDao.update(signedOutUser);
