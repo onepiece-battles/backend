@@ -216,4 +216,19 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
             logger.error("Error sending message to session {}", session.getId(), e);
         }
     }
+
+    public void disconnectUser(UUID userId) {
+        WebSocketSession session = userSocketMap.get(userId);
+        if (session != null && session.isOpen()) {
+            try {
+                logger.info("Force closing session for user: {}", userId);
+                // Close with a normal status code
+                session.close(CloseStatus.NORMAL);
+            } catch (IOException e) {
+                logger.error("Error closing session for user {}", userId, e);
+            }
+            // Note: session.close() will trigger afterConnectionClosed(),
+            // which handles the map cleanup logic you already wrote.
+        }
+    }
 }
