@@ -148,14 +148,19 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
                 // Otherwise, 'sendMessagesToGroup' won't know who to send to.
                 registerUsersToGroup(request.getIds(), chat.getId());
                 // --- FIX ENDS HERE ---
-
-                var response = messageService.sendMessage(
-                        new SendMessageRequest()
-                                .conversationId(chat.getId())
-                                .type(MessageType.SEND_MESSAGE)
-                                .content("我通过了你的朋友验证请求，现在我们可以开始聊天了")
-                                .userId(request.getIds().get(1))); // Assuming index 1 is the sender or specific logic
-
+                String firstMessageContent;
+                if (chat.getGroup()) {
+                    firstMessageContent = "我创建了一个群组，大家一起聊天吧";
+                } else {
+                   firstMessageContent="我通过了你的朋友验证请求，现在我们可以开始聊天了";
+                }
+                logger.info(firstMessageContent);
+                    var response = messageService.sendMessage(
+                            new SendMessageRequest()
+                                    .conversationId(chat.getId())
+                                    .type(MessageType.SEND_MESSAGE)
+                                    .content(firstMessageContent)
+                                    .userId(request.getIds().get(chat.getGroup()?0:1))); // Assuming index 1 is the sender or specific logic
                 if (response.getResult()) {
                     logger.info("send message to new group");
                     // 3. Now this will work because the map is updated
