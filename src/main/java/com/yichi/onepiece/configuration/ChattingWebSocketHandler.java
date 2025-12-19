@@ -119,6 +119,14 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
+        // --- FIX START: Handle Heartbeat ---
+        // Check if the message is just a simple "ping" string
+        if ("ping".equalsIgnoreCase(payload)) {
+            // Optional: Reply with "pong" so the frontend knows the server is alive
+            // session.sendMessage(new TextMessage("pong"));
+            logger.debug("Received heartbeat from user");
+            return; // Stop processing here, do not try to parse JSON
+        }
         JsonNode jsonNode = objectMapper.readTree(payload);
         String messageType = jsonNode.has("type") ? jsonNode.get("type").asText() : "UNKNOWN";
 
