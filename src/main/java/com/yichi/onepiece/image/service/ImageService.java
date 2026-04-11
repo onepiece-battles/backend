@@ -24,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Nullable;
+
 @Service
 public class ImageService {
   Logger logger = LoggerFactory.getLogger(ImageService.class);
@@ -99,9 +101,9 @@ public class ImageService {
     return AliCloudObjectStorage.putFileStream(new ByteArrayInputStream(EncryptHelper.base64Decode(profileImage)));
   }
 
-  public String getImage(String uri) {
+  public String getImage(String uri, @Nullable Boolean fullImage) {
     try {
-      return EncryptHelper.base64Encode(AliCloudObjectStorage.getFileStream(uri).readAllBytes());
+        return EncryptHelper.base64Encode(AliCloudObjectStorage.getImageStream(uri,fullImage).readAllBytes());
     } catch (Exception e) {
       logger.error(e.toString());
     }

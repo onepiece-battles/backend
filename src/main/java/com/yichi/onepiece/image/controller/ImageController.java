@@ -18,7 +18,7 @@ public class ImageController implements ImageApi {
   }
     @Override
     public ResponseEntity<GetImageResponse> getImage(GetImageRequest getImageRequest) {
-        var imageData=imageService.getImage(getImageRequest.getUri());
+        var imageData=imageService.getImage(getImageRequest.getUri(), getImageRequest.getFullImage());
         return ResponseEntity.ok(new GetImageResponse().image(imageData));
     }
 
