@@ -114,8 +114,10 @@ public class DataExportService {
               starterCharacter.getName().getZhCN():starterCharacter.getName().getEnUS();
       String receiverName = locale.equals(OnepieceLocale.ZH_CN.getValue())?
               receiverCharacter.getName().getZhCN():receiverCharacter.getName().getEnUS();
-      ImageData starterImageData = loadCharacterImage(starterCharacter, starterName);
-      ImageData receiverImageData = loadCharacterImage(receiverCharacter, receiverName);
+      ImageData starterOriginalImageData = loadCharacterImage(starterCharacter, starterName, true);
+      ImageData receiverOriginalImageData = loadCharacterImage(receiverCharacter, receiverName, true);
+      ImageData starterCompressedImageData = loadCharacterImage(starterCharacter, starterName, false);
+      ImageData receiverCompressedImageData = loadCharacterImage(receiverCharacter, receiverName, false);
       boolean starterWon = battleEntity.getStarterId().equals(battleExecutionEntity.getWinnerId());
       String winnerName = starterWon ? starterName : receiverName;
 
@@ -124,8 +126,8 @@ public class DataExportService {
       overviewSection.add(createFighterSection(
               starterCharacter,
               receiverCharacter,
-              starterImageData,
-              receiverImageData,
+	              starterOriginalImageData,
+	              receiverOriginalImageData,
               starterName,
               receiverName,
               starterWon,
@@ -139,11 +141,11 @@ public class DataExportService {
       document.add(sectionTitle(localized("战斗详情", "Battle Details", locale), font));
       int i = 0;
       for (; i < processList.size(); i++) {
-        document.add(getBattleStatusBlock(starterImageData, receiverImageData, statusList.get(i), locale, font));
+	        document.add(getBattleStatusBlock(starterCompressedImageData, receiverCompressedImageData, statusList.get(i), locale, font));
         document.add(getBattleProcessBlock(processList.get(i), locale, font, starterCharacter.getId()));
       }
       if (!statusList.isEmpty() && i < statusList.size()) {
-        document.add(getBattleStatusBlock(starterImageData, receiverImageData, statusList.get(i), locale, font));
+	        document.add(getBattleStatusBlock(starterCompressedImageData, receiverCompressedImageData, statusList.get(i), locale, font));
       }
       document.add(new Paragraph(localized("战斗结束", "Battle finished", locale))
               .setFont(font)
@@ -204,17 +206,18 @@ public class DataExportService {
     return cell;
   }
 
-  private ImageData loadCharacterImage(CharacterEntity character, String fallbackName) {
-    if (character.getImageUri() != null && !character.getImageUri().isBlank()) {
-      try {
-        return ImageDataFactory.create(
-                AliCloudObjectStorage.getFileStream(character.getImageUri()).readAllBytes());
-      } catch (Exception e) {
-        logger.warn(
-                "failed to load pdf image from OSS for character {}, using fallback image",
-                character.getId(),
-                e);
-      }
+	  private ImageData loadCharacterImage(CharacterEntity character, String fallbackName, boolean fullImage) {
+	    if (character.getImageUri() != null && !character.getImageUri().isBlank()) {
+	      try {
+	        return ImageDataFactory.create(
+	                AliCloudObjectStorage.getImageStream(character.getImageUri(), fullImage).readAllBytes());
+	      } catch (Exception e) {
+	        logger.warn(
+	                "failed to load {} pdf image from OSS for character {}, using fallback image",
+	                fullImage ? "original" : "compressed",
+	                character.getId(),
+	                e);
+	      }
     }
     if (character.getProfileImage() != null && character.getProfileImage().length > 0) {
       try {
