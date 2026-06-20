@@ -1,14 +1,30 @@
 package com.yichi.onepiece.configuration;
 
+import com.yichi.onepiece.constants.JwtConstants;
+import com.yichi.onepiece.iam.model.TokenDao;
+import com.yichi.onepiece.user.model.UserDetailImpl;
+import com.yichi.onepiece.utils.JwtHelper;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import java.util.Map;
 
+@Component
 public class AuthHandshakeInterceptor implements HandshakeInterceptor {
+    private final TokenDao tokenDao;
+    private final UserDetailsService userDetailsService;
+
+    public AuthHandshakeInterceptor(TokenDao tokenDao, UserDetailsService userDetailsService) {
+        this.tokenDao = tokenDao;
+        this.userDetailsService = userDetailsService;
+    }
+
     @Override
     public boolean beforeHandshake(
             ServerHttpRequest request,
@@ -17,15 +33,37 @@ public class AuthHandshakeInterceptor implements HandshakeInterceptor {
             Map<String, Object> attributes) throws Exception {
         if (request instanceof ServletServerHttpRequest servletReq) {
             HttpServletRequest httpServletRequest = servletReq.getServletRequest();
-            // Expect userId as query param: ws://localhost:8081/chat?userId=123
-            String userId = httpServletRequest.getParameter("userId");
-            if (userId != null && !userId.isBlank()) {
-                attributes.put("userId", userId);
-                return true;
+            String jwt = getJwt(httpServletRequest);
+            if (jwt == null) {
+                return false;
+            }
+            try {
+                String username = JwtHelper.extractUsername(jwt);
+                var userDetails = userDetailsService.loadUserByUsername(username);
+                var hasValidToken =
+                        tokenDao.findByTokenValue(jwt)
+                                .map(token -> !token.getExpired() && !token.getRevoked())
+                                .orElse(false);
+                if (hasValidToken
+                        && JwtHelper.isTokenValid(jwt, userDetails)
+                        && userDetails instanceof UserDetailImpl userDetail) {
+                    attributes.put("userId", userDetail.getId().toString());
+                    return true;
+                }
+            } catch (IllegalArgumentException | JwtException e) {
+                return false;
             }
         }
-        // reject if not present (or you can allow anonymous)
         return false;
+    }
+
+    private String getJwt(HttpServletRequest request) {
+        String authorization = request.getHeader(JwtConstants.HTTP_HEADER_AUTH);
+        if (authorization != null && authorization.startsWith(JwtConstants.HTTP_HEADER_AUTH_SCHEME)) {
+            return authorization.substring(JwtConstants.HTTP_HEADER_AUTH_SCHEME.length());
+        }
+        String token = request.getParameter("token");
+        return token == null || token.isBlank() ? null : token;
     }
 
     @Override

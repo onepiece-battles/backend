@@ -2,6 +2,7 @@ package com.yichi.onepiece.Login.Service;
 
 import com.yichi.onepiece.email.EmailClient;
 import jakarta.mail.MessagingException;
+import java.io.IOException;
 import org.mockito.testng.MockitoTestNGListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +16,7 @@ public class MailServiceTests extends AbstractTestNGSpringContextTests {
   @Autowired private EmailClient emailService;
 
   @Test
-  public void testSendEmail() throws MessagingException {
+  public void testSendEmail() throws MessagingException, IOException {
     String subject = "Test Email From OnePiece Battles";
     String toEmail = "zhangyichiwind@163.com";
     String body = "<h1>Welcome to OnePiece Battles!</h1>";

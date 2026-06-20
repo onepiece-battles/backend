@@ -3,6 +3,7 @@ package com.yichi.onepiece.image.service;
 import com.yichi.onepiece.alicloud.AliCloudObjectStorage;
 import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.exception.FileStorageException;
+import com.yichi.onepiece.exception.PermissionDeniedException;
 import com.yichi.onepiece.file.model.FileCategory;
 import com.yichi.onepiece.file.model.FileObjectEntityBuilder;
 import com.yichi.onepiece.file.service.FileObjectService;
@@ -58,6 +59,11 @@ public class ImageService {
   }
 
   public I18nText uploadImage(UUID targetId, ResourceType resourceType, String profileImage)  {
+    if (ResourceType.USER.equals(resourceType)
+            && !UserHelper.hasAdminPermission()
+            && !UserHelper.getCurrentUserId().equals(targetId)) {
+      throw new PermissionDeniedException("Access Denied");
+    }
     try {
       String uri = uploadImage(profileImage);
       switch (resourceType) {

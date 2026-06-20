@@ -72,7 +72,7 @@ public class DataExportService {
    *
    * @param battleId id of battle that will be analyzed.
    */
-  public void generateBattleResultPdf(UUID battleId, String userEmail, String locale, UUID userId, String roleName) {
+  public UUID generateBattleResultPdf(UUID battleId, String userEmail, String locale, UUID userId, String roleName) {
     logger.info("start getting source data for report generation");
     var battleEntity = battleService.findBattleById(battleId);
     var battleExecutionEntity = battleService.getBattleExecution(battleId);
@@ -196,9 +196,12 @@ public class DataExportService {
       // update battle entity
       battleService.updateBattleReportStage(battleId, BattleReportStage.FINISHED);
       battleService.updateFileId(battleId, fileObjectEntity.getId());
+      return fileObjectEntity.getId();
     } catch (Exception e) {
       logger.error(e.toString());
+      battleService.updateBattleReportStage(battleId, BattleReportStage.WAITING);
     }
+    return null;
   }
 
   private Cell createTextCell(String text,

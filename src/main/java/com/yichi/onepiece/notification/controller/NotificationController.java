@@ -45,6 +45,9 @@ public class NotificationController implements NotificationApi {
 
     @Override
     public ResponseEntity<MarkNotificationReceivedResult> markReceived(MarkNotificationReceived markNotificationReceived) {
-        return null;
+        iamService.checkPermissionOfCurrentAccount(
+                ResourceType.CHATTING, Set.of(Permission.UPDATE));
+        var response = notificationService.markReceived(markNotificationReceived);
+        return ResponseEntity.ok(response);
     }
 }

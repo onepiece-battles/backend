@@ -15,7 +15,7 @@ import org.apache.ibatis.annotations.Update;
 public interface TokenDao extends BaseDao<TokenEntity, UUID> {
   String LIST_TOKENS_BY_USER_ID = "com.yichi.onepiece.iam.model.TokenDao.listTokenByUserId";
 
-  @Select("SELECT * FROM token WHERE id = #{userId}")
+  @Select("SELECT * FROM token WHERE user_id = #{userId}")
   List<TokenEntity> listTokenByUserId(@Param("userId") UUID userId);
 
   @Select("SELECT * FROM token WHERE token.token_value = #{tokenValue}")

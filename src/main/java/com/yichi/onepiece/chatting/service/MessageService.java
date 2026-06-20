@@ -2,9 +2,11 @@ package com.yichi.onepiece.chatting.service;
 
 import com.yichi.onepiece.chatting.model.*;
 import com.yichi.onepiece.exception.FileStorageException;
+import com.yichi.onepiece.exception.PermissionDeniedException;
 import com.yichi.onepiece.image.service.ImageService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
+import com.yichi.onepiece.user.UserHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,20 +31,35 @@ public class MessageService {
     }
 
     public ListMessageResponse listMessage(ListMessageRequest request) {
+        checkCurrentUserInConversation(request.getChatId());
         var messages = messageDao.listMessageFullView(request.getChatId(), request.getLimit());
         return new ListMessageResponse().chats(messages.stream().map(e-> ChatConverter.INSTANCE.toMessage(e)).toList());
     }
 
     public RetractMessageResponse retractMessage(RetractMessageRequest request) {
         var message = messageDao.findById(request.getMessageId()).orElseThrow();
+        if (!UserHelper.getCurrentUserId().equals(message.getUserId())) {
+            throw new PermissionDeniedException("Access Denied");
+        }
         message = message.toBuilder().setRetracted(true).build();
         messageDao.update(message);
         return new RetractMessageResponse().result(Boolean.TRUE);
     }
 
     public SendMessageResponse sendMessage(SendMessageRequest request) {
+        return sendMessage(request, UserHelper.getCurrentUserId(), true);
+    }
+
+    public SendMessageResponse sendMessage(SendMessageRequest request, UUID senderUserId) {
+        return sendMessage(request, senderUserId, false);
+    }
+
+    private SendMessageResponse sendMessage(SendMessageRequest request, UUID senderUserId, boolean checkMembership) {
+        if (checkMembership) {
+            checkCurrentUserInConversation(request.getConversationId());
+        }
         MessageEntityBuilder messageEntityBuilder=MessageEntityBuilder.newBuilder();
-        var actionRecord = actionRecordService.createWithUserId(request.getUserId());
+        var actionRecord = actionRecordService.createWithUserId(senderUserId);
         String imageUri = "";
         String voiceUri = "";
         try {
@@ -59,7 +76,7 @@ public class MessageService {
             return new SendMessageResponse().result(Boolean.FALSE);
         }
         MessageEntity messageEntity = messageEntityBuilder.setPreMessageId(request.getPreMessageId())
-                .setUserId(request.getUserId())
+                .setUserId(senderUserId)
                 .setContent(request.getContent())
                 .setRetracted(Boolean.FALSE)
                 .setImageContentUri(imageUri.isEmpty()?null: imageUri)
@@ -74,7 +91,9 @@ public class MessageService {
     }
 
     public JumpToMessageResponse jumpToMessage(JumpToMessageRequest request) {
-        UUID messageId = chattingService.getLastReadMessageId(request.getUserId(), request.getConversationId());
+        UUID currentUserId = UserHelper.getCurrentUserId();
+        checkCurrentUserInConversation(request.getConversationId());
+        UUID messageId = chattingService.getLastReadMessageId(currentUserId, request.getConversationId());
         if(messageId==null) {
             return new JumpToMessageResponse();
         }
@@ -85,5 +104,15 @@ public class MessageService {
 
     public List<MessageFullView> getRecentMessage(UUID conversationId) {
         return messageDao.listMessageFullView(conversationId, 20);
+    }
+
+    private void checkCurrentUserInConversation(UUID conversationId) {
+        UUID currentUserId = UserHelper.getCurrentUserId();
+        var isMember =
+                chattingService.listUserConversationByUserId(currentUserId).stream()
+                        .anyMatch(conversation -> conversationId.equals(conversation.getConversationId()));
+        if (!isMember) {
+            throw new PermissionDeniedException("Access Denied");
+        }
     }
 }

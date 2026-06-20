@@ -9,6 +9,8 @@ import com.yichi.onepiece.lineage.model.ActionRecordConverter;
 import com.yichi.onepiece.lineage.model.ActionRecordEntity;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.*;
+import com.yichi.onepiece.exception.PermissionDeniedException;
+import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,13 @@ public class ChattingService {
     }
 
     public Chat create(CreateChatRequest request) {
+        return create(request, UserHelper.getCurrentUserId());
+    }
+
+    public Chat create(CreateChatRequest request, UUID creatorUserId) {
+        if (!request.getIds().contains(creatorUserId)) {
+            throw new PermissionDeniedException("Access Denied");
+        }
         List<User> users  = userService.listByUserIds(request.getIds());
         logger.info("list user ids");
         logger.info(request.getIds().toString());
@@ -47,7 +56,7 @@ public class ChattingService {
         if (!conversationEntities.isEmpty()) {
             return ChatConverter.INSTANCE.toChat(conversationEntities.get(0));
         }
-        ActionRecordEntity actionRecordEntity = actionRecordService.createWithUserId(request.getIds().get(0));
+        ActionRecordEntity actionRecordEntity = actionRecordService.createWithUserId(creatorUserId);
         String name = getChatName(users.stream().map(e->e.getNickname()).toList());
         ConversationEntity conversationEntity = ConversationEntityBuilder.newBuilder()
                 .setGroup(request.getIds().size()>=3)
@@ -75,6 +84,13 @@ public class ChattingService {
     }
 
     public Chat joinChat(JoinChatRequest joinChatRequest) {
+        return joinChat(joinChatRequest, UserHelper.getCurrentUserId());
+    }
+
+    public Chat joinChat(JoinChatRequest joinChatRequest, UUID joinerUserId) {
+        if (!joinChatRequest.getIds().contains(joinerUserId)) {
+            throw new PermissionDeniedException("Access Denied");
+        }
         createUserConversation(joinChatRequest.getIds(),joinChatRequest.getConversationId());
         var conversationEntity = conversationDao.findById(joinChatRequest.getConversationId()).orElseThrow();
         return  ChatConverter.INSTANCE.toChat(conversationDao.findChatFullVieById(conversationEntity.getId()).orElseThrow());
@@ -83,7 +99,7 @@ public class ChattingService {
 
 
     public List<Chat> list(ListChatRequest request) {
-        return conversationDao.listChat(request.getUserId()).stream()
+        return conversationDao.listChat(UserHelper.getCurrentUserId()).stream()
                 .map(e->ChatConverter.INSTANCE.toChat(e)).toList();
     }
 

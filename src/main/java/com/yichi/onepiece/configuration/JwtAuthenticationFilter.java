@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import io.jsonwebtoken.JwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
@@ -47,7 +48,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
     // get read jwt by removing the prefix
     String jwt = authentication.substring(JwtConstants.HTTP_HEADER_AUTH_SCHEME.length());
-    String username = JwtHelper.extractUsername(jwt);
+    String username;
+    try {
+      username = JwtHelper.extractUsername(jwt);
+    } catch (IllegalArgumentException | JwtException e) {
+      logger.warn("Invalid JWT received", e);
+      filterChain.doFilter(request, response);
+      return;
+    }
 
     if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
       UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);

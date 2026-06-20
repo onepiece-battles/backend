@@ -7,6 +7,8 @@ import com.yichi.onepiece.notification.mapper.NotificationConverter;
 import com.yichi.onepiece.notification.mapper.NotificationDao;
 import com.yichi.onepiece.notification.mapper.NotificationEntity;
 import com.yichi.onepiece.notification.mapper.NotificationEntityBuilder;
+import com.yichi.onepiece.exception.PermissionDeniedException;
+import com.yichi.onepiece.user.UserHelper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,7 +26,7 @@ public class NotificationService {
         ActionRecordEntity actionRecordEntity = actionRecordService.create();
         NotificationEntity notification = NotificationEntityBuilder.newBuilder()
                 .setSystemNotification(false)
-                .setNotificationSourceId(request.getCreatorId())
+                .setNotificationSourceId(UserHelper.getCurrentUserId())
                 .setNotificationTargetId(request.getReceiverId())
                 .setCategory(request.getNotificationType())
                 .setCreationRecordId(actionRecordEntity.getId())
@@ -39,6 +41,7 @@ public class NotificationService {
     public CloseNotificationResponse close(CloseNotificationRequest request) {
         ActionRecordEntity actionRecordEntity = actionRecordService.create();
         var notification = notificationDao.findById(request.getNotificationId()).orElseThrow();
+        checkNotificationOwner(notification);
         notification = notification
                 .toBuilder()
                 .setModificationRecordId(actionRecordEntity.getId())
@@ -47,12 +50,31 @@ public class NotificationService {
         return new CloseNotificationResponse().result(true).notification(new I18nText().enUS("success").zhCN("成功"));
     }
 
+    public MarkNotificationReceivedResult markReceived(MarkNotificationReceived request) {
+        ActionRecordEntity actionRecordEntity = actionRecordService.create();
+        var notification = notificationDao.findById(request.getNotificationId()).orElseThrow();
+        checkNotificationOwner(notification);
+        notification = notification
+                .toBuilder()
+                .setModificationRecordId(actionRecordEntity.getId())
+                .setReceived(true).build();
+        notificationDao.update(notification);
+        return new MarkNotificationReceivedResult().result(true).notification(new I18nText().enUS("success").zhCN("成功"));
+    }
+
     public ListNotificationResponse list(ListNotificationRequest request) {
         List<NotificationEntity> notificationEntities = request.getOnlyNew()?
-                notificationDao.listNew(request.getUserId()):
-                notificationDao.list(request.getUserId());
+                notificationDao.listNew(UserHelper.getCurrentUserId()):
+                notificationDao.list(UserHelper.getCurrentUserId());
         List<Notification> notifications = notificationEntities
                 .stream().map(NotificationConverter.INSTANCE::toNotification).toList();
        return new ListNotificationResponse().notifications(notifications).totalSize(notifications.size());
+    }
+
+    private void checkNotificationOwner(NotificationEntity notification) {
+        if (!UserHelper.hasAdminPermission()
+                && !UserHelper.getCurrentUserId().equals(notification.getNotificationTargetId())) {
+            throw new PermissionDeniedException("Access Denied");
+        }
     }
 }

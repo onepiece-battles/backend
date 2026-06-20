@@ -17,7 +17,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class JwtHelper {
 
   private static final String SECRET_KEY =
-      "REDACTED";
+      envOrDefault(
+          "ONEPIECE_JWT_SECRET_KEY",
+          "REDACTED");
+
+  private static String envOrDefault(String name, String defaultValue) {
+    String value = System.getenv(name);
+    if (value == null || value.isBlank()) {
+      return defaultValue;
+    }
+    return value;
+  }
 
   public static String generateAccessToken(UserEntity user) {
     return buildToken(user, ACCESS_TOKEN_EXPIRATION_PERIOD);

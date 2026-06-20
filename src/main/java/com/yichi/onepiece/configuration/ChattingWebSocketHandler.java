@@ -129,16 +129,17 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
         }
         JsonNode jsonNode = objectMapper.readTree(payload);
         String messageType = jsonNode.has("type") ? jsonNode.get("type").asText() : "UNKNOWN";
+        UUID userId = UUID.fromString(session.getAttributes().get("userId").toString());
 
         if (MessageType.SEND_MESSAGE.toString().equals(messageType)) {
             SendMessageRequest request = objectMapper.readValue(payload, SendMessageRequest.class);
-            var response = messageService.sendMessage(request);
+            var response = messageService.sendMessage(request, userId);
             if (response.getResult()) {
                 sendMessagesToGroup(request.getConversationId(), new TextMessage(objectMapper.writeValueAsString(response.getMessage())));
             }
         } else if (MessageType.JOIN_CHAT.toString().equals(messageType)) {
             JoinChatRequest request = objectMapper.readValue(payload, JoinChatRequest.class);
-            var chat = chattingService.joinChat(request);
+            var chat = chattingService.joinChat(request, userId);
             if (chat != null) {
                 // Logic for Join might also need to update groupMaps if the user wasn't in it before
                 registerUsersToGroup(new ArrayList<>(request.getIds()), chat.getId());
@@ -146,7 +147,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
             }
         } else if (MessageType.CREATE_CHAT.toString().equals(messageType)) {
             CreateChatRequest request = objectMapper.readValue(payload, CreateChatRequest.class);
-            var chat = chattingService.create(request);
+            var chat = chattingService.create(request, userId);
             if (chat != null) {
                 // 1. Send the New Chat Object to frontend (so they can render the chat box)
                 sendMessagesToUsers(request.getIds(), new TextMessage(objectMapper.writeValueAsString(chat)));
@@ -168,7 +169,8 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
                                     .conversationId(chat.getId())
                                     .type(MessageType.SEND_MESSAGE)
                                     .content(firstMessageContent)
-                                    .userId(request.getIds().get(chat.getGroup()?0:1))); // Assuming index 1 is the sender or specific logic
+                                    .userId(userId),
+                            userId);
                 if (response.getResult()) {
                     logger.info("send message to new group");
                     // 3. Now this will work because the map is updated

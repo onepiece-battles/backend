@@ -36,11 +36,15 @@ public class MessageController implements MessageApi {
 
     @Override
     public ResponseEntity<RetractMessageResponse> retractMessage(RetractMessageRequest retractMessageRequest) {
+        iamService.checkPermissionOfCurrentAccount(
+                ResourceType.CHATTING, Set.of(Permission.UPDATE));
         return ResponseEntity.ok(messageService.retractMessage(retractMessageRequest));
     }
 
     @Override
     public ResponseEntity<SendMessageResponse> sendMessage(SendMessageRequest sendMessageRequest) {
+        iamService.checkPermissionOfCurrentAccount(
+                ResourceType.CHATTING, Set.of(Permission.CREATE));
         return ResponseEntity.ok(messageService.sendMessage(sendMessageRequest));
     }
 }

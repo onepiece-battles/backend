@@ -3,8 +3,6 @@ package com.yichi.onepiece.alicloud;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
-import com.aliyun.oss.common.auth.CredentialsProviderFactory;
-import com.aliyun.oss.common.auth.EnvironmentVariableCredentialsProvider;
 import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.OSSObjectSummary;
@@ -12,7 +10,6 @@ import com.aliyun.oss.model.ObjectListing;
 import com.aliyuncs.exceptions.ClientException;
 import com.yichi.onepiece.exception.FileStorageException;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
@@ -28,7 +25,18 @@ public class AliCloudObjectStorage {
   private static final OSS ossClient;
 
   static {
-      ossClient = new OSSClientBuilder().build(OSS_EXTERNAL_ENDPOINT, "REDACTED", "REDACTED");
+      ossClient = new OSSClientBuilder().build(
+              OSS_EXTERNAL_ENDPOINT,
+              envOrDefault("ALIYUN_OSS_ACCESS_KEY_ID", "REDACTED"),
+              envOrDefault("ALIYUN_OSS_ACCESS_KEY_SECRET", "REDACTED"));
+  }
+
+  private static String envOrDefault(String name, String defaultValue) {
+    String value = System.getenv(name);
+    if (value == null || value.isBlank()) {
+      return defaultValue;
+    }
+    return value;
   }
 
   public static String putFileStream(ByteArrayInputStream content) throws FileStorageException {
@@ -109,10 +117,6 @@ public class AliCloudObjectStorage {
       return ossObjects.getObjectSummaries();
     } catch (OSSException oe) {
       throw toFileStorageException(oe);
-    } finally {
-      if (ossClient != null) {
-        ossClient.shutdown();
-      }
     }
   }
 
@@ -121,10 +125,6 @@ public class AliCloudObjectStorage {
       ossClient.deleteObject(OSS_BUCKET_NAME, objectName);
     } catch (OSSException oe) {
       throw  toFileStorageException(oe);
-    } finally {
-      if (ossClient != null) {
-        ossClient.shutdown();
-      }
     }
   }
   private static String getUriPrefix() {

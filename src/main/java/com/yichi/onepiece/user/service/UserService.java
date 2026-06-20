@@ -5,6 +5,7 @@ import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.*;
 
 import com.aliyuncs.utils.Base64Helper;
 import com.yichi.onepiece.email.EmailService;
+import com.yichi.onepiece.exception.PermissionDeniedException;
 import com.yichi.onepiece.notification.service.NotificationService;
 import com.yichi.onepiece.quartz.jobs.EmailJob;
 import com.yichi.onepiece.exception.ExceptionUtils;
@@ -126,11 +127,12 @@ public class UserService {
   }
 
   public ListFriendResponse listFriend(ListFriendRequest request) {
-    List<FriendshipEntity> friendships = friendshipDao.listFriendshipsByUserId(request.getUserId(), FriendshipStatus.ACCEPTED);
+    UUID currentUserId = UserHelper.getCurrentUserId();
+    List<FriendshipEntity> friendships = friendshipDao.listFriendshipsByUserId(currentUserId, FriendshipStatus.ACCEPTED);
     logger.info(friendships.toString());
     List<UUID> friendIds = new ArrayList<>();
     for(var fs : friendships) {
-      if(request.getUserId().equals(fs.getFriendLeftId())) {
+      if(currentUserId.equals(fs.getFriendLeftId())) {
         friendIds.add(fs.getFriendRightId());
       } else {
         friendIds.add(fs.getFriendLeftId());
@@ -164,10 +166,14 @@ public class UserService {
         roleEntities.stream()
             .map(RoleEntity::getName)
             .collect(Collectors.toCollection(HashSet::new));
-    var roleIds = roleEntities.stream().map(RoleEntity::getId).collect(Collectors.toSet());
     if (roleNameFullSet.containsAll(roles)) {
       List<UserRoleEntity> userRoleEntities = new ArrayList<>();
-      for (var roleId : roleIds) {
+      var requestedRoleIds =
+          roleEntities.stream()
+              .filter(roleEntity -> roles.contains(roleEntity.getName()))
+              .map(RoleEntity::getId)
+              .toList();
+      for (var roleId : requestedRoleIds) {
         var userRoleEntity =
             UserRoleEntityBuilder.newBuilder().setUserId(userId).setRoleId(roleId).build();
         userRoleEntities.add(userRoleEntity);
@@ -197,6 +203,9 @@ public class UserService {
   }
 
   public User getUserById(UUID userId) {
+    if (!UserHelper.hasAdminPermission() && !UserHelper.getCurrentUserId().equals(userId)) {
+      throw new PermissionDeniedException("Access Denied");
+    }
     var user = userDao.getById(userId).orElseThrow();
     return UserConverter.INSTANCE.toUser(user)
             .profileImage(EncryptHelper.base64Encode(ArrayUtils.toPrimitive(user.getProfileImage())))
@@ -208,7 +217,7 @@ public class UserService {
   }
 
   public ShareResourceResponse shareResource(ShareResourceRequest request) {
-    UUID sourceUserId = request.getSourceUserId();
+    UUID sourceUserId = UserHelper.getCurrentUserId();
     UUID targetUserId = request.getTargetUserId();
     var userResourceIds =
         userResourceDao.getResourceIdsByUserIdAndResourceType(
@@ -237,6 +246,9 @@ public class UserService {
   }
 
   public User updateUser(UpdateUserRequest request) {
+    if (!UserHelper.hasAdminPermission() && !UserHelper.getCurrentUserId().equals(request.getId())) {
+      throw new PermissionDeniedException("Access Denied");
+    }
     var user = userDao.findById(request.getId()).orElseThrow();
     var updatedUser =
         user.toBuilder().setLocale(request.getLocale()).setNickname(request.getNickname()).build();
@@ -255,6 +267,9 @@ public class UserService {
 
 
   public VerifyByEmailCodeResponse verifyUserEmail(VerifyByEmailCodeRequest request) {
+    if (!UserHelper.getCurrentUserId().equals(request.getUserId())) {
+      throw new PermissionDeniedException("Access Denied");
+    }
     var result =  justifyVerificationCode(request.getUserId(), request.getEmail(),request.getVerificationCode());
     if (!VERIFICATION_SUCCESS.equals(result)) {
       return new VerifyByEmailCodeResponse()
@@ -339,6 +354,10 @@ public class UserService {
   }
 
   public RejectFriendResponse rejectFriend(RejectFriendRequest request) {
+    List<FriendshipEntity> friendships = friendshipDao.findFriendShipById(request.getFriendId(), UserHelper.getCurrentUserId());
+    for (var friendship : friendships) {
+      friendshipDao.update(friendship.toBuilder().setFriendshipStatus(FriendshipStatus.REJECTED).build());
+    }
     UserEntity sender = userDao.findById(UserHelper.getCurrentUserId()).orElseThrow();
     CreateNotificationRequest notificationRequest = new CreateNotificationRequest()
             .notificationType(NotificationType.FRIEND_REQUEST)

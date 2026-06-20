@@ -4,6 +4,7 @@ import static com.yichi.onepiece.constants.OnepieceConstants.SUCCESS;
 import com.yichi.onepiece.api.UserApi;
 import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.*;
+import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserAccountService;
 import com.yichi.onepiece.user.service.UserService;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
@@ -42,7 +43,7 @@ public class UserController implements UserApi {
 
   @Override
   public ResponseEntity<AssignRoleResponse> assignRole(AssignRoleRequest assignRoleRequest) {
-    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
+    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.ASSIGN_ROLE));
     var roles =
         userService.assignRoleToUser(assignRoleRequest.getUserId(), assignRoleRequest.getRoles());
     return ResponseEntity.ok(
@@ -79,7 +80,7 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<LogoutResponse> logout(LogoutRequest logoutRequest) {
     iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
-    var response = userAccountService.logout(logoutRequest.getUserId());
+    var response = userAccountService.logout(UserHelper.getCurrentUserId());
     return ResponseEntity.ok(response);
   }
 
@@ -92,7 +93,7 @@ public class UserController implements UserApi {
             registerRequest.getUsername(),
             registerRequest.getConfirmedPassword(),
             registerRequest.getLocale(),
-            registerRequest.getUserRole());
+            null);
     var registerSuccess = verificationKey.equals(SUCCESS);
     return ResponseEntity.ok(
         new RegisterResponse()
@@ -105,6 +106,7 @@ public class UserController implements UserApi {
 
   @Override
   public ResponseEntity<RejectFriendResponse> rejectFriend(RejectFriendRequest rejectFriendRequest) {
+    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
     var response = userService.rejectFriend(rejectFriendRequest);
     return ResponseEntity.ok(response);
   }
@@ -125,6 +127,7 @@ public class UserController implements UserApi {
 
   @Override
   public ResponseEntity<UpdateLoginRoleResponse> updateRole(UpdateLoginRoleRequest request) {
+    iamService.checkPermissionOfCurrentAccount(ResourceType.USER, Set.of(Permission.UPDATE));
     var response = userService.updateLoginRole(request.getRole());
     return ResponseEntity.ok(response);
   }

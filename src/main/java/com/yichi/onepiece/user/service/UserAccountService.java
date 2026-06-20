@@ -212,6 +212,7 @@ public class UserAccountService {
 
     public LogoutResponse logout(UUID userId) {
         chattingWebSocketHandler.disconnectUser(userId);
+        tokenDao.revokeAllUserTokensByUserId(userId);
         var userOptional = userDao.findById(userId);
         if (userOptional.isEmpty()) {
             return new LogoutResponse().logoutResult(NO_USER_FOUND);
