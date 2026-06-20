@@ -39,7 +39,7 @@ public class ReportGeneratingJob extends QuartzJobBean {
                     locale,
                     UUID.fromString(userId), roleName);
         }catch (Exception e) {
-            logger.error(e.toString());
+            logger.error("failed to run report generation job for battle {}", battleId, e);
         }
     }
 }

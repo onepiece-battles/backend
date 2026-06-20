@@ -344,10 +344,10 @@ public class BattleService {
               .forJob(reportGeneratingJob)
               .startNow().build();
       scheduler.start();
-      scheduler.scheduleJob(reportGeneratingJob, reportGeneratingTrigger);
       updateBattleReportStage(battleId, BattleReportStage.IN_PROGRESS);
+      scheduler.scheduleJob(reportGeneratingJob, reportGeneratingTrigger);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("failed to schedule battle report generation", e);
     }
   }
 
