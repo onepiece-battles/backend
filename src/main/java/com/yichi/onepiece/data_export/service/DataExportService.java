@@ -573,7 +573,7 @@ public class DataExportService {
             .setBorder(new SolidBorder(missed ? GOLD : BORDER, 0.8f))
             .setBackgroundColor(missed ? new DeviceRgb(255, 249, 232) : LIGHT_BLUE)
             .setPadding(12)
-            .setMarginBottom(10)
+            .setMarginBottom(10);
 
     Table header = new Table(UnitValue.createPercentArray(new float[] {55, 45})).useAllAvailableWidth();
     header.addCell(new Cell()
