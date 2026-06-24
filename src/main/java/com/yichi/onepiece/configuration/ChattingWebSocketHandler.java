@@ -58,7 +58,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
         logger.info("user socket map: {}", userSocketMap);
 
         // Load user's chats
-        List<Chat> chats = chattingService.list(new ListChatRequest().userId(userId));
+        List<Chat> chats = chattingService.list(userId);
         List<UUID> groupIds = chats.stream().map(Chat::getId).toList();
 
         // FIX: Atomic computation to prevent race conditions

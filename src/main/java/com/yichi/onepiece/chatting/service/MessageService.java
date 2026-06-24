@@ -63,16 +63,20 @@ public class MessageService {
         String imageUri = "";
         String voiceUri = "";
         try {
-            if (request.getProfileImage()!=null) {
+            if (request.getProfileImage() != null && !request.getProfileImage().isBlank()) {
+                logger.info(
+                        "uploading image message for conversation {}, encoded image length {}",
+                        request.getConversationId(),
+                        request.getProfileImage().length());
                 imageUri = imageService.uploadImage(request.getProfileImage());
                 messageEntityBuilder.setImageContentUri(imageUri);
             }
-            if (request.getVoice()!=null) {
+            if (request.getVoice() != null && !request.getVoice().isBlank()) {
                 voiceUri = imageService.uploadImage(request.getVoice());
                 messageEntityBuilder.setVoiceContentUri(voiceUri);
             }
-        } catch (FileStorageException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error("failed to upload message attachment for conversation {}", request.getConversationId(), e);
             return new SendMessageResponse().result(Boolean.FALSE);
         }
         MessageEntity messageEntity = messageEntityBuilder.setPreMessageId(request.getPreMessageId())

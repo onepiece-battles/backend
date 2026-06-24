@@ -99,7 +99,11 @@ public class ChattingService {
 
 
     public List<Chat> list(ListChatRequest request) {
-        return conversationDao.listChat(UserHelper.getCurrentUserId()).stream()
+        return list(UserHelper.getCurrentUserId());
+    }
+
+    public List<Chat> list(UUID userId) {
+        return conversationDao.listChat(userId).stream()
                 .map(e->ChatConverter.INSTANCE.toChat(e)).toList();
     }
 

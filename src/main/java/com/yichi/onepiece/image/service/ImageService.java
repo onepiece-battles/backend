@@ -104,15 +104,36 @@ public class ImageService {
 
   // encode image with base64 and upload this image to alicloud. the return value is the URI of this image
   public String uploadImage(String profileImage) throws FileStorageException {
-    return AliCloudObjectStorage.putFileStream(new ByteArrayInputStream(EncryptHelper.base64Decode(profileImage)));
+    return AliCloudObjectStorage.putFileStream(
+            new ByteArrayInputStream(EncryptHelper.base64Decode(normalizeBase64Image(profileImage))));
   }
 
   public String getImage(String uri, @Nullable Boolean fullImage) {
     try {
         return EncryptHelper.base64Encode(AliCloudObjectStorage.getImageStream(uri,fullImage).readAllBytes());
     } catch (Exception e) {
-      logger.error(e.toString());
+      if (fullImage == null || !fullImage) {
+        logger.warn("failed to load compressed image {}, falling back to original image", uri, e);
+        try {
+          return EncryptHelper.base64Encode(AliCloudObjectStorage.getImageStream(uri, true).readAllBytes());
+        } catch (Exception fallbackException) {
+          logger.error("failed to load original image after compressed image fallback {}", uri, fallbackException);
+        }
+      } else {
+        logger.error("failed to load original image {}", uri, e);
+      }
     }
     throw new RuntimeException("file retrieval failed");
+  }
+
+  private String normalizeBase64Image(String image) {
+    if (image == null) {
+      return null;
+    }
+    int dataSeparator = image.indexOf(',');
+    if (image.startsWith("data:") && dataSeparator >= 0) {
+      return image.substring(dataSeparator + 1);
+    }
+    return image;
   }
 }
