@@ -86,6 +86,8 @@ public class UserController implements UserApi {
 
   @Override
   public ResponseEntity<RegisterResponse> register(RegisterRequest registerRequest) {
+    UserRole requestedPublicRole =
+            UserRole.VISITOR.equals(registerRequest.getUserRole()) ? UserRole.VISITOR : null;
     var verificationKey =
             userAccountService.register(
             registerRequest.getNickname(),
@@ -93,7 +95,7 @@ public class UserController implements UserApi {
             registerRequest.getUsername(),
             registerRequest.getConfirmedPassword(),
             registerRequest.getLocale(),
-            null);
+            requestedPublicRole);
     var registerSuccess = verificationKey.equals(SUCCESS);
     return ResponseEntity.ok(
         new RegisterResponse()
