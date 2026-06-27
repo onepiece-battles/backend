@@ -11,7 +11,7 @@ import org.springframework.web.socket.server.standard.ServletServerContainerFact
 @Configuration
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
-    private static final int MAX_MESSAGE_SIZE_BYTES = 20 * 1024 * 1024;
+    private static final int MAX_MESSAGE_SIZE_BYTES = 9 * 1024 * 1024;
     private final AuthHandshakeInterceptor interceptor;
 
     private final ChattingWebSocketHandler chattingWebSocketHandler;

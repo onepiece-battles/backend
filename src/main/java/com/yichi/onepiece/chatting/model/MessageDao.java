@@ -48,8 +48,11 @@ public interface MessageDao extends BaseDao<MessageEntity, UUID> {
     @Result(property = "modificationRecord", column = "modification_record_id", javaType = ActionRecordEntity.class,
             one = @One(select = "com.yichi.onepiece.lineage.model.ActionRecordDao.findById")
     )
-    @Select("select * from `message` where `message`.`conversation_id` = #{conversationId} and `message`.`creation_record_id` >= #{messageDigit}")
-    List<MessageFullView> listMessageFullViewByLastMessageId(@Param("conversationId") UUID conversationId, @Param("messageDigit") Long messageDigit);
+    @Select("select * from `message` where `message`.`conversation_id` = #{conversationId} and `message`.`creation_record_id` >= #{messageDigit} order by `message`.`creation_record_id` asc limit #{limit}")
+    List<MessageFullView> listMessageFullViewByLastMessageId(
+            @Param("conversationId") UUID conversationId,
+            @Param("messageDigit") Long messageDigit,
+            @Param("limit") int limit);
 
 
     @Result(property = "preMessage", column = "pre_message_id",

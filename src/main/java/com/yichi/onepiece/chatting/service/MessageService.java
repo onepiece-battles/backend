@@ -1,7 +1,6 @@
 package com.yichi.onepiece.chatting.service;
 
 import com.yichi.onepiece.chatting.model.*;
-import com.yichi.onepiece.exception.FileStorageException;
 import com.yichi.onepiece.exception.PermissionDeniedException;
 import com.yichi.onepiece.image.service.ImageService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
@@ -16,6 +15,8 @@ import java.util.UUID;
 
 @Service
 public class MessageService {
+    private static final int DEFAULT_MESSAGE_PAGE_SIZE = 20;
+    private static final int MAX_MESSAGE_PAGE_SIZE = 100;
     Logger logger = LoggerFactory.getLogger(MessageService.class);
 
     private final MessageDao messageDao;
@@ -32,7 +33,8 @@ public class MessageService {
 
     public ListMessageResponse listMessage(ListMessageRequest request) {
         checkCurrentUserInConversation(request.getChatId());
-        var messages = messageDao.listMessageFullView(request.getChatId(), request.getLimit());
+        int limit = boundedPageSize(request.getLimit());
+        var messages = messageDao.listMessageFullView(request.getChatId(), limit);
         return new ListMessageResponse().chats(messages.stream().map(e-> ChatConverter.INSTANCE.toMessage(e)).toList());
     }
 
@@ -51,15 +53,14 @@ public class MessageService {
     }
 
     public SendMessageResponse sendMessage(SendMessageRequest request, UUID senderUserId) {
-        return sendMessage(request, senderUserId, false);
+        return sendMessage(request, senderUserId, true);
     }
 
     private SendMessageResponse sendMessage(SendMessageRequest request, UUID senderUserId, boolean checkMembership) {
         if (checkMembership) {
-            checkCurrentUserInConversation(request.getConversationId());
+            checkUserInConversation(senderUserId, request.getConversationId());
         }
         MessageEntityBuilder messageEntityBuilder=MessageEntityBuilder.newBuilder();
-        var actionRecord = actionRecordService.createWithUserId(senderUserId);
         String imageUri = "";
         String voiceUri = "";
         try {
@@ -69,16 +70,19 @@ public class MessageService {
                         request.getConversationId(),
                         request.getProfileImage().length());
                 imageUri = imageService.uploadImage(request.getProfileImage());
+                request.setProfileImage(null);
                 messageEntityBuilder.setImageContentUri(imageUri);
             }
             if (request.getVoice() != null && !request.getVoice().isBlank()) {
                 voiceUri = imageService.uploadImage(request.getVoice());
+                request.setVoice(null);
                 messageEntityBuilder.setVoiceContentUri(voiceUri);
             }
         } catch (Exception e) {
             logger.error("failed to upload message attachment for conversation {}", request.getConversationId(), e);
             return new SendMessageResponse().result(Boolean.FALSE);
         }
+        var actionRecord = actionRecordService.createWithUserId(senderUserId);
         MessageEntity messageEntity = messageEntityBuilder.setPreMessageId(request.getPreMessageId())
                 .setUserId(senderUserId)
                 .setContent(request.getContent())
@@ -102,21 +106,35 @@ public class MessageService {
             return new JumpToMessageResponse();
         }
         MessageEntity messageEntity = messageDao.findById(messageId).orElseThrow();
-        List<MessageFullView> messageFullViewList = messageDao.listMessageFullViewByLastMessageId(request.getConversationId(),messageEntity.getCreationRecordId());
+        List<MessageFullView> messageFullViewList =
+                messageDao.listMessageFullViewByLastMessageId(
+                        request.getConversationId(),
+                        messageEntity.getCreationRecordId(),
+                        MAX_MESSAGE_PAGE_SIZE);
         return new JumpToMessageResponse().messages(messageFullViewList.stream().map(e-> ChatConverter.INSTANCE.toMessage(e)).toList());
     }
 
     public List<MessageFullView> getRecentMessage(UUID conversationId) {
-        return messageDao.listMessageFullView(conversationId, 20);
+        return messageDao.listMessageFullView(conversationId, DEFAULT_MESSAGE_PAGE_SIZE);
     }
 
     private void checkCurrentUserInConversation(UUID conversationId) {
-        UUID currentUserId = UserHelper.getCurrentUserId();
+        checkUserInConversation(UserHelper.getCurrentUserId(), conversationId);
+    }
+
+    private void checkUserInConversation(UUID userId, UUID conversationId) {
         var isMember =
-                chattingService.listUserConversationByUserId(currentUserId).stream()
+                chattingService.listUserConversationByUserId(userId).stream()
                         .anyMatch(conversation -> conversationId.equals(conversation.getConversationId()));
         if (!isMember) {
             throw new PermissionDeniedException("Access Denied");
         }
+    }
+
+    private int boundedPageSize(Integer requestedLimit) {
+        if (requestedLimit == null || requestedLimit <= 0) {
+            return DEFAULT_MESSAGE_PAGE_SIZE;
+        }
+        return Math.min(requestedLimit, MAX_MESSAGE_PAGE_SIZE);
     }
 }

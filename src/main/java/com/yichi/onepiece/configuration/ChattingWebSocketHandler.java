@@ -1,9 +1,9 @@
 package com.yichi.onepiece.configuration;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yichi.onepiece.chatting.model.ChatConverter;
-import com.yichi.onepiece.chatting.model.UserConversationEntity;
 import com.yichi.onepiece.chatting.service.ChattingService;
 import com.yichi.onepiece.chatting.service.MessageService;
 import com.yichi.onepiece.model.*;
@@ -23,6 +23,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Component
 public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
     private static final Logger logger = LoggerFactory.getLogger(ChattingWebSocketHandler.class);
+    private static final int MAX_MESSAGE_SIZE_BYTES = 9 * 1024 * 1024;
+    private static final String SESSION_GROUP_IDS = "chatGroupIds";
 
     private final MessageService messageService;
     private final ChattingService chattingService;
@@ -54,12 +56,17 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
 
         // FIX: Always put the latest session.
         // Note: If you want to support multiple devices per user, this map needs to be UUID -> Set<Session>
-        userSocketMap.put(userId, session);
-        logger.info("user socket map: {}", userSocketMap);
+        WebSocketSession previousSession = userSocketMap.put(userId, session);
+        if (previousSession != null && previousSession != session && previousSession.isOpen()) {
+            previousSession.close(CloseStatus.NORMAL.withReason("Replaced by a newer connection"));
+        }
 
         // Load user's chats
         List<Chat> chats = chattingService.list(userId);
         List<UUID> groupIds = chats.stream().map(Chat::getId).toList();
+        Set<UUID> sessionGroupIds = ConcurrentHashMap.newKeySet();
+        sessionGroupIds.addAll(groupIds);
+        session.getAttributes().put(SESSION_GROUP_IDS, sessionGroupIds);
 
         // FIX: Atomic computation to prevent race conditions
         for (UUID groupId : groupIds) {
@@ -68,20 +75,16 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
 
         // Update chat list
         for (Chat chat : chats) {
-            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(chat)));
+            sendMessageSafely(session, new TextMessage(objectMapper.writeValueAsString(chat)));
         }
 
-        // Collect recent messages
-        // Optimization: Use parallel stream if message volume is high, but keep sequential for ordering if needed
-        List<Message> messageFullViewList = groupIds.stream()
-                .map(messageService::getRecentMessage)
-                .flatMap(Collection::stream)
-                .map(ChatConverter.INSTANCE::toMessage)
-                .toList(); // Java 17 toList()
-
-        for (Message message : messageFullViewList) {
-            String stringMessage = objectMapper.writeValueAsString(message);
-            session.sendMessage(new TextMessage(stringMessage));
+        // Keep only one conversation's history in memory while initializing the socket.
+        for (UUID groupId : groupIds) {
+            for (var message : messageService.getRecentMessage(groupId)) {
+                String stringMessage =
+                        objectMapper.writeValueAsString(ChatConverter.INSTANCE.toMessage(message));
+                sendMessageSafely(session, new TextMessage(stringMessage));
+            }
         }
     }
 
@@ -94,50 +97,65 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
 
             // FIX: Only remove if the map currently holds THIS specific session.
             // This prevents removing the user's *new* tab if they opened a second one before closing the first.
-            logger.info("before removing: {}", userSocketMap);
-            logger.info("remove user: {} from user socket map", userId);
             userSocketMap.remove(userId, session);
-            logger.info("after removing: {}", userSocketMap);
-            // Clean up group memberships
-            List<UserConversationEntity> conversations = chattingService.listUserConversationByUserId(userId);
-            if (conversations != null) {
-                for (UserConversationEntity conv : conversations) {
-                    Set<WebSocketSession> sessions = groupMaps.get(conv.getConversationId());
-                    if (sessions != null) {
-                        sessions.remove(session);
-                        // Optional: remove the group entry if empty to save memory
-                        if (sessions.isEmpty()) {
-                            groupMaps.remove(conv.getConversationId());
+            Object groupIds = session.getAttributes().get(SESSION_GROUP_IDS);
+            if (groupIds instanceof Set<?> groups) {
+                for (Object groupId : groups) {
+                    if (groupId instanceof UUID conversationId) {
+                        Set<WebSocketSession> sessions = groupMaps.get(conversationId);
+                        if (sessions != null) {
+                            sessions.remove(session);
+                            if (sessions.isEmpty()) {
+                                groupMaps.remove(conversationId, sessions);
+                            }
                         }
                     }
                 }
             }
         }
-        // No need to call session.close(status), the framework does it.
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        String payload = message.getPayload();
-        // --- FIX START: Handle Heartbeat ---
-        // Check if the message is just a simple "ping" string
-        if ("ping".equalsIgnoreCase(payload)) {
-            // Optional: Reply with "pong" so the frontend knows the server is alive
-            // session.sendMessage(new TextMessage("pong"));
-            logger.debug("Received heartbeat from user");
-            return; // Stop processing here, do not try to parse JSON
+        if (message.getPayloadLength() > MAX_MESSAGE_SIZE_BYTES) {
+            logger.warn(
+                    "Closing session {} after oversized chat payload: {} bytes",
+                    session.getId(),
+                    message.getPayloadLength());
+            session.close(CloseStatus.TOO_BIG_TO_PROCESS);
+            return;
         }
-        JsonNode jsonNode = objectMapper.readTree(payload);
-        String messageType = jsonNode.has("type") ? jsonNode.get("type").asText() : "UNKNOWN";
+        String payload = message.getPayload();
+        if ("ping".equalsIgnoreCase(payload)) {
+            logger.debug("Received heartbeat from user");
+            return;
+        }
+
+        String messageType;
+        try {
+            messageType = readMessageType(payload);
+        } catch (IOException e) {
+            logger.warn("Ignoring malformed WebSocket message from session {}", session.getId());
+            return;
+        }
+        if ("ping".equalsIgnoreCase(messageType)) {
+            logger.debug("Received heartbeat from user");
+            return;
+        }
+        if (messageType == null) {
+            logger.warn("Ignoring WebSocket message without a type from session {}", session.getId());
+            return;
+        }
+
         UUID userId = UUID.fromString(session.getAttributes().get("userId").toString());
 
-        if (MessageType.SEND_MESSAGE.toString().equals(messageType)) {
+        if (MessageType.SEND_MESSAGE.getValue().equals(messageType)) {
             SendMessageRequest request = objectMapper.readValue(payload, SendMessageRequest.class);
             var response = messageService.sendMessage(request, userId);
             if (response.getResult()) {
                 sendMessagesToGroup(request.getConversationId(), new TextMessage(objectMapper.writeValueAsString(response.getMessage())));
             }
-        } else if (MessageType.JOIN_CHAT.toString().equals(messageType)) {
+        } else if (MessageType.JOIN_CHAT.getValue().equals(messageType)) {
             JoinChatRequest request = objectMapper.readValue(payload, JoinChatRequest.class);
             var chat = chattingService.joinChat(request, userId);
             if (chat != null) {
@@ -145,7 +163,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
                 registerUsersToGroup(new ArrayList<>(request.getIds()), chat.getId());
                 sendMessagesToUsers(new ArrayList<>(request.getIds()), new TextMessage(objectMapper.writeValueAsString(chat)));
             }
-        } else if (MessageType.CREATE_CHAT.toString().equals(messageType)) {
+        } else if (MessageType.CREATE_CHAT.getValue().equals(messageType)) {
             CreateChatRequest request = objectMapper.readValue(payload, CreateChatRequest.class);
             var chat = chattingService.create(request, userId);
             if (chat != null) {
@@ -177,6 +195,11 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
                     sendMessagesToGroup(chat.getId(), new TextMessage(objectMapper.writeValueAsString(response.getMessage())));
                 }
             }
+        } else {
+            logger.warn(
+                    "Ignoring unsupported WebSocket message type '{}' from session {}",
+                    messageType,
+                    session.getId());
         }
     }
 
@@ -189,6 +212,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
             // Only add if the user is currently online (has a session)
             if (userSession != null && userSession.isOpen()) {
                 groupMaps.computeIfAbsent(groupId, k -> new CopyOnWriteArraySet<>()).add(userSession);
+                getSessionGroupIds(userSession).add(groupId);
             }
         }
     }
@@ -205,10 +229,6 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
     }
 
     private void sendMessagesToUsers(List<UUID> userIds, TextMessage message) {
-        logger.info("users in socket: {}", userIds.stream()
-                .map(userSocketMap::get)
-                .filter(Objects::nonNull).toList());
-
         // FIX: Handle nulls if user is offline
         userIds.stream()
                 .map(userSocketMap::get)
@@ -216,15 +236,35 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
                 .forEach(session -> sendMessageSafely(session, message));
     }
 
+    private String readMessageType(String payload) throws IOException {
+        try (JsonParser parser = objectMapper.createParser(payload)) {
+            while (parser.nextToken() != null) {
+                if (parser.currentToken() == JsonToken.FIELD_NAME
+                        && "type".equals(parser.currentName())
+                        && parser.nextToken() == JsonToken.VALUE_STRING) {
+                    return parser.getValueAsString();
+                }
+            }
+        }
+        return null;
+    }
+
     private void sendMessageSafely(WebSocketSession session, TextMessage message) {
         try {
-            if (session.isOpen()) {
-                logger.info("sending message: {}", message);
-                session.sendMessage(message);
+            synchronized (session) {
+                if (session.isOpen()) {
+                    session.sendMessage(message);
+                }
             }
         } catch (IOException e) {
             logger.error("Error sending message to session {}", session.getId(), e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Set<UUID> getSessionGroupIds(WebSocketSession session) {
+        return (Set<UUID>) session.getAttributes().computeIfAbsent(
+                SESSION_GROUP_IDS, ignored -> ConcurrentHashMap.newKeySet());
     }
 
     public void disconnectUser(UUID userId) {

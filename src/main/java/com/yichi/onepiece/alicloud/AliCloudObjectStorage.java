@@ -6,10 +6,11 @@ import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.OSSObjectSummary;
+import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.ObjectListing;
 import com.aliyuncs.exceptions.ClientException;
 import com.yichi.onepiece.exception.FileStorageException;
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
@@ -39,15 +40,33 @@ public class AliCloudObjectStorage {
     return value;
   }
 
-  public static String putFileStream(ByteArrayInputStream content) throws FileStorageException {
+  public static String putFileStream(InputStream content) throws FileStorageException {
+    return putFileStream(content, null);
+  }
+
+  public static String putFileStream(InputStream content, long contentLength)
+      throws FileStorageException {
+    return putFileStream(content, Long.valueOf(contentLength));
+  }
+
+  private static String putFileStream(InputStream content, Long contentLength)
+      throws FileStorageException {
     String key = UUID.randomUUID().toString();
-    try {
+    try (content) {
       logger.info("start putting file to alicloud");
-      ossClient.putObject(OSS_BUCKET_NAME, key, content);
+      if (contentLength == null) {
+        ossClient.putObject(OSS_BUCKET_NAME, key, content);
+      } else {
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(contentLength);
+        ossClient.putObject(OSS_BUCKET_NAME, key, content, metadata);
+      }
       return toOssUri(key);
     } catch (OSSException oe) {
       logger.info(oe.toString());
       throw toFileStorageException(oe);
+    } catch (IOException ioe) {
+      throw new FileStorageException("Failed to close uploaded file stream", ioe);
     }
   }
 

@@ -14,8 +14,10 @@ import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.ResourceType;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
-import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Base64;
 import java.util.Map;
 import java.util.UUID;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
@@ -29,6 +31,7 @@ import javax.annotation.Nullable;
 
 @Service
 public class ImageService {
+  private static final int MAX_ATTACHMENT_BASE64_LENGTH = 8 * 1024 * 1024;
   Logger logger = LoggerFactory.getLogger(ImageService.class);
   private final CharacterService characterService;
   private final FruitService fruitService;
@@ -104,18 +107,37 @@ public class ImageService {
 
   // encode image with base64 and upload this image to alicloud. the return value is the URI of this image
   public String uploadImage(String profileImage) throws FileStorageException {
-    return AliCloudObjectStorage.putFileStream(
-            new ByteArrayInputStream(EncryptHelper.base64Decode(normalizeBase64Image(profileImage))));
+    if (profileImage == null || profileImage.isBlank()) {
+      throw new FileStorageException("Image content is empty");
+    }
+
+    int contentOffset = getBase64ContentOffset(profileImage);
+    int encodedLength = profileImage.length() - contentOffset;
+    if (encodedLength > MAX_ATTACHMENT_BASE64_LENGTH) {
+      throw new FileStorageException("Image content exceeds the 6 MB upload limit");
+    }
+    if (encodedLength < 2 || encodedLength % 4 == 1) {
+      throw new FileStorageException("Image content is not valid Base64");
+    }
+
+    try {
+      InputStream encodedStream = new CharSequenceAsciiInputStream(profileImage, contentOffset);
+      return AliCloudObjectStorage.putFileStream(
+          Base64.getDecoder().wrap(encodedStream),
+          decodedBase64Length(profileImage, contentOffset));
+    } catch (IllegalArgumentException e) {
+      throw new FileStorageException("Image content is not valid Base64", e);
+    }
   }
 
   public String getImage(String uri, @Nullable Boolean fullImage) {
-    try {
-        return EncryptHelper.base64Encode(AliCloudObjectStorage.getImageStream(uri,fullImage).readAllBytes());
+    try (InputStream imageStream = AliCloudObjectStorage.getImageStream(uri, fullImage)) {
+        return EncryptHelper.base64Encode(imageStream.readAllBytes());
     } catch (Exception e) {
       if (fullImage == null || !fullImage) {
         logger.warn("failed to load compressed image {}, falling back to original image", uri, e);
-        try {
-          return EncryptHelper.base64Encode(AliCloudObjectStorage.getImageStream(uri, true).readAllBytes());
+        try (InputStream imageStream = AliCloudObjectStorage.getImageStream(uri, true)) {
+          return EncryptHelper.base64Encode(imageStream.readAllBytes());
         } catch (Exception fallbackException) {
           logger.error("failed to load original image after compressed image fallback {}", uri, fallbackException);
         }
@@ -126,14 +148,63 @@ public class ImageService {
     throw new RuntimeException("file retrieval failed");
   }
 
-  private String normalizeBase64Image(String image) {
-    if (image == null) {
-      return null;
-    }
+  private int getBase64ContentOffset(String image) {
     int dataSeparator = image.indexOf(',');
     if (image.startsWith("data:") && dataSeparator >= 0) {
-      return image.substring(dataSeparator + 1);
+      return dataSeparator + 1;
     }
-    return image;
+    return 0;
+  }
+
+  private long decodedBase64Length(String image, int contentOffset) {
+    int encodedLength = image.length() - contentOffset;
+    int padding = 0;
+    if (image.endsWith("==")) {
+      padding = 2;
+    } else if (image.endsWith("=")) {
+      padding = 1;
+    }
+    return (encodedLength * 6L / 8L) - padding;
+  }
+
+  /**
+   * Exposes an existing Base64 string as ASCII bytes without allocating another full-size byte array.
+   */
+  private static final class CharSequenceAsciiInputStream extends InputStream {
+    private final CharSequence value;
+    private int position;
+
+    private CharSequenceAsciiInputStream(CharSequence value, int offset) {
+      this.value = value;
+      this.position = offset;
+    }
+
+    @Override
+    public int read() throws IOException {
+      if (position >= value.length()) {
+        return -1;
+      }
+      char current = value.charAt(position++);
+      if (current > 0x7F) {
+        throw new IOException("Base64 content contains a non-ASCII character");
+      }
+      return current;
+    }
+
+    @Override
+    public int read(byte[] buffer, int offset, int length) throws IOException {
+      if (position >= value.length()) {
+        return -1;
+      }
+      int count = Math.min(length, value.length() - position);
+      for (int i = 0; i < count; i++) {
+        char current = value.charAt(position++);
+        if (current > 0x7F) {
+          throw new IOException("Base64 content contains a non-ASCII character");
+        }
+        buffer[offset + i] = (byte) current;
+      }
+      return count;
+    }
   }
 }
