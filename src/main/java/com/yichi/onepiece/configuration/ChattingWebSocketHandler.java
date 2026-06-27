@@ -58,32 +58,58 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
         // Note: If you want to support multiple devices per user, this map needs to be UUID -> Set<Session>
         WebSocketSession previousSession = userSocketMap.put(userId, session);
         if (previousSession != null && previousSession != session && previousSession.isOpen()) {
-            previousSession.close(CloseStatus.NORMAL.withReason("Replaced by a newer connection"));
+            try {
+                previousSession.close(CloseStatus.NORMAL.withReason("Replaced by a newer connection"));
+            } catch (IOException e) {
+                logger.debug("Failed to close replaced WebSocket session {}", previousSession.getId(), e);
+            }
         }
 
-        // Load user's chats
-        List<Chat> chats = chattingService.list(userId);
-        List<UUID> groupIds = chats.stream().map(Chat::getId).toList();
         Set<UUID> sessionGroupIds = ConcurrentHashMap.newKeySet();
-        sessionGroupIds.addAll(groupIds);
         session.getAttributes().put(SESSION_GROUP_IDS, sessionGroupIds);
 
-        // FIX: Atomic computation to prevent race conditions
+        try {
+            initializeSession(session, userId, sessionGroupIds);
+        } catch (RuntimeException e) {
+            // A history/query problem must not tear down an authenticated live socket.
+            logger.error(
+                    "WebSocket connected for user {}, but initial chat synchronization failed",
+                    userId,
+                    e);
+        }
+    }
+
+    private void initializeSession(
+            WebSocketSession session, UUID userId, Set<UUID> sessionGroupIds) {
+        List<Chat> chats = chattingService.list(userId);
+        List<UUID> groupIds = chats.stream().map(Chat::getId).toList();
+        sessionGroupIds.addAll(groupIds);
+
         for (UUID groupId : groupIds) {
-            groupMaps.computeIfAbsent(groupId, k -> new CopyOnWriteArraySet<>()).add(session);
+            groupMaps.computeIfAbsent(groupId, ignored -> new CopyOnWriteArraySet<>()).add(session);
         }
 
-        // Update chat list
         for (Chat chat : chats) {
-            sendMessageSafely(session, new TextMessage(objectMapper.writeValueAsString(chat)));
+            try {
+                sendMessageSafely(session, new TextMessage(objectMapper.writeValueAsString(chat)));
+            } catch (RuntimeException | IOException e) {
+                logger.warn("Failed to synchronize chat {} to session {}", chat.getId(), session.getId(), e);
+            }
         }
 
-        // Keep only one conversation's history in memory while initializing the socket.
         for (UUID groupId : groupIds) {
-            for (var message : messageService.getRecentMessage(groupId)) {
-                String stringMessage =
-                        objectMapper.writeValueAsString(ChatConverter.INSTANCE.toMessage(message));
-                sendMessageSafely(session, new TextMessage(stringMessage));
+            try {
+                for (var message : messageService.getRecentMessage(groupId)) {
+                    String stringMessage =
+                            objectMapper.writeValueAsString(ChatConverter.INSTANCE.toMessage(message));
+                    sendMessageSafely(session, new TextMessage(stringMessage));
+                }
+            } catch (RuntimeException | IOException e) {
+                logger.warn(
+                        "Failed to synchronize recent messages for chat {} to session {}",
+                        groupId,
+                        session.getId(),
+                        e);
             }
         }
     }
@@ -153,6 +179,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
             SendMessageRequest request = objectMapper.readValue(payload, SendMessageRequest.class);
             var response = messageService.sendMessage(request, userId);
             if (response.getResult()) {
+                registerSessionToGroup(session, request.getConversationId());
                 sendMessagesToGroup(request.getConversationId(), new TextMessage(objectMapper.writeValueAsString(response.getMessage())));
             }
         } else if (MessageType.JOIN_CHAT.getValue().equals(messageType)) {
@@ -215,6 +242,11 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
                 getSessionGroupIds(userSession).add(groupId);
             }
         }
+    }
+
+    private void registerSessionToGroup(WebSocketSession session, UUID groupId) {
+        groupMaps.computeIfAbsent(groupId, ignored -> new CopyOnWriteArraySet<>()).add(session);
+        getSessionGroupIds(session).add(groupId);
     }
 
 
