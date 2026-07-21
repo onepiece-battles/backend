@@ -41,11 +41,21 @@ public class ChattingService {
         this.imageService = imageService;
     }
 
+    /// Distinguishes "found an existing conversation for this participant
+    /// set" from "created a brand new one" — a retried CREATE_CHAT request
+    /// (network retry, duplicate click) must not re-trigger the one-time
+    /// "chat created"/"friend request accepted" welcome message.
+    public record ChatCreationResult(Chat chat, boolean created) {}
+
     public Chat create(CreateChatRequest request) {
         return create(request, UserHelper.getCurrentUserId());
     }
 
     public Chat create(CreateChatRequest request, UUID creatorUserId) {
+        return createWithResult(request, creatorUserId).chat();
+    }
+
+    public ChatCreationResult createWithResult(CreateChatRequest request, UUID creatorUserId) {
         if (!request.getIds().contains(creatorUserId)) {
             throw new PermissionDeniedException("Access Denied");
         }
@@ -54,7 +64,7 @@ public class ChattingService {
         logger.info(request.getIds().toString());
         List<ConversationEntity> conversationEntities = conversationDao.listByUserIds(request.getIds(), request.getIds().size());
         if (!conversationEntities.isEmpty()) {
-            return ChatConverter.INSTANCE.toChat(conversationEntities.get(0));
+            return new ChatCreationResult(ChatConverter.INSTANCE.toChat(conversationEntities.get(0)), false);
         }
         ActionRecordEntity actionRecordEntity = actionRecordService.createWithUserId(creatorUserId);
         String name = getChatName(users.stream().map(e->e.getNickname()).toList());
@@ -67,15 +77,27 @@ public class ChattingService {
                 .build();
         conversationDao.insert(conversationEntity);
         createUserConversation(users.stream().map(e->e.getId()).toList(), conversationEntity.getId());
-        return ChatConverter.INSTANCE.toChat(
+        Chat chat = ChatConverter.INSTANCE.toChat(
                 conversationDao.findChatFullVieById(conversationEntity.getId()).orElseThrow());
+        return new ChatCreationResult(chat, true);
     }
 
     private void createUserConversation(List<UUID> userIds, UUID conversationId) {
-        List<UserConversationEntity> uc =userIds.stream()
+        // Idempotent: skip ids that are already members so a retried
+        // request (network retry, duplicate click, or a race between two
+        // callers) doesn't insert duplicate user_conversation rows, which
+        // would make listChat/initializeSession replay the same chat and
+        // its message history multiple times.
+        var existingUserIds = userConversationDao.listByConversationId(conversationId).stream()
+                .map(UserConversationEntity::getUserId)
+                .collect(Collectors.toSet());
+        List<UserConversationEntity> uc = userIds.stream()
+                .filter(id -> !existingUserIds.contains(id))
                 .map(e-> UserConversationEntityBuilder.newBuilder().setUserId(e).setConversationId(conversationId).build())
                 .toList();
-        userConversationDao.batchInsert(uc);
+        if (!uc.isEmpty()) {
+            userConversationDao.batchInsert(uc);
+        }
     }
 
     private String getChatName(List<String> userNames) {
@@ -89,6 +111,16 @@ public class ChattingService {
 
     public Chat joinChat(JoinChatRequest joinChatRequest, UUID joinerUserId) {
         if (!joinChatRequest.getIds().contains(joinerUserId)) {
+            throw new PermissionDeniedException("Access Denied");
+        }
+        // The caller must already belong to the conversation to add anyone
+        // (including themselves) to it — otherwise anyone who merely knows
+        // or guesses a conversationId could force their way into any
+        // conversation and add arbitrary other users to it.
+        boolean joinerIsMember = userConversationDao.listByConversationId(joinChatRequest.getConversationId())
+                .stream()
+                .anyMatch(uc -> joinerUserId.equals(uc.getUserId()));
+        if (!joinerIsMember) {
             throw new PermissionDeniedException("Access Denied");
         }
         createUserConversation(joinChatRequest.getIds(),joinChatRequest.getConversationId());

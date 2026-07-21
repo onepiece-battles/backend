@@ -14,7 +14,6 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import java.util.Map;
-import java.util.UUID;
 
 @Component
 public class AuthHandshakeInterceptor implements HandshakeInterceptor {
@@ -36,7 +35,7 @@ public class AuthHandshakeInterceptor implements HandshakeInterceptor {
             HttpServletRequest httpServletRequest = servletReq.getServletRequest();
             String jwt = getJwt(httpServletRequest);
             if (jwt == null) {
-                return useLegacyUserId(httpServletRequest, attributes);
+                return false;
             }
             try {
                 String username = JwtHelper.extractUsername(jwt);
@@ -56,19 +55,6 @@ public class AuthHandshakeInterceptor implements HandshakeInterceptor {
             }
         }
         return false;
-    }
-
-    private boolean useLegacyUserId(HttpServletRequest request, Map<String, Object> attributes) {
-        String userId = request.getParameter("userId");
-        if (userId == null || userId.isBlank()) {
-            return false;
-        }
-        try {
-            attributes.put("userId", UUID.fromString(userId).toString());
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
     }
 
     private String getJwt(HttpServletRequest request) {

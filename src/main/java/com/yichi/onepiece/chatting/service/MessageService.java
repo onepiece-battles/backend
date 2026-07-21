@@ -1,6 +1,7 @@
 package com.yichi.onepiece.chatting.service;
 
 import com.yichi.onepiece.chatting.model.*;
+import com.yichi.onepiece.configuration.ChattingWebSocketHandler;
 import com.yichi.onepiece.exception.PermissionDeniedException;
 import com.yichi.onepiece.image.service.ImageService;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
@@ -8,6 +9,7 @@ import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.user.UserHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,12 +25,18 @@ public class MessageService {
     private final ChattingService chattingService;
     private final ActionRecordService actionRecordService;
     private final ImageService imageService;
+    // @Lazy breaks the constructor cycle: ChattingWebSocketHandler already
+    // depends on MessageService to replay history, and this dependency runs
+    // the other way so retraction can broadcast a live update to connected
+    // clients instead of only updating the database.
+    private final ChattingWebSocketHandler chattingWebSocketHandler;
 
-    public MessageService(MessageDao messageDao, ChattingService chattingService, ActionRecordService actionRecordService, ImageService imageService) {
+    public MessageService(MessageDao messageDao, ChattingService chattingService, ActionRecordService actionRecordService, ImageService imageService, @Lazy ChattingWebSocketHandler chattingWebSocketHandler) {
         this.messageDao = messageDao;
         this.chattingService = chattingService;
         this.actionRecordService = actionRecordService;
         this.imageService = imageService;
+        this.chattingWebSocketHandler = chattingWebSocketHandler;
     }
 
     public ListMessageResponse listMessage(ListMessageRequest request) {
@@ -43,8 +51,26 @@ public class MessageService {
         if (!UserHelper.getCurrentUserId().equals(message.getUserId())) {
             throw new PermissionDeniedException("Access Denied");
         }
-        message = message.toBuilder().setRetracted(true).build();
+        // Retraction must actually remove the content, not just flag it —
+        // otherwise every history read (list_message, jump_to_message, the
+        // WS reconnect replay) still returns the original text/media with
+        // only a `retracted` flag alongside it, leaving enforcement to
+        // client-side convention.
+        message = message.toBuilder()
+                .setRetracted(true)
+                .setContent(null)
+                .setImageContentUri(null)
+                .setVoiceContentUri(null)
+                .build();
         messageDao.update(message);
+
+        // Push the retraction to other connected participants immediately —
+        // without this, their sessions keep showing the message as live
+        // until they happen to refetch history.
+        var fullView = messageDao.getMessageFullView(message.getId()).orElseThrow();
+        chattingWebSocketHandler.broadcastMessageUpdate(
+                message.getConversationId(), ChatConverter.INSTANCE.toMessage(fullView));
+
         return new RetractMessageResponse().result(Boolean.TRUE);
     }
 

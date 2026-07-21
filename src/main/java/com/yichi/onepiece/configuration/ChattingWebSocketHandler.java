@@ -175,58 +175,81 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
 
         UUID userId = UUID.fromString(session.getAttributes().get("userId").toString());
 
-        if (MessageType.SEND_MESSAGE.getValue().equals(messageType)) {
-            SendMessageRequest request = objectMapper.readValue(payload, SendMessageRequest.class);
-            var response = messageService.sendMessage(request, userId);
-            if (response.getResult()) {
-                registerSessionToGroup(session, request.getConversationId());
-                sendMessagesToGroup(request.getConversationId(), new TextMessage(objectMapper.writeValueAsString(response.getMessage())));
-            }
-        } else if (MessageType.JOIN_CHAT.getValue().equals(messageType)) {
-            JoinChatRequest request = objectMapper.readValue(payload, JoinChatRequest.class);
-            var chat = chattingService.joinChat(request, userId);
-            if (chat != null) {
-                // Logic for Join might also need to update groupMaps if the user wasn't in it before
-                registerUsersToGroup(new ArrayList<>(request.getIds()), chat.getId());
-                sendMessagesToUsers(new ArrayList<>(request.getIds()), new TextMessage(objectMapper.writeValueAsString(chat)));
-            }
-        } else if (MessageType.CREATE_CHAT.getValue().equals(messageType)) {
-            CreateChatRequest request = objectMapper.readValue(payload, CreateChatRequest.class);
-            var chat = chattingService.create(request, userId);
-            if (chat != null) {
-                // 1. Send the New Chat Object to frontend (so they can render the chat box)
-                sendMessagesToUsers(request.getIds(), new TextMessage(objectMapper.writeValueAsString(chat)));
-
-                // --- FIX STARTS HERE ---
-                // 2. We must register the current active sessions to this NEW group ID in memory.
-                // Otherwise, 'sendMessagesToGroup' won't know who to send to.
-                registerUsersToGroup(request.getIds(), chat.getId());
-                // --- FIX ENDS HERE ---
-                String firstMessageContent;
-                if (chat.getGroup()) {
-                    firstMessageContent = "我创建了一个群组，大家一起聊天吧";
-                } else {
-                   firstMessageContent="我通过了你的朋友验证请求，现在我们可以开始聊天了";
-                }
-                logger.info(firstMessageContent);
-                    var response = messageService.sendMessage(
-                            new SendMessageRequest()
-                                    .conversationId(chat.getId())
-                                    .type(MessageType.SEND_MESSAGE)
-                                    .content(firstMessageContent)
-                                    .userId(userId),
-                            userId);
+        // Each branch is guarded individually: a malformed payload or a
+        // service-level error (e.g. PermissionDeniedException, a missing
+        // conversation) must not propagate out of handleTextMessage — Spring
+        // wraps this handler in ExceptionWebSocketHandlerDecorator, which
+        // force-closes the *entire* session on any uncaught exception. That
+        // would kill a user's whole live connection over one bad message
+        // instead of just rejecting that message.
+        try {
+            if (MessageType.SEND_MESSAGE.getValue().equals(messageType)) {
+                SendMessageRequest request = objectMapper.readValue(payload, SendMessageRequest.class);
+                var response = messageService.sendMessage(request, userId);
                 if (response.getResult()) {
-                    logger.info("send message to new group");
-                    // 3. Now this will work because the map is updated
-                    sendMessagesToGroup(chat.getId(), new TextMessage(objectMapper.writeValueAsString(response.getMessage())));
+                    registerSessionToGroup(session, request.getConversationId());
+                    sendMessagesToGroup(request.getConversationId(), new TextMessage(objectMapper.writeValueAsString(response.getMessage())));
                 }
+            } else if (MessageType.JOIN_CHAT.getValue().equals(messageType)) {
+                JoinChatRequest request = objectMapper.readValue(payload, JoinChatRequest.class);
+                var chat = chattingService.joinChat(request, userId);
+                if (chat != null) {
+                    // Logic for Join might also need to update groupMaps if the user wasn't in it before
+                    registerUsersToGroup(new ArrayList<>(request.getIds()), chat.getId());
+                    sendMessagesToUsers(new ArrayList<>(request.getIds()), new TextMessage(objectMapper.writeValueAsString(chat)));
+                }
+            } else if (MessageType.CREATE_CHAT.getValue().equals(messageType)) {
+                CreateChatRequest request = objectMapper.readValue(payload, CreateChatRequest.class);
+                var result = chattingService.createWithResult(request, userId);
+                var chat = result.chat();
+                if (chat != null) {
+                    // 1. Send the New Chat Object to frontend (so they can render the chat box)
+                    sendMessagesToUsers(request.getIds(), new TextMessage(objectMapper.writeValueAsString(chat)));
+
+                    // --- FIX STARTS HERE ---
+                    // 2. We must register the current active sessions to this NEW group ID in memory.
+                    // Otherwise, 'sendMessagesToGroup' won't know who to send to.
+                    registerUsersToGroup(request.getIds(), chat.getId());
+                    // --- FIX ENDS HERE ---
+
+                    // Only a *newly created* conversation gets the one-time
+                    // welcome message — a retried CREATE_CHAT against an
+                    // already-existing conversation must not re-insert and
+                    // re-broadcast it into that conversation's history.
+                    if (result.created()) {
+                        String firstMessageContent;
+                        if (chat.getGroup()) {
+                            firstMessageContent = "我创建了一个群组，大家一起聊天吧";
+                        } else {
+                            firstMessageContent = "我通过了你的朋友验证请求，现在我们可以开始聊天了";
+                        }
+                        logger.info(firstMessageContent);
+                        var response = messageService.sendMessage(
+                                new SendMessageRequest()
+                                        .conversationId(chat.getId())
+                                        .type(MessageType.SEND_MESSAGE)
+                                        .content(firstMessageContent)
+                                        .userId(userId),
+                                userId);
+                        if (response.getResult()) {
+                            logger.info("send message to new group");
+                            // 3. Now this will work because the map is updated
+                            sendMessagesToGroup(chat.getId(), new TextMessage(objectMapper.writeValueAsString(response.getMessage())));
+                        }
+                    }
+                }
+            } else {
+                logger.warn(
+                        "Ignoring unsupported WebSocket message type '{}' from session {}",
+                        messageType,
+                        session.getId());
             }
-        } else {
+        } catch (Exception e) {
             logger.warn(
-                    "Ignoring unsupported WebSocket message type '{}' from session {}",
+                    "Failed to handle WebSocket message of type '{}' from session {}: {}",
                     messageType,
-                    session.getId());
+                    session.getId(),
+                    e.getMessage());
         }
     }
 
@@ -297,6 +320,18 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
     private Set<UUID> getSessionGroupIds(WebSocketSession session) {
         return (Set<UUID>) session.getAttributes().computeIfAbsent(
                 SESSION_GROUP_IDS, ignored -> ConcurrentHashMap.newKeySet());
+    }
+
+    /// Broadcasts an out-of-band message update (currently: retraction) to
+    /// every connected member of the conversation. Public because it's
+    /// called from MessageService's retraction path, which isn't triggered
+    /// by an inbound WebSocket frame the way SEND_MESSAGE is.
+    public void broadcastMessageUpdate(UUID conversationId, Message message) {
+        try {
+            sendMessagesToGroup(conversationId, new TextMessage(objectMapper.writeValueAsString(message)));
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            logger.error("Failed to broadcast message update for conversation {}", conversationId, e);
+        }
     }
 
     public void disconnectUser(UUID userId) {
