@@ -16,15 +16,21 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class JwtHelper {
 
-  private static final String SECRET_KEY =
-      envOrDefault(
-          "ONEPIECE_JWT_SECRET_KEY",
-          "REDACTED");
+  private static final String JWT_SECRET_ENV = "ONEPIECE_JWT_SECRET_KEY";
 
-  private static String envOrDefault(String name, String defaultValue) {
-    String value = System.getenv(name);
+  /**
+   * Resolves the JWT signing secret from the environment. The secret must never be hardcoded or
+   * committed to source control; it is provided at runtime (e.g. via the deployment's environment
+   * variables). Read lazily so the application and tests can start without it — it is only required
+   * when a token is actually signed or verified.
+   */
+  private static String secretKey() {
+    String value = System.getenv(JWT_SECRET_ENV);
     if (value == null || value.isBlank()) {
-      return defaultValue;
+      throw new IllegalStateException(
+          "Environment variable "
+              + JWT_SECRET_ENV
+              + " is not set. Provide a Base64-encoded HMAC-SHA256 secret via the environment.");
     }
     return value;
   }
@@ -63,7 +69,7 @@ public class JwtHelper {
   }
 
   private static Key getSignInKey() {
-    byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+    byte[] keyBytes = Decoders.BASE64.decode(secretKey());
     return Keys.hmacShaKeyFor(keyBytes);
   }
 

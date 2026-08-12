@@ -23,19 +23,43 @@ public class AliCloudObjectStorage {
   private static final Logger logger = LoggerFactory.getLogger(AliCloudObjectStorage.class);
   private static final String OSS_EXTERNAL_ENDPOINT = "oss-cn-shanghai.aliyuncs.com";
   private static final String OSS_BUCKET_NAME = "onepiece-battles";
-  private static final OSS ossClient;
+  private static final String OSS_ACCESS_KEY_ID_ENV = "ALIYUN_OSS_ACCESS_KEY_ID";
+  private static final String OSS_ACCESS_KEY_SECRET_ENV = "ALIYUN_OSS_ACCESS_KEY_SECRET";
 
-  static {
-      ossClient = new OSSClientBuilder().build(
-              OSS_EXTERNAL_ENDPOINT,
-              envOrDefault("ALIYUN_OSS_ACCESS_KEY_ID", "REDACTED"),
-              envOrDefault("ALIYUN_OSS_ACCESS_KEY_SECRET", "REDACTED"));
+  private static volatile OSS ossClient;
+
+  /**
+   * Builds the OSS client lazily on first use. Credentials come exclusively from the environment and
+   * must never be hardcoded or committed to source control (they are supplied at runtime, e.g. via
+   * the deployment's environment variables). Building lazily lets the application and tests start
+   * without OSS credentials — they are only required when object storage is actually accessed.
+   */
+  private static OSS client() {
+    OSS local = ossClient;
+    if (local == null) {
+      synchronized (AliCloudObjectStorage.class) {
+        local = ossClient;
+        if (local == null) {
+          local =
+              new OSSClientBuilder()
+                  .build(
+                      OSS_EXTERNAL_ENDPOINT,
+                      requireEnv(OSS_ACCESS_KEY_ID_ENV),
+                      requireEnv(OSS_ACCESS_KEY_SECRET_ENV));
+          ossClient = local;
+        }
+      }
+    }
+    return local;
   }
 
-  private static String envOrDefault(String name, String defaultValue) {
+  private static String requireEnv(String name) {
     String value = System.getenv(name);
     if (value == null || value.isBlank()) {
-      return defaultValue;
+      throw new IllegalStateException(
+          "Environment variable "
+              + name
+              + " is not set. OSS credentials must be provided via the environment.");
     }
     return value;
   }
@@ -55,11 +79,11 @@ public class AliCloudObjectStorage {
     try (content) {
       logger.info("start putting file to alicloud");
       if (contentLength == null) {
-        ossClient.putObject(OSS_BUCKET_NAME, key, content);
+        client().putObject(OSS_BUCKET_NAME, key, content);
       } else {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(contentLength);
-        ossClient.putObject(OSS_BUCKET_NAME, key, content, metadata);
+        client().putObject(OSS_BUCKET_NAME, key, content, metadata);
       }
       return toOssUri(key);
     } catch (OSSException oe) {
@@ -97,7 +121,7 @@ public class AliCloudObjectStorage {
       logger.info("uri is: {}", uri);
       String key = extractFromUri(uri);
       logger.info("key is: {}", key);
-      OSSObject ossObject = ossClient.getObject(OSS_BUCKET_NAME, key);
+      OSSObject ossObject = client().getObject(OSS_BUCKET_NAME, key);
       return ossObject.getObjectContent();
     } catch (OSSException oe) {
       throw toFileStorageException(oe);
@@ -114,7 +138,7 @@ public class AliCloudObjectStorage {
       if (fullImage == null || !fullImage) {
           request.setProcess("image/resize,w_100");
       }
-      ossObject = ossClient.getObject(request);
+      ossObject = client().getObject(request);
       return ossObject.getObjectContent();
     } catch (OSSException oe) {
       throw toFileStorageException(oe);
@@ -132,7 +156,7 @@ public class AliCloudObjectStorage {
 
   public static List<OSSObjectSummary> list() throws FileStorageException {
     try{
-      ObjectListing ossObjects = ossClient.listObjects(OSS_BUCKET_NAME);
+      ObjectListing ossObjects = client().listObjects(OSS_BUCKET_NAME);
       return ossObjects.getObjectSummaries();
     } catch (OSSException oe) {
       throw toFileStorageException(oe);
@@ -141,7 +165,7 @@ public class AliCloudObjectStorage {
 
   public static void delete(String objectName) throws FileStorageException {
     try{
-      ossClient.deleteObject(OSS_BUCKET_NAME, objectName);
+      client().deleteObject(OSS_BUCKET_NAME, objectName);
     } catch (OSSException oe) {
       throw  toFileStorageException(oe);
     }
