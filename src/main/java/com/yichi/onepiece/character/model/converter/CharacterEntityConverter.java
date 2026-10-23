@@ -63,7 +63,9 @@ public interface CharacterEntityConverter {
   @Mapping(target = "speed", source = "baseSpeed")
   @Mapping(target = "blood", source = "baseBlood")
   @Mapping(target = "groupGain", source = "baseGroupGain")
-  @Mapping(target = "imageUri", ignore = true)
+  // imageUri is mapped from the request (not ignored) so a basic/combat-info
+  // update preserves the avatar the client sends back; ignoring it made the
+  // full-column BaseDao.update overwrite image_uri with null. See BUG-002.
   @Mapping(target = "profileImage", ignore = true)
   CharacterEntity toCharacterEntity(UpdateCharacterRequest updateCharacterRequest);
 }
