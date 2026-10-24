@@ -146,4 +146,10 @@ public class ChattingService {
     public List<UserConversationEntity> listUserConversationByUserId(UUID userId) {
         return userConversationDao.listByUserId(userId);
     }
+
+    /// Whether [userId] belongs to [conversationId]. Backed by a single EXISTS
+    /// query — used by the send-message membership check.
+    public boolean isMember(UUID userId, UUID conversationId) {
+        return userConversationDao.existsByUserIdAndConversationId(userId, conversationId);
+    }
 }

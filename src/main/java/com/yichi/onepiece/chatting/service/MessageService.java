@@ -149,10 +149,7 @@ public class MessageService {
     }
 
     private void checkUserInConversation(UUID userId, UUID conversationId) {
-        var isMember =
-                chattingService.listUserConversationByUserId(userId).stream()
-                        .anyMatch(conversation -> conversationId.equals(conversation.getConversationId()));
-        if (!isMember) {
+        if (!chattingService.isMember(userId, conversationId)) {
             throw new PermissionDeniedException("Access Denied");
         }
     }
