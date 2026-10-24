@@ -199,13 +199,6 @@ public class DataExportService {
     return new Cell().setBorder(Border.NO_BORDER).setWidth(width).setHeight(height);
   }
 
-  private Cell createImageCell(Image image, float imageWidth, float imageHeight) {
-    Cell cell = new Cell();
-    cell.add(image.setWidth(imageWidth).setHeight(imageHeight));
-    cell.setBorder(Border.NO_BORDER);
-    return cell;
-  }
-
 	  private ImageData loadCharacterImage(CharacterEntity character, String fallbackName, boolean fullImage) {
 	    if (character.getImageUri() != null && !character.getImageUri().isBlank()) {
 	      try {

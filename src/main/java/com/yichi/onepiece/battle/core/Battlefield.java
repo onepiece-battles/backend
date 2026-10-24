@@ -7,11 +7,8 @@ import com.yichi.onepiece.battle.model.BattleStatusDetailEntityBuilder;
 import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.utils.RandomGenerator;
 import java.util.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Battlefield {
-  private static final Logger logger = LoggerFactory.getLogger(Battlefield.class);
   private static final int MAXIMUM_INTELLIGENCE = 260;
   private static final int MINIMUM_INTELLIGENCE = 70;
   private static final int MAXIMUM_SPEED = 200;
@@ -55,17 +52,14 @@ public class Battlefield {
   private void initBattle(CharacterInBattle characterInit, CharacterInBattle characterReceive) {
     characterReverseMap = new HashMap<>();
     idToCharacterMap = new HashMap<>();
-    logger.info("create attack member list");
     battleStatusDetailEntities = new ArrayList<>();
     battleProcessDetailEntities = new ArrayList<>();
     battleStatusCount = 0;
     battleProcessCount = 0;
-    logger.info("create character reverse map");
     characterReverseMap.put(characterInit.getCharacterId(), Boolean.FALSE);
     characterReverseMap.put(characterReceive.getCharacterId(), Boolean.FALSE);
     idToCharacterMap.put(characterInit.getCharacterId(), characterInit);
     idToCharacterMap.put(characterReceive.getCharacterId(), characterReceive);
-    logger.info("create hide index map");
     this.MAX_HIDE_INDEX_DIFF = MAXIMUM_SPEED - MINIMUM_SPEED;
     calculateHideIndex();
     calculateAttackLikelihood();
@@ -215,11 +209,9 @@ public class Battlefield {
             1,
             attackLikelihoodMap.get(characterInit.getCharacterId())+ attackLikelihoodMap.get(characterReceive.getCharacterId()));
     if (value<=attackLikelihoodMap.get(characterInit.getCharacterId())) {
-      logger.info("init");
       currentAttackerId = characterInit.getCharacterId();
       currentDefenderId = characterReceive.getCharacterId();
     } else {
-      logger.info("receive");
       currentDefenderId = characterInit.getCharacterId();
       currentAttackerId = characterReceive.getCharacterId();
     }

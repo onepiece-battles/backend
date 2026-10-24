@@ -26,14 +26,11 @@ import javax.annotation.Nullable;
 import com.yichi.onepiece.utils.EncryptHelper;
 import com.yichi.onepiece.utils.I18nHelper;
 import org.apache.commons.lang3.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
-  private final Logger logger = LoggerFactory.getLogger(UserService.class);
   private final UserDao userDao;
   private final FriendshipDao friendshipDao;
   private final TokenDao tokenDao;
@@ -129,7 +126,6 @@ public class UserService {
   public ListFriendResponse listFriend(ListFriendRequest request) {
     UUID currentUserId = UserHelper.getCurrentUserId();
     List<FriendshipEntity> friendships = friendshipDao.listFriendshipsByUserId(currentUserId, FriendshipStatus.ACCEPTED);
-    logger.info(friendships.toString());
     List<UUID> friendIds = new ArrayList<>();
     for(var fs : friendships) {
       if(currentUserId.equals(fs.getFriendLeftId())) {
@@ -138,7 +134,6 @@ public class UserService {
         friendIds.add(fs.getFriendLeftId());
       }
     }
-    logger.info(friendIds.toString());
     List<UserEntity> userEntities;
     if (!friendIds.isEmpty()) {
       userEntities = userDao.listByUserIds(friendIds);
