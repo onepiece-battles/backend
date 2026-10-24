@@ -2,8 +2,10 @@ package com.yichi.onepiece.configuration;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yichi.onepiece.chatting.model.ChatConverter;
+import com.yichi.onepiece.chatting.model.MessageFullView;
 import com.yichi.onepiece.chatting.service.ChattingService;
 import com.yichi.onepiece.chatting.service.MessageService;
 import com.yichi.onepiece.model.*;
@@ -96,22 +98,10 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
                 logger.warn("Failed to synchronize chat {} to session {}", chat.getId(), session.getId(), e);
             }
         }
-
-        for (UUID groupId : groupIds) {
-            try {
-                for (var message : messageService.getRecentMessage(groupId)) {
-                    String stringMessage =
-                            objectMapper.writeValueAsString(ChatConverter.INSTANCE.toMessage(message));
-                    sendMessageSafely(session, new TextMessage(stringMessage));
-                }
-            } catch (RuntimeException | IOException e) {
-                logger.warn(
-                        "Failed to synchronize recent messages for chat {} to session {}",
-                        groupId,
-                        session.getId(),
-                        e);
-            }
-        }
+        // Message history is no longer replayed on connect. The client sends a
+        // SYNC request after connecting; the server then pushes only messages
+        // newer than the client's per-conversation cursor (see handleSync),
+        // so a reconnect no longer re-streams the entire recent history.
     }
 
     @Override
@@ -183,7 +173,9 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
         // would kill a user's whole live connection over one bad message
         // instead of just rejecting that message.
         try {
-            if (MessageType.SEND_MESSAGE.getValue().equals(messageType)) {
+            if ("SYNC".equalsIgnoreCase(messageType)) {
+                handleSync(session, payload);
+            } else if (MessageType.SEND_MESSAGE.getValue().equals(messageType)) {
                 SendMessageRequest request = objectMapper.readValue(payload, SendMessageRequest.class);
                 var response = messageService.sendMessage(request, userId);
                 if (response.getResult()) {
@@ -250,6 +242,30 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
                     messageType,
                     session.getId(),
                     e.getMessage());
+        }
+    }
+
+    /// Incremental sync: replays, per conversation, only the messages newer
+    /// than the client's last-known creation_record_id cursor (or the recent
+    /// batch when the client has none for that conversation). Driven by the
+    /// client's SYNC frame on (re)connect, replacing the full history replay
+    /// that used to run in initializeSession.
+    private void handleSync(WebSocketSession session, String payload) throws IOException {
+        JsonNode cursors = objectMapper.readTree(payload).get("cursors");
+        for (UUID conversationId : getSessionGroupIds(session)) {
+            Long cursor = null;
+            if (cursors != null && cursors.hasNonNull(conversationId.toString())) {
+                cursor = cursors.get(conversationId.toString()).asLong();
+            }
+            List<MessageFullView> messages = cursor != null
+                    ? messageService.getMessagesAfter(conversationId, cursor)
+                    : messageService.getRecentMessage(conversationId);
+            for (MessageFullView message : messages) {
+                sendMessageSafely(
+                        session,
+                        new TextMessage(objectMapper.writeValueAsString(
+                                ChatConverter.INSTANCE.toMessage(message))));
+            }
         }
     }
 
