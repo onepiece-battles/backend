@@ -27,6 +27,8 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
     private static final Logger logger = LoggerFactory.getLogger(ChattingWebSocketHandler.class);
     private static final int MAX_MESSAGE_SIZE_BYTES = 9 * 1024 * 1024;
     private static final String SESSION_GROUP_IDS = "chatGroupIds";
+    private static final String FRAME_CHAT = "CHAT";
+    private static final String FRAME_MESSAGE = "MESSAGE";
 
     private final MessageService messageService;
     private final ChattingService chattingService;
@@ -93,7 +95,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
 
         for (Chat chat : chats) {
             try {
-                sendMessageSafely(session, new TextMessage(objectMapper.writeValueAsString(chat)));
+                sendMessageSafely(session, frame(FRAME_CHAT, chat));
             } catch (RuntimeException | IOException e) {
                 logger.warn("Failed to synchronize chat {} to session {}", chat.getId(), session.getId(), e);
             }
@@ -180,7 +182,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
                 var response = messageService.sendMessage(request, userId);
                 if (response.getResult()) {
                     registerSessionToGroup(session, request.getConversationId());
-                    sendMessagesToGroup(request.getConversationId(), new TextMessage(objectMapper.writeValueAsString(response.getMessage())));
+                    sendMessagesToGroup(request.getConversationId(), frame(FRAME_MESSAGE, response.getMessage()));
                 }
             } else if (MessageType.JOIN_CHAT.getValue().equals(messageType)) {
                 JoinChatRequest request = objectMapper.readValue(payload, JoinChatRequest.class);
@@ -188,7 +190,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
                 if (chat != null) {
                     // Logic for Join might also need to update groupMaps if the user wasn't in it before
                     registerUsersToGroup(new ArrayList<>(request.getIds()), chat.getId());
-                    sendMessagesToUsers(new ArrayList<>(request.getIds()), new TextMessage(objectMapper.writeValueAsString(chat)));
+                    sendMessagesToUsers(new ArrayList<>(request.getIds()), frame(FRAME_CHAT, chat));
                 }
             } else if (MessageType.CREATE_CHAT.getValue().equals(messageType)) {
                 CreateChatRequest request = objectMapper.readValue(payload, CreateChatRequest.class);
@@ -196,7 +198,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
                 var chat = result.chat();
                 if (chat != null) {
                     // 1. Send the New Chat Object to frontend (so they can render the chat box)
-                    sendMessagesToUsers(request.getIds(), new TextMessage(objectMapper.writeValueAsString(chat)));
+                    sendMessagesToUsers(request.getIds(), frame(FRAME_CHAT, chat));
 
                     // --- FIX STARTS HERE ---
                     // 2. We must register the current active sessions to this NEW group ID in memory.
@@ -226,7 +228,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
                         if (response.getResult()) {
                             logger.info("send message to new group");
                             // 3. Now this will work because the map is updated
-                            sendMessagesToGroup(chat.getId(), new TextMessage(objectMapper.writeValueAsString(response.getMessage())));
+                            sendMessagesToGroup(chat.getId(), frame(FRAME_MESSAGE, response.getMessage()));
                         }
                     }
                 }
@@ -263,8 +265,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
             for (MessageFullView message : messages) {
                 sendMessageSafely(
                         session,
-                        new TextMessage(objectMapper.writeValueAsString(
-                                ChatConverter.INSTANCE.toMessage(message))));
+                        frame(FRAME_MESSAGE, ChatConverter.INSTANCE.toMessage(message)));
             }
         }
     }
@@ -320,6 +321,17 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
         return null;
     }
 
+    /// Wraps an outbound object in a self-describing envelope
+    /// {"type": ..., "payload": ...} so the client dispatches by type
+    /// instead of sniffing which fields happen to be present.
+    private TextMessage frame(String type, Object payload)
+            throws com.fasterxml.jackson.core.JsonProcessingException {
+        Map<String, Object> envelope = new HashMap<>();
+        envelope.put("type", type);
+        envelope.put("payload", payload);
+        return new TextMessage(objectMapper.writeValueAsString(envelope));
+    }
+
     private void sendMessageSafely(WebSocketSession session, TextMessage message) {
         try {
             synchronized (session) {
@@ -344,7 +356,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
     /// by an inbound WebSocket frame the way SEND_MESSAGE is.
     public void broadcastMessageUpdate(UUID conversationId, Message message) {
         try {
-            sendMessagesToGroup(conversationId, new TextMessage(objectMapper.writeValueAsString(message)));
+            sendMessagesToGroup(conversationId, frame(FRAME_MESSAGE, message));
         } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
             logger.error("Failed to broadcast message update for conversation {}", conversationId, e);
         }
