@@ -83,4 +83,31 @@
         <include refid="messageFullViewJoins"/>
     </select>
 
+    <!-- Messages from a given point onward, oldest-first (the jump-to-message /
+         "last read" path). Same JOIN mapping as listMessageFullView, so it no
+         longer fires 3 nested @One selects per returned row. -->
+    <select id="listMessageFullViewByLastMessageId" resultMap="messageFullView">
+        SELECT <include refid="messageFullViewColumns"/>
+        FROM (
+            SELECT * FROM `message`
+            WHERE conversation_id = #{conversationId}
+              AND creation_record_id &gt;= #{messageDigit}
+            ORDER BY creation_record_id ASC
+            LIMIT #{limit}
+        ) m
+        <include refid="messageFullViewJoins"/>
+        ORDER BY m.creation_record_id ASC
+    </select>
+
+    <!-- A single message by id (used after send / retract to build the view
+         broadcast to clients). JOIN mapping replaces the 3 per-row nested
+         @One selects. -->
+    <select id="getMessageFullView" resultMap="messageFullView">
+        SELECT <include refid="messageFullViewColumns"/>
+        FROM (
+            SELECT * FROM `message` WHERE id = #{id}
+        ) m
+        <include refid="messageFullViewJoins"/>
+    </select>
+
 </mapper>
