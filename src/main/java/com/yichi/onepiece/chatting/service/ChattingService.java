@@ -12,8 +12,6 @@ import com.yichi.onepiece.model.*;
 import com.yichi.onepiece.exception.PermissionDeniedException;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,8 +21,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class ChattingService {
-    Logger logger = LoggerFactory.getLogger(ChattingService.class);
-
     private final ConversationDao conversationDao;
     private final MessageDao messageDao;
     private final UserConversationDao userConversationDao;
@@ -60,8 +56,6 @@ public class ChattingService {
             throw new PermissionDeniedException("Access Denied");
         }
         List<User> users  = userService.listByUserIds(request.getIds());
-        logger.info("list user ids");
-        logger.info(request.getIds().toString());
         List<ConversationEntity> conversationEntities = conversationDao.listByUserIds(request.getIds(), request.getIds().size());
         if (!conversationEntities.isEmpty()) {
             return new ChatCreationResult(ChatConverter.INSTANCE.toChat(conversationEntities.get(0)), false);
@@ -116,11 +110,10 @@ public class ChattingService {
         // The caller must already belong to the conversation to add anyone
         // (including themselves) to it — otherwise anyone who merely knows
         // or guesses a conversationId could force their way into any
-        // conversation and add arbitrary other users to it.
-        boolean joinerIsMember = userConversationDao.listByConversationId(joinChatRequest.getConversationId())
-                .stream()
-                .anyMatch(uc -> joinerUserId.equals(uc.getUserId()));
-        if (!joinerIsMember) {
+        // conversation and add arbitrary other users to it. Backed by a
+        // single EXISTS query instead of loading every member row and
+        // scanning it in memory.
+        if (!isMember(joinerUserId, joinChatRequest.getConversationId())) {
             throw new PermissionDeniedException("Access Denied");
         }
         createUserConversation(joinChatRequest.getIds(),joinChatRequest.getConversationId());

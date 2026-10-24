@@ -2,7 +2,6 @@ package com.yichi.onepiece.chatting.model;
 
 import com.yichi.infra.support.mybatis.annotations.Dao;
 import com.yichi.infra.support.mybatis.dao.BaseDao;
-import com.yichi.onepiece.lineage.model.ActionRecordEntity;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -21,31 +20,12 @@ public interface MessageDao extends BaseDao<MessageEntity, UUID> {
     // SQL + result mapping defined in messageDao.xml (JOIN-based, no N+1).
     List<MessageFullView> listMessageFullView(@Param("conversationId") UUID conversationId, @Param("limit") int limit);
 
-    @Result(property = "preMessage", column = "pre_message_id",
-            javaType = MessageEntity.class,
-            one = @One(select = "findById"))
-    @Result(property = "creationRecord", column = "creation_record_id", javaType = ActionRecordEntity.class,
-            one = @One(select = "com.yichi.onepiece.lineage.model.ActionRecordDao.findById")
-    )
-    @Result(property = "modificationRecord", column = "modification_record_id", javaType = ActionRecordEntity.class,
-            one = @One(select = "com.yichi.onepiece.lineage.model.ActionRecordDao.findById")
-    )
-    @Select("select * from `message` where `message`.`conversation_id` = #{conversationId} and `message`.`creation_record_id` >= #{messageDigit} order by `message`.`creation_record_id` asc limit #{limit}")
+    // SQL + result mapping defined in messageDao.xml (JOIN-based, no N+1).
     List<MessageFullView> listMessageFullViewByLastMessageId(
             @Param("conversationId") UUID conversationId,
             @Param("messageDigit") Long messageDigit,
             @Param("limit") int limit);
 
-
-    @Result(property = "preMessage", column = "pre_message_id",
-            javaType = MessageEntity.class,
-            one = @One(select = "findById"))
-    @Result(property = "creationRecord", column = "creation_record_id", javaType = ActionRecordEntity.class,
-            one = @One(select = "com.yichi.onepiece.lineage.model.ActionRecordDao.findById")
-    )
-    @Result(property = "modificationRecord", column = "modification_record_id", javaType = ActionRecordEntity.class,
-            one = @One(select = "com.yichi.onepiece.lineage.model.ActionRecordDao.findById")
-    )
-    @Select("select * from `message` where `message`.`id` = #{id}")
+    // SQL + result mapping defined in messageDao.xml (JOIN-based, no N+1).
     Optional<MessageFullView> getMessageFullView(@Param("id") UUID id);
 }
