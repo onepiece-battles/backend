@@ -39,9 +39,4 @@ public class I18nHelper {
                 .enUS("SUCCESS")
                 .zhCN("成功");
     }
-    public static I18nText getFailed() {
-        return new I18nText()
-                .enUS("FAILED")
-                .zhCN("失败");
-    }
 }

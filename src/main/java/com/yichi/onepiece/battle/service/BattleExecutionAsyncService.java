@@ -45,7 +45,6 @@ public class BattleExecutionAsyncService {
     battleExecution = battleExecution.toBuilder().setModificationTimestamp(
         actionRecord.getActionTimestamp()).setBattleStatus(BattleStatus.IN_PROGRESS).build();
     JobDataMap jobDataMap = new JobDataMap();
-//    logger.info("current user: {}", UserHelper.getCurrentUserDetail().toString());
     jobDataMap.put(BATTLE_ID, battleId.toString());
     jobDataMap.put(USER_ID, UserHelper.getCurrentUserId().toString());
     jobDataMap.put(USER_EMAIL, UserHelper.getCurrentUserDetail().getUsername());

@@ -74,7 +74,6 @@ public class BattleController implements BattleApi {
     StopWatch watch = new StopWatch();
     watch.start();
     iamService.checkPermissionOfCurrentAccount(ResourceType.BATTLE, Set.of(Permission.LIST));
-    logger.info("starter name {}, receiver name {}", listBattleRequest.getBattleFilter().getStarterName(),  listBattleRequest.getBattleFilter().getReceiverName());
     var response = battleService.list(listBattleRequest);
     watch.stop();
     logger.info("list battle takes: {}", watch.getTotalTimeSeconds());

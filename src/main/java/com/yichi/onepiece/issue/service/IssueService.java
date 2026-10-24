@@ -11,13 +11,10 @@ import java.time.Clock;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class IssueService {
-  private final Logger logger = LoggerFactory.getLogger(IssueService.class);
   private final ActionRecordService actionRecordService;
 
   private final IssueDao issueDao;
@@ -67,7 +64,6 @@ public class IssueService {
             .stream()
             .map(IssueConverter.INSTANCE::toIssue)
             .collect(Collectors.toList());
-    logger.info("filter:{}", request.getIssueFilter());
     return new ListIssueResponse().issues(issues).totalSize(totalSize);
   }
 

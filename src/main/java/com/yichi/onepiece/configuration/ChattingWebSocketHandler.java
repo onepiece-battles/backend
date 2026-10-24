@@ -223,7 +223,6 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
                         } else {
                             firstMessageContent = "我通过了你的朋友验证请求，现在我们可以开始聊天了";
                         }
-                        logger.info(firstMessageContent);
                         var response = messageService.sendMessage(
                                 new SendMessageRequest()
                                         .conversationId(chat.getId())
@@ -232,7 +231,6 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
                                         .userId(userId),
                                 userId);
                         if (response.getResult()) {
-                            logger.info("send message to new group");
                             // 3. Now this will work because the map is updated
                             sendMessagesToGroup(chat.getId(), new TextMessage(objectMapper.writeValueAsString(response.getMessage())));
                         }
