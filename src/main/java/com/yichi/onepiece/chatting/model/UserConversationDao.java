@@ -24,4 +24,11 @@ public interface UserConversationDao extends BaseDao<UserConversationEntity, UUI
 
     @Select("select `last_read_message_id` from `user_conversation` where `user_id` = #{userId} and `conversation_id` = #{conversationId} ")
     UUID findLastReadMessageId(@Param("userId") UUID userId, @Param("conversationId") UUID conversationID);
+
+    /// Single-row membership check used on the send-message hot path, instead
+    /// of loading the user's entire conversation list and scanning it.
+    @Select("select exists(select 1 from `user_conversation` "
+            + "where `user_id` = #{userId} and `conversation_id` = #{conversationId})")
+    boolean existsByUserIdAndConversationId(
+            @Param("userId") UUID userId, @Param("conversationId") UUID conversationId);
 }
