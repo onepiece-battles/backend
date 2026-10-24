@@ -12,31 +12,13 @@ import java.util.UUID;
 @Dao
 @Mapper
 public interface MessageDao extends BaseDao<MessageEntity, UUID> {
-    @Result(property = "preMessage", column = "pre_message_id",
-            javaType = MessageEntity.class,
-            one = @One(select = "findById"))
-    @Result(property = "creationRecord", column = "creation_record_id", javaType = ActionRecordEntity.class,
-            one = @One(select = "com.yichi.onepiece.lineage.model.ActionRecordDao.findById")
-    )
-    @Result(property = "modificationRecord", column = "modification_record_id", javaType = ActionRecordEntity.class,
-            one = @One(select = "com.yichi.onepiece.lineage.model.ActionRecordDao.findById")
-    )
-    @Select("select * from message where conversation_id = #{conversationId} ORDER BY creation_record_id DESC LIMIT 1")
+    // SQL + result mapping defined in messageDao.xml (JOIN-based, no N+1).
     MessageFullView getMostRecentMessage(@Param("conversationId") UUID conversationId);
 
     @Select("select * from message where conversation_id = #{conversationId} ORDER BY creation_record_id DESC LIMIT #{limit}")
     List<MessageEntity> listMessage(@Param("conversationId") UUID conversationId, @Param("limit") int limit);
 
-    @Result(property = "preMessage", column = "pre_message_id",
-            javaType = MessageEntity.class,
-            one = @One(select = "findById"))
-    @Result(property = "creationRecord", column = "creation_record_id", javaType = ActionRecordEntity.class,
-            one = @One(select = "com.yichi.onepiece.lineage.model.ActionRecordDao.findById")
-    )
-    @Result(property = "modificationRecord", column = "modification_record_id", javaType = ActionRecordEntity.class,
-            one = @One(select = "com.yichi.onepiece.lineage.model.ActionRecordDao.findById")
-    )
-    @Select(" SELECT * FROM (select * from message where conversation_id = #{conversationId} ORDER BY creation_record_id DESC LIMIT #{limit}) as t ORDER BY creation_record_id ASC")
+    // SQL + result mapping defined in messageDao.xml (JOIN-based, no N+1).
     List<MessageFullView> listMessageFullView(@Param("conversationId") UUID conversationId, @Param("limit") int limit);
 
     @Result(property = "preMessage", column = "pre_message_id",
