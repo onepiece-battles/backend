@@ -70,6 +70,20 @@
         ORDER BY m.creation_record_id ASC
     </select>
 
+    <!-- Incremental sync: messages with creation_record_id strictly greater
+         than the client's per-conversation cursor, oldest-first, capped. -->
+    <select id="listMessageFullViewAfter" resultMap="messageFullView">
+        SELECT <include refid="messageFullViewColumns"/>
+        FROM (
+            SELECT * FROM `message`
+            WHERE conversation_id = #{conversationId} AND creation_record_id &gt; #{after}
+            ORDER BY creation_record_id ASC
+            LIMIT #{limit}
+        ) m
+        <include refid="messageFullViewJoins"/>
+        ORDER BY m.creation_record_id ASC
+    </select>
+
     <!-- Single most-recent message for a conversation (used by the chat-list
          conversationFullView.message association). -->
     <select id="getMostRecentMessage" resultMap="messageFullView">

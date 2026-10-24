@@ -144,6 +144,13 @@ public class MessageService {
         return messageDao.listMessageFullView(conversationId, DEFAULT_MESSAGE_PAGE_SIZE);
     }
 
+    /// Incremental sync on (re)connect: messages in [conversationId] newer than
+    /// the client's last-known creation_record_id cursor, oldest-first, capped.
+    public List<MessageFullView> getMessagesAfter(UUID conversationId, Long afterCreationRecordId) {
+        return messageDao.listMessageFullViewAfter(
+                conversationId, afterCreationRecordId, MAX_MESSAGE_PAGE_SIZE);
+    }
+
     private void checkCurrentUserInConversation(UUID conversationId) {
         checkUserInConversation(UserHelper.getCurrentUserId(), conversationId);
     }

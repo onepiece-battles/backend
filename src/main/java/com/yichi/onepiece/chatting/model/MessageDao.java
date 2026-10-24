@@ -21,6 +21,13 @@ public interface MessageDao extends BaseDao<MessageEntity, UUID> {
     // SQL + result mapping defined in messageDao.xml (JOIN-based, no N+1).
     List<MessageFullView> listMessageFullView(@Param("conversationId") UUID conversationId, @Param("limit") int limit);
 
+    // Incremental sync: messages newer than a creation_record_id cursor,
+    // oldest-first. SQL + result mapping in messageDao.xml.
+    List<MessageFullView> listMessageFullViewAfter(
+            @Param("conversationId") UUID conversationId,
+            @Param("after") Long after,
+            @Param("limit") int limit);
+
     @Result(property = "preMessage", column = "pre_message_id",
             javaType = MessageEntity.class,
             one = @One(select = "findById"))
