@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yichi.onepiece.chatting.model.MessageDao">
+
+    <!--
+      JOIN-based mapping for MessageFullView: the preMessage, creationRecord and
+      modificationRecord are fetched in the SAME query via LEFT JOINs instead of
+      three per-row nested @One selects. This removes the N+1 that previously
+      cost ~1 + 3*rows queries per conversation (≈61 for a 20-message batch),
+      which was replayed for every conversation on every WebSocket (re)connect.
+
+      Column prefixes keep the three joined entities' columns distinct:
+        pm_ = pre_message, cr_ = creation action_lineage, mr_ = modification.
+      autoMapping + map-underscore-to-camel-case fills the scalar fields; the
+      <id> elements anchor identity. notNullColumn="id" makes preMessage null
+      when there is no pre_message_id (matching the old findById(null) => null).
+    -->
+    <resultMap id="messageFullView"
+               type="com.yichi.onepiece.chatting.model.MessageFullView"
+               autoMapping="true">
+        <id column="id" property="id"/>
+        <association property="preMessage"
+                     javaType="com.yichi.onepiece.chatting.model.MessageEntity"
+                     columnPrefix="pm_" autoMapping="true" notNullColumn="id">
+            <id column="id" property="id"/>
+        </association>
+        <association property="creationRecord"
+                     javaType="com.yichi.onepiece.lineage.model.ActionRecordEntity"
+                     columnPrefix="cr_" autoMapping="true" notNullColumn="id">
+            <id column="id" property="id"/>
+        </association>
+        <association property="modificationRecord"
+                     javaType="com.yichi.onepiece.lineage.model.ActionRecordEntity"
+                     columnPrefix="mr_" autoMapping="true" notNullColumn="id">
+            <id column="id" property="id"/>
+        </association>
+    </resultMap>
+
+    <!-- Selected columns for the joined entities (message `m` auto-mapped via m.*). -->
+    <sql id="messageFullViewJoins">
+        LEFT JOIN `message` pm ON m.pre_message_id = pm.id
+        LEFT JOIN `action_lineage` cr ON m.creation_record_id = cr.id
+        LEFT JOIN `action_lineage` mr ON m.modification_record_id = mr.id
+    </sql>
+
+    <sql id="messageFullViewColumns">
+        m.*,
+        pm.id pm_id, pm.user_id pm_user_id, pm.conversation_id pm_conversation_id,
+        pm.pre_message_id pm_pre_message_id, pm.content pm_content, pm.retracted pm_retracted,
+        pm.image_content_uri pm_image_content_uri, pm.voice_content_uri pm_voice_content_uri,
+        pm.creation_record_id pm_creation_record_id, pm.modification_record_id pm_modification_record_id,
+        cr.id cr_id, cr.action_timestamp cr_action_timestamp, cr.user_id cr_user_id,
+        cr.username cr_username, cr.nickname cr_nickname, cr.role_id cr_role_id, cr.role_name cr_role_name,
+        mr.id mr_id, mr.action_timestamp mr_action_timestamp, mr.user_id mr_user_id,
+        mr.username mr_username, mr.nickname mr_nickname, mr.role_id mr_role_id, mr.role_name mr_role_name
+    </sql>
+
+    <!-- Recent messages for one conversation, oldest-first (same contract as
+         the previous annotation-based query). -->
+    <select id="listMessageFullView" resultMap="messageFullView">
+        SELECT <include refid="messageFullViewColumns"/>
+        FROM (
+            SELECT * FROM `message`
+            WHERE conversation_id = #{conversationId}
+            ORDER BY creation_record_id DESC
+            LIMIT #{limit}
+        ) m
+        <include refid="messageFullViewJoins"/>
+        ORDER BY m.creation_record_id ASC
+    </select>
+
+    <!-- Single most-recent message for a conversation (used by the chat-list
+         conversationFullView.message association). -->
+    <select id="getMostRecentMessage" resultMap="messageFullView">
+        SELECT <include refid="messageFullViewColumns"/>
+        FROM (
+            SELECT * FROM `message`
+            WHERE conversation_id = #{conversationId}
+            ORDER BY creation_record_id DESC
+            LIMIT 1
+        ) m
+        <include refid="messageFullViewJoins"/>
+    </select>
+
+</mapper>
