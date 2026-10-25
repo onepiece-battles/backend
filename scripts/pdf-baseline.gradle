@@ -1,0 +1,13 @@
+gradle.projectsEvaluated {
+    def project = gradle.rootProject
+    project.tasks.register('compilePdfBaseline', JavaCompile) {
+        dependsOn project.tasks.named('testClasses')
+        def sourcePath = project.providers.gradleProperty('pdfBaselineSource').get()
+        source = project.fileTree(sourcePath) { include '**/DataExportService.java' }
+        classpath = project.sourceSets.test.runtimeClasspath
+        destinationDirectory = project.layout.buildDirectory.dir('pdf-baseline-classes')
+        sourceCompatibility = '17'
+        targetCompatibility = '17'
+        options.encoding = 'UTF-8'
+    }
+}
