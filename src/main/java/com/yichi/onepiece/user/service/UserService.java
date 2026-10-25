@@ -28,9 +28,12 @@ import com.yichi.onepiece.utils.I18nHelper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
+  private static final Set<ResourceType> SHAREABLE_RESOURCE_TYPES =
+      Set.of(ResourceType.CHARACTER, ResourceType.FRUIT, ResourceType.BATTLE, ResourceType.GROUP);
   private final UserDao userDao;
   private final FriendshipDao friendshipDao;
   private final TokenDao tokenDao;
@@ -214,12 +217,21 @@ public class UserService {
   public ShareResourceResponse shareResource(ShareResourceRequest request) {
     UUID sourceUserId = UserHelper.getCurrentUserId();
     UUID targetUserId = request.getTargetUserId();
+    if (request.getResourceType() == null || !SHAREABLE_RESOURCE_TYPES.contains(request.getResourceType())
+        || request.getResourceIds() == null || request.getResourceIds().stream().anyMatch(Objects::isNull)) {
+      throw new PermissionDeniedException("Access Denied");
+    }
+    var requestedResourceIds = request.getResourceIds().stream().distinct().toList();
+    if (!requestedResourceIds.isEmpty()
+        && userResourceDao.countShareableResources(sourceUserId, request.getResourceType(),
+            requestedResourceIds, UserHelper.hasAdminPermission()) != requestedResourceIds.size()) {
+      throw new PermissionDeniedException("Access Denied");
+    }
     var existingResourceIds = new HashSet<>(
         userResourceDao.getResourceIdsByUserIdAndResourceType(
             targetUserId, request.getResourceType()));
     var userResourceEntities =
-        request.getResourceIds().stream()
-            .distinct()
+        requestedResourceIds.stream()
             .filter(id -> !existingResourceIds.contains(id))
             .map(
                 id ->
@@ -330,22 +342,20 @@ public class UserService {
 
 
 
+  @Transactional
   public AcceptFriendResponse acceptFriend(AcceptFriendRequest request) {
-    List<FriendshipEntity> friendships = friendshipDao.findFriendShipById(request.getFriendId(), UserHelper.getCurrentUserId());
-    if (!friendships.isEmpty()) {
-      friendships = friendships.stream().map(e-> e.toBuilder().setFriendshipStatus(FriendshipStatus.ACCEPTED).build()).toList();
+    UUID currentUserId = UserHelper.getCurrentUserId();
+    if (currentUserId.equals(request.getFriendId())
+        || friendshipDao.acceptPendingRequests(request.getFriendId(), currentUserId) == 0) {
+      throw new PermissionDeniedException("Access Denied");
     }
-    for (var friend : friendships) {
-      // 更新朋友信息
-      friendshipDao.update(friend);
-      UserEntity sender = userDao.findById(UserHelper.getCurrentUserId()).orElseThrow();
-      CreateNotificationRequest notificationRequest = new CreateNotificationRequest()
-              .notificationType(NotificationType.FRIEND_ACCEPTED)
-              .creatorId(UserHelper.getCurrentUserId())
-              .receiverId(request.getFriendId())
-              .content(I18nHelper.getFriendAcceptMessage(sender));
-      notificationService.create(notificationRequest);
-    }
+    UserEntity sender = userDao.findById(currentUserId).orElseThrow();
+    CreateNotificationRequest notificationRequest = new CreateNotificationRequest()
+            .notificationType(NotificationType.FRIEND_ACCEPTED)
+            .creatorId(currentUserId)
+            .receiverId(request.getFriendId())
+            .content(I18nHelper.getFriendAcceptMessage(sender));
+    notificationService.create(notificationRequest);
     return new AcceptFriendResponse()
             .result(true)
             .notification(I18nHelper.getSuccess());
