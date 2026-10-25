@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.user.model.UserDao">
-    <select id="listUsers" resultType="com.yichi.onepiece.user.model.UserDetailImpl" resultMap="userDetailView">
+    <select id="listUsers" resultType="com.yichi.onepiece.user.model.UserDetailImpl" resultMap="userListView">
         SELECT
             `id`,
             `nickname`,
@@ -58,7 +58,7 @@
         </choose>
     </sql>
 
-    <resultMap id="userDetailView" type="com.yichi.onepiece.user.model.UserDetailImpl" autoMapping="true">
+    <resultMap id="userListView" type="com.yichi.onepiece.user.model.UserDetailImpl" autoMapping="true">
         <result property="id" column="id"/>
         <result property="creationRecordId" column="creation_record_id"/>
         <result property="modificationRecordId" column="modification_record_id"/>
@@ -66,9 +66,6 @@
         <result property="imageUri" column="image_uri"/>
         <association column="login_role" property="loginRoleResources"
                      select="com.yichi.onepiece.iam.model.RoleDao.listResourceTypeByRoleName"
-        />
-        <association column="id" property="tokens"
-                     select="com.yichi.onepiece.iam.model.TokenDao.listTokenByUserId"
         />
         <association column="id" property="userRoles"
                      select="com.yichi.onepiece.iam.model.RoleDao.listRolesByUserId"
@@ -79,5 +76,11 @@
         <association column="modification_record_id" property="modificationRecord"
                      select="com.yichi.onepiece.lineage.model.ActionRecordDao.findById"
         />
+    </resultMap>
+
+    <resultMap id="userDetailView" type="com.yichi.onepiece.user.model.UserDetailImpl"
+               extends="userListView" autoMapping="true">
+        <association column="id" property="tokens"
+                     select="com.yichi.onepiece.iam.model.TokenDao.listTokenByUserId"/>
     </resultMap>
 </mapper>

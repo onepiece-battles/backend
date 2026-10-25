@@ -49,7 +49,7 @@ public class IamService {
     var roleNames = authorities.stream().map(GrantedAuthority::getAuthority).toList();
     var loginRole = UserHelper.getCurrentUserDetail().getLoginRole();
     if (!roleNames.contains(loginRole.name())) {
-      ExceptionUtils.notFound("role name %s not found", loginRole).get();
+      throw new PermissionDeniedException("Access Denied");
     }
     for(var permission: permissions) {
       checkPermission(resourceType, permission, loginRole);

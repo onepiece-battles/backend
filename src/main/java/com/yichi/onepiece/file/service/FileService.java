@@ -33,12 +33,13 @@ public class FileService {
     }
     try {
       String uri = fileObject.getOssUri();
-      var inputStream = AliCloudObjectStorage.getFileStream(uri);
-      var response = new DownloadFileResponse();
-      response.fileData(Base64Helper.encode(inputStream.readAllBytes()))
-              .fileName(fileObject.getFileName())
-              .httpMimeType(fileObject.getHttpMimeType());
-      return response;
+      try (var inputStream = AliCloudObjectStorage.getFileStream(uri)) {
+        var response = new DownloadFileResponse();
+        response.fileData(Base64Helper.encode(inputStream.readAllBytes()))
+                .fileName(fileObject.getFileName())
+                .httpMimeType(fileObject.getHttpMimeType());
+        return response;
+      }
     } catch (FileStorageException | IOException e) {
       logger.error("error downloading file", e);
     }

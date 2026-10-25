@@ -42,6 +42,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -201,9 +202,8 @@ public class DataExportService {
 
 	  private ImageData loadCharacterImage(CharacterEntity character, String fallbackName, boolean fullImage) {
 	    if (character.getImageUri() != null && !character.getImageUri().isBlank()) {
-	      try {
-	        return ImageDataFactory.create(
-	                AliCloudObjectStorage.getImageStream(character.getImageUri(), fullImage).readAllBytes());
+	      try (InputStream imageStream = AliCloudObjectStorage.getImageStream(character.getImageUri(), fullImage)) {
+	        return ImageDataFactory.create(imageStream.readAllBytes());
 	      } catch (Exception e) {
 	        logger.warn(
 	                "failed to load {} pdf image from OSS for character {}, using fallback image",
