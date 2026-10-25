@@ -214,12 +214,13 @@ public class UserService {
   public ShareResourceResponse shareResource(ShareResourceRequest request) {
     UUID sourceUserId = UserHelper.getCurrentUserId();
     UUID targetUserId = request.getTargetUserId();
-    var userResourceIds =
+    var existingResourceIds = new HashSet<>(
         userResourceDao.getResourceIdsByUserIdAndResourceType(
-            targetUserId, request.getResourceType());
-    userResourceIds.addAll(request.getResourceIds());
+            targetUserId, request.getResourceType()));
     var userResourceEntities =
-        userResourceIds.stream()
+        request.getResourceIds().stream()
+            .distinct()
+            .filter(id -> !existingResourceIds.contains(id))
             .map(
                 id ->
                     UserResourceEntityBuilder.newBuilder()
@@ -229,7 +230,9 @@ public class UserService {
                         .setResourceId(id)
                         .build())
             .toList();
-    userResourceDao.batchInsert(userResourceEntities);
+    if (!userResourceEntities.isEmpty()) {
+      userResourceDao.batchInsert(userResourceEntities);
+    }
     ShareResourceResponse response = new ShareResourceResponse();
     response.setSharingInformation(
         UserFacingConstants.getConstant(RESOURCE_SHARING_SUCCESS).getDisplayName());

@@ -23,6 +23,7 @@ public interface UserConverter {
 
   @Mapping(target = "loginRoleResourcesPermissionMap", ignore = true)
   @Mapping(target = "profileImage", ignore = true)
+  @Mapping(target = "tokens", ignore = true)
   User toUser(UserDetailImpl userDetail);
 
   @Mapping(target = "loginRoleResourcesPermissionMap", ignore = true)
