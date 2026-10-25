@@ -75,6 +75,7 @@ public class UserService {
   }
 
 
+  @Transactional
   public UpdatePasswordResponse updatePassword(UpdatePasswordRequest request) {
     var result = justifyVerificationCode(null, request.getUsername(), request.getVerificationCode());
     if (!VERIFICATION_SUCCESS.equals(result)) {
@@ -217,7 +218,7 @@ public class UserService {
   public ShareResourceResponse shareResource(ShareResourceRequest request) {
     UUID sourceUserId = UserHelper.getCurrentUserId();
     UUID targetUserId = request.getTargetUserId();
-    if (request.getResourceType() == null || !SHAREABLE_RESOURCE_TYPES.contains(request.getResourceType())
+    if (targetUserId == null || request.getResourceType() == null || !SHAREABLE_RESOURCE_TYPES.contains(request.getResourceType())
         || request.getResourceIds() == null || request.getResourceIds().stream().anyMatch(Objects::isNull)) {
       throw new PermissionDeniedException("Access Denied");
     }
@@ -236,6 +237,7 @@ public class UserService {
             .map(
                 id ->
                     UserResourceEntityBuilder.newBuilder()
+                        .setId(UUID.randomUUID())
                         .setUserId(targetUserId)
                         .setSourceUserId(sourceUserId)
                         .setResourceType(request.getResourceType())
@@ -243,7 +245,7 @@ public class UserService {
                         .build())
             .toList();
     if (!userResourceEntities.isEmpty()) {
-      userResourceDao.batchInsert(userResourceEntities);
+      userResourceDao.insertSharesIfAbsent(userResourceEntities);
     }
     ShareResourceResponse response = new ShareResourceResponse();
     response.setSharingInformation(
@@ -276,6 +278,7 @@ public class UserService {
   }
 
 
+  @Transactional
   public VerifyByEmailCodeResponse verifyUserEmail(VerifyByEmailCodeRequest request) {
     if (!UserHelper.getCurrentUserId().equals(request.getUserId())) {
       throw new PermissionDeniedException("Access Denied");
@@ -296,26 +299,12 @@ public class UserService {
   }
 
   private String justifyVerificationCode(@Nullable UUID userId, String email, String verificationCode) {
-    List<EmailVerificationEntity> emailVerificationEntity;
-    if (userId==null) {
-      emailVerificationEntity= emailVerificationDao.getByEmailAndNullUserId(email, verificationCode);
-    } else {
-      emailVerificationEntity =emailVerificationDao
-              .getByEmailAndUserId(email, userId, verificationCode);
+    long now = clock.millis();
+    if (emailVerificationDao.consumeCode(email, userId, verificationCode, now) > 0) {
+      return VERIFICATION_SUCCESS;
     }
-    if (emailVerificationEntity.isEmpty()) {
-      return VERIFICATION_CODE_NOT_MATCH;
-    }
-    if (emailVerificationEntity.get(0).getExpirationTimestamp() < clock.millis()) {
-      return VERIFICATION_CODE_EXPIRED;
-    }
-    // mark email as used.
-    if (userId==null) {
-      emailVerificationDao.markEmailAsUsedNullUserId(email);
-    } else {
-      emailVerificationDao.markEmailAsUsed(userId, email);
-    }
-    return VERIFICATION_SUCCESS;
+    return emailVerificationDao.hasExpiredCode(email, userId, verificationCode, now)
+        ? VERIFICATION_CODE_EXPIRED : VERIFICATION_CODE_NOT_MATCH;
   }
 
   public AddFriendResponse addFriend(AddFriendRequest request) {

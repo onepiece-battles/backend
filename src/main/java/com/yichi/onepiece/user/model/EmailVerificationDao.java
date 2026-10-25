@@ -3,8 +3,6 @@ package com.yichi.onepiece.user.model;
 import com.yichi.infra.support.mybatis.annotations.Dao;
 import com.yichi.infra.support.mybatis.dao.BaseDao;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -16,19 +14,29 @@ import javax.annotation.Nullable;
 @Dao
 @Mapper
 public interface EmailVerificationDao extends BaseDao<EmailVerificationEntity, UUID> {
-  @Select("select * from email_verification where email_verification.user_id = #{userId} and "
-      + "email_verification.email = #{email} and is_used = false and email_verification.email_verification_code = #{verificationCode}")
-  List<EmailVerificationEntity> getByEmailAndUserId(
-      @Param("email") String email,
-      @Param("userId") @Nullable UUID userId,
-      @Param("verificationCode") String verificationCode
-  );
-  @Select("select * from email_verification where email_verification.user_id is null and "
-          + "email_verification.email = #{email} and is_used = false and email_verification.email_verification_code = #{verificationCode}")
-  List<EmailVerificationEntity> getByEmailAndNullUserId(
-          @Param("email") String email,
-          @Param("verificationCode") String verificationCode
-  );
+  @Update({
+      "<script>",
+      "UPDATE email_verification SET is_used = TRUE",
+      "WHERE email = #{email} AND email_verification_code = #{verificationCode}",
+      "AND is_used = FALSE AND expiration_timestamp &gt;= #{now}",
+      "<choose><when test='userId == null'>AND user_id IS NULL</when>",
+      "<otherwise>AND user_id = #{userId}</otherwise></choose>",
+      "</script>"
+  })
+  int consumeCode(@Param("email") String email, @Param("userId") @Nullable UUID userId,
+      @Param("verificationCode") String verificationCode, @Param("now") long now);
+
+  @Select({
+      "<script>",
+      "SELECT EXISTS(SELECT 1 FROM email_verification",
+      "WHERE email = #{email} AND email_verification_code = #{verificationCode}",
+      "AND is_used = FALSE AND expiration_timestamp &lt; #{now}",
+      "<choose><when test='userId == null'>AND user_id IS NULL</when>",
+      "<otherwise>AND user_id = #{userId}</otherwise></choose>)",
+      "</script>"
+  })
+  boolean hasExpiredCode(@Param("email") String email, @Param("userId") @Nullable UUID userId,
+      @Param("verificationCode") String verificationCode, @Param("now") long now);
 
   @Update("update email_verification set is_used = true where user_id is null "
           + "and email_verification.email = #{email}")
