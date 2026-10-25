@@ -48,22 +48,11 @@ public interface GroupDao extends BaseDao<GroupEntity, UUID> {
 
 
 
-  // this function list all the father groups of this group, including this group itself.
-  @Select({
-          "<script>",
-          "WITH RECURSIVE `GroupHierarchy` AS (",
-          "   SELECT id, father_group_id, 0 AS level",
-          "   FROM `group`",
-          "   WHERE id = #{id}",
-          "   UNION ALL",
-          "   SELECT g.id, g.father_group_id, gh.level + 1",
-          "   FROM `group` g",
-          "   JOIN GroupHierarchy gh ON g.id = gh.father_group_id",
-          ")",
-          "SELECT * FROM `GroupHierarchy`",
-          "</script>"
-  })
-  List<GroupEntity> listAllFatherGroups(@Param("id") UUID id);
+  @Select("SELECT id FROM group_hierarchy_lock WHERE id = 1 FOR UPDATE")
+  int lockHierarchy();
+
+  @Select("SELECT father_group_id FROM `group` WHERE id = #{id} FOR UPDATE")
+  UUID findFatherGroupIdForUpdate(@Param("id") UUID id);
 
   int count(
       @Param("groupFilter") GroupFilter groupFilter,

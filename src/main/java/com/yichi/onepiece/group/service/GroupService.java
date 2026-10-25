@@ -18,10 +18,15 @@ import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import com.yichi.onepiece.utils.EncryptHelper;
 import java.util.List;
 import java.util.UUID;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Objects;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class GroupService {
@@ -144,9 +149,15 @@ public class GroupService {
                     .getDisplayName());
   }
 
+  @Transactional
   public AddGroupResponse addGroup(AddGroupRequest request) {
+    groupDao.lockHierarchy();
     UUID fatherGroupId = request.getFatherGroupId();
-    List<UUID> childGroupIds = request.getChildGroupIds();
+    if (fatherGroupId == null || request.getChildGroupIds() == null
+        || request.getChildGroupIds().stream().anyMatch(Objects::isNull)) {
+      throw new IllegalArgumentException("Group IDs must not be null");
+    }
+    List<UUID> childGroupIds = request.getChildGroupIds().stream().distinct().toList();
     var group = groupDao.findById(fatherGroupId).orElseThrow();
     if (!GroupCategory.GROUP.equals(group.getGroupCategory())) {
       return new AddGroupResponse()
@@ -154,7 +165,14 @@ public class GroupService {
               .notification(UserFacingConstants.getConstant(UserFacingConstantsKey.WRONG_MEMBER_TYPE)
                       .getDisplayName());
     }
-    var childGroups = groupDao.listByIds(childGroupIds);
+    var ancestors = getAncestorIds(fatherGroupId);
+    if (childGroupIds.stream().anyMatch(ancestors::contains)) {
+      throw new IllegalArgumentException("Group hierarchy must not contain a cycle");
+    }
+    var childGroups = childGroupIds.isEmpty() ? List.<GroupEntity>of() : groupDao.listByIds(childGroupIds);
+    if (childGroups.size() != childGroupIds.size()) {
+      throw new IllegalArgumentException("A child group does not exist");
+    }
 
     var updatedGroups = childGroups
             .stream()
@@ -173,11 +191,18 @@ public class GroupService {
 
   public GroupFullView getGroupFullView(GetGroupRequest getGroupRequest) {
     var groupFullView = groupDao.getFullViewById(getGroupRequest.getId()).orElseThrow();
-    var fatherGroups = new java.util.ArrayList<>(groupDao.listAllFatherGroups(
-            getGroupRequest.getId()).stream().map(e -> groupDao.findById(e.getId()).orElseThrow()).toList());
-    // remove current group
-    if (!fatherGroups.isEmpty()) {
-      fatherGroups.remove(0);
+    var fatherGroups = new ArrayList<GroupEntity>();
+    Set<UUID> visited = new HashSet<>();
+    visited.add(getGroupRequest.getId());
+    UUID fatherId = groupFullView.getFatherGroupId();
+    while (fatherId != null) {
+      if (!visited.add(fatherId)) {
+        logger.warn("Cycle detected while reading group hierarchy for {}", getGroupRequest.getId());
+        break;
+      }
+      var fatherGroup = groupDao.findById(fatherId).orElseThrow();
+      fatherGroups.add(fatherGroup);
+      fatherId = fatherGroup.getFatherGroupId();
     }
     groupFullView = groupFullView.toBuilder()
             .setPreviousGroup(getPreviousGroup(groupFullView.getCreationRecord().getId()))
@@ -187,7 +212,9 @@ public class GroupService {
     return GroupConverter.INSTANCE.toGroupFullView(groupFullView);
   }
 
+  @Transactional
   public void updateGroupImage(UUID groupId, String uri) {
+    groupDao.lockHierarchy();
     var modificationRecord = actionRecordService.create();
     var group = groupDao.findById(groupId).orElseThrow();
     var updatedGroup =
@@ -198,7 +225,12 @@ public class GroupService {
     groupDao.update(updatedGroup);
   }
 
+  @Transactional
   public UpdateGroupResponse update(Group group) {
+    groupDao.lockHierarchy();
+    if (group.getId() == null || getAncestorIds(group.getFatherGroupId()).contains(group.getId())) {
+      throw new IllegalArgumentException("Group hierarchy must not contain a cycle");
+    }
     GroupEntity groupEntity = GroupConverter.INSTANCE.toGroupEntity(group);
     groupDao.update(groupEntity);
     UpdateGroupResponse response = new UpdateGroupResponse();
@@ -225,5 +257,17 @@ public class GroupService {
 
   public List<GroupEntity> listNoUriGroups() {
     return groupDao.listNoUriGroups();
+  }
+
+  private Set<UUID> getAncestorIds(UUID groupId) {
+    Set<UUID> ancestors = new HashSet<>();
+    UUID currentId = groupId;
+    while (currentId != null) {
+      if (!ancestors.add(currentId)) {
+        throw new IllegalArgumentException("Group hierarchy already contains a cycle");
+      }
+      currentId = groupDao.findFatherGroupIdForUpdate(currentId);
+    }
+    return ancestors;
   }
 }
