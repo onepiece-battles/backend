@@ -306,7 +306,7 @@ public class BattleService {
   }
 
   private int getKFactorOfCharacter(UUID characterId) {
-    int battleCount = battleDao.listBattlesByCharacterId(characterId).size();
+    int battleCount = battleDao.countBattlesByCharacterId(characterId);
     if(battleCount<=10) {
       return 1500;
     }

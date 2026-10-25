@@ -35,6 +35,11 @@ public interface BattleDao extends BaseDao<BattleEntity, UUID> {
               "order by `battle_execution`.`modification_timestamp` DESC")
   List<BattleListView> listBattlesByCharacterId(@Param("characterId") UUID characterId);
 
+  @Select("select count(*) from `battle` left join `battle_execution` "
+      + "on `battle`.`id` = `battle_execution`.`battle_id` "
+      + "where #{characterId} in (`battle`.`starter_id`, `battle`.`receiver_id`)")
+  int countBattlesByCharacterId(@Param("characterId") UUID characterId);
+
   // result map is defined in battleDao.xml
   Optional<BattleFullView> getBattleFullView(@Param("id") UUID id);
 
