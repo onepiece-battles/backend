@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Insert;
 
 @Dao
 @Mapper
@@ -47,4 +48,15 @@ public interface UserResourceDao extends BaseDao<UserResourceEntity, UUID> {
       @Param("resourceType") ResourceType resourceType,
       @Param("resourceIds") List<UUID> resourceIds,
       @Param("admin") boolean admin);
+
+  @Insert({
+      "<script>",
+      "INSERT INTO user_resource (id, user_id, source_user_id, resource_type, resource_id) VALUES",
+      "<foreach item='resource' collection='resources' separator=','>",
+      "(#{resource.id}, #{resource.userId}, #{resource.sourceUserId}, #{resource.resourceType}, #{resource.resourceId})",
+      "</foreach>",
+      "ON DUPLICATE KEY UPDATE id = user_resource.id",
+      "</script>"
+  })
+  int insertSharesIfAbsent(@Param("resources") List<UserResourceEntity> resources);
 }

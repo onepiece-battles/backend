@@ -36,8 +36,8 @@ public class UserResourceSharingTests {
     doAnswer(invocation -> {
       List<UserResourceEntity> batch = invocation.getArgument(0);
       inserted.addAll(batch);
-      return null;
-    }).when(dao).batchInsert(anyList());
+      return 1;
+    }).when(dao).insertSharesIfAbsent(anyList());
     var request = new ShareResourceRequest().targetUserId(targetId)
         .sourceUserId(UUID.randomUUID())
         .resourceType(ResourceType.CHARACTER).resourceIds(List.of(existingId, newId, newId));
@@ -48,7 +48,7 @@ public class UserResourceSharingTests {
           .thenReturn(new UserFacingConstants.Constant());
       service.shareResource(request);
       service.shareResource(request);
-      verify(dao, times(1)).batchInsert(anyList());
+      verify(dao, times(1)).insertSharesIfAbsent(anyList());
       assertThat(inserted).hasSize(1);
       assertThat(inserted.get(0).getResourceId()).isEqualTo(newId);
       assertThat(inserted.get(0).getUserId()).isEqualTo(targetId);
@@ -154,7 +154,7 @@ public class UserResourceSharingTests {
           .thenReturn(new UserFacingConstants.Constant());
       service.shareResource(request);
       verify(dao).countShareableResources(adminId, ResourceType.GROUP, requestedIds, true);
-      verify(dao).batchInsert(anyList());
+      verify(dao).insertSharesIfAbsent(anyList());
     }
   }
 }
