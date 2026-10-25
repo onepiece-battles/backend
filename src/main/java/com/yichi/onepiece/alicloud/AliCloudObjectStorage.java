@@ -129,14 +129,22 @@ public class AliCloudObjectStorage {
   }
 
   public static InputStream getImageStream(String uri, @Nullable Boolean fullImage) throws FileStorageException {
+    return getProcessedImageStream(uri, fullImage == null || !fullImage ? "image/resize,w_100" : null);
+  }
+
+  public static InputStream getReportImageStream(String uri) throws FileStorageException {
+    return getProcessedImageStream(uri, "image/resize,m_lfit,w_256,h_256/format,jpg/quality,Q_80");
+  }
+
+  private static InputStream getProcessedImageStream(String uri, String process) throws FileStorageException {
     try{
       logger.info("uri is: {}", uri);
       String key = extractFromUri(uri);
       logger.info("key is: {}", key);
       OSSObject ossObject;
       GetObjectRequest request = new GetObjectRequest(OSS_BUCKET_NAME, key);
-      if (fullImage == null || !fullImage) {
-          request.setProcess("image/resize,w_100");
+      if (process != null) {
+          request.setProcess(process);
       }
       ossObject = client().getObject(request);
       return ossObject.getObjectContent();

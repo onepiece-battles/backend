@@ -212,7 +212,7 @@ public class UserService {
   }
 
   public UserEntity getUserEntityById(UUID userId) {
-    return userDao.getById(userId).orElseThrow();
+    return userDao.findById(userId).orElseThrow();
   }
 
   public ShareResourceResponse shareResource(ShareResourceRequest request) {
