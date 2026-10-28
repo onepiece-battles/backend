@@ -20,7 +20,6 @@ import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.http.ResponseEntity;
@@ -98,7 +97,10 @@ public class AuthenticationResponseTests {
     }
   }
 
-  @Configuration
+  // OnePieceApplication's own @ComponentScan("com.yichi") has no TypeExcludeFilter, so any
+  // stereotype-annotated class in test sources ends up in every @SpringBootTest context. This
+  // class therefore carries no @Configuration and is only processed (as a lite configuration
+  // class) where the tests above register it explicitly.
   @EnableWebMvc
   @Import(SecurityConfiguration.class)
   static class TestConfiguration {
@@ -127,23 +129,25 @@ public class AuthenticationResponseTests {
     LoginEndpoint loginEndpoint() {
       return new LoginEndpoint();
     }
-  }
 
-  @RestController
-  static class LoginEndpoint {
-    @RequestMapping("/error")
-    ResponseEntity<Void> error(HttpServletRequest request) {
-      return ResponseEntity.status((int) request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)).build();
-    }
+    // Non-static so component scanning skips it (it needs an enclosing instance); otherwise its
+    // /error and /api/onepiece/user/login mappings would clash with the real controllers.
+    @RestController
+    class LoginEndpoint {
+      @RequestMapping("/error")
+      ResponseEntity<Void> error(HttpServletRequest request) {
+        return ResponseEntity.status((int) request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)).build();
+      }
 
-    @PostMapping("/api/onepiece/denied")
-    String denied() {
-      throw new PermissionDeniedException("Access Denied");
-    }
+      @PostMapping("/api/onepiece/denied")
+      String denied() {
+        throw new PermissionDeniedException("Access Denied");
+      }
 
-    @PostMapping("/api/onepiece/user/login")
-    String login() {
-      return "ok";
+      @PostMapping("/api/onepiece/user/login")
+      String login() {
+        return "ok";
+      }
     }
   }
 }
