@@ -9,6 +9,7 @@ import com.yichi.onepiece.file.model.FileObjectEntityBuilder;
 import com.yichi.onepiece.file.service.FileObjectService;
 import com.yichi.onepiece.fruit.service.FruitService;
 import com.yichi.onepiece.group.service.GroupService;
+import com.yichi.onepiece.image.dto.ImageAccess;
 import com.yichi.onepiece.lineage.service.ActionRecordService;
 import com.yichi.onepiece.model.I18nText;
 import com.yichi.onepiece.model.ResourceType;
@@ -20,6 +21,9 @@ import java.io.InputStream;
 import java.util.Base64;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Date;
+import java.time.Instant;
+import java.time.Duration;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey;
 import com.yichi.onepiece.utils.EncryptHelper;
@@ -146,6 +150,15 @@ public class ImageService {
       }
     }
     throw new RuntimeException("file retrieval failed");
+  }
+
+  public ImageAccess getImageAccess(String uri, @Nullable Boolean fullImage)
+      throws FileStorageException {
+    Date expiration = Date.from(Instant.now().plus(Duration.ofMinutes(15)));
+    String original = AliCloudObjectStorage.signImageUrl(uri, true, expiration).toExternalForm();
+    String display = Boolean.TRUE.equals(fullImage) ? original
+        : AliCloudObjectStorage.signImageUrl(uri, false, expiration).toExternalForm();
+    return new ImageAccess(display, original, expiration.getTime());
   }
 
   private int getBase64ContentOffset(String image) {

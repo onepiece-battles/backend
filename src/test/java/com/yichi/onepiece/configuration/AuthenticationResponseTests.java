@@ -79,6 +79,8 @@ public class AuthenticationResponseTests {
           .addFilters(context.getBean("springSecurityFilterChain", Filter.class)).build();
       mvc.perform(post("/api/onepiece/character/list_characters"))
           .andExpect(status().isUnauthorized());
+      mvc.perform(post("/api/onepiece/image/get_image_url"))
+          .andExpect(status().isUnauthorized());
       mvc.perform(post("/api/onepiece/battle/get_battle_full_view")
               .header("Authorization", "Bearer invalid-token"))
           .andExpect(status().isUnauthorized());

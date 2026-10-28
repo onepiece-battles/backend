@@ -4,6 +4,7 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.GetObjectRequest;
+import com.aliyun.oss.model.GeneratePresignedUrlRequest;
 import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.OSSObjectSummary;
 import com.aliyun.oss.model.ObjectMetadata;
@@ -12,6 +13,8 @@ import com.aliyuncs.exceptions.ClientException;
 import com.yichi.onepiece.exception.FileStorageException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -43,7 +46,7 @@ public class AliCloudObjectStorage {
           local =
               new OSSClientBuilder()
                   .build(
-                      OSS_EXTERNAL_ENDPOINT,
+                      "https://" + OSS_EXTERNAL_ENDPOINT,
                       requireEnv(OSS_ACCESS_KEY_ID_ENV),
                       requireEnv(OSS_ACCESS_KEY_SECRET_ENV));
           ossClient = local;
@@ -130,6 +133,20 @@ public class AliCloudObjectStorage {
 
   public static InputStream getImageStream(String uri, @Nullable Boolean fullImage) throws FileStorageException {
     return getProcessedImageStream(uri, fullImage == null || !fullImage ? "image/resize,w_100" : null);
+  }
+
+  /** Signs a read for one existing object; image bytes never pass through the app server. */
+  public static URL signImageUrl(String uri, boolean fullImage, Date expiration)
+      throws FileStorageException {
+    if (uri == null || uri.indexOf('?') >= 0 || uri.indexOf('#') >= 0) {
+      throw new FileStorageException("Expected a stored OSS image URI");
+    }
+    String key = extractFromUri(uri);
+    if (key.isBlank()) throw new FileStorageException("Image object key is empty");
+    var request = new GeneratePresignedUrlRequest(OSS_BUCKET_NAME, key, com.aliyun.oss.HttpMethod.GET);
+    request.setExpiration(expiration);
+    if (!fullImage) request.setProcess("image/resize,w_100");
+    return client().generatePresignedUrl(request);
   }
 
   public static InputStream getReportImageStream(String uri) throws FileStorageException {
