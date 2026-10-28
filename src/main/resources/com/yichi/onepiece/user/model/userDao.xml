@@ -3,10 +3,16 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yichi.onepiece.user.model.UserDao">
     <select id="listUsers" resultType="com.yichi.onepiece.user.model.UserDetailImpl" resultMap="userListView">
+        <!-- profile_image (MEDIUMBLOB) is intentionally NOT selected: the list
+             response (UserConverter.toUser) ignores profileImage, so loading the
+             avatar BLOB for every row only wasted heap (a boxed Byte[] is ~16x
+             the bytes) and bandwidth. The avatar is resolved by the client from
+             image_uri instead. getById still SELECTs * when the full image is
+             actually returned. -->
         SELECT
             `id`,
             `nickname`,
-            `username`, `login_role`, `encrypted_password`, `account_status`, `profile_image`,
+            `username`, `login_role`, `encrypted_password`, `account_status`,
             `locale`, `email_verified`, `creation_record_id`, `modification_record_id`, `image_uri`
         FROM `user`
         <include refid="userFilter">
