@@ -71,7 +71,7 @@ public class ImageService {
       String uri = uploadImage(profileImage);
       switch (resourceType) {
         case USER -> {
-           userService.updateProfile(targetId, uri, profileImage);
+           userService.updateProfile(targetId, uri);
         }
         case FRUIT -> {
            fruitService.updateProfile(targetId, uri);

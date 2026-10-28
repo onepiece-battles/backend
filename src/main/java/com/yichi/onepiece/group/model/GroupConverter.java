@@ -5,8 +5,6 @@ import com.yichi.onepiece.character.model.entity.CharacterInFruitView;
 import com.yichi.onepiece.model.CharacterInGroupView;
 import com.yichi.onepiece.model.Group;
 import com.yichi.onepiece.model.GroupFullView;
-import com.yichi.onepiece.utils.EncryptHelper;
-import org.apache.commons.lang3.ArrayUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -21,24 +19,9 @@ public interface GroupConverter {
   GroupFullView toGroupFullView(com.yichi.onepiece.group.model.GroupFullView groupFullView);
 
   @Mapping(target = "systemResource", ignore = true)
-  @Mapping(target = "profileImage", ignore = true)
   GroupEntity toGroupEntity(Group group);
 
   Group toGroup(GroupEntity group);
 
   CharacterInGroupView toCharacterInGroupView(com.yichi.onepiece.character.model.entity.CharacterInGroupView characterInGroupView);
-
-  default String blobToString(Byte[] profileByteArray) {
-    if (profileByteArray == null) {
-      return null;
-    }
-    return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(profileByteArray));
-  }
-
-  default Byte[] stringToBlob(String string) {
-    if (string == null) {
-      return null;
-    }
-    return ArrayUtils.toObject(EncryptHelper.base64Decode(string));
-  }
 }

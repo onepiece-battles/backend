@@ -35,18 +35,6 @@ final class ReportImageLoader {
         logger.warn("Failed to load report portrait for character {}, using fallback", character.getId(), exception);
       }
     }
-    Byte[] legacy = character.getProfileImage();
-    if (legacy != null && legacy.length > 0 && legacy.length <= MAX_LEGACY_BYTES) {
-      try {
-        byte[] bytes = new byte[legacy.length];
-        for (int index = 0; index < legacy.length; index++) {
-          bytes[index] = legacy[index];
-        }
-        return thumbnail(bytes);
-      } catch (Exception exception) {
-        logger.warn("Failed to decode legacy report portrait for character {}", character.getId(), exception);
-      }
-    }
     return placeholder(fallbackName);
   }
 

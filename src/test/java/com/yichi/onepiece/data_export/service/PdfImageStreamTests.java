@@ -39,23 +39,6 @@ public class PdfImageStreamTests {
   }
 
   @Test
-  public void downsizesLegacyPortraitAndFlattensTransparencyToWhite() throws Exception {
-    var character = mock(CharacterEntity.class);
-    when(character.getProfileImage()).thenReturn(org.apache.commons.lang3.ArrayUtils.toObject(BattleReportGenerationTests.Images.ORIGINAL));
-    var portrait = new ReportImageLoader().load(character, "Test");
-    assertThat(portrait.getWidth()).isLessThanOrEqualTo(256);
-    assertThat(portrait.getHeight()).isLessThanOrEqualTo(256);
-    assertThat(portrait.getData().length).isLessThan(BattleReportGenerationTests.Images.ORIGINAL.length / 5);
-    var transparent = new BufferedImage(2, 2, BufferedImage.TYPE_INT_ARGB);
-    var source = new ByteArrayOutputStream();
-    ImageIO.write(transparent, "png", source);
-    when(character.getProfileImage()).thenReturn(org.apache.commons.lang3.ArrayUtils.toObject(source.toByteArray()));
-    var flattened = new ReportImageLoader().load(character, "Test");
-    var decoded = ImageIO.read(new ByteArrayInputStream(flattened.getData()));
-    assertThat(decoded.getRGB(0, 0) & 0xffffff).isEqualTo(0xffffff);
-  }
-
-  @Test
   public void oversizedRemoteImageIsBoundedAndStreamIsClosed() throws Exception {
     var stream = spy(new ByteArrayInputStream(new byte[2 * 1024 * 1024 + 2]));
     var character = mock(CharacterEntity.class);
@@ -69,15 +52,16 @@ public class PdfImageStreamTests {
   }
 
   @Test
-  public void readFailureClosesStreamAndUsesLegacyFallback() throws Exception {
+  public void readFailureClosesStreamAndFallsBackToPlaceholder() throws Exception {
     var stream = mock(InputStream.class);
     when(stream.readNBytes(anyInt())).thenThrow(new IOException("Simulated read failure"));
     var character = mock(CharacterEntity.class);
     when(character.getImageUri()).thenReturn("oss-test");
-    when(character.getProfileImage()).thenReturn(org.apache.commons.lang3.ArrayUtils.toObject(BattleReportGenerationTests.Images.REPORT));
     try (var storage = mockStatic(AliCloudObjectStorage.class)) {
       storage.when(() -> AliCloudObjectStorage.getReportImageStream("oss-test")).thenReturn(stream);
-      assertThat(new ReportImageLoader().load(character, "Test").getWidth()).isEqualTo(256);
+      // The legacy profile_image BLOB fallback was removed (images live only in
+      // OSS now), so a failed OSS read falls back to the generated placeholder.
+      assertThat(new ReportImageLoader().load(character, "Test").getWidth()).isEqualTo(96);
       verify(stream).close();
     }
   }

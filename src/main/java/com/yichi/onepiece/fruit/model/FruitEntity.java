@@ -16,9 +16,6 @@ public interface FruitEntity {
   @Column(json = true)
   I18nText getName();
 
-  @Nullable
-  Byte[] getProfileImage();
-
   String getImageUri();
 
   FruitType getFruitType();

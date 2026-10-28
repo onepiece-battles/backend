@@ -3,9 +3,7 @@ package com.yichi.onepiece.user.model;
 import com.yichi.infra.support.EntityBuilder;
 import com.yichi.onepiece.iam.model.TokenEntity;
 import com.yichi.onepiece.model.User;
-import com.yichi.onepiece.utils.EncryptHelper;
 import java.util.List;
-import org.apache.commons.lang3.ArrayUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -18,7 +16,6 @@ public interface UserConverter {
   @Mapping(target = "modificationRecordId", ignore = true)
   @Mapping(target = "encryptedPassword", ignore = true)
   @Mapping(target = "imageUri", ignore = true)
-  @Mapping(target = "profileImage", ignore = true)
   UserEntity toUserEntity(User user);
 
   @Mapping(target = "loginRoleResourcesPermissionMap", ignore = true)
@@ -29,20 +26,6 @@ public interface UserConverter {
   @Mapping(target = "loginRoleResourcesPermissionMap", ignore = true)
   @Mapping(target = "profileImage", ignore = true)
   User toUser(UserEntity userEntity);
-
-  default String blobToString(Byte[] profileByteArray) {
-    if (profileByteArray == null) {
-      return null;
-    }
-    return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(profileByteArray));
-  }
-
-  default Byte[] stringToBlob(String profileEncodedValue) {
-    if (profileEncodedValue == null) {
-      return null;
-    }
-    return ArrayUtils.toObject(EncryptHelper.base64Decode(profileEncodedValue));
-  }
 
   default List<String> tokenEntityToToken(List<TokenEntity> tokenEntityList) {
     if (tokenEntityList == null) {

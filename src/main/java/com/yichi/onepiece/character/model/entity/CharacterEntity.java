@@ -27,9 +27,6 @@ public interface CharacterEntity {
 
   Integer getScore();
 
-  @Nullable
-  Byte[] getProfileImage();
-
   String getImageUri();
 
   // default to be 1, unless special characters.
