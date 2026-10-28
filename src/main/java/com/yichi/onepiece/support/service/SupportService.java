@@ -53,7 +53,13 @@ public class SupportService {
                             ResourceType.GROUP, EncryptHelper.base64Encode(ArrayUtils.toPrimitive(group.getProfileImage())));
                 }
             }
-            case FRUIT -> {}
+            case FRUIT -> {
+                var fruits = fruitService.listNoUriFruits();
+                for (var fruit: fruits) {
+                    imageService.uploadImage(fruit.getId(),
+                            ResourceType.FRUIT, EncryptHelper.base64Encode(ArrayUtils.toPrimitive(fruit.getProfileImage())));
+                }
+            }
             case CHARACTER -> {
                 var characters = characterService.listNoUriCharacters();
                 for (var character: characters) {
