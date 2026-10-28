@@ -142,6 +142,10 @@ public class FruitService {
     return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(fruit.getProfileImage()));
   }
 
+  public List<FruitEntity> listNoUriFruits() {
+    return fruitDao.listNoUriFruits();
+  }
+
   public FruitEntity getPreviousFruit(Long currentCreationRecordId) {
     var fruitList =  fruitDao.getPreviousFruitId(currentCreationRecordId);
     if (fruitList.isEmpty()) {

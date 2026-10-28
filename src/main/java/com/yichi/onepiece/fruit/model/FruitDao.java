@@ -53,4 +53,7 @@ public interface FruitDao extends BaseDao<FruitEntity, UUID> {
   @Select("select `id` from `fruit` where creation_record_id > #{creationRecordId} order by creation_record_id ASC")
   List<UUID> getPreviousFruitId(
           @Param("creationRecordId") Long currentCreationRecordId);
+
+  @Select("select * from `fruit` where `fruit`.`image_uri` is null")
+  List<FruitEntity> listNoUriFruits();
 }
