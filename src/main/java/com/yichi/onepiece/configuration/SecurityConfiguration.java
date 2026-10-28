@@ -1,6 +1,7 @@
 package com.yichi.onepiece.configuration;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.DispatcherType;
 import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,6 +47,11 @@ public class SecurityConfiguration {
         .authorizeHttpRequests(
             authorize -> {
               authorize
+                  // Servlet error dispatches must retain their real status;
+                  // re-authenticating /error in a stateless chain masks SQL
+                  // and other server errors as an expired session (401).
+                  .dispatcherTypeMatchers(DispatcherType.ERROR)
+                  .permitAll()
                   .requestMatchers(HttpMethod.OPTIONS, "/**")
                   .permitAll()
                   .requestMatchers("/api/onepiece/user/login", "/api/onepiece/user/register", "/chat")

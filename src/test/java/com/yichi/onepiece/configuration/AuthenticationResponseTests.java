@@ -15,11 +15,15 @@ import com.yichi.onepiece.utils.JwtHelper;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.Filter;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockServletContext;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,10 +32,32 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.testng.annotations.Test;
 
 public class AuthenticationResponseTests {
+  @Test
+  public void internalErrorsPreserveTheirStatusWithoutOpeningTheErrorUrl() throws Exception {
+    try (var context = new AnnotationConfigWebApplicationContext()) {
+      context.setServletContext(new MockServletContext());
+      context.register(TestConfiguration.class);
+      context.refresh();
+      var mvc = MockMvcBuilders.webAppContextSetup(context)
+          .addFilters(context.getBean("springSecurityFilterChain", Filter.class)).build();
+      for (int errorStatus : new int[] {404, 500}) {
+        mvc.perform(post("/error").with(request -> {
+              request.setDispatcherType(DispatcherType.ERROR);
+              return request;
+            })
+                .requestAttr(RequestDispatcher.ERROR_STATUS_CODE, errorStatus))
+            .andExpect(status().is(errorStatus));
+      }
+      mvc.perform(post("/error")).andExpect(status().isUnauthorized());
+      mvc.perform(post("/api/onepiece/user/list")).andExpect(status().isUnauthorized());
+    }
+  }
+
   @Test
   public void protectedResourcesReturn401ForMissingOrInvalidToken() throws Exception {
     try (var context = new AnnotationConfigWebApplicationContext();
@@ -103,6 +129,11 @@ public class AuthenticationResponseTests {
 
   @RestController
   static class LoginEndpoint {
+    @RequestMapping("/error")
+    ResponseEntity<Void> error(HttpServletRequest request) {
+      return ResponseEntity.status((int) request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)).build();
+    }
+
     @PostMapping("/api/onepiece/denied")
     String denied() {
       throw new PermissionDeniedException("Access Denied");
