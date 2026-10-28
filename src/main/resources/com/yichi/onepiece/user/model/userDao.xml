@@ -6,7 +6,7 @@
         SELECT
             `id`,
             `nickname`,
-            `username`, `login_role`, `encrypted_password`, `account_status`, `profile_image`,
+            `username`, `login_role`, `encrypted_password`, `account_status`,
             `locale`, `email_verified`, `creation_record_id`, `modification_record_id`, `image_uri`
         FROM `user`
         <include refid="userFilter">
