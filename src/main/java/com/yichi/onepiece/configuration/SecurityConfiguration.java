@@ -50,7 +50,11 @@ public class SecurityConfiguration {
                   // Servlet error dispatches must retain their real status;
                   // re-authenticating /error in a stateless chain masks SQL
                   // and other server errors as an expired session (401).
-                  .dispatcherTypeMatchers(DispatcherType.ERROR)
+                  // ASYNC is the re-dispatch that closes a streamed response
+                  // (the assistant's SSE /ask); the request that opened the
+                  // stream was already authenticated, and the JWT filter does
+                  // not run again on async dispatches.
+                  .dispatcherTypeMatchers(DispatcherType.ERROR, DispatcherType.ASYNC)
                   .permitAll()
                   .requestMatchers(HttpMethod.OPTIONS, "/**")
                   .permitAll()

@@ -34,4 +34,25 @@ public final class AssistantDto {
     public record ListAiMessagesResponse(List<AiMessageView> messages) {}
 
     public record SimpleResult(boolean result) {}
+
+    // ----- server-side agent (/ask, answered as a text/event-stream) -----
+
+    /** A question for the agent. {@code language} is the client's UI language (zh_CN / en_US), optional. */
+    public record AskRequest(String message, String language) {}
+
+    /** {@code event: status} — a tool is running. Drop any answer text streamed so far. */
+    public record StatusEvent(String tool, String label) {}
+
+    /** {@code event: delta} — the next fragment of the answer. */
+    public record DeltaEvent(String text) {}
+
+    /** A battle the assistant prepared for the user to confirm and create. */
+    public record BattleProposal(String starterId, String receiverId, String label) {}
+
+    /** {@code event: done} — the final answer with links repaired; replaces the streamed text. */
+    public record DoneEvent(
+            String messageId, String content, List<ResourceLink> resources, BattleProposal battleProposal) {}
+
+    /** {@code event: error} — the answer failed; {@code code} is stable, {@code message} is for display. */
+    public record ErrorEvent(String code, String message) {}
 }
