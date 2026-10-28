@@ -57,10 +57,10 @@
                             `fruit`.`system_resource` = #{fruitFilter.systemResource}
                         </if>
                         <if test="fruitFilter.userId != null">
-                            `user_id` = #{fruitFilter.userId}
+                            OR `user_id` = #{fruitFilter.userId}
                         </if>
                         <if test="externalResourceIds != null and externalResourceIds.size > 0">
-                            `fruit`.id IN
+                            OR `fruit`.id IN
                             <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator=","
                                      close=")">
                                 #{externalResourceId}

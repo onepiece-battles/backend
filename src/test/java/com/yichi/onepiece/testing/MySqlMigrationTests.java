@@ -15,7 +15,7 @@ public class MySqlMigrationTests {
     try (var database = new ConcurrencyDatabase()) {
       var flyway = Flyway.configure().dataSource(database.dataSource()).locations("classpath:db/migration").load();
       flyway.migrate();
-      assertThat(flyway.info().current().getVersion().compareTo(org.flywaydb.core.api.MigrationVersion.fromVersion("26"))).isZero();
+      assertThat(flyway.info().current().getVersion().compareTo(org.flywaydb.core.api.MigrationVersion.fromVersion("30"))).isZero();
       assertThat(flyway.validateWithResult().validationSuccessful).isTrue();
       assertThat(flyway.migrate().migrationsExecuted).isZero();
     }

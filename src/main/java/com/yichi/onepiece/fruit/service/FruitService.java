@@ -69,8 +69,13 @@ public class FruitService {
   }
 
   public ListFruitResponse listFruit(ListFruitRequest request) {
+    return listFruit(request, true);
+  }
+
+  /** Allows internal callers to request a strict own/system scope without shared rows. */
+  public ListFruitResponse listFruit(ListFruitRequest request, boolean includeShared) {
     var userId = UserHelper.getCurrentUserId();
-    var resourceList = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
+    var resourceList = includeShared ? userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE) : List.<UUID>of();
     // need to take external resource into consideration
     var totalSize = fruitDao.searchCount(userId, request.getFruitFilter(), resourceList);
     // pageIndex is 1- based. offset is 0- based.
@@ -95,7 +100,7 @@ public class FruitService {
 
   public UpdateFruitResponse updateFruit(UpdateFruitRequest request) {
     var modificationRecord = actionRecordService.create();
-    fruitDao
+    var current = fruitDao
         .findById(request.getId())
         .orElseThrow(
             ExceptionUtils.notFound(
@@ -103,6 +108,9 @@ public class FruitService {
     var fruitEntity =
         FruitConverter.INSTANCE.toFruitEntity(request).toBuilder()
             .setModificationRecordId(modificationRecord.getId())
+            .setCreationRecordId(current.getCreationRecordId())
+            .setSystemResource(current.getSystemResource())
+            .setImageUri(current.getImageUri())
             .build();
     fruitDao.update(fruitEntity);
     // update character battle indexes that has eaten this fruit

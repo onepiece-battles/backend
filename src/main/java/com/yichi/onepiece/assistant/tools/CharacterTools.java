@@ -1,5 +1,7 @@
 package com.yichi.onepiece.assistant.tools;
 
+import static com.yichi.onepiece.assistant.tools.ToolJson.singleMatch;
+
 import static com.yichi.onepiece.assistant.tools.ToolJson.link;
 import static com.yichi.onepiece.assistant.tools.ToolJson.map;
 import static com.yichi.onepiece.assistant.tools.ToolJson.nonNull;
@@ -234,7 +236,7 @@ public class CharacterTools implements AssistantToolProvider {
     }
 
     private Optional<CharacterListView> findOne(String name, ToolContext context) {
-        return list(name, context, 1, List.of()).stream().findFirst();
+        return singleMatch(list(name, context, 30, List.of()), name, "character", CharacterListView::getId, CharacterListView::getName, context.language());
     }
 
     private List<CharacterListView> list(

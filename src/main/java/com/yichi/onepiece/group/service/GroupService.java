@@ -66,8 +66,13 @@ public class GroupService {
   }
 
   public ListGroupResponse list(ListGroupRequest request) {
+    return list(request, true);
+  }
+
+  /** Allows internal callers to request a strict own/system scope without shared rows. */
+  public ListGroupResponse list(ListGroupRequest request, boolean includeShared) {
     var userId = UserHelper.getCurrentUserId();
-    var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
+    var resourceIds = includeShared ? userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE) : List.<UUID>of();
     var totalSize = groupDao.count(request.getGroupFilter(), userId, resourceIds);
     // pageIndex is 1- based. offset is 0- based.
     var offset = (request.getPageIndex() - 1) * request.getPageSize();
@@ -231,7 +236,11 @@ public class GroupService {
     if (group.getId() == null || getAncestorIds(group.getFatherGroupId()).contains(group.getId())) {
       throw new IllegalArgumentException("Group hierarchy must not contain a cycle");
     }
-    GroupEntity groupEntity = GroupConverter.INSTANCE.toGroupEntity(group);
+    var current = groupDao.findById(group.getId()).orElseThrow();
+    GroupEntity groupEntity = GroupConverter.INSTANCE.toGroupEntity(group).toBuilder()
+        .setCreationRecordId(current.getCreationRecordId())
+        .setSystemResource(current.getSystemResource())
+        .build();
     groupDao.update(groupEntity);
     UpdateGroupResponse response = new UpdateGroupResponse();
     return response.result(

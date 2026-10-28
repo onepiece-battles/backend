@@ -1,5 +1,7 @@
 package com.yichi.onepiece.assistant.tools;
 
+import static com.yichi.onepiece.assistant.tools.ToolJson.singleMatch;
+
 import static com.yichi.onepiece.assistant.tools.ToolJson.link;
 import static com.yichi.onepiece.assistant.tools.ToolJson.map;
 import static com.yichi.onepiece.assistant.tools.ToolJson.nonNull;
@@ -87,12 +89,12 @@ public class GroupTools implements AssistantToolProvider {
 
     ToolResult groupDetail(String name, ToolContext context) {
         check(ResourceType.GROUP, Permission.LIST);
-        List<GroupListView> found = list(name, context, 1);
+        List<GroupListView> found = list(name, context, 30);
         if (found.isEmpty()) {
             return result(map("found", false, "query", name), List.of());
         }
         AssistantLanguage language = context.language();
-        GroupListView group = found.get(0);
+        GroupListView group = singleMatch(found, name, "group", GroupListView::getId, GroupListView::getName, language).orElseThrow();
         String groupName = language.displayName(group.getName());
         List<ResourceLink> links = new ArrayList<>();
         links.add(link("group", group.getId(), groupName));
@@ -155,7 +157,7 @@ public class GroupTools implements AssistantToolProvider {
                 .pageSize(size)
                 .pageIndex(1)
                 .sortKeys(new ArrayList<>())
-                .groupFilter(new GroupFilter().name(name).languageCode(context.language().languageCode())));
+                .groupFilter(new GroupFilter().name(name).languageCode(context.language().languageCode()).userId(context.userId()).systemResource(true)));
         return response == null ? List.of() : nonNull(response.getGroups());
     }
 }

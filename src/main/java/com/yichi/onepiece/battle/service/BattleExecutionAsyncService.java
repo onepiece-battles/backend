@@ -64,7 +64,7 @@ public class BattleExecutionAsyncService {
       scheduler.start();
       scheduler.scheduleJob(battleStartJob, trigger);
     } catch (Exception e) {
-      logger.error(e.toString());
+      throw new IllegalStateException("Could not schedule battle execution", e);
     }
     battleService.updateBattleExecutionEntity(battleExecution);
   }

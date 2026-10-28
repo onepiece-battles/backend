@@ -33,14 +33,18 @@
     <sql id="battleFilter">
         <where>
             <trim prefixOverrides="AND">
-                <if test="battleFilter.userId != null or battleFilter.systemResource != null">
+                <if test="battleFilter.userId != null or battleFilter.systemResource != null or (externalResourceIds != null and externalResourceIds.size > 0)">
                     (
                     <trim prefixOverrides="OR">
                         <if test="battleFilter.userId != null">
                             `user_id` = #{battleFilter.userId}
                         </if>
                         <if test="battleFilter.systemResource != null">
-                            `battle`.`system_resource` = #{battleFilter.systemResource}
+                            OR `battle`.`system_resource` = #{battleFilter.systemResource}
+                        </if>
+                        <if test="externalResourceIds != null and externalResourceIds.size > 0">
+                            OR `battle`.`id` IN
+                            <foreach item="externalId" collection="externalResourceIds" open="(" separator="," close=")">#{externalId}</foreach>
                         </if>
                     </trim>
                     )
@@ -83,7 +87,7 @@
             </when>
             <otherwise>
                 <foreach item="item" collection="sortList" separator=",">
-                    ${item.sortKey} ${item.sortOrder}
+                    `battle`.${item.sortKey} ${item.sortOrder}
                 </foreach>
             </otherwise>
         </choose>

@@ -20,6 +20,11 @@ import com.yichi.onepiece.assistant.service.AiAssistantService;
 import com.yichi.onepiece.assistant.service.AiSettingService;
 import com.yichi.onepiece.assistant.service.AiTurn;
 import com.yichi.onepiece.exception.PermissionDeniedException;
+import com.yichi.onepiece.assistant.tools.ActionConfirmationService;
+import java.util.Optional;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -192,6 +197,63 @@ public class AssistantAgentTests {
         assertThatThrownBy(() -> agent().run(USER, "Hi", AssistantLanguage.EN_US, sink))
                 .isInstanceOfSatisfying(AssistantException.class,
                         e -> assertThat(e.code()).isEqualTo(AssistantException.UPSTREAM_ERROR));
+    }
+
+    @Test
+    public void confirmationBypassesTheModelEvenWithoutAnApiKey() {
+        var actions = mock(ActionConfirmationService.class);
+        var reply = new ActionConfirmationService.Reply("Completed", List.of(LUFFY));
+        when(actions.handle(eq("confirm ABCDEF1234"), any())).thenReturn(Optional.of(reply));
+        when(settings.isConfigured()).thenReturn(false);
+        var agent = new AssistantAgent(settings, store, client, new ToolRegistry(List.of()), Runnable::run, actions);
+        agent.run(USER, "confirm ABCDEF1234", AssistantLanguage.EN_US, sink);
+        assertThat(client.requests).isEmpty();
+        assertThat(sink.done.content()).isEqualTo("Completed");
+        assertThat(saved).extracting(AiTurn::role).containsExactly("user", "assistant");
+    }
+
+    @Test
+    public void proposalInstructionsArePersistedAndStreamedButNeverBecomeResourceChips() {
+        var proposal = new ResourceLink(ActionConfirmationService.PROPOSAL, "ABCDEF1234", "Proposed change");
+        var actions = mock(ActionConfirmationService.class);
+        when(actions.handle(any(), any())).thenReturn(Optional.empty());
+        when(actions.instructions(any(), any())).thenReturn("\nConfirm ABCDEF1234 to execute");
+        var provider = (AssistantToolProvider) () -> List.of(tool("prepare_create_group", new ToolResult("{}", List.of(proposal))));
+        var agent = new AssistantAgent(settings, store, client, new ToolRegistry(List.of(provider)), Runnable::run, actions);
+        client.script.add(toolCall("call_1", "prepare_create_group", "{}"));
+        client.script.add(answer("Prepared for review."));
+        agent.run(USER, "Create a crew", AssistantLanguage.EN_US, sink);
+        assertThat(sink.done.content()).contains("Confirm ABCDEF1234");
+        assertThat(sink.streamed.toString()).contains("Confirm ABCDEF1234");
+        assertThat(sink.done.resources()).isEmpty();
+        verify(actions).publish(any(), any());
+        verify(actions, never()).handle(eq("confirm ABCDEF1234"), any());
+    }
+
+    @Test
+    public void actionableToolErrorsReachTheModelInsteadOfGenericLookupFailure() {
+        var problem = new ToolProblem("Choose a character", new ToolResult("{\"error\":\"ambiguous_resource\"}", List.of(LUFFY)));
+        var tool = new AssistantTool("get_character_profile", "test", schema(), (a,c) -> { throw problem; }, (a,l) -> "lookup");
+        var agent = agent(tool);
+        client.script.add(toolCall("call_1", "get_character_profile", "{}"));
+        client.script.add(answer("Please choose a character."));
+        agent.run(USER, "Which Luffy?", AssistantLanguage.EN_US, sink);
+        assertThat(client.requests.get(1).messages().get(3).path("content").asText()).contains("ambiguous_resource");
+    }
+
+    @Test
+    public void failedAnswersDiscardUnpublishedDrafts() {
+        var actions = mock(ActionConfirmationService.class);
+        when(actions.handle(any(), any())).thenReturn(Optional.empty());
+        var provider = (AssistantToolProvider) () -> List.of(tool("prepare_create_group", new ToolResult("{}",
+                List.of(new ResourceLink(ActionConfirmationService.PROPOSAL, "ABCDEF1234", "Draft")))));
+        var agent = new AssistantAgent(settings, store, client, new ToolRegistry(List.of(provider)), Runnable::run, actions);
+        client.script.add(toolCall("call_1", "prepare_create_group", "{}"));
+        client.script.add(answer(""));
+        assertThatThrownBy(() -> agent.run(USER, "Create a crew", AssistantLanguage.EN_US, sink))
+                .isInstanceOf(AssistantException.class);
+        verify(actions).discardUnpublished(any(), any());
+        verify(actions, never()).publish(any(), any());
     }
 
     private AssistantAgent agent(AssistantTool... tools) {

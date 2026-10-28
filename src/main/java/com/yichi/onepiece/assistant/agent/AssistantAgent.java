@@ -15,6 +15,8 @@ import com.yichi.onepiece.assistant.dto.AssistantDto.ResourceLink;
 import com.yichi.onepiece.assistant.service.AiAssistantService;
 import com.yichi.onepiece.assistant.service.AiSettingService;
 import com.yichi.onepiece.assistant.service.AiTurn;
+import com.yichi.onepiece.assistant.tools.ActionConfirmationService;
+import com.yichi.onepiece.assistant.tools.ActionSchemas;
 import com.yichi.onepiece.exception.PermissionDeniedException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,16 +55,23 @@ public class AssistantAgent {
     private final ChatCompletionClient client;
     private final ToolRegistry toolRegistry;
     private final Executor toolExecutor;
+    private final ActionConfirmationService actions;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     public AssistantAgent(AiSettingService settingService, AiAssistantService assistantService,
-            ChatCompletionClient client, ToolRegistry toolRegistry, AssistantExecutors executors) {
-        this(settingService, assistantService, client, toolRegistry, executors.tools());
+            ChatCompletionClient client, ToolRegistry toolRegistry, AssistantExecutors executors, ActionConfirmationService actions) {
+        this(settingService, assistantService, client, toolRegistry, executors.tools(), actions);
     }
 
     AssistantAgent(AiSettingService settingService, AiAssistantService assistantService,
             ChatCompletionClient client, ToolRegistry toolRegistry, Executor toolExecutor) {
+        this(settingService, assistantService, client, toolRegistry, toolExecutor, null);
+    }
+
+    AssistantAgent(AiSettingService settingService, AiAssistantService assistantService,
+            ChatCompletionClient client, ToolRegistry toolRegistry, Executor toolExecutor, ActionConfirmationService actions) {
+        this.actions = actions;
         this.settingService = settingService;
         this.assistantService = assistantService;
         this.client = client;
@@ -77,6 +86,26 @@ public class AssistantAgent {
      * that carries the caller's security context.
      */
     public void run(UUID userId, String question, AssistantLanguage language, AssistantEventSink sink) {
+        ToolContext context = new ToolContext(userId, language);
+        if (actions != null) {
+            Optional<ActionConfirmationService.Reply> reply;
+            try {
+                reply = actions.handle(question, context);
+            } catch (ToolProblem problem) {
+                reply = Optional.of(new ActionConfirmationService.Reply(language.pick(
+                        "未执行操作：", "No change executed: ") + problem.getMessage(), problem.result().resources()));
+            } catch (PermissionDeniedException denied) {
+                reply = Optional.of(new ActionConfirmationService.Reply(language.pick(
+                        "当前角色没有执行此操作的权限。", "The current role cannot perform this action."), List.of()));
+            }
+            if (reply.isPresent()) {
+                var confirmed = reply.get();
+                List<String> ids = assistantService.saveTurns(userId, List.of(AiTurn.user(question), AiTurn.assistant(confirmed.content(), confirmed.resources())));
+                sink.delta(confirmed.content());
+                sink.done(new DoneEvent(ids.get(ids.size()-1), confirmed.content(), confirmed.resources(), null));
+                return;
+            }
+        }
         if (!settingService.isConfigured()) {
             throw new AssistantException(AssistantException.NOT_CONFIGURED, language.pick(
                     "AI 助手还没有配置 DeepSeek Key,请联系管理员。",
@@ -95,7 +124,6 @@ public class AssistantAgent {
         transcript.addAll(replay.messages());
         transcript.add(Transcript.message(objectMapper, AiTurn.USER, question));
 
-        ToolContext context = new ToolContext(userId, language);
         Set<ResourceLink> mentioned = new LinkedHashSet<>();
         List<AiTurn> toolTurns = new ArrayList<>();
         List<String> toolsUsed = new ArrayList<>();
@@ -103,55 +131,72 @@ public class AssistantAgent {
         int rounds = 0;
         String answer = null;
 
-        while (answer == null && rounds < MAX_TOOL_ROUNDS) {
-            rounds++;
-            Completion completion = complete(settings, transcript, toolRegistry.definitions(), sink);
-            usage = usage.plus(completion.usage());
-            if (!completion.hasToolCalls()) {
+        try {
+            while (answer == null && rounds < MAX_TOOL_ROUNDS) {
+                rounds++;
+                Completion completion = complete(settings, transcript, toolRegistry.definitions(), sink);
+                usage = usage.plus(completion.usage());
+                if (!completion.hasToolCalls()) {
+                    answer = completion.content();
+                    break;
+                }
+                ArrayNode calls = Transcript.toolCalls(objectMapper, completion.toolCalls());
+                transcript.add(Transcript.assistantToolCalls(objectMapper, completion.content(), calls));
+                toolTurns.add(AiTurn.assistantToolCalls(completion.content(), calls.toString()));
+                List<ToolResult> results = runTools(completion.toolCalls(), context, sink);
+                for (int i = 0; i < results.size(); i++) {
+                    ToolCall call = completion.toolCalls().get(i);
+                    ToolResult result = results.get(i);
+                    transcript.add(Transcript.tool(objectMapper, call.id(), result.content()));
+                    // Stored trimmed: replay never uses more, and it keeps the row within a TEXT column.
+                    toolTurns.add(AiTurn.tool(
+                            call.id(), ConversationReplay.trimToolContent(result.content()), result.resources()));
+                    mentioned.addAll(result.resources());
+                    toolsUsed.add(call.name());
+                }
+            }
+            if (answer == null) {
+                // Out of tool rounds: answer from what has been gathered, with tools disabled.
+                rounds++;
+                Completion completion = complete(settings, transcript, null, sink);
+                usage = usage.plus(completion.usage());
                 answer = completion.content();
-                break;
             }
-            ArrayNode calls = Transcript.toolCalls(objectMapper, completion.toolCalls());
-            transcript.add(Transcript.assistantToolCalls(objectMapper, completion.content(), calls));
-            toolTurns.add(AiTurn.assistantToolCalls(completion.content(), calls.toString()));
-            List<ToolResult> results = runTools(completion.toolCalls(), context, sink);
-            for (int i = 0; i < results.size(); i++) {
-                ToolCall call = completion.toolCalls().get(i);
-                ToolResult result = results.get(i);
-                transcript.add(Transcript.tool(objectMapper, call.id(), result.content()));
-                // Stored trimmed: replay never uses more, and it keeps the row within a TEXT column.
-                toolTurns.add(AiTurn.tool(
-                        call.id(), ConversationReplay.trimToolContent(result.content()), result.resources()));
-                mentioned.addAll(result.resources());
-                toolsUsed.add(call.name());
+            if (answer == null || answer.isBlank()) {
+                throw new AssistantException(AssistantException.UPSTREAM_ERROR, language.pick(
+                        "DeepSeek 返回了空回答,请重试。", "DeepSeek returned an empty answer. Please try again."));
             }
-        }
-        if (answer == null) {
-            // Out of tool rounds: answer from what has been gathered, with tools disabled.
-            rounds++;
-            Completion completion = complete(settings, transcript, null, sink);
-            usage = usage.plus(completion.usage());
-            answer = completion.content();
-        }
-        if (answer == null || answer.isBlank()) {
-            throw new AssistantException(AssistantException.UPSTREAM_ERROR, language.pick(
-                    "DeepSeek 返回了空回答,请重试。", "DeepSeek returned an empty answer. Please try again."));
-        }
 
-        List<ResourceLink> known = new ArrayList<>(replay.resources());
-        known.addAll(mentioned);
-        String content = ResourceLinkNormalizer.normalize(answer, known);
-        List<ResourceLink> links = mentioned.stream()
-                .filter(r -> !BATTLE_PROPOSAL.equals(r.type()) && r.id() != null && !r.id().isEmpty())
-                .toList();
+            List<ResourceLink> known = new ArrayList<>(replay.resources());
+            known.addAll(mentioned);
+            String content = ResourceLinkNormalizer.normalize(answer, known);
+            if (actions != null) {
+                String instructions = actions.instructions(mentioned, context);
+                content += instructions;
+                if (!instructions.isEmpty()) sink.delta(instructions);
+            }
+            List<ResourceLink> links = mentioned.stream()
+                    .filter(r -> !BATTLE_PROPOSAL.equals(r.type()) && !ActionConfirmationService.PROPOSAL.equals(r.type()) && r.id() != null && !r.id().isEmpty())
+                    .toList();
 
-        List<AiTurn> turns = new ArrayList<>(toolTurns);
-        turns.add(AiTurn.assistant(content, links));
-        List<String> ids = assistantService.saveTurns(userId, turns);
-        sink.done(new DoneEvent(ids.get(ids.size() - 1), content, links, battleProposal(mentioned)));
-        logger.info("assistant answered user {} in {} ms: {} round(s), tools {}, tokens {} in / {} out",
-                userId, (System.nanoTime() - startedAt) / 1_000_000, rounds, toolsUsed,
-                usage.promptTokens(), usage.completionTokens());
+            List<AiTurn> turns = new ArrayList<>(toolTurns);
+            turns.add(AiTurn.assistant(content, links));
+            List<String> ids = assistantService.saveTurns(userId, turns);
+            if (actions != null) actions.publish(mentioned, context);
+            sink.done(new DoneEvent(ids.get(ids.size() - 1), content, links, battleProposal(mentioned)));
+            logger.info("assistant answered user {} in {} ms: {} round(s), tools {}, tokens {} in / {} out",
+                    userId, (System.nanoTime() - startedAt) / 1_000_000, rounds, toolsUsed,
+                    usage.promptTokens(), usage.completionTokens());
+        } catch (RuntimeException failure) {
+            if (actions != null) {
+                try {
+                    actions.discardUnpublished(mentioned, context);
+                } catch (RuntimeException cleanupFailure) {
+                    logger.warn("Could not discard unpublished assistant actions for {}", userId, cleanupFailure);
+                }
+            }
+            throw failure;
+        }
     }
 
     static String resolveModel(String configured) {
@@ -201,7 +246,10 @@ public class AssistantAgent {
             return failure("unknown tool " + call.name());
         }
         try {
+            ActionSchemas.validate(arguments, tool.get().parameters(), "arguments");
             return tool.get().handler().execute(arguments, context);
+        } catch (ToolProblem e) {
+            return e.result();
         } catch (PermissionDeniedException e) {
             return failure("permission denied");
         } catch (RuntimeException e) {
