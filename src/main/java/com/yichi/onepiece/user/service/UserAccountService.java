@@ -109,7 +109,6 @@ public class UserAccountService {
                     .setLoginRole(null)
                     .setLoginRoleId(null)
                     .setImageUri(uri)
-                    .setProfileImage(ArrayUtils.toObject(defaultImage))
                     .build();
         } catch (IOException e) {
             throw new RuntimeException();
@@ -204,7 +203,6 @@ public class UserAccountService {
                 .user(
                         UserConverter.INSTANCE
                                 .toUser(user)
-                                .profileImage(EncryptHelper.base64Encode(ArrayUtils.toPrimitive(user.getProfileImage())))
                                 .loginRoleResourcesPermissionMap(resourcePermissionMaps)
                                 .userRoles(roleNames)
                                 .tokens(tokens));

@@ -134,14 +134,6 @@ public class FruitService {
     fruitDao.update(updatedFruit);
   }
 
-  public String getProfile(UUID fruitId) {
-    var fruit =
-        fruitDao
-            .findById(fruitId)
-            .orElseThrow(ExceptionUtils.notFound("fruit with id %s not found", fruitId));
-    return EncryptHelper.base64Encode(ArrayUtils.toPrimitive(fruit.getProfileImage()));
-  }
-
   public List<FruitEntity> listNoUriFruits() {
     return fruitDao.listNoUriFruits();
   }

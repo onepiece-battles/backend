@@ -40,7 +40,6 @@ public interface CharacterEntityConverter {
   @Mapping(target = "baseBlood", source = "blood")
   @Mapping(target = "baseGroupGain", source = "groupGain")
   @Mapping(target = "imageUri", ignore = true)
-  @Mapping(target = "profileImage", ignore = true)
   CharacterEntity toCharacterEntity(CreateCharacterRequest createCharacterRequest);
 
   @Mapping(target = "creationRecordId", ignore = true)
@@ -52,7 +51,6 @@ public interface CharacterEntityConverter {
   @Mapping(target = "blood", source = "baseBlood")
   @Mapping(target = "groupGain", source = "baseGroupGain")
   @Mapping(target = "imageUri", ignore = true)
-  @Mapping(target = "profileImage", ignore = true)
   CharacterEntity toCharacterEntity(Character character);
 
   @Mapping(target = "creationRecordId", ignore = true)
@@ -64,6 +62,5 @@ public interface CharacterEntityConverter {
   @Mapping(target = "blood", source = "baseBlood")
   @Mapping(target = "groupGain", source = "baseGroupGain")
   @Mapping(target = "imageUri", ignore = true)
-  @Mapping(target = "profileImage", ignore = true)
   CharacterEntity toCharacterEntity(UpdateCharacterRequest updateCharacterRequest);
 }

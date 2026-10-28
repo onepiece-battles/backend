@@ -16,9 +16,6 @@ public interface GroupEntity {
 
   GroupCategory getGroupCategory();
 
-  @Nullable
-  Byte[] getProfileImage();
-
   String getImageUri();
 
   Long getCreationRecordId();

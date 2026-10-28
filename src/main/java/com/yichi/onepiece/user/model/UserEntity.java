@@ -33,9 +33,6 @@ public interface UserEntity {
 
   AccountStatus getAccountStatus();
 
-  @Nullable
-  Byte[] getProfileImage();
-
   String getImageUri();
 
   UserEntityBuilder toBuilder();

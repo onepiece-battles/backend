@@ -98,14 +98,13 @@ public class UserService {
     }
   }
 
-  public void updateProfile(UUID userId, String uri, String image) {
+  public void updateProfile(UUID userId, String uri) {
     var modificationRecord = actionRecordService.create();
     var user =
             userDao
                     .findById(userId)
                     .orElseThrow(ExceptionUtils.notFound("user with id %s not found", userId));
     var updatedUser = user.toBuilder()
-            .setProfileImage(ArrayUtils.toObject(EncryptHelper.base64Decode(image)))
             .setImageUri(uri).setModificationRecordId(modificationRecord.getId()).build();
     userDao.update(updatedUser);
   }
@@ -207,7 +206,6 @@ public class UserService {
     }
     var user = userDao.getById(userId).orElseThrow();
     return UserConverter.INSTANCE.toUser(user)
-            .profileImage(EncryptHelper.base64Encode(ArrayUtils.toPrimitive(user.getProfileImage())))
             .loginRoleResourcesPermissionMap(roleService.getPermissionMapByRoleName(user.getLoginRole()));
   }
 

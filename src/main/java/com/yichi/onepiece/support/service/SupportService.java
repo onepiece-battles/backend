@@ -38,36 +38,9 @@ public class SupportService {
     }
 
     public UpdateUriResponse updateUri(ResourceType resourceType, @Nullable UUID resourceId) {
-        switch (resourceType) {
-            case USER -> {
-                var users = userService.listNoUriUsers();
-                for (var user: users) {
-                    imageService.uploadImage(user.getId(),
-                            ResourceType.USER, EncryptHelper.base64Encode(ArrayUtils.toPrimitive(user.getProfileImage())));
-                }
-            }
-            case GROUP -> {
-                var groups = groupService.listNoUriGroups();
-                for (var group: groups) {
-                    imageService.uploadImage(group.getId(),
-                            ResourceType.GROUP, EncryptHelper.base64Encode(ArrayUtils.toPrimitive(group.getProfileImage())));
-                }
-            }
-            case FRUIT -> {
-                var fruits = fruitService.listNoUriFruits();
-                for (var fruit: fruits) {
-                    imageService.uploadImage(fruit.getId(),
-                            ResourceType.FRUIT, EncryptHelper.base64Encode(ArrayUtils.toPrimitive(fruit.getProfileImage())));
-                }
-            }
-            case CHARACTER -> {
-                var characters = characterService.listNoUriCharacters();
-                for (var character: characters) {
-                    imageService.uploadImage(character.getId(),
-                            ResourceType.CHARACTER, EncryptHelper.base64Encode(ArrayUtils.toPrimitive(character.getProfileImage())));
-                }
-            }
-        }
+        // Retired: profile images now live only in OSS (image_uri) and the
+        // profile_image BLOB column has been dropped, so there is nothing left
+        // to backfill. Kept as a no-op because it is part of the admin API.
         return new UpdateUriResponse().result(UserFacingConstants.getConstant(UserFacingConstantsKey.IMAGE_UPLOAD_SUCCESS)
                 .getDisplayName());
     }
