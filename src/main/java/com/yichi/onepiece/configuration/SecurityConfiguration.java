@@ -1,5 +1,6 @@
 package com.yichi.onepiece.configuration;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +38,11 @@ public class SecurityConfiguration {
         // http://127.0.0.1:8081 to pass.
         .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
         .csrf(AbstractHttpConfigurer::disable)
+        // Missing, expired and revoked tokens must trigger the client's login
+        // flow. Authenticated users without resource permission still get 403.
+        .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(
+            (request, response, exception) ->
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
         .authorizeHttpRequests(
             authorize -> {
               authorize
