@@ -94,9 +94,11 @@ public class AiAssistantService {
 
     // ----- persistence -----
 
+    /** The visible thread: questions and final answers, without the hidden tool rounds. */
     public List<AiMessageView> listMessages(UUID userId) {
         AiConversationEntity conversation = getOrCreateConversation(userId);
         return messageDao.listByConversation(conversation.getId(), MAX_HISTORY).stream()
+                .filter(AiAssistantService::isVisible)
                 .map(this::toView)
                 .toList();
     }
@@ -117,6 +119,40 @@ public class AiAssistantService {
         return entity.getId().toString();
     }
 
+    /** Stores the messages of one agent turn, in order, and returns their ids. */
+    public List<String> saveTurns(UUID userId, List<AiTurn> turns) {
+        AiConversationEntity conversation = getOrCreateConversation(userId);
+        List<String> ids = new ArrayList<>();
+        for (AiTurn turn : turns) {
+            // One action record per message: creation_record_id is what orders the thread.
+            ActionRecordEntity record = actionRecordService.createWithUserId(userId);
+            AiMessageEntity entity = AiMessageEntityBuilder.newBuilder()
+                    .setConversationId(conversation.getId())
+                    .setUserId(userId)
+                    .setRole(turn.role())
+                    .setContent(turn.content())
+                    .setToolCalls(turn.toolCalls())
+                    .setToolCallId(turn.toolCallId())
+                    .setResources(serializeResources(turn.resources()))
+                    .setCreationRecordId(record.getId())
+                    .setModificationRecordId(record.getId())
+                    .build();
+            messageDao.insert(entity);
+            ids.add(entity.getId().toString());
+        }
+        return ids;
+    }
+
+    /** The newest stored messages, oldest first, including the hidden tool rounds. */
+    public List<AiTurn> recentTurns(UUID userId) {
+        return conversationDao.findByUserId(userId)
+                .map(conversation -> messageDao.listByConversation(conversation.getId(), MAX_HISTORY).stream()
+                        .map(entity -> new AiTurn(entity.getRole(), entity.getContent(), entity.getToolCalls(),
+                                entity.getToolCallId(), deserializeResources(entity.getResources())))
+                        .toList())
+                .orElse(List.of());
+    }
+
     public void clear(UUID userId) {
         conversationDao.findByUserId(userId)
                 .ifPresent(conversation -> messageDao.deleteByConversation(conversation.getId()));
@@ -133,6 +169,10 @@ public class AiAssistantService {
             conversationDao.insert(entity);
             return entity;
         });
+    }
+
+    private static boolean isVisible(AiMessageEntity entity) {
+        return new AiTurn(entity.getRole(), null, entity.getToolCalls(), null, null).visible();
     }
 
     private AiMessageView toView(AiMessageEntity entity) {

@@ -13,8 +13,10 @@ import java.util.UUID;
 @Dao
 @Mapper
 public interface AiMessageDao extends BaseDao<AiMessageEntity, UUID> {
-    @Select("select * from ai_message where conversation_id = #{conversationId} "
-            + "order by creation_record_id asc limit #{limit}")
+    /** The newest {@code limit} messages, oldest first. */
+    @Select("select * from (select * from ai_message where conversation_id = #{conversationId} "
+            + "order by creation_record_id desc limit #{limit}) recent "
+            + "order by creation_record_id asc")
     List<AiMessageEntity> listByConversation(
             @Param("conversationId") UUID conversationId, @Param("limit") int limit);
 
