@@ -19,12 +19,15 @@ public class PrepareResourceAndPermissionData implements CommandLineRunner {
   private final ResourcePermissionDao resourcePermissionDao;
   private final RoleToResourcePermissionDao roleToResourcePermissionDao;
   private final RoleDao roleDao;
+  private final UserRoleDao userRoleDao;
 
   public PrepareResourceAndPermissionData(ResourcePermissionDao resourcePermissionDao,
-      RoleToResourcePermissionDao roleToResourcePermissionDao, RoleDao roleDao) {
+      RoleToResourcePermissionDao roleToResourcePermissionDao, RoleDao roleDao,
+      UserRoleDao userRoleDao) {
     this.resourcePermissionDao = resourcePermissionDao;
     this.roleToResourcePermissionDao = roleToResourcePermissionDao;
     this.roleDao = roleDao;
+    this.userRoleDao = userRoleDao;
   }
 
   @Override
@@ -73,6 +76,33 @@ public class PrepareResourceAndPermissionData implements CommandLineRunner {
     var updatedResourcePermissions = resourcePermissionDao.listAll();
     for(var role : updatedRoles) {
       initRoleToResourcePermissionTable(role, updatedResourcePermissions);
+    }
+
+    backfillMissingUserRoles(updatedRoles);
+  }
+
+  /// Guarantees every account has its roles assigned. An account with no
+  /// user_role rows resolves to zero authorities, which makes every
+  /// permission-checked endpoint (e.g. the user list) reject it with a 401
+  /// (AuthorizationServiceException) before any permission is evaluated. New
+  /// accounts get the full role set at registration; this repairs any account
+  /// that is missing it (seeded / legacy accounts) the same way.
+  private void backfillMissingUserRoles(List<RoleEntity> allRoles) {
+    var userIdsWithoutRole = userRoleDao.listUserIdsWithoutRole();
+    if (userIdsWithoutRole.isEmpty()) {
+      return;
+    }
+    var allRoleIds = allRoles.stream().map(RoleEntity::getId).toList();
+    List<UserRoleEntity> newUserRoles = new ArrayList<>();
+    for (var userId : userIdsWithoutRole) {
+      for (var roleId : allRoleIds) {
+        newUserRoles.add(
+            UserRoleEntityBuilder.newBuilder().setUserId(userId).setRoleId(roleId).build());
+      }
+    }
+    if (!newUserRoles.isEmpty()) {
+      userRoleDao.batchInsert(newUserRoles);
+      logger.info("assigned roles to {} account(s) that had none", userIdsWithoutRole.size());
     }
   }
 
