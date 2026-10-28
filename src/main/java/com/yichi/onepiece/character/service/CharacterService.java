@@ -153,7 +153,7 @@ public class CharacterService {
                         characterToGroupEntity.getGroupId().equals(request.getGroupId())
                 ).findFirst();
         if (groupMatchEntity.isPresent()) {
-            var updatedEntity = groupMatchEntity.get().toBuilder().setOnceBelongedTo(false).build();
+            var updatedEntity = groupMatchEntity.get().toBuilder().setOnceBelongedTo(false).position(request.getPosition()).build();
             characterToGroupDao.update(updatedEntity);
         } else {
             CharacterToGroupEntity characterToGroupEntity = CharacterToGroupEntityBuilder.newBuilder()
@@ -178,14 +178,16 @@ public class CharacterService {
         int fruitLimit = character.getMaximumFruitCount();
         var fruits = fruitService.listFruitEntityByCharacterId(characterId);
         EatFruitResponse response = new EatFruitResponse();
-        if (fruits.size() == fruitLimit) {
+        if (fruits.size() >= fruitLimit) {
             // fruit count exceeds the maximum permitted count.
             return response.fruitMessage(
                     UserFacingConstants.getConstant(UserFacingConstantsKey.FRUIT_COUNT_REACH_LIMIT)
                             .getDisplayName());
         }
         var fruit = fruitService.findById(fruitId);
-        characterHelper.calculateCharacterBattleIndex(character, List.of(fruit));
+        var allFruits = new ArrayList<>(fruits);
+        allFruits.add(fruit);
+        characterHelper.calculateCharacterBattleIndex(character, allFruits);
         // this character can take more fruit
         var characterToFruitEntity =
                 CharacterToFruitEntityBuilder.newBuilder()
@@ -200,8 +202,13 @@ public class CharacterService {
     }
 
     public ListCharacterResponse listCharacters(ListCharacterRequest request) {
+        return listCharacters(request, true);
+    }
+
+    /** Allows internal callers to request a strict own/system scope without shared rows. */
+    public ListCharacterResponse listCharacters(ListCharacterRequest request, boolean includeShared) {
         var userId = UserHelper.getCurrentUserId();
-        var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
+        var resourceIds = includeShared ? userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE) : List.<UUID>of();
         var totalSize = characterDao.count(request.getCharacterFilter(), resourceIds);
         // pageIndex is 1- based. offset is 0- based.
         var offset = (request.getPageIndex() - 1) * request.getPageSize();
@@ -237,7 +244,15 @@ public class CharacterService {
     }
 
     public UpdateCharacterResponse updateCharacter(UpdateCharacterRequest character) {
-        var characterUpdated = CharacterEntityConverter.INSTANCE.toCharacterEntity(character);
+        var current = findByCharacterId(character.getId());
+        var modification = actionRecordService.create();
+        var characterUpdated = CharacterEntityConverter.INSTANCE.toCharacterEntity(character).toBuilder()
+                .setCreationRecordId(current.getCreationRecordId())
+                .setModificationRecordId(modification.getId())
+                .setImageUri(current.getImageUri())
+                .setSystemResource(current.getSystemResource())
+                .setScore(current.getScore())
+                .build();
         var fruits = fruitService.listFruitEntityByCharacterId(character.getId());
         characterHelper.calculateCharacterBattleIndex(characterUpdated, fruits);
         updateHaki(character.getId(), character.getHakis());

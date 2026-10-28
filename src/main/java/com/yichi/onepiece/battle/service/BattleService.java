@@ -103,8 +103,13 @@ public class BattleService {
   }
 
   public ListBattleResponse list(ListBattleRequest request) {
+    return list(request, true);
+  }
+
+  /** Allows internal callers to request a strict own/system scope without shared rows. */
+  public ListBattleResponse list(ListBattleRequest request, boolean includeShared) {
     var userId = UserHelper.getCurrentUserId();
-    var resourceIds = userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE);
+    var resourceIds = includeShared ? userService.getResourceIdsByUserIdResourceType(userId, RESOURCE_TYPE) : List.<UUID>of();
     var totalSize = battleDao.searchCount( request.getBattleFilter(), resourceIds);
     logger.info("total size {}", totalSize);
     var offset = (request.getPageIndex() - 1) * request.getPageSize();

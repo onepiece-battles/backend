@@ -74,7 +74,7 @@ public class FruitTools implements AssistantToolProvider {
 
     ToolResult searchFruits(String name, ToolContext context) {
         checkList();
-        FruitFilter filter = new FruitFilter().name(name).languageCode(context.language().languageCode());
+        FruitFilter filter = new FruitFilter().name(name).languageCode(context.language().languageCode()).userId(context.userId()).systemResource(true);
         List<ResourceLink> links = new ArrayList<>();
         List<Map<String, Object>> fruits = describe(list(filter, SEARCH_LIMIT), context.language(), links);
         return result(map("fruits", fruits), links);

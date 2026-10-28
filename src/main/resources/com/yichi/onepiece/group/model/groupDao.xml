@@ -31,10 +31,10 @@
               `group`.`system_resource` = #{groupFilter.systemResource}
             </if>
             <if test="groupFilter.userId != null">
-              `user_id` = #{groupFilter.userId}
+              OR `user_id` = #{groupFilter.userId}
             </if>
             <if test="externalResourceIds != null and externalResourceIds.size > 0">
-              `group`.`id` IN
+              OR `group`.`id` IN
               <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator="," close=")">
                 #{externalResourceId}
               </foreach>

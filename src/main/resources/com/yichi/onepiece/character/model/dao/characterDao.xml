@@ -43,10 +43,10 @@
                             `system_resource` = #{characterFilter.systemResource}
                         </if>
                         <if test="characterFilter.userId != null">
-                            `user_id` = #{characterFilter.userId}
+                            OR `user_id` = #{characterFilter.userId}
                         </if>
                         <if test="externalResourceIds != null and externalResourceIds.size > 0">
-                            `character`.`id` IN
+                            OR `character`.`id` IN
                             <foreach item="externalResourceId" collection="externalResourceIds" open="(" separator=","
                                      close=")">
                                 #{externalResourceId}
