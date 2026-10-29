@@ -196,31 +196,7 @@ public class BattleService {
     int currentBattleTurn = 0;
     while (battlefield.allAlive()) {
       if (currentBattleTurn>BATTLE_MAXIMUM_TURNS) {
-        var battleExecution = battleExecutionDao.findByBattleId(battleId).orElseThrow();
-        var battleExecutionBuilder = battleExecution.toBuilder()
-                .setBattleStatus(BattleStatus.FINISHED)
-                .setModificationTimestamp(clock.millis())
-                .setWinnerId(battlefield.getAttackSide().getBlood()>battlefield.getDefenseSide().getBlood()?
-                        battlefield.getAttackSide().getCharacterId():
-                        battlefield.getDefenseSide().getCharacterId());
-        if (battleEntity.getStarterId().equals(battlefield.getAttackSide().getCharacterId())) {
-          battleExecutionBuilder.setStarterScoreBefore(
-                  battlefield.getAttackSide().getScore()).setStarterScoreAfter(battlefield.getAttackSide().getScore())
-                  .setReceiverScoreBefore(
-                          battlefield.getDefenseSide().getScore())
-                  .setReceiverScoreAfter(battlefield.getDefenseSide().getScore());
-        } else {
-          battleExecutionBuilder.setStarterScoreBefore(
-                          battlefield.getDefenseSide().getScore()).setStarterScoreAfter(battlefield.getDefenseSide().getScore())
-                  .setReceiverScoreBefore(
-                          battlefield.getAttackSide().getScore())
-                  .setReceiverScoreAfter(battlefield.getAttackSide().getScore());
-        }
-        battleExecutionBuilder.setWinnerScoreChange(0);
-        battleExecutionBuilder.setLoserScoreChange(0);
-        battleExecutionBuilder.setBattleStatus(BattleStatus.FAILED);
-        battleExecution = battleExecutionBuilder.build();
-        battleExecutionDao.update(battleExecution);
+        recordDraw(battleEntity, battlefield);
         return;
       }
       battlefield.checkReverse();
@@ -258,6 +234,34 @@ public class BattleService {
     updateCharacter(winner.getCharacterId(), scores.getLeft(), userId, UserRole.fromValue(roleName));
     updateCharacter(loser.getCharacterId(), scores.getRight(), userId, UserRole.fromValue(roleName));
     scheduleFileGeneratingJob(battleId, userId, email, nickname, roleName, locale);
+  }
+
+  /**
+   * Neither side fell within {@link #BATTLE_MAXIMUM_TURNS}: the battle is a draw. The API has no
+   * draw status, so a draw is stored as FAILED (nothing else sets FAILED) with no winner and
+   * unchanged scores. The rounds are kept so the battle can still be replayed; no report is made.
+   */
+  private void recordDraw(BattleEntity battle, Battlefield battlefield) {
+    battlefield.completeFinalStatus();
+    battleStatusDetailDao.batchInsert(battlefield.getBattleStatusDetailEntities());
+    battleProcessDetailDao.batchInsert(battlefield.getBattleProcessDetailEntities());
+    var attacker = battlefield.getAttackSide();
+    var defender = battlefield.getDefenseSide();
+    var starter = battle.getStarterId().equals(attacker.getCharacterId()) ? attacker : defender;
+    var receiver = starter == attacker ? defender : attacker;
+    var battleExecution = battleExecutionDao.findByBattleId(battle.getId()).orElseThrow();
+    battleExecutionDao.update(battleExecution.toBuilder()
+            .setBattleStatus(BattleStatus.FAILED)
+            .setModificationTimestamp(clock.millis())
+            .setWinnerId(null)
+            .setStarterScoreBefore(starter.getScore())
+            .setStarterScoreAfter(starter.getScore())
+            .setReceiverScoreBefore(receiver.getScore())
+            .setReceiverScoreAfter(receiver.getScore())
+            .setWinnerScoreChange(0)
+            .setLoserScoreChange(0)
+            .build());
+    logger.info("Battle {} reached {} turns: draw", battle.getId(), BATTLE_MAXIMUM_TURNS);
   }
 
   private void updateCharacter(UUID characterId, int newScore, UUID userId, UserRole loginRole) {
