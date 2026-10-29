@@ -252,10 +252,28 @@ public class ResourceActionExecutor {
       jdbc.queryForList("SELECT id FROM " + table + " WHERE id=? FOR UPDATE", uuidBytes(parts[1]));
     }
     var fresh = plan(operation, payload.get("input"), c);
-    if (!fresh.payload().get("snapshots").equals(snapshots))
+    if (!sameSnapshot(fresh.payload().get("snapshots"), snapshots))
       throw problem(
           "stale_action",
-          "Resource data changed after this proposal. Ask for a fresh proposal before confirming.");
+          c.language()
+              .pick(
+                  "资源信息已更新，请重新生成提案后再确认。",
+                  "Resource data changed after this proposal. Ask for a fresh proposal before"
+                      + " confirming."));
+  }
+
+  /**
+   * Stored JSON has no Java integer widths: LongNode(1) is read back as IntNode(1). Compare numbers
+   * exactly by value at every depth while retaining object fields, string/boolean types and array
+   * order (fruit modifier order can affect combat stats).
+   */
+  static boolean sameSnapshot(JsonNode fresh, JsonNode stored) {
+    return fresh.equals(
+        (left, right) ->
+            left.isNumber() && right.isNumber()
+                ? left.decimalValue().compareTo(right.decimalValue())
+                : left.toString().compareTo(right.toString()),
+        stored);
   }
 
   ToolResult execute(String operation, ObjectNode payload, ToolContext c) {

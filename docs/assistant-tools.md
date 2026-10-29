@@ -46,6 +46,9 @@ For example, the user says `把路飞的基础攻击改为 500`:
 5. Confirmation binds the account and login role, checks the 15-minute expiry, locks the proposal
    and affected resource rows, rechecks permissions/ownership and compares the snapshot. Changed
    data requires a fresh proposal. Execution and the stored result commit in one transaction.
+   Snapshot numbers are compared exactly by value, independent of Java/Jackson integer widths
+   after JSON persistence. Strings, booleans, missing fields and array ordering remain significant;
+   fruit modifier order must not be ignored.
 6. A repeated or concurrent confirmation returns the stored result without performing the write
    again. Service failures roll back both the change and confirmation result.
 

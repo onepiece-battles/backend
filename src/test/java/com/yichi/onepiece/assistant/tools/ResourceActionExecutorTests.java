@@ -100,6 +100,96 @@ public class ResourceActionExecutorTests {
   }
 
   @Test
+  public void unchangedBattleParticipantsSurviveStoredJsonRoundTrip() throws Exception {
+    character
+        .bounty(1374000000L)
+        .creationRecord(
+            new ActionRecord().id(1L).actionTimestamp(1780000000000L).userId(USER).roleId(ROLE));
+    UUID opponent = UUID.randomUUID();
+    when(characters.getCharacterFullView(opponent))
+        .thenReturn(
+            new CharacterFullView()
+                .id(opponent)
+                .name(new I18nText().enUS("Marco"))
+                .bounty(3000000000L)
+                .creationRecord(new ActionRecord().id(2L).userId(USER).roleId(ROLE)));
+    var plan =
+        executor.plan(
+            "create_battle",
+            args("{\"starter\":\"" + CHARACTER + "\",\"receiver\":\"" + opponent + "\"}"),
+            c);
+    var persisted =
+        (com.fasterxml.jackson.databind.node.ObjectNode) json.readTree(plan.payload().toString());
+    // Production stores JSON text, so small Java Long values are read back as IntNode.
+    assertThat(
+            plan.payload()
+                .path("snapshots")
+                .path("character:" + CHARACTER)
+                .path("creation_record")
+                .path("id")
+                .isLong())
+        .isTrue();
+    assertThat(
+            persisted
+                .path("snapshots")
+                .path("character:" + CHARACTER)
+                .path("creation_record")
+                .path("id")
+                .isInt())
+        .isTrue();
+    executor.lockAndCheck("create_battle", persisted, c);
+  }
+
+  @Test
+  public void persistedSnapshotStillRejectsRealNumericAndIdentityChanges() throws Exception {
+    character.creationRecord(new ActionRecord().id(1L).userId(USER).roleId(ROLE));
+    var plan = executor.plan("update_character", update(), c);
+    var persisted =
+        (com.fasterxml.jackson.databind.node.ObjectNode) json.readTree(plan.payload().toString());
+    executor.lockAndCheck("update_character", persisted, c);
+    character.baseAttack(101);
+    assertThatThrownBy(() -> executor.lockAndCheck("update_character", persisted, c))
+        .isInstanceOf(ToolProblem.class)
+        .hasMessageContaining("changed");
+    character.baseAttack(100).creationRecord(new ActionRecord().id(2L).userId(USER).roleId(ROLE));
+    assertThatThrownBy(() -> executor.lockAndCheck("update_character", persisted, c))
+        .isInstanceOf(ToolProblem.class)
+        .hasMessageContaining("changed");
+  }
+
+  @Test
+  public void snapshotEqualityUsesExactNumbersButKeepsAllOtherChangesSignificant()
+      throws Exception {
+    var fresh =
+        (com.fasterxml.jackson.databind.node.ObjectNode)
+            args("{\"relations\":[{\"id\":1,\"power\":1.25}],\"enabled\":true,\"name\":\"same\"}");
+    ((com.fasterxml.jackson.databind.node.ObjectNode) fresh.path("relations").get(0)).put("id", 1L);
+    assertThat(ResourceActionExecutor.sameSnapshot(fresh, args(fresh.toString()))).isTrue();
+    assertThat(ResourceActionExecutor.sameSnapshot(args("{\"value\":1.0}"), args("{\"value\":1}")))
+        .isTrue();
+    assertThat(
+            ResourceActionExecutor.sameSnapshot(
+                args("{\"value\":9007199254740992}"), args("{\"value\":9007199254740993}")))
+        .isFalse();
+    assertThat(
+            ResourceActionExecutor.sameSnapshot(
+                args("{\"value\":1.25}"), args("{\"value\":1.250000001}")))
+        .isFalse();
+    assertThat(
+            ResourceActionExecutor.sameSnapshot(args("{\"value\":1}"), args("{\"value\":\"1\"}")))
+        .isFalse();
+    assertThat(
+            ResourceActionExecutor.sameSnapshot(
+                args("{\"value\":true}"), args("{\"value\":false}")))
+        .isFalse();
+    assertThat(ResourceActionExecutor.sameSnapshot(args("{\"value\":null}"), args("{}"))).isFalse();
+    assertThat(
+            ResourceActionExecutor.sameSnapshot(
+                args("{\"fruits\":[1,2]}"), args("{\"fruits\":[2,1]}")))
+        .isFalse();
+  }
+
+  @Test
   public void draftRechecksOwnershipAndRejectsChangesFromAnotherRole() throws Exception {
     character.getCreationRecord().roleId(UUID.randomUUID());
     assertThatThrownBy(() -> executor.plan("update_character", update(), c))
