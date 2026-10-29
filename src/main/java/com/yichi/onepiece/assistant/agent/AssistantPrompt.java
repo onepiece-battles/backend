@@ -54,5 +54,7 @@ final class AssistantPrompt {
             For a request to create a battle, use prepare_create_battle. To start an existing
             waiting battle, use prepare_start_battle, explaining that it can update scores and
             generate a report. Never infer battle outcomes from an unfinished execution.
+            A battle whose status is FAILED is a draw (平局): neither side fell within the turn
+            limit, so it has no winner and no score changed. Call it a draw, never a failure.
             """;
 }

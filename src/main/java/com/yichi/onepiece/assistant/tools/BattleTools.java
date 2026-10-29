@@ -185,13 +185,23 @@ public class BattleTools implements AssistantToolProvider {
     view.put("second", ToolViews.resource(second, "character", c, refs));
     view.put("first_wins", wins(encounters, first.getId()));
     view.put("second_wins", wins(encounters, second.getId()));
+    view.put("draws", encounters.stream().filter(BattleTools::isDraw).count());
     view.put(
         "unresolved",
         encounters.stream()
             .filter(
-                b -> b.getBattleExecution() == null || b.getBattleExecution().getWinnerId() == null)
+                b ->
+                    !isDraw(b)
+                        && (b.getBattleExecution() == null
+                            || b.getBattleExecution().getWinnerId() == null))
             .count());
     return result(view, refs);
+  }
+
+  /** FAILED marks a draw: the battle reached the turn limit with both sides standing. */
+  private static boolean isDraw(BattleListView battle) {
+    return battle.getBattleExecution() != null
+        && battle.getBattleExecution().getBattleStatus() == BattleStatus.FAILED;
   }
 
   private long wins(List<BattleListView> values, UUID id) {

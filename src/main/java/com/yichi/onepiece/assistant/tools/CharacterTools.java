@@ -17,6 +17,7 @@ import com.yichi.onepiece.assistant.dto.AssistantDto.ResourceLink;
 import com.yichi.onepiece.character.service.CharacterService;
 import com.yichi.onepiece.iam.service.IamService;
 import com.yichi.onepiece.model.BattleListView;
+import com.yichi.onepiece.model.BattleStatus;
 import com.yichi.onepiece.model.CharacterFilter;
 import com.yichi.onepiece.model.CharacterFullView;
 import com.yichi.onepiece.model.CharacterListView;
@@ -155,8 +156,11 @@ public class CharacterTools implements AssistantToolProvider {
             var opponent = isStarter ? battle.getReceiver() : battle.getStarter();
             UUID opponentId = opponent == null ? null : opponent.getId();
             String opponentName = opponent == null ? "" : language.displayName(opponent.getName());
-            UUID winnerId = battle.getBattleExecution() == null ? null : battle.getBattleExecution().getWinnerId();
-            String outcome = winnerId == null ? "undecided" : winnerId.equals(full.getId()) ? "win" : "lose";
+            var execution = battle.getBattleExecution();
+            UUID winnerId = execution == null ? null : execution.getWinnerId();
+            // FAILED marks a draw: the battle reached the turn limit.
+            String outcome = execution != null && execution.getBattleStatus() == BattleStatus.FAILED ? "draw"
+                    : winnerId == null ? "undecided" : winnerId.equals(full.getId()) ? "win" : "lose";
             if (opponentId != null) {
                 links.add(link("character", opponentId, opponentName));
             }

@@ -251,7 +251,15 @@ public class ResourceToolkitTests {
                             .starter(y)
                             .receiver(x)
                             .battleExecution(
-                                new BattleExecution().battleStatus(BattleStatus.IN_PROGRESS)))));
+                                new BattleExecution().battleStatus(BattleStatus.IN_PROGRESS)),
+                        new BattleListView()
+                            .id(UUID.randomUUID())
+                            .starterId(first)
+                            .receiverId(second)
+                            .starter(x)
+                            .receiver(y)
+                            .battleExecution(
+                                new BattleExecution().battleStatus(BattleStatus.FAILED)))));
     when(characters.getCharacterFullView(second))
         .thenReturn(new CharacterFullView().id(second).name(name("Law")));
     var value =
@@ -259,9 +267,10 @@ public class ResourceToolkitTests {
             battleTools
                 .headToHead(args("{\"first\":\"" + first + "\",\"second\":\"" + second + "\"}"), c)
                 .content());
-    assertThat(value.path("total_count").asInt()).isEqualTo(2);
+    assertThat(value.path("total_count").asInt()).isEqualTo(3);
     assertThat(value.path("first_wins").asInt()).isEqualTo(1);
     assertThat(value.path("second_wins").asInt()).isZero();
+    assertThat(value.path("draws").asInt()).isEqualTo(1);
     assertThat(value.path("unresolved").asInt()).isEqualTo(1);
   }
 
