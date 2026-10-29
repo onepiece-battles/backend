@@ -93,6 +93,9 @@ public class DeepSeekClient implements ChatCompletionClient {
             body.set("tools", request.tools());
             body.put("tool_choice", "auto");
         }
+        if (request.jsonOutput()) {
+            body.putObject("response_format").put("type", "json_object");
+        }
         body.put("temperature", request.temperature());
         body.put("max_tokens", request.maxTokens());
         body.put("stream", true);

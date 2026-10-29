@@ -180,14 +180,14 @@ public class AssistantController {
         }
     }
 
-    private static String rejection(Decision decision, AssistantLanguage language) {
+    static String rejection(Decision decision, AssistantLanguage language) {
         return decision == Decision.RATE_LIMITED
                 ? language.pick("提问太频繁了,请一分钟后再试。", "Too many questions. Please wait a minute.")
                 : language.pick("上一个问题还在回答中,请稍等。", "Still answering your previous question.");
     }
 
     /** Upstream failures carry technical detail (already logged); show a plain message instead. */
-    private static String userMessage(AssistantException e, AssistantLanguage language) {
+    static String userMessage(AssistantException e, AssistantLanguage language) {
         return switch (e.code()) {
             case AssistantException.TIMEOUT -> language.pick(
                     "DeepSeek 响应超时,请重试。", "DeepSeek did not respond in time. Please try again.");
