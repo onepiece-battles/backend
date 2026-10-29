@@ -12,6 +12,7 @@ import com.yichi.onepiece.assistant.importing.ImportDrafter;
 import com.yichi.onepiece.assistant.importing.ImportDto.CommitRejected;
 import com.yichi.onepiece.assistant.importing.ImportDto.CommitRequest;
 import com.yichi.onepiece.assistant.importing.ImportDto.DraftRequest;
+import com.yichi.onepiece.assistant.importing.ImportDto.ReviseRequest;
 import com.yichi.onepiece.exception.PermissionDeniedException;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.model.UserDetailImpl;
@@ -19,6 +20,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -34,8 +37,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * AI batch import (NIKA only). {@code /draft} streams progress as {@code status} events and ends
- * with one {@code draft} (or {@code error}); nothing is written until the reviewed draft is sent to
- * {@code /commit}.
+ * with one {@code draft} (or {@code error}); {@code /revise} changes a draft the same way, as the
+ * reviewer asks. Nothing is written until the reviewed draft is sent to {@code /commit}.
  */
 @RestController
 @RequestMapping("/api/onepiece/assistant/import")
@@ -61,24 +64,55 @@ public class AssistantImportController {
     @PostMapping(value = "/draft", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter draft(@RequestBody DraftRequest request, HttpServletResponse response) {
         requireNika();
+        UserDetailImpl user = UserHelper.getCurrentUserDetail();
+        AssistantLanguage language = AssistantLanguage.resolve(request.language(), user.getLocale());
+        String scope = request.scope() == null ? "" : request.scope().strip();
+        String invalid = scope.isEmpty() || scope.length() > MAX_SCOPE_LENGTH
+                ? language.pick(
+                        "请描述要录入的范围,不超过 " + MAX_SCOPE_LENGTH + " 字。",
+                        "Describe what to import in at most " + MAX_SCOPE_LENGTH + " characters.")
+                : null;
+        return stream(response, user.getId(), language, invalid,
+                progress -> drafter.draft(scope, user.getId(), language, progress));
+    }
+
+    /** Changes the reviewed draft as the reviewer asks; streams like {@code /draft}. */
+    @PostMapping(value = "/revise", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter revise(@RequestBody ReviseRequest request, HttpServletResponse response) {
+        requireNika();
+        UserDetailImpl user = UserHelper.getCurrentUserDetail();
+        AssistantLanguage language = AssistantLanguage.resolve(request.language(), user.getLocale());
+        String instruction = request.instruction() == null ? "" : request.instruction().strip();
+        String invalid = instruction.isEmpty() || instruction.length() > MAX_SCOPE_LENGTH
+                ? language.pick(
+                        "请说明要怎么修改,不超过 " + MAX_SCOPE_LENGTH + " 字。",
+                        "Say what to change in at most " + MAX_SCOPE_LENGTH + " characters.")
+                : request.items() == null || request.items().isEmpty()
+                                || request.items().size() > ImportCommitter.MAX_ITEMS
+                        ? language.pick("草稿为空或太大。", "The draft is empty or too large.")
+                        : null;
+        return stream(response, user.getId(), language, invalid,
+                progress -> drafter.revise(
+                        request.items(), request.messages(), instruction, user.getId(), language, progress));
+    }
+
+    /**
+     * Runs {@code job} on the assistant's worker pool and streams its progress as {@code status}
+     * events, then the result as one {@code draft} event, or an {@code error}. {@code invalid} is the
+     * message for a request that cannot run.
+     */
+    private SseEmitter stream(HttpServletResponse response, UUID userId, AssistantLanguage language,
+            String invalid, Function<Consumer<String>, Object> job) {
         response.setHeader("X-Accel-Buffering", "no");
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache");
         SseEmitter emitter = new SseEmitter(DRAFT_TIMEOUT.toMillis());
         SseEventSink sink = new SseEventSink(emitter);
-
-        UserDetailImpl user = UserHelper.getCurrentUserDetail();
-        UUID userId = user.getId();
-        AssistantLanguage language = AssistantLanguage.resolve(request.language(), user.getLocale());
         emitter.onCompletion(sink::markClosed);
         emitter.onError(error -> sink.markClosed());
         emitter.onTimeout(() -> sink.error(AssistantException.TIMEOUT,
                 language.pick("起草超时了,请缩小范围后重试。", "Drafting took too long. Try a smaller scope.")));
-
-        String scope = request.scope() == null ? "" : request.scope().strip();
-        if (scope.isEmpty() || scope.length() > MAX_SCOPE_LENGTH) {
-            sink.error(AssistantException.INVALID_REQUEST, language.pick(
-                    "请描述要录入的范围,不超过 " + MAX_SCOPE_LENGTH + " 字。",
-                    "Describe what to import in at most " + MAX_SCOPE_LENGTH + " characters."));
+        if (invalid != null) {
+            sink.error(AssistantException.INVALID_REQUEST, invalid);
             return emitter;
         }
         // Shares the assistant's limiter: one heavy DeepSeek job per user at a time.
@@ -91,8 +125,7 @@ public class AssistantImportController {
 
         Runnable work = () -> {
             try {
-                var draft = drafter.draft(scope, userId, language, label -> sink.status("import", label));
-                sink.finish("draft", draft);
+                sink.finish("draft", job.apply(label -> sink.status("import", label)));
             } catch (AssistantCancelledException e) {
                 logger.debug("import draft for user {} was closed by the client", userId);
             } catch (AssistantException e) {

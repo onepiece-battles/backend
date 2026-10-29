@@ -162,9 +162,10 @@ public class ImportCommitterTests {
                     AssistantLanguage.ZH_CN),
             ImportRejected.class);
 
+    // f1 both exists already and is eaten by no one.
     assertThat(rejected.problems())
         .extracting(Problem::key)
-        .containsExactlyInAnyOrder("c1", "c2", "f1", "g2", "c3");
+        .containsExactlyInAnyOrder("c1", "c2", "f1", "f1", "g2", "c3");
     assertThat(rejected.problems()).filteredOn(p -> p.key().equals("c1")).first()
         .extracting(Problem::message).asString().contains("attack");
     verify(groups, never()).create(any());
@@ -249,5 +250,29 @@ public class ImportCommitterTests {
             ImportRejected.class);
 
     assertThat(rejected.problems()).extracting(Problem::key).containsExactly("g1");
+  }
+
+  @Test
+  public void aNewFruitNobodyEatsIsNotImported() {
+    UUID kage = UUID.randomUUID();
+    when(fruits.getFruit(any())).thenReturn(new FruitFullView().id(kage));
+
+    var rejected =
+        catchThrowableOfType(
+            () ->
+                committer.commit(
+                    List.of(
+                        item("f1", FRUIT, fruit("野猪果实", "Boar Boar Fruit")),
+                        reuse("f2", FRUIT, kage, name("影子果实", "Kage Kage no Mi")),
+                        member("c1", character("佩罗娜", "Perona", 1), List.of(), null, null)),
+                    userId,
+                    roleId,
+                    AssistantLanguage.ZH_CN),
+            ImportRejected.class);
+
+    // The reused fruit needs no holder: nothing is created for it.
+    assertThat(rejected.problems()).extracting(Problem::key).containsExactly("f1");
+    assertThat(rejected.problems().get(0).message()).contains("持有者");
+    verify(fruits, never()).createFruit(any());
   }
 }

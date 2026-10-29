@@ -31,11 +31,61 @@ final class ImportPrompts {
         navigator, scholar, intern or member.
       - "fruits" lists the keys of the devil fruits a character has eaten; include every such fruit
         in "fruits". "group" is the key of the group the character currently belongs to.
+      - List a devil fruit only together with the character who ate it: every fruit key must appear
+        in some character's "fruits".
       - Include the groups the scope names; do not add every group a character ever belonged to.
       - At most 30 characters, 15 fruits and 5 groups. If the scope is larger, keep the most
         important ones and say what was left out in notes.
       - notes: short remarks for the person reviewing the draft, in Simplified Chinese.
       """;
+
+  /** Changes to a draft the reviewer asks for; the reply is written in {@code replyLanguage}. */
+  static String revise(String replyLanguage) {
+    return """
+        You help a person refine a draft import for "One Piece Battles", an app of One Piece
+        characters, devil fruits and groups. The last user message holds the current draft as JSON
+        and the person's request; earlier messages are the conversation so far. Answer with ONE
+        JSON object that describes only the changes:
+
+        {"reply":"…",
+         "remove":["c3"],
+         "update":[{"key":"c2","name":{"zh_CN":"…","en_US":"…"},"data":{"bounty":71000000},
+                    "fruits":["f1"],"group":"g1","position":"captain"}],
+         "add":{"groups":[{"key":"new_g1","name":{"zh_CN":"…","en_US":"…"},"group_category":"pirate"}],
+                "fruits":[{"key":"new_f1","name":{"zh_CN":"…","en_US":"…"},"fruit_type":"Zoan"}],
+                "characters":[{"key":"new_c1","name":{"zh_CN":"…","en_US":"…"},"fruits":["new_f1"],
+                               "group":"g1","position":"member"}]},
+         "notes":["…"]}
+
+        Rules:
+        - Change only what the request asks for and leave everything else out of the answer.
+        - Refer to draft items by their key. Give new items new keys of your choice; other entries
+          of this answer may refer to them.
+        - In "update" give only what changes. "fruits" replaces the character's whole fruit list;
+          "group": null takes the character out of its group. "data" holds create fields (below),
+          never "name". Items marked "existing" are already in the app: only a character's fruits,
+          group and position can change.
+        - Every devil fruit in the draft is eaten by a character in the draft. When you add a fruit,
+          give it to the character who ate it (add that character if needed). When you remove a
+          character, remove their fruits too unless someone else in the draft ate them.
+        - Only canon One Piece entities; never invent a person, fruit or group. If a request is not
+          canon or unclear, change nothing and say why in "reply".
+        - "reply": one or two short sentences to the person, in %s, saying what changed.
+        - zh_CN is the usual Simplified Chinese name (with · between name parts); en_US the usual
+          English name.
+        - group_category: pirate, marine, revolution_army, government, under_world or other.
+        - fruit_type: Paramecia, Logia, Zoan, Ancient_Zoan, Mythical_Zoan or Artificial_Zoan.
+        - position: captain, first_mate, combatant, musician, doctor, cook, helmsman, shipwright,
+          navigator, scholar, intern or member.
+
+        Character fields:
+        %s
+
+        Fruit fields:
+        %s
+        """
+        .formatted(replyLanguage, guide("character"), guide("fruit"));
+  }
 
   static String detail(String references) {
     return """
