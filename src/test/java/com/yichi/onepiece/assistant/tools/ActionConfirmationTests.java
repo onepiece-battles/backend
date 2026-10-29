@@ -113,6 +113,42 @@ public class ActionConfirmationTests {
   }
 
   @Test
+  public void restoresOldTextOnlyProposalsAndTheirLatestResultFromHistory() throws Exception {
+    var refs = draft();
+    actions.publish(refs, c);
+    String code = code(refs);
+    var message =
+        new com.yichi.onepiece.assistant.dto.AssistantDto.AiMessageView(
+            "old-answer", "assistant", "保留角色对比" + actions.instructions(refs, c), List.of());
+    var proposal = actions.decorateMessages(List.of(message), c).get(0).actionProposals().get(0);
+    assertThat(proposal.code()).isEqualTo(code);
+    assertThat(proposal.status()).isEqualTo("pending");
+    assertThat(proposal.summary()).contains("草帽团");
+    actions.handle("确认 " + code, c);
+    var completed = actions.decorateMessages(List.of(message), c).get(0).actionProposals().get(0);
+    assertThat(completed.status()).isEqualTo("completed");
+    assertThat(completed.resources()).hasSize(1);
+    assertThat(completed.resources().get(0).type()).isEqualTo("group");
+    authenticate(USER, UUID.randomUUID());
+    assertThat(actions.decorateMessages(List.of(message), c).get(0).actionProposals()).isEmpty();
+  }
+
+  @Test
+  public void cardProjectionRejectsFabricatedAndUnpublishedCodesAndShowsExpiry() throws Exception {
+    var refs = draft();
+    assertThat(actions.proposals(refs, c)).isEmpty();
+    assertThat(actions.proposalsForText("确认 0123456789", c)).isEmpty();
+    actions.publish(refs, c);
+    jdbc.update("UPDATE assistant_action SET expires_at=0 WHERE code=?", code(refs));
+    assertThat(actions.proposals(refs, c).get(0).status()).isEqualTo("expired");
+    var userMessage =
+        new com.yichi.onepiece.assistant.dto.AssistantDto.AiMessageView(
+            "user", "user", "确认 " + code(refs), List.of());
+    assertThat(actions.decorateMessages(List.of(userMessage), c).get(0).actionProposals())
+        .isEmpty();
+  }
+
+  @Test
   public void onlySeparateExactUserCommandsAreRecognized() throws Exception {
     String code = presented();
     assertThat(actions.handle("请解释‘确认 " + code + "’的含义", c)).isEmpty();

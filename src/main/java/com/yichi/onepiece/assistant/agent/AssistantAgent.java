@@ -102,7 +102,7 @@ public class AssistantAgent {
                 var confirmed = reply.get();
                 List<String> ids = assistantService.saveTurns(userId, List.of(AiTurn.user(question), AiTurn.assistant(confirmed.content(), confirmed.resources())));
                 sink.delta(confirmed.content());
-                sink.done(new DoneEvent(ids.get(ids.size()-1), confirmed.content(), confirmed.resources(), null));
+                sink.done(new DoneEvent(ids.get(ids.size()-1), confirmed.content(), confirmed.resources(), null, actions.proposalsForText(question, context)));
                 return;
             }
         }
@@ -183,7 +183,8 @@ public class AssistantAgent {
             turns.add(AiTurn.assistant(content, links));
             List<String> ids = assistantService.saveTurns(userId, turns);
             if (actions != null) actions.publish(mentioned, context);
-            sink.done(new DoneEvent(ids.get(ids.size() - 1), content, links, battleProposal(mentioned)));
+            sink.done(new DoneEvent(ids.get(ids.size() - 1), content, links, battleProposal(mentioned),
+                    actions == null ? List.of() : actions.proposals(mentioned, context)));
             logger.info("assistant answered user {} in {} ms: {} round(s), tools {}, tokens {} in / {} out",
                     userId, (System.nanoTime() - startedAt) / 1_000_000, rounds, toolsUsed,
                     usage.promptTokens(), usage.completionTokens());

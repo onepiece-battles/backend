@@ -6,7 +6,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yichi.onepiece.assistant.agent.*;
+import com.yichi.onepiece.assistant.dto.AssistantDto.ActionProposal;
+import com.yichi.onepiece.assistant.dto.AssistantDto.AiMessageView;
 import com.yichi.onepiece.assistant.dto.AssistantDto.ResourceLink;
+import com.yichi.onepiece.assistant.service.AiTurn;
 import com.yichi.onepiece.user.UserHelper;
 import java.time.Clock;
 import java.util.*;
@@ -23,6 +26,11 @@ public class ActionConfirmationService {
   private static final Pattern COMMAND =
       Pattern.compile(
           "^(确认|取消|confirm|cancel)\\s+([A-Fa-f0-9]{10})[。.!！]?$", Pattern.CASE_INSENSITIVE);
+  // Used only to recover older persisted answers; every code is checked against the store
+  // under the authenticated account/role. The frontend never parses confirmation prose.
+  private static final Pattern MENTIONED_CODE =
+      Pattern.compile(
+          "(?:确认|取消|confirm|cancel)\\s+([A-Fa-f0-9]{10})(?![A-Fa-f0-9])", Pattern.CASE_INSENSITIVE);
   private static final long TTL = 15 * 60 * 1000L;
   private final JdbcTemplate jdbc;
   private final ResourceActionExecutor executor;
@@ -122,6 +130,94 @@ public class ActionConfirmationService {
             "No change executed. The server will append the exact confirmation instructions. Never"
                 + " claim this action succeeded."),
         refs);
+  }
+
+  public List<ActionProposal> proposals(Collection<ResourceLink> resources, ToolContext c) {
+    Set<String> codes = new LinkedHashSet<>();
+    for (var resource : resources) {
+      if (PROPOSAL.equals(resource.type())) codes.add(resource.id());
+    }
+    return new ArrayList<>(loadProposals(codes, c).values());
+  }
+
+  public List<ActionProposal> proposalsForText(String content, ToolContext c) {
+    return new ArrayList<>(loadProposals(codesIn(content), c).values());
+  }
+
+  /**
+   * Restore pending/completed/cancelled/expired cards, including answers saved before this field.
+   */
+  public List<AiMessageView> decorateMessages(List<AiMessageView> messages, ToolContext c) {
+    Set<String> codes = new LinkedHashSet<>();
+    for (var message : messages) {
+      if (AiTurn.ASSISTANT.equals(message.role())) codes.addAll(codesIn(message.content()));
+    }
+    var known = loadProposals(codes, c);
+    return messages.stream()
+        .map(
+            message -> {
+              List<ActionProposal> proposals =
+                  AiTurn.ASSISTANT.equals(message.role())
+                      ? codesIn(message.content()).stream()
+                          .map(known::get)
+                          .filter(Objects::nonNull)
+                          .toList()
+                      : List.of();
+              return new AiMessageView(
+                  message.id(), message.role(), message.content(), message.resources(), proposals);
+            })
+        .toList();
+  }
+
+  private Set<String> codesIn(String content) {
+    Set<String> codes = new LinkedHashSet<>();
+    var matcher = MENTIONED_CODE.matcher(content == null ? "" : content);
+    while (matcher.find()) codes.add(matcher.group(1).toUpperCase(Locale.ROOT));
+    return codes;
+  }
+
+  private Map<String, ActionProposal> loadProposals(Set<String> codes, ToolContext c) {
+    if (codes.isEmpty()) return Map.of();
+    String placeholders = String.join(",", Collections.nCopies(codes.size(), "?"));
+    var args = new ArrayList<Object>();
+    args.add(c.userId().toString());
+    args.add(role(c));
+    args.addAll(codes);
+    var found =
+        rows(
+            "SELECT code, operation, '' AS payload, summary, status, expires_at, result FROM"
+                + " assistant_action WHERE user_id=? AND role_id=? AND code IN ("
+                + placeholders
+                + ")",
+            args.toArray());
+    Map<String, Pending> byCode = new HashMap<>();
+    for (var row : found) byCode.put(row.code(), row);
+    Map<String, ActionProposal> result = new LinkedHashMap<>();
+    for (String code : codes) {
+      var row = byCode.get(code);
+      if (row == null || row.status().equals("PREPARED")) continue;
+      String status =
+          switch (row.status()) {
+            case "DONE" -> "completed";
+            case "CANCELLED" -> "cancelled";
+            default -> row.expires() <= clock.millis() ? "expired" : "pending";
+          };
+      List<ResourceLink> resources =
+          row.status().equals("DONE") && row.result() != null
+              ? decode(row.result()).resources()
+              : List.of();
+      result.put(
+          code,
+          new ActionProposal(
+              code,
+              row.operation(),
+              ResourceActionExecutor.title(row.operation(), c),
+              row.summary(),
+              status,
+              row.expires(),
+              resources));
+    }
+    return result;
   }
 
   public ToolResult pending(ToolContext c) {

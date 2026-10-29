@@ -29,7 +29,16 @@ public final class AssistantDto {
 
     public record SaveAiMessageResponse(String id) {}
 
-    public record AiMessageView(String id, String role, String content, List<ResourceLink> resources) {}
+    public record AiMessageView(String id, String role, String content, List<ResourceLink> resources,
+            List<ActionProposal> actionProposals) {
+        public AiMessageView(String id, String role, String content, List<ResourceLink> resources) {
+            this(id, role, content, resources, List.of());
+        }
+    }
+
+    /** Authoritative action state from the confirmation store, never inferred by the client. */
+    public record ActionProposal(String code, String operation, String title, String summary,
+            String status, long expiresAt, List<ResourceLink> resources) {}
 
     public record ListAiMessagesResponse(List<AiMessageView> messages) {}
 
@@ -51,7 +60,12 @@ public final class AssistantDto {
 
     /** {@code event: done} — the final answer with links repaired; replaces the streamed text. */
     public record DoneEvent(
-            String messageId, String content, List<ResourceLink> resources, BattleProposal battleProposal) {}
+            String messageId, String content, List<ResourceLink> resources, BattleProposal battleProposal,
+            List<ActionProposal> actionProposals) {
+        public DoneEvent(String messageId, String content, List<ResourceLink> resources, BattleProposal battleProposal) {
+            this(messageId, content, resources, battleProposal, List.of());
+        }
+    }
 
     /** {@code event: error} — the answer failed; {@code code} is stable, {@code message} is for display. */
     public record ErrorEvent(String code, String message) {}

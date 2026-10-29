@@ -83,6 +83,23 @@ public class ResourceActionExecutorTests {
   }
 
   @Test
+  public void battleProposalKeepsStarterAndReceiverRolesExplicit() throws Exception {
+    UUID opponent = UUID.randomUUID();
+    when(characters.getCharacterFullView(opponent))
+        .thenReturn(new CharacterFullView().id(opponent).name(new I18nText().enUS("Law")));
+    var plan =
+        executor.plan(
+            "create_battle",
+            args("{\"starter\":\"" + CHARACTER + "\",\"receiver\":\"" + opponent + "\"}"),
+            c);
+    assertThat(plan.summary()).contains("Starter: [Luffy]", "Receiver: [Law]");
+    assertThat(plan.payload().path("input").path("starter").asText())
+        .isEqualTo(CHARACTER.toString());
+    assertThat(plan.payload().path("input").path("receiver").asText())
+        .isEqualTo(opponent.toString());
+  }
+
+  @Test
   public void draftRechecksOwnershipAndRejectsChangesFromAnotherRole() throws Exception {
     character.getCreationRecord().roleId(UUID.randomUUID());
     assertThatThrownBy(() -> executor.plan("update_character", update(), c))

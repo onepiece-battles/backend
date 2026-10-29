@@ -204,10 +204,15 @@ public class AssistantAgentTests {
         var actions = mock(ActionConfirmationService.class);
         var reply = new ActionConfirmationService.Reply("Completed", List.of(LUFFY));
         when(actions.handle(eq("confirm ABCDEF1234"), any())).thenReturn(Optional.of(reply));
+        when(actions.proposalsForText(eq("confirm ABCDEF1234"), any())).thenReturn(List.of(
+                new com.yichi.onepiece.assistant.dto.AssistantDto.ActionProposal("ABCDEF1234", "create_battle",
+                        "Create battle", "Two participants", "completed", 1000L, List.of(LUFFY))));
         when(settings.isConfigured()).thenReturn(false);
         var agent = new AssistantAgent(settings, store, client, new ToolRegistry(List.of()), Runnable::run, actions);
         agent.run(USER, "confirm ABCDEF1234", AssistantLanguage.EN_US, sink);
         assertThat(client.requests).isEmpty();
+        assertThat(sink.done.actionProposals().get(0).status()).isEqualTo("completed");
+        assertThat(sink.done.actionProposals().get(0).resources()).containsExactly(LUFFY);
         assertThat(sink.done.content()).isEqualTo("Completed");
         assertThat(saved).extracting(AiTurn::role).containsExactly("user", "assistant");
     }
@@ -218,12 +223,16 @@ public class AssistantAgentTests {
         var actions = mock(ActionConfirmationService.class);
         when(actions.handle(any(), any())).thenReturn(Optional.empty());
         when(actions.instructions(any(), any())).thenReturn("\nConfirm ABCDEF1234 to execute");
-        var provider = (AssistantToolProvider) () -> List.of(tool("prepare_create_group", new ToolResult("{}", List.of(proposal))));
+        when(actions.proposals(any(), any())).thenReturn(List.of(new com.yichi.onepiece.assistant.dto.AssistantDto.ActionProposal(
+                "ABCDEF1234", "create_battle", "Create battle", "Review these participants", "pending", 1000L, List.of())));
+        var provider = (AssistantToolProvider) () -> List.of(tool("prepare_create_battle", new ToolResult("{}", List.of(proposal))));
         var agent = new AssistantAgent(settings, store, client, new ToolRegistry(List.of(provider)), Runnable::run, actions);
-        client.script.add(toolCall("call_1", "prepare_create_group", "{}"));
+        client.script.add(toolCall("call_1", "prepare_create_battle", "{}"));
         client.script.add(answer("Prepared for review."));
-        agent.run(USER, "Create a crew", AssistantLanguage.EN_US, sink);
+        agent.run(USER, "Create a battle", AssistantLanguage.EN_US, sink);
         assertThat(sink.done.content()).contains("Confirm ABCDEF1234");
+        assertThat(sink.done.actionProposals()).hasSize(1);
+        assertThat(sink.done.actionProposals().get(0).operation()).isEqualTo("create_battle");
         assertThat(sink.streamed.toString()).contains("Confirm ABCDEF1234");
         assertThat(sink.done.resources()).isEmpty();
         verify(actions).publish(any(), any());
