@@ -284,21 +284,29 @@ public class ResourceActionExecutor {
     switch (operation) {
       case "create_character" -> {
         var request = JSON.convertValue(input.get("data"), CreateCharacterRequest.class);
-        request.userId(c.userId()).roleId(UserHelper.getCurrentUserDetail().getLoginRoleId());
+        request
+            .name(createdName(input))
+            .userId(c.userId())
+            .roleId(UserHelper.getCurrentUserDetail().getLoginRoleId());
         var created = lookup.characters.createCharacter(request);
         id = created.getId();
         type = "character";
       }
       case "create_fruit" -> {
         var request = JSON.convertValue(input.get("data"), CreateFruitRequest.class);
-        request.userId(c.userId()).roleId(UserHelper.getCurrentUserDetail().getLoginRoleId());
+        request
+            .name(createdName(input))
+            .userId(c.userId())
+            .roleId(UserHelper.getCurrentUserDetail().getLoginRoleId());
         var created = lookup.fruits.createFruit(request);
         id = created.getId();
         type = "fruit";
       }
       case "create_group" -> {
         var created =
-            lookup.groups.create(JSON.convertValue(input.get("data"), CreateGroupRequest.class));
+            lookup.groups.create(
+                JSON.convertValue(input.get("data"), CreateGroupRequest.class)
+                    .name(createdName(input)));
         id = created.getId();
         type = "group";
       }
@@ -379,8 +387,7 @@ public class ResourceActionExecutor {
       String name =
           type.equals("battle")
               ? c.language().pick("战斗记录", "Battle record")
-              : c.language()
-                  .displayName(JSON.convertValue(input.path("data").get("name"), I18nText.class));
+              : c.language().displayName(createdName(input));
       refs.add(link(type, id, name));
     } else {
       JsonNode value = read(type, id.toString(), c);
@@ -405,6 +412,10 @@ public class ResourceActionExecutor {
         refs);
   }
 
+  private static I18nText createdName(ObjectNode input) {
+    return ActionSchemas.i18nText(input.path("data").path("name"), new I18nText());
+  }
+
   static void merge(ObjectNode current, ObjectNode changes, boolean character) {
     changes
         .fields()
@@ -414,9 +425,15 @@ public class ResourceActionExecutor {
                   character && ActionSchemas.STATS.contains(e.getKey())
                       ? "base_" + e.getKey()
                       : e.getKey();
-              if (e.getValue().isObject() && current.path(key).isObject())
-                ((ObjectNode) current.get(key)).setAll((ObjectNode) e.getValue());
-              else current.set(key, e.getValue());
+              JsonNode value = e.getValue();
+              if (key.equals("name")) {
+                // A partial name keeps the current view's other language.
+                var name = JSON.convertValue(current.get("name"), I18nText.class);
+                value =
+                    JSON.valueToTree(
+                        ActionSchemas.i18nText(value, name == null ? new I18nText() : name));
+              }
+              current.set(key, value);
             });
   }
 

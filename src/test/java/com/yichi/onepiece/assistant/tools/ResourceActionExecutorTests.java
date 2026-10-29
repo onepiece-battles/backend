@@ -33,6 +33,7 @@ public class ResourceActionExecutorTests {
   private FruitService fruits;
   private GroupService groups;
   private IamService iam;
+  private ActionRecordService records;
   private ResourceActionExecutor executor;
   private CharacterFullView character;
 
@@ -42,11 +43,12 @@ public class ResourceActionExecutorTests {
     fruits = mock(FruitService.class);
     groups = mock(GroupService.class);
     iam = mock(IamService.class);
+    records = mock(ActionRecordService.class);
     executor =
         new ResourceActionExecutor(
             new ResourceLookup(characters, fruits, groups, mock(BattleService.class), iam),
             mock(BattleExecutionAsyncService.class),
-            mock(ActionRecordService.class),
+            records,
             mock(JdbcTemplate.class));
     var actor = new UserDetailImpl();
     actor.setId(USER);
@@ -235,6 +237,104 @@ public class ResourceActionExecutorTests {
     assertThat(request.getValue().getName().getZhCN()).isEqualTo("路飞");
     assertThat(request.getValue().getHakis()).containsExactly(Haki.BUSOSHOKU);
     assertThat(request.getValue().getImageUri()).isEqualTo(character.getImageUri());
+  }
+
+  private ToolResult confirm(String operation, String arguments) throws Exception {
+    return executor.execute(operation, executor.plan(operation, args(arguments), c).payload(), c);
+  }
+
+  @Test
+  public void createdResourcesKeepTheirLocalizedNames() throws Exception {
+    when(characters.createCharacter(any()))
+        .thenReturn(new com.yichi.onepiece.model.Character().id(CHARACTER));
+    when(fruits.createFruit(any())).thenReturn(new Fruit().id(FRUIT));
+    when(groups.create(any())).thenReturn(new CreateGroupResponse().id(GROUP));
+    var created =
+        confirm(
+            "create_character",
+            "{\"data\":{\"name\":{\"zh_CN\":\"路飞\",\"en_US\":\"Luffy\"},\"race\":\"HUMAN\","
+                + "\"battle_style\":\"BODY\",\"maximum_fruit_count\":1,\"group_gain\":100,"
+                + "\"attack\":100,\"defense\":100,\"blood\":1000,\"speed\":50,"
+                + "\"intelligence\":100,\"energy\":20}}");
+    var characterRequest = ArgumentCaptor.forClass(CreateCharacterRequest.class);
+    verify(characters).createCharacter(characterRequest.capture());
+    assertThat(characterRequest.getValue().getName())
+        .isEqualTo(new I18nText().zhCN("路飞").enUS("Luffy"));
+    assertThat(created.resources().get(0).name()).isEqualTo("Luffy");
+
+    var stats = new StringBuilder();
+    for (var stat : List.of("attack", "defense", "blood", "group_gain", "speed", "intelligence"))
+      stats.append(",\"%s_slope\":1,\"%s_intercept\":0".formatted(stat, stat));
+    confirm(
+        "create_fruit",
+        "{\"data\":{\"name\":{\"zh_CN\":\"橡胶果实\",\"en_US\":\"Gomu Gomu no Mi\"},"
+            + "\"fruit_type\":\"Paramecia\",\"energy_consume\":10"
+            + stats
+            + "}}");
+    var fruitRequest = ArgumentCaptor.forClass(CreateFruitRequest.class);
+    verify(fruits).createFruit(fruitRequest.capture());
+    assertThat(fruitRequest.getValue().getName())
+        .isEqualTo(new I18nText().zhCN("橡胶果实").enUS("Gomu Gomu no Mi"));
+
+    created =
+        confirm(
+            "create_group",
+            "{\"data\":{\"name\":{\"zh_CN\":\"草帽一伙\"},\"group_category\":\"pirate\"}}");
+    var groupRequest = ArgumentCaptor.forClass(CreateGroupRequest.class);
+    verify(groups).create(groupRequest.capture());
+    assertThat(groupRequest.getValue().getName()).isEqualTo(new I18nText().zhCN("草帽一伙"));
+    assertThat(created.resources().get(0).name()).isEqualTo("草帽一伙");
+  }
+
+  @Test
+  public void nameChangesReachTheUpdateAndKeepTheOtherLanguage() throws Exception {
+    var plan =
+        executor.plan(
+            "update_character",
+            args(
+                "{\"character\":\""
+                    + CHARACTER
+                    + "\",\"changes\":{\"name\":{\"en_US\":\"Monkey D. Luffy\"}}}"),
+            c);
+    assertThat(plan.summary()).contains("路飞", "Monkey D. Luffy");
+    executor.execute("update_character", plan.payload(), c);
+    var characterRequest = ArgumentCaptor.forClass(UpdateCharacterRequest.class);
+    verify(characters).updateCharacter(characterRequest.capture());
+    assertThat(characterRequest.getValue().getName())
+        .isEqualTo(new I18nText().zhCN("路飞").enUS("Monkey D. Luffy"));
+
+    var owner = new ActionRecord().userId(USER).roleId(ROLE);
+    when(fruits.getFruit(any()))
+        .thenReturn(
+            new FruitFullView()
+                .id(FRUIT)
+                .name(new I18nText().zhCN("橡胶果实").enUS("Gum-Gum Fruit"))
+                .creationRecord(owner));
+    confirm(
+        "update_fruit",
+        "{\"fruit\":\"" + FRUIT + "\",\"changes\":{\"name\":{\"en_US\":\"Gomu Gomu no Mi\"}}}");
+    var fruitRequest = ArgumentCaptor.forClass(UpdateFruitRequest.class);
+    verify(fruits).updateFruit(fruitRequest.capture());
+    assertThat(fruitRequest.getValue().getName())
+        .isEqualTo(new I18nText().zhCN("橡胶果实").enUS("Gomu Gomu no Mi"));
+
+    when(groups.getGroupFullView(any()))
+        .thenReturn(
+            new GroupFullView()
+                .id(GROUP)
+                .name(new I18nText().zhCN("草帽一伙").enUS("Straw Hat Pirates"))
+                .groupCategory(GroupCategory.PIRATE)
+                .creationRecord(owner));
+    var modification = mock(com.yichi.onepiece.lineage.model.ActionRecordEntity.class);
+    when(modification.getId()).thenReturn(12L);
+    when(records.create()).thenReturn(modification);
+    confirm(
+        "update_group",
+        "{\"group\":\"" + GROUP + "\",\"changes\":{\"name\":{\"zh_CN\":\"草帽海贼团\"}}}");
+    var group = ArgumentCaptor.forClass(Group.class);
+    verify(groups).update(group.capture());
+    assertThat(group.getValue().getName())
+        .isEqualTo(new I18nText().zhCN("草帽海贼团").enUS("Straw Hat Pirates"));
   }
 
   @Test

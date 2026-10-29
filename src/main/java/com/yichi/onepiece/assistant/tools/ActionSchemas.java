@@ -77,6 +77,17 @@ public final class ActionSchemas {
     return node;
   }
 
+  /**
+   * Writes an {@link #i18n} value onto {@code text}, keeping the text of a language it leaves out.
+   * Read by hand: the schema's keys are zh_CN / en_US while I18nText's JSON properties are zh-CN /
+   * en-US, so convertValue would silently drop the name.
+   */
+  public static I18nText i18nText(JsonNode value, I18nText text) {
+    if (value.hasNonNull("zh_CN")) text.zhCN(value.get("zh_CN").asText());
+    if (value.hasNonNull("en_US")) text.enUS(value.get("en_US").asText());
+    return text;
+  }
+
   static ObjectNode fields(String resource, boolean create) {
     var node = object();
     prop(node, "name", i18n(100));

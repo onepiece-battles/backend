@@ -312,13 +312,15 @@ public class ResourceToolkitTests {
     var current =
         (com.fasterxml.jackson.databind.node.ObjectNode)
             args(
-                "{\"name\":{\"zh_CN\":\"路飞\",\"en_US\":\"Luffy\"},\"attack\":200,\"base_attack\":100,\"image_uri\":\"oss-avatar\"}");
+                "{\"name\":{\"zh-CN\":\"路飞\",\"en-US\":\"Luffy\"},\"attack\":200,\"base_attack\":100,\"image_uri\":\"oss-avatar\"}");
+    // The current view uses I18nText's zh-CN / en-US keys; the model's changes use zh_CN / en_US.
     ResourceActionExecutor.merge(
         current,
         (com.fasterxml.jackson.databind.node.ObjectNode)
             args("{\"name\":{\"en_US\":\"New Luffy\"},\"attack\":150}"),
         true);
-    assertThat(current.path("name").path("zh_CN").asText()).isEqualTo("路飞");
+    assertThat(current.path("name").path("zh-CN").asText()).isEqualTo("路飞");
+    assertThat(current.path("name").path("en-US").asText()).isEqualTo("New Luffy");
     assertThat(current.path("base_attack").asInt()).isEqualTo(150);
     assertThat(current.path("attack").asInt()).isEqualTo(200);
     assertThat(current.path("image_uri").asText()).isEqualTo("oss-avatar");
