@@ -95,3 +95,17 @@ Validation note: the existing full-suite `DatabaseSchemaTests` and `MailServiceT
 working application datasource and fail to initialize in this local configuration (database
 authentication failure). The AI-tool tests and complete migration test have also been run against
 a separate, automatically removed MySQL 8 container without using the application database.
+
+## Confirmation cards
+
+The `done` SSE event and stored assistant messages also expose an optional `actionProposals`
+array. Each entry contains the server's code, operation, title, exact summary, status, expiry
+and completed-result resource links. Clients render confirmation/cancellation buttons that send
+an ordinary explicit `确认 CODE` / `取消 CODE` (or English equivalent) to `/ask`; they must not
+create a second resource through the legacy battle API.
+
+The array is projected from the confirmation store under the authenticated account and role.
+History restores current pending, completed, cancelled or expired states, including older
+text-only proposal answers whose codes can be verified in that store. Unknown or unpublished
+codes do not produce cards. Existing clients may continue to use the textual instructions;
+the original `battleProposal` field remains compatible with legacy replies.

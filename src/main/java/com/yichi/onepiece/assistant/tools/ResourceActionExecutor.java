@@ -412,14 +412,38 @@ public class ResourceActionExecutor {
       String op, ObjectNode input, ObjectNode snapshots, List<ResourceLink> refs, ToolContext c) {
     var text =
         new StringBuilder(c.language().pick("待确认操作：", "Proposed action: ")).append(title(op, c));
-    for (var ref : new LinkedHashSet<>(refs))
-      text.append("\n- [")
-          .append(ref.name().replace("[", "").replace("]", ""))
-          .append("](onepiece://")
-          .append(ref.type())
-          .append('/')
-          .append(ref.id())
-          .append(')');
+    if (op.equals("create_battle")) {
+      for (String participant : List.of("starter", "receiver")) {
+        var ref =
+            refs.stream()
+                .filter(
+                    r ->
+                        r.type().equals("character")
+                            && r.id().equals(input.path(participant).asText()))
+                .findFirst()
+                .orElseThrow();
+        String role =
+            participant.equals("starter")
+                ? c.language().pick("发起方", "Starter")
+                : c.language().pick("接受方", "Receiver");
+        text.append("\n- ")
+            .append(role)
+            .append(": [")
+            .append(ref.name().replace("[", "").replace("]", ""))
+            .append("](onepiece://character/")
+            .append(ref.id())
+            .append(')');
+      }
+    } else {
+      for (var ref : new LinkedHashSet<>(refs))
+        text.append("\n- [")
+            .append(ref.name().replace("[", "").replace("]", ""))
+            .append("](onepiece://")
+            .append(ref.type())
+            .append('/')
+            .append(ref.id())
+            .append(')');
+    }
     JsonNode values =
         input.has("data") ? input.get("data") : input.has("changes") ? input.get("changes") : input;
     values

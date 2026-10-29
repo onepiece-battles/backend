@@ -1,6 +1,8 @@
 package com.yichi.onepiece.assistant.controller;
 
 import com.yichi.onepiece.assistant.agent.AssistantAgent;
+import com.yichi.onepiece.assistant.agent.ToolContext;
+import com.yichi.onepiece.assistant.tools.ActionConfirmationService;
 import com.yichi.onepiece.assistant.agent.AssistantCancelledException;
 import com.yichi.onepiece.assistant.agent.AssistantException;
 import com.yichi.onepiece.assistant.agent.AssistantExecutors;
@@ -55,14 +57,16 @@ public class AssistantController {
     private final AssistantAgent agent;
     private final AssistantRateLimiter rateLimiter;
     private final AssistantExecutors executors;
+    private final ActionConfirmationService actions;
 
     public AssistantController(AiAssistantService assistantService, AiSettingService settingService,
-            AssistantAgent agent, AssistantRateLimiter rateLimiter, AssistantExecutors executors) {
+            AssistantAgent agent, AssistantRateLimiter rateLimiter, AssistantExecutors executors, ActionConfirmationService actions) {
         this.assistantService = assistantService;
         this.settingService = settingService;
         this.agent = agent;
         this.rateLimiter = rateLimiter;
         this.executors = executors;
+        this.actions = actions;
     }
 
     /**
@@ -138,7 +142,9 @@ public class AssistantController {
 
     @PostMapping("/list_messages")
     public ListAiMessagesResponse listMessages() {
-        return new ListAiMessagesResponse(assistantService.listMessages(UserHelper.getCurrentUserId()));
+        var user = UserHelper.getCurrentUserDetail();
+        var context = new ToolContext(user.getId(), AssistantLanguage.resolve(null, user.getLocale()));
+        return new ListAiMessagesResponse(actions.decorateMessages(assistantService.listMessages(user.getId()), context));
     }
 
     @PostMapping("/save_message")
