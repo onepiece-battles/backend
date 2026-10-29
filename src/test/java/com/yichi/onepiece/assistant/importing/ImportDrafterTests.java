@@ -120,11 +120,12 @@ public class ImportDrafterTests {
     assertThat(luffy.data().path("name").path("en_US").asText()).isEqualTo("Monkey D. Luffy");
     assertThat(luffy.data().path("hakis").isArray()).isTrue();
     var zoro = item(draft, "c2");
-    assertThat(zoro.fruits()).isEmpty(); // unknown fruit key dropped
+    assertThat(zoro.fruits()).isEmpty(); // unknown fruit key dropped, with a note
     assertThat(zoro.position()).isEqualTo("member"); // unknown position falls back
     assertThat(item(draft, "g1").data().path("group_category").asText()).isEqualTo("pirate");
     assertThat(item(draft, "f2").problems()).isEmpty();
-    assertThat(draft.notes()).containsExactly("只包含当前成员");
+    assertThat(draft.notes()).hasSize(2).first().isEqualTo("只包含当前成员");
+    assertThat(draft.notes().get(1)).contains("罗罗诺亚·索隆", "「nope」");
     assertThat(progress).isNotEmpty();
     var detailRequest = deepSeek.requests.get(1);
     assertThat(detailRequest.jsonOutput()).isTrue();
@@ -132,6 +133,38 @@ public class ImportDrafterTests {
     assertThat(detailRequest.messages().get(0).path("content").asText())
         .contains("attack: integer 10–1500")
         .contains("\"name\":\"路飞\"");
+  }
+
+  @Test
+  public void notesFruitsNobodyEatsAndRelationsItCouldNotLink() {
+    when(existing.find(
+            eq(FRUIT), argThat(n -> Set.of("影子果实", "透明果实").contains(n.getZhCN())), any()))
+        .thenReturn(Optional.of(UUID.randomUUID()));
+    // The model names Perona's fruit and crew instead of using their keys, and adds a fruit
+    // that no one in the crew eats. An unheld fruit that already exists is only reused: no note.
+    deepSeek.roster =
+        """
+        {"groups":[{"key":"crew","name":{"zh_CN":"月光莫利亚海贼团"},"group_category":"pirate"}],
+         "fruits":[{"key":"kage","name":{"zh_CN":"影子果实"},"fruit_type":"Paramecia"},
+                   {"key":"suke","name":{"zh_CN":"透明果实"},"fruit_type":"Paramecia"},
+                   {"key":"horo","name":{"zh_CN":"灵灵果实"},"fruit_type":"Paramecia"},
+                   {"key":"boar","name":{"zh_CN":"野猪果实"},"fruit_type":"Zoan"}],
+         "characters":[{"key":"moria","name":{"zh_CN":"杰克斯·莫利亚"},"fruits":["kage"],"group":"crew"},
+                       {"key":"perona","name":{"zh_CN":"佩罗娜"},"fruits":["灵灵果实"],"group":"月光莫利亚海贼团"},
+                       {"key":"absalom","name":{"zh_CN":"阿布萨罗姆"},"group":"crew"}]}
+        """;
+
+    var draft = drafter.draft("月光莫利亚海贼团", userId, AssistantLanguage.ZH_CN, progress::add);
+
+    assertThat(item(draft, "c2").fruits()).isEmpty();
+    assertThat(item(draft, "c2").group()).isNull();
+    assertThat(draft.notes())
+        .containsExactly(
+            "「佩罗娜」的果实「灵灵果实」不在名单里，已忽略，请确认。",
+            "「佩罗娜」的团体「月光莫利亚海贼团」不在名单里，已忽略，请确认。",
+            "「灵灵果实」：草稿里没有角色吃这个果实，请确认是否需要导入。",
+            "「野猪果实」：草稿里没有角色吃这个果实，请确认是否需要导入。");
+    assertThat(item(draft, "c1").fruits()).containsExactly("f1");
   }
 
   @Test

@@ -129,6 +129,7 @@ public class ImportDrafter {
     for (var entry : entries) {
       existing.find(entry.type, entry.name, userId).ifPresent(id -> entry.existingId = id.toString());
     }
+    noteUnheldFruits(entries, notes, language);
 
     var toDetail =
         entries.stream()
@@ -197,10 +198,38 @@ public class ImportDrafter {
     return json.createObjectNode().put("role", role).put("content", content);
   }
 
+  /** A note for a roster relation whose key matches no listed fruit or group. */
+  private static String droppedLink(
+      I18nText character, String reference, String zh, String en, AssistantLanguage language) {
+    String who = language.displayName(character);
+    return language.pick(
+        "「" + who + "」的" + zh + "「" + reference + "」不在名单里，已忽略，请确认。",
+        who + ": the " + en + " \"" + reference + "\" is not in the roster and was left out.");
+  }
+
+  /**
+   * New fruits that no character in the draft eats. Usually the model left out (or made up) the
+   * holder, and an unheld fruit is easy to import by mistake.
+   */
+  private static void noteUnheldFruits(
+      List<Entry> entries, List<String> notes, AssistantLanguage language) {
+    var eaten = new HashSet<String>();
+    entries.forEach(entry -> eaten.addAll(entry.fruits));
+    for (var entry : entries) {
+      if (!entry.type.equals(FRUIT) || entry.existingId != null || eaten.contains(entry.key))
+        continue;
+      String fruit = language.displayName(entry.name);
+      notes.add(
+          language.pick(
+              "「" + fruit + "」：草稿里没有角色吃这个果实，请确认是否需要导入。",
+              fruit + ": no character in this draft eats this fruit; check that it belongs."));
+    }
+  }
+
   /**
    * Reads the roster with keys reassigned by the server (g1, f1, c1, …): the model's keys only link
    * its own entries. Unknown categories/types/positions are dropped, relations to unlisted keys are
-   * dropped, and duplicate names keep their first entry.
+   * dropped with a note, and duplicate names keep their first entry.
    */
   private List<Entry> readRoster(JsonNode roster, List<String> notes, AssistantLanguage language) {
     for (var note : roster.path("notes")) if (note.isTextual()) notes.add(note.asText());
@@ -237,9 +266,13 @@ public class ImportDrafter {
       var entry = new Entry("c" + (++characters), CHARACTER, name);
       for (var fruit : c.path("fruits")) {
         String key = fruitKeys.get(fruit.asText());
-        if (key != null && !entry.fruits.contains(key)) entry.fruits.add(key);
+        if (key == null) notes.add(droppedLink(name, fruit.asText(), "果实", "fruit", language));
+        else if (!entry.fruits.contains(key)) entry.fruits.add(key);
       }
-      entry.group = groupKeys.get(c.path("group").asText());
+      String group = c.path("group").asText("");
+      entry.group = groupKeys.get(group);
+      if (entry.group == null && !group.isBlank())
+        notes.add(droppedLink(name, group, "团体", "group", language));
       if (entry.group != null) {
         String position = c.path("position").asText();
         entry.position = validEnum(position, GroupPosition.values()) ? position : "member";
