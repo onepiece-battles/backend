@@ -77,7 +77,7 @@ public final class ActionSchemas {
     return node;
   }
 
-  static ObjectNode fields(String resource, boolean create) {
+  public static ObjectNode fields(String resource, boolean create) {
     var node = object();
     prop(node, "name", i18n(100));
     switch (resource) {
