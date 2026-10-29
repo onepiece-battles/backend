@@ -69,14 +69,6 @@ public final class ActionSchemas {
     for (var key : keys) r.add(key);
   }
 
-  static ObjectNode i18n(int max) {
-    var node = object();
-    prop(node, "zh_CN", string(max));
-    prop(node, "en_US", string(max));
-    node.put("minProperties", 1);
-    return node;
-  }
-
   /**
    * Writes an {@link #i18n} value onto {@code text}, keeping the text of a language it leaves out.
    * Read by hand: the schema's keys are zh_CN / en_US while I18nText's JSON properties are zh-CN /
@@ -86,6 +78,14 @@ public final class ActionSchemas {
     if (value.hasNonNull("zh_CN")) text.zhCN(value.get("zh_CN").asText());
     if (value.hasNonNull("en_US")) text.enUS(value.get("en_US").asText());
     return text;
+  }
+
+  static ObjectNode i18n(int max) {
+    var node = object();
+    prop(node, "zh_CN", string(max));
+    prop(node, "en_US", string(max));
+    node.put("minProperties", 1);
+    return node;
   }
 
   static ObjectNode fields(String resource, boolean create) {
