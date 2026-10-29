@@ -44,6 +44,12 @@ final class SseEventSink implements AssistantEventSink {
         complete();
     }
 
+    /** Sends a final event of any name (the import's {@code draft}) and ends the stream. */
+    void finish(String event, Object data) {
+        send(event, data);
+        complete();
+    }
+
     @Override
     public void error(String code, String message) {
         try {

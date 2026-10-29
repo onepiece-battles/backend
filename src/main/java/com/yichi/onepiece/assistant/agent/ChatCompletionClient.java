@@ -14,7 +14,10 @@ public interface ChatCompletionClient {
      */
     Completion complete(CompletionRequest request, Consumer<String> onContentDelta);
 
-    /** {@code tools} is null when the model must answer without calling tools. */
+    /**
+     * {@code tools} is null when the model must answer without calling tools;
+     * {@code jsonOutput} asks for a single JSON object as the answer.
+     */
     record CompletionRequest(
             String baseUrl,
             String apiKey,
@@ -22,7 +25,14 @@ public interface ChatCompletionClient {
             List<ObjectNode> messages,
             ArrayNode tools,
             double temperature,
-            int maxTokens) {}
+            int maxTokens,
+            boolean jsonOutput) {
+
+        public CompletionRequest(String baseUrl, String apiKey, String model, List<ObjectNode> messages,
+                ArrayNode tools, double temperature, int maxTokens) {
+            this(baseUrl, apiKey, model, messages, tools, temperature, maxTokens, false);
+        }
+    }
 
     record ToolCall(String id, String name, String arguments) {}
 

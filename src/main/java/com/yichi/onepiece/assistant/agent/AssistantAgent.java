@@ -200,7 +200,7 @@ public class AssistantAgent {
         }
     }
 
-    static String resolveModel(String configured) {
+    public static String resolveModel(String configured) {
         String model = configured == null ? "" : configured.trim();
         if (TOOL_CAPABLE_MODELS.contains(model)) {
             return model;
