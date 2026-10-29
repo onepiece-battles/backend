@@ -317,15 +317,9 @@ public class ImportCommitter {
     return item.position() == null || item.position().isBlank() ? "member" : item.position();
   }
 
-  /**
-   * The draft's name as I18nText. Read by hand: the schema's keys are zh_CN / en_US while
-   * I18nText's JSON properties are zh-CN / en-US, so convertValue would silently drop the name.
-   */
+  /** The draft's name as I18nText; see {@link ActionSchemas#i18nText}. */
   static I18nText name(JsonNode data) {
-    JsonNode name = data.path("name");
-    return new I18nText()
-        .zhCN(name.hasNonNull("zh_CN") ? name.get("zh_CN").asText() : null)
-        .enUS(name.hasNonNull("en_US") ? name.get("en_US").asText() : null);
+    return ActionSchemas.i18nText(data.path("name"), new I18nText());
   }
 
   private UUID create(ImportItem item, UUID userId, UUID roleId) {
