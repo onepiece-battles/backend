@@ -255,7 +255,7 @@ public class ResourceActionExecutorTests {
             "{\"data\":{\"name\":{\"zh_CN\":\"路飞\",\"en_US\":\"Luffy\"},\"race\":\"HUMAN\","
                 + "\"battle_style\":\"BODY\",\"maximum_fruit_count\":1,\"group_gain\":100,"
                 + "\"attack\":100,\"defense\":100,\"blood\":1000,\"speed\":50,"
-                + "\"intelligence\":100,\"energy\":20}}");
+                + "\"intelligence\":100,\"energy\":150}}");
     var characterRequest = ArgumentCaptor.forClass(CreateCharacterRequest.class);
     verify(characters).createCharacter(characterRequest.capture());
     assertThat(characterRequest.getValue().getName())
