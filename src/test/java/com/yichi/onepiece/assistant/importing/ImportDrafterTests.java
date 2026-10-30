@@ -71,7 +71,7 @@ public class ImportDrafterTests {
   private static String character(String key, String extra) {
     return "{\"key\":\"" + key + "\",\"data\":{\"race\":\"HUMAN\",\"battle_style\":\"KATANA\","
         + "\"maximum_fruit_count\":1,\"group_gain\":120,\"attack\":800,\"defense\":500,"
-        + "\"blood\":4000,\"speed\":110,\"intelligence\":120,\"energy\":35" + extra + "}}";
+        + "\"blood\":4000,\"speed\":110,\"intelligence\":120,\"energy\":150" + extra + "}}";
   }
 
   private static String fruit(String key) {

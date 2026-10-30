@@ -49,7 +49,7 @@ public class ImportCommitterTests {
     data.set("name", name(zh, en));
     data.put("race", "HUMAN").put("battle_style", "BODY").put("maximum_fruit_count", fruitCapacity);
     data.put("group_gain", 120).put("attack", 900).put("defense", 600).put("blood", 5000);
-    data.put("speed", 120).put("intelligence", 150).put("energy", 40).put("bounty", 3000000000L);
+    data.put("speed", 120).put("intelligence", 150).put("energy", 150).put("bounty", 3000000000L);
     data.putArray("hakis").add("Haoshoku");
     return data;
   }

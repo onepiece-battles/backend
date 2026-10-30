@@ -88,6 +88,10 @@ public final class ActionSchemas {
     return node;
   }
 
+  /**
+   * The create / update fields of a resource. Ranges match the app's own create forms (the
+   * generated CreateCharacterRequest still documents older energy and bounty limits).
+   */
   public static ObjectNode fields(String resource, boolean create) {
     var node = object();
     prop(node, "name", i18n(100));
@@ -100,7 +104,7 @@ public final class ActionSchemas {
         prop(node, "height", number(1, 100000, true));
         prop(node, "birth_place", string(200));
         prop(node, "date_of_birth", string(100));
-        prop(node, "bounty", number(10, 10000000000L, true));
+        prop(node, "bounty", number(10, 100000000000L, true));
         prop(node, "maximum_fruit_count", number(1, 2, true));
         prop(node, "group_gain", number(100, 200, true));
         prop(node, "attack", number(10, 1500, true));
@@ -108,7 +112,7 @@ public final class ActionSchemas {
         prop(node, "blood", number(100, 10000, true));
         prop(node, "speed", number(10, 200, true));
         prop(node, "intelligence", number(70, 260, true));
-        prop(node, "energy", number(10, 50, true));
+        prop(node, "energy", number(100, 300, true));
         if (create)
           required(
               node,
@@ -126,7 +130,7 @@ public final class ActionSchemas {
       }
       case "fruit" -> {
         prop(node, "fruit_type", enums(FruitType.values()));
-        prop(node, "energy_consume", number(0, 100, true));
+        prop(node, "energy_consume", number(1, 10, true));
         String[] stats = {"attack", "defense", "blood", "group_gain", "speed", "intelligence"};
         double[] maxSlopes = {1.5, 1.5, 1.5, 2, 3, 2};
         int[] mins = {-100, -100, -1000, -10, -10, -30}, maxs = {300, 800, 3000, 30, 30, 30};
