@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yichi.onepiece.assistant.agent.AssistantAgent;
 import com.yichi.onepiece.assistant.agent.AssistantException;
@@ -55,6 +56,8 @@ public class ImportDrafter {
   static final int REFERENCE_FRUITS = 6;
   static final double TEMPERATURE = 0.2;
   static final int MAX_TOKENS = 4000;
+  static final int MAX_HISTORY = 12;
+  static final int MAX_TURN_LENGTH = 2000;
 
   private final AiSettingService settings;
   private final ChatCompletionClient client;
@@ -102,16 +105,19 @@ public class ImportDrafter {
     }
   }
 
-  public ImportDraft draft(
-      String scope, UUID userId, AssistantLanguage language, Consumer<String> progress) {
+  private Settings connect(AssistantLanguage language) {
     if (!settings.isConfigured()) {
       throw new AssistantException(
           AssistantException.NOT_CONFIGURED,
           language.pick("还没有配置 DeepSeek Key。", "No DeepSeek key is configured yet."));
     }
-    var s =
-        new Settings(
-            settings.baseUrl(), settings.apiKey(), AssistantAgent.resolveModel(settings.model()));
+    return new Settings(
+        settings.baseUrl(), settings.apiKey(), AssistantAgent.resolveModel(settings.model()));
+  }
+
+  public ImportDraft draft(
+      String scope, UUID userId, AssistantLanguage language, Consumer<String> progress) {
+    var s = connect(language);
     var notes = new ArrayList<String>();
 
     progress.accept(language.pick("正在梳理名单…", "Listing who and what is in scope…"));
@@ -131,40 +137,9 @@ public class ImportDrafter {
     }
     noteUnheldFruits(entries, notes, language);
 
-    var toDetail =
-        entries.stream()
-            .filter(e -> e.existingId == null && !e.type.equals(GROUP))
-            .toList();
-    Map<String, JsonNode> details = new HashMap<>();
-    if (!toDetail.isEmpty()) {
-      String references = references(userId);
-      var batches = new ArrayList<List<Entry>>();
-      for (int i = 0; i < toDetail.size(); i += BATCH_SIZE)
-        batches.add(toDetail.subList(i, Math.min(i + BATCH_SIZE, toDetail.size())));
-      progress.accept(
-          language.pick(
-              "正在起草 " + toDetail.size() + " 项属性（" + batches.size() + " 批）…",
-              "Drafting " + toDetail.size() + " items in " + batches.size() + " batches…"));
-      var byKey = new HashMap<String, Entry>();
-      entries.forEach(e -> byKey.put(e.key, e));
-      var futures =
-          batches.stream()
-              .map(
-                  batch ->
-                      CompletableFuture.supplyAsync(
-                          () -> ask(s, ImportPrompts.detail(references), detailRequest(batch, byKey)),
-                          detailExecutor))
-              .toList();
-      try {
-        for (var future : futures) {
-          for (var item : future.join().path("items")) details.put(item.path("key").asText(), item);
-        }
-      } catch (CompletionException e) {
-        futures.forEach(f -> f.cancel(true));
-        if (e.getCause() instanceof RuntimeException cause) throw cause;
-        throw e;
-      }
-    }
+    var byKey = new HashMap<String, Entry>();
+    entries.forEach(e -> byKey.put(e.key, e));
+    var details = details(s, entries, byKey, userId, language, progress);
 
     progress.accept(language.pick("正在校验草稿…", "Checking the draft…"));
     var items = new ArrayList<ImportItem>();
@@ -172,10 +147,332 @@ public class ImportDrafter {
     return new ImportDraft(items, notes);
   }
 
+  /**
+   * Drafts the create fields of the new characters and fruits among {@code entries}, in parallel
+   * batches, by entry key. {@code byKey} names their relations for context.
+   */
+  private Map<String, JsonNode> details(
+      Settings s,
+      List<Entry> entries,
+      Map<String, Entry> byKey,
+      UUID userId,
+      AssistantLanguage language,
+      Consumer<String> progress) {
+    var toDetail =
+        entries.stream().filter(e -> e.existingId == null && !e.type.equals(GROUP)).toList();
+    Map<String, JsonNode> details = new HashMap<>();
+    if (toDetail.isEmpty()) return details;
+    String references = references(userId);
+    var batches = new ArrayList<List<Entry>>();
+    for (int i = 0; i < toDetail.size(); i += BATCH_SIZE)
+      batches.add(toDetail.subList(i, Math.min(i + BATCH_SIZE, toDetail.size())));
+    progress.accept(
+        language.pick(
+            "正在起草 " + toDetail.size() + " 项属性（" + batches.size() + " 批）…",
+            "Drafting " + toDetail.size() + " items in " + batches.size() + " batches…"));
+    var futures =
+        batches.stream()
+            .map(
+                batch ->
+                    CompletableFuture.supplyAsync(
+                        () -> ask(s, ImportPrompts.detail(references), detailRequest(batch, byKey)),
+                        detailExecutor))
+            .toList();
+    try {
+      for (var future : futures) {
+        for (var item : future.join().path("items")) details.put(item.path("key").asText(), item);
+      }
+    } catch (CompletionException e) {
+      futures.forEach(f -> f.cancel(true));
+      if (e.getCause() instanceof RuntimeException cause) throw cause;
+      throw e;
+    }
+    return details;
+  }
+
+  /**
+   * Applies a reviewer's request to the current draft. The model answers with changes only
+   * (remove / add / update), so everything it does not mention keeps the reviewer's own edits.
+   * Added characters and fruits get their create fields drafted as in {@link #draft}; afterwards
+   * every item is checked again and the notes are worked out afresh.
+   */
+  public ImportRevision revise(
+      List<ImportItem> current,
+      List<Turn> history,
+      String instruction,
+      UUID userId,
+      AssistantLanguage language,
+      Consumer<String> progress) {
+    var s = connect(language);
+    progress.accept(language.pick("正在理解你的修改…", "Working out the changes…"));
+    var messages = new ArrayList<ObjectNode>();
+    messages.add(
+        message("system", ImportPrompts.revise(language.pick("Simplified Chinese", "English"))));
+    var turns = history == null ? List.<Turn>of() : history;
+    for (var turn : turns.subList(Math.max(0, turns.size() - MAX_HISTORY), turns.size()))
+      if (turn != null && turn.content() != null && Set.of("user", "assistant").contains(turn.role()))
+        messages.add(message(turn.role(), truncate(turn.content(), MAX_TURN_LENGTH)));
+    messages.add(
+        message("user", "Current draft:\n" + roster(current) + "\n\nRequest: " + instruction));
+    JsonNode changes = ask(s, messages);
+
+    var items = new LinkedHashMap<String, ImportItem>();
+    for (var item : current) if (item != null && item.key() != null) items.put(item.key(), item);
+    // Keys of removed items are not handed out again: the page keeps per-key review state.
+    var taken = Set.copyOf(items.keySet());
+    var notes = new ArrayList<String>();
+    for (var note : changes.path("notes")) if (note.isTextual()) notes.add(note.asText());
+    var changed = new LinkedHashSet<String>();
+    for (var key : changes.path("remove")) items.remove(key.asText());
+
+    // The model's keys for new items map to server keys after the current ones; a "new" item with
+    // the name of a current one maps to that item.
+    var keys = new HashMap<String, String>();
+    var named = new HashMap<String, String>();
+    for (var item : items.values()) {
+      keys.put(item.key(), item.key());
+      var name = name(item.data() == null ? MissingNode.getInstance() : item.data().path("name"));
+      if (name != null) named.put(item.type() + ":" + ExistingResources.normalize(display(name)), item.key());
+    }
+    var added = new ArrayList<Entry>();
+    var relations = new HashMap<Entry, JsonNode>();
+    JsonNode add = changes.path("add");
+    for (var section : List.of(GROUP, FRUIT, CHARACTER)) {
+      for (var node : add.path(section + "s")) {
+        var name = name(node.path("name"));
+        if (name == null) continue;
+        String same = named.get(section + ":" + ExistingResources.normalize(display(name)));
+        if (same != null) {
+          keys.put(node.path("key").asText(), same);
+          continue;
+        }
+        if (count(items.values(), added, section) >= limit(section)) {
+          notes.add(
+              language.pick(
+                  "已达到单次导入的上限，没有加上「" + display(name) + "」。",
+                  "The draft is full; " + display(name) + " was not added."));
+          continue;
+        }
+        var entry = new Entry(nextKey(section, taken, added), section, name);
+        if (section.equals(GROUP)) {
+          String category = node.path("group_category").asText();
+          if (validEnum(category, GroupCategory.values()) && !category.equals("group"))
+            entry.rosterData.put("group_category", category);
+        } else if (section.equals(FRUIT)) {
+          String fruitType = node.path("fruit_type").asText();
+          if (validEnum(fruitType, FruitType.values())) entry.rosterData.put("fruit_type", fruitType);
+        } else relations.put(entry, node);
+        keys.put(node.path("key").asText(), entry.key);
+        named.put(section + ":" + ExistingResources.normalize(display(name)), entry.key);
+        added.add(entry);
+      }
+    }
+    var types = new HashMap<String, String>();
+    items.values().forEach(i -> types.put(i.key(), i.type()));
+    added.forEach(e -> types.put(e.key, e.type));
+    for (var relation : relations.entrySet()) {
+      var entry = relation.getKey();
+      var node = relation.getValue();
+      entry.fruits.addAll(
+          linked(node.path("fruits"), FRUIT, entry.name, keys, types, notes, language));
+      var group = linked(node.path("group"), GROUP, entry.name, keys, types, notes, language);
+      if (!group.isEmpty()) {
+        entry.group = group.get(0);
+        String position = node.path("position").asText();
+        entry.position = validEnum(position, GroupPosition.values()) ? position : "member";
+      }
+    }
+
+    for (var update : changes.path("update")) {
+      var item = items.get(update.path("key").asText());
+      if (item == null) continue;
+      boolean fresh = item.existingId() == null;
+      var data = item.data() == null ? json.createObjectNode() : item.data().deepCopy();
+      var uncertain = new ArrayList<>(item.uncertain() == null ? List.<String>of() : item.uncertain());
+      if (fresh && update.path("name").isObject()) {
+        var name = name(data.path("name"));
+        var patch = name(update.path("name"));
+        if (patch != null)
+          data.set(
+              "name",
+              nameNode(
+                  new I18nText()
+                      .zhCN(patch.getZhCN() != null ? patch.getZhCN() : name == null ? null : name.getZhCN())
+                      .enUS(patch.getEnUS() != null ? patch.getEnUS() : name == null ? null : name.getEnUS())));
+      }
+      if (fresh && update.path("data").isObject()) sanitize(item.type(), update.get("data"), data, uncertain);
+      var fruits = item.fruits();
+      var group = item.group();
+      var position = item.position();
+      if (item.type().equals(CHARACTER)) {
+        var name = name(data.path("name"));
+        if (update.has("fruits"))
+          fruits = linked(update.get("fruits"), FRUIT, name, keys, types, notes, language);
+        if (update.has("group")) {
+          var linked = linked(update.get("group"), GROUP, name, keys, types, notes, language);
+          group = linked.isEmpty() ? null : linked.get(0);
+          if (group == null) position = null;
+          else if (position == null) position = "member";
+        }
+        String requested = update.path("position").asText();
+        if (group != null && validEnum(requested, GroupPosition.values())) position = requested;
+      }
+      items.put(
+          item.key(),
+          new ImportItem(
+              item.key(), item.type(), data, item.existingId(), fruits, group, position, uncertain, List.of()));
+      changed.add(item.key());
+    }
+
+    if (!added.isEmpty()) {
+      progress.accept(language.pick("正在核对已有数据…", "Checking what already exists…"));
+      for (var entry : added)
+        existing.find(entry.type, entry.name, userId).ifPresent(id -> entry.existingId = id.toString());
+      var byKey = new HashMap<String, Entry>();
+      for (var item : items.values()) {
+        var entry = entry(item);
+        if (entry != null) byKey.put(entry.key, entry);
+      }
+      added.forEach(e -> byKey.put(e.key, e));
+      var details = details(s, added, byKey, userId, language, progress);
+      for (var entry : added) {
+        items.put(entry.key, toItem(entry, details.get(entry.key), language));
+        changed.add(entry.key);
+      }
+    }
+
+    progress.accept(language.pick("正在校验草稿…", "Checking the draft…"));
+    var result = new ArrayList<ImportItem>();
+    for (var item : items.values()) result.add(checked(item, items.keySet(), language));
+    var entries = new ArrayList<Entry>();
+    for (var item : result) {
+      var entry = entry(item);
+      if (entry != null) entries.add(entry);
+    }
+    noteUnheldFruits(entries, notes, language);
+    String reply = changes.path("reply").asText("").trim();
+    return new ImportRevision(
+        result,
+        notes,
+        reply.isEmpty() ? language.pick("草稿已更新。", "The draft is updated.") : reply,
+        List.copyOf(changed));
+  }
+
+  /** The draft as the revise prompt shows it: relations, and the editable fields of new items. */
+  private String roster(List<ImportItem> items) {
+    var roster = json.createObjectNode();
+    for (var type : List.of(GROUP, FRUIT, CHARACTER)) {
+      var list = roster.putArray(type + "s");
+      for (var item : items) {
+        if (item == null || !type.equals(item.type())) continue;
+        var node = list.addObject().put("key", item.key());
+        var data = item.data() == null ? json.createObjectNode() : item.data();
+        node.set("name", data.path("name").deepCopy());
+        node.put("existing", item.existingId() != null);
+        if (type.equals(CHARACTER)) {
+          node.set("fruits", json.valueToTree(item.fruits() == null ? List.of() : item.fruits()));
+          if (item.group() != null) node.put("group", item.group()).put("position", item.position());
+        }
+        if (item.existingId() == null) {
+          var fields = data.deepCopy();
+          fields.remove("name");
+          node.set("data", fields);
+        }
+      }
+    }
+    return roster.toString();
+  }
+
+  /**
+   * The keys of {@code type} that {@code refs} (a key or an array of keys) points to. A reference
+   * to no such item is dropped with a note, as when the draft is first read.
+   */
+  private static List<String> linked(
+      JsonNode refs,
+      String type,
+      I18nText character,
+      Map<String, String> keys,
+      Map<String, String> types,
+      List<String> notes,
+      AssistantLanguage language) {
+    var result = new ArrayList<String>();
+    Iterable<JsonNode> values = refs.isArray() ? refs : refs.isTextual() ? List.of(refs) : List.of();
+    for (var ref : values) {
+      String key = keys.get(ref.asText());
+      if (key == null || !type.equals(types.get(key))) {
+        if (character != null && !ref.asText().isBlank())
+          notes.add(droppedLink(character, ref.asText(), type.equals(FRUIT) ? "果实" : "团体", type, language));
+      } else if (!result.contains(key)) result.add(key);
+    }
+    return result;
+  }
+
+  /** The item checked again: capacity fitted to its fruits, required fields, dangling links cut. */
+  private ImportItem checked(ImportItem item, Set<String> present, AssistantLanguage language) {
+    var fruits =
+        (item.fruits() == null ? List.<String>of() : item.fruits())
+            .stream().filter(present::contains).toList();
+    String group = present.contains(item.group()) ? item.group() : null;
+    if (item.existingId() != null)
+      return new ImportItem(
+          item.key(), item.type(), item.data(), item.existingId(), fruits, group,
+          group == null ? null : item.position(), List.of(), List.of());
+    var data = item.data() == null ? json.createObjectNode() : item.data().deepCopy();
+    var uncertain = new ArrayList<>(item.uncertain() == null ? List.<String>of() : item.uncertain());
+    var problems = new ArrayList<String>();
+    if (item.type().equals(CHARACTER)) {
+      if (!data.has("hakis")) data.putArray("hakis");
+      fitFruitCapacity(fruits.size(), data, uncertain, problems, language);
+    }
+    missingRequired(item.type(), data, problems, language);
+    return new ImportItem(
+        item.key(), item.type(), data, null, fruits, group, group == null ? null : item.position(),
+        uncertain, problems);
+  }
+
+  private Entry entry(ImportItem item) {
+    var name = name(item.data() == null ? MissingNode.getInstance() : item.data().path("name"));
+    if (name == null) return null;
+    var entry = new Entry(item.key(), item.type(), name);
+    entry.existingId = item.existingId();
+    if (item.fruits() != null) entry.fruits.addAll(item.fruits());
+    entry.group = item.group();
+    entry.position = item.position();
+    return entry;
+  }
+
+  private static int limit(String type) {
+    return switch (type) {
+      case GROUP -> MAX_GROUPS;
+      case FRUIT -> MAX_FRUITS;
+      default -> MAX_CHARACTERS;
+    };
+  }
+
+  private static long count(Collection<ImportItem> items, List<Entry> added, String type) {
+    return items.stream().filter(i -> type.equals(i.type())).count()
+        + added.stream().filter(e -> e.type.equals(type)).count();
+  }
+
+  /** g4 after g1–g3: one past the highest number the type's prefix has had in this draft. */
+  private static String nextKey(String type, Set<String> current, List<Entry> added) {
+    String prefix = type.substring(0, 1);
+    int max = 0;
+    var all = new ArrayList<>(current);
+    added.forEach(e -> all.add(e.key));
+    for (var key : all) {
+      if (key.startsWith(prefix) && key.substring(1).matches("\\d+"))
+        max = Math.max(max, Integer.parseInt(key.substring(1)));
+    }
+    return prefix + (max + 1);
+  }
+
   /** One JSON-mode completion; a reply that is not a JSON object is retried once. */
   private JsonNode ask(Settings s, String system, String user) {
-    var messages =
-        List.of(message("system", system), message("user", user));
+    return ask(s, List.of(message("system", system), message("user", user)));
+  }
+
+  private JsonNode ask(Settings s, List<ObjectNode> messages) {
     for (int attempt = 1; ; attempt++) {
       var completion =
           client.complete(
@@ -376,7 +673,7 @@ public class ImportDrafter {
           data.set("fruit_type", entry.rosterData.get("fruit_type"));
         if (entry.type.equals(CHARACTER)) {
           if (!data.has("hakis")) data.putArray("hakis");
-          fitFruitCapacity(entry, data, uncertain, problems, language);
+          fitFruitCapacity(entry.fruits.size(), data, uncertain, problems, language);
         }
       }
       missingRequired(entry.type, data, problems, language);
@@ -480,12 +777,11 @@ public class ImportDrafter {
 
   /** A character that eats more fruits than its capacity gets the capacity raised (max 2). */
   private void fitFruitCapacity(
-      Entry entry,
+      int fruits,
       ObjectNode data,
       List<String> uncertain,
       List<String> problems,
       AssistantLanguage language) {
-    int fruits = entry.fruits.size();
     if (fruits > 2) {
       problems.add(
           language.pick(

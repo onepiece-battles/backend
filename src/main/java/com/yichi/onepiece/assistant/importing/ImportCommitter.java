@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class ImportCommitter {
-  static final int MAX_ITEMS = 60;
+  public static final int MAX_ITEMS = 60;
   private static final ObjectMapper JSON =
       new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -105,6 +105,17 @@ public class ImportCommitter {
       } else validateNew(item, key, userId, names, language, problems);
     }
     for (var item : byKey.values()) validateRelations(item, byKey, current, language, problems);
+    var held = new HashSet<String>();
+    for (var item : byKey.values())
+      if (item.type().equals(CHARACTER)) held.addAll(nonNull(item.fruits()));
+    for (var item : byKey.values())
+      if (item.type().equals(FRUIT) && item.existingId() == null && !held.contains(item.key()))
+        problems.add(
+            new Problem(
+                item.key(),
+                language.pick(
+                    "这个果实还没有持有者：请选择吃它的角色，或不导入它。",
+                    "No character eats this fruit: choose who ate it, or leave it out.")));
     if (!problems.isEmpty()) throw new ImportRejected(problems);
 
     var ids = new HashMap<String, UUID>();

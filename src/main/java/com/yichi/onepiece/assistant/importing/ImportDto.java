@@ -36,6 +36,23 @@ public final class ImportDto {
 
   public record ImportDraft(List<ImportItem> items, List<String> notes) {}
 
+  /** One message of the review conversation: {@code role} is "user" or "assistant". */
+  public record Turn(String role, String content) {}
+
+  /**
+   * The reviewer asks the AI to change the current draft ({@code items}, with the reviewer's own
+   * edits). {@code messages} is the conversation so far, oldest first.
+   */
+  public record ReviseRequest(
+      List<ImportItem> items, List<Turn> messages, String instruction, String language) {}
+
+  /**
+   * The draft after a revision. {@code reply} answers the reviewer; {@code changed} lists the keys
+   * of the items that were added or modified.
+   */
+  public record ImportRevision(
+      List<ImportItem> items, List<String> notes, String reply, List<String> changed) {}
+
   public record CommitRequest(List<ImportItem> items, String language) {}
 
   public record CreatedResource(String key, String type, String id, String name) {}
