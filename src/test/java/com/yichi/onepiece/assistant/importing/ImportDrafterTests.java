@@ -11,6 +11,7 @@ import com.yichi.onepiece.assistant.agent.AssistantException;
 import com.yichi.onepiece.assistant.agent.AssistantLanguage;
 import com.yichi.onepiece.assistant.agent.ChatCompletionClient;
 import com.yichi.onepiece.assistant.service.AiSettingService;
+import com.yichi.onepiece.model.I18nText;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -301,6 +302,47 @@ public class ImportDrafterTests {
       assertThat(request.path("request").asText()).isEqualTo("佩罗娜的悬赏不对，查一下");
       assertThat(request.path("facts").path("生日").asText()).isEqualTo("6月7日");
     });
+  }
+
+  @Test
+  public void anExistingCharactersFruitIsReusedNotDraftedAgain() {
+    UUID moria = UUID.randomUUID(), perona = UUID.randomUUID();
+    UUID kage = UUID.randomUUID(), horo = UUID.randomUUID();
+    when(existing.find(eq(ImportDto.CHARACTER), argThat(n -> "月光·莫利亚".equals(n.getZhCN())), any()))
+        .thenReturn(Optional.of(moria));
+    when(existing.find(eq(ImportDto.CHARACTER), argThat(n -> "佩罗娜".equals(n.getZhCN())), any()))
+        .thenReturn(Optional.of(perona));
+    when(existing.heldFruits(moria))
+        .thenReturn(List.of(new ExistingResources.Held(kage, new I18nText().zhCN("影子果实").enUS("Kage Kage no Mi"))));
+    when(existing.heldFruits(perona))
+        .thenReturn(List.of(new ExistingResources.Held(horo, new I18nText().zhCN("灵灵果实"))));
+    // The draft names Moria's fruit differently and gives Perona none.
+    deepSeek.roster =
+        """
+        {"fruits":[{"key":"kage","name":{"zh_CN":"影影果实"},"fruit_type":"Paramecia"},
+                   {"key":"suke","name":{"zh_CN":"透明果实","en_US":"Suke Suke no Mi"},"fruit_type":"Paramecia"}],
+         "characters":[{"key":"moria","name":{"zh_CN":"月光·莫利亚"},"fruits":["kage"]},
+                       {"key":"perona","name":{"zh_CN":"佩罗娜"}},
+                       {"key":"absalom","name":{"zh_CN":"阿布萨罗姆"},"fruits":["suke"]}]}
+        """;
+    var asked = new ArrayList<String>();
+    deepSeek.details =
+        request -> {
+          request.forEach(r -> asked.add(r.path("key").asText()));
+          return "{\"items\":[" + fruit("f2") + "," + character("c3", "") + "]}";
+        };
+
+    var draft = drafter.draft("月光莫利亚海贼团", userId, AssistantLanguage.ZH_CN, progress::add);
+
+    var moriasFruit = item(draft, "f1");
+    assertThat(moriasFruit.existingId()).isEqualTo(kage.toString());
+    assertThat(moriasFruit.data().path("name").path("zh_CN").asText()).isEqualTo("影子果实");
+    assertThat(item(draft, "c1").fruits()).containsExactly("f1");
+    var peronasFruit = item(draft, item(draft, "c2").fruits().get(0));
+    assertThat(peronasFruit.existingId()).isEqualTo(horo.toString());
+    assertThat(item(draft, "c3").fruits()).containsExactly("f2"); // Absalom's new fruit stays new
+    assertThat(asked).containsExactlyInAnyOrder("f2", "c3"); // nothing reused is drafted
+    assertThat(draft.notes()).containsExactly("「影影果实」就是已有的「影子果实」，直接复用。");
   }
 
   @Test
