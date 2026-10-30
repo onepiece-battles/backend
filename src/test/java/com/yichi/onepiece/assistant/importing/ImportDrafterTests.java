@@ -37,6 +37,8 @@ public class ImportDrafterTests {
   static final class FakeDeepSeek implements ChatCompletionClient {
     String roster;
     Function<String, String> plan = request -> "{}";
+    /** Models whose calls fail, as an unknown model or an outage would. */
+    final Set<String> failing = new HashSet<>();
     Function<JsonNode, String> details = request -> "{\"items\":[]}";
     Function<JsonNode, String> fruitCheck =
         request -> {
@@ -57,6 +59,8 @@ public class ImportDrafterTests {
     @Override
     public Completion complete(CompletionRequest request, Consumer<String> onContentDelta) {
       requests.add(request);
+      if (failing.contains(request.model()))
+        throw new AssistantException(AssistantException.UPSTREAM_ERROR, "DeepSeek returned HTTP 400");
       String content;
       if (request.messages().get(0).path("content").asText().equals(ImportPrompts.PLAN))
         content = plan.apply(request.messages().get(request.messages().size() - 1).path("content").asText());
@@ -893,7 +897,11 @@ public class ImportDrafterTests {
     var sugar = revision.items().get(2);
     assertThat(sugar.data().path("attack").asInt()).isEqualTo(500);
     assertThat(sugar.data().path("speed").asInt()).isEqualTo(110);
-    assertThat(deepSeek.requests).hasSize(3); // the plan twice (not JSON), then the edit
+    // The plan twice per model (not JSON), then the edit.
+    assertThat(deepSeek.requests)
+        .extracting(ChatCompletionClient.CompletionRequest::model)
+        .containsExactly(
+            "deepseek-reasoner", "deepseek-reasoner", "deepseek-chat", "deepseek-chat", "deepseek-chat");
   }
 
   /** The fake Straw Hats' captain, drafted under his nickname, and his crewmate. */
@@ -1000,5 +1008,102 @@ public class ImportDrafterTests {
     var kept =
         drafter.revise(current, List.of(), "假索隆的头像别动", userId, AssistantLanguage.ZH_CN, progress::add);
     assertThat(kept.refreshAvatars()).isEmpty();
+  }
+
+  @Test
+  public void theThinkingModelReadsTheRequestAndTheChatModelStandsIn() throws Exception {
+    var current = family();
+    deepSeek.plan =
+        request -> "{\"targets\":[{\"key\":\"c1\",\"action\":\"change\",\"fields\":[\"energy\"]}]}";
+    deepSeek.scripted.add("{\"update\":[{\"key\":\"c1\",\"data\":{\"energy\":220}}]}");
+    drafter.revise(current, List.of(), "多弗朗明哥精力高一点", userId, AssistantLanguage.ZH_CN, progress::add);
+    var plan = deepSeek.requests.get(0);
+    assertThat(plan.model()).isEqualTo(ImportDrafter.REASONING_MODEL);
+    assertThat(plan.maxTokens()).isEqualTo(ImportDrafter.REASONING_MAX_TOKENS);
+    assertThat(edits()).extracting(ChatCompletionClient.CompletionRequest::model).containsExactly("deepseek-chat");
+
+    // Without the thinking model (another provider, an outage) the chat model plans.
+    deepSeek.requests.clear();
+    deepSeek.failing.add(ImportDrafter.REASONING_MODEL);
+    deepSeek.scripted.add("{\"update\":[{\"key\":\"c1\",\"data\":{\"energy\":220}}]}");
+    var revision =
+        drafter.revise(current, List.of(), "多弗朗明哥精力高一点", userId, AssistantLanguage.ZH_CN, progress::add);
+    assertThat(deepSeek.requests)
+        .extracting(ChatCompletionClient.CompletionRequest::model)
+        .containsExactly("deepseek-reasoner", "deepseek-chat", "deepseek-chat");
+    assertThat(revision.items().get(1).data().path("energy").asInt()).isEqualTo(220);
+  }
+
+  @Test
+  public void deepSeekNamesTheImpostorWhenTheSourcesDoNotKnowTheNickname() throws Exception {
+    var current =
+        List.of(
+            drafted(
+                "c1",
+                ImportDto.CHARACTER,
+                data(character("c1", ""), "冒牌路飞", "Fake Luffy"),
+                List.of(),
+                null,
+                null));
+    deepSeek.plan =
+        request ->
+            """
+            {"targets":[{"key":"c1","refers_to":"冒牌路飞","action":"look_up","fields":["name"],
+                         "real_name":{"zh_CN":"德马罗·布莱克","en_US":"Demaro Black"},
+                         "impersonates":{"zh_CN":"蒙奇·D·路飞","en_US":"Monkey D. Luffy"}}]}
+            """;
+
+    // Nothing knows 冒牌路飞, nor DeepSeek's spelling: its answer stands, with a remark.
+    var revision =
+        drafter.revise(current, List.of(), "冒牌路飞改成真名", userId, AssistantLanguage.ZH_CN, progress::add);
+    var name = revision.items().get(0).data().path("name");
+    assertThat(name.path("zh_CN").asText()).isEqualTo("德马罗·布莱克");
+    assertThat(name.path("en_US").asText()).isEqualTo("Demaro Black");
+    assertThat(revision.notes()).containsExactly("「冒牌路飞」的真名来自 DeepSeek，百度百科 / Bangumi 里没有查到，请确认。");
+
+    // A source that knows DeepSeek's answer gives its usual spelling and no remark is needed.
+    knownFacts.put("德马罗·布莱克", Map.of("canonical_zh_CN", "丹马罗·布拉克", "canonical_en_US", "Demaro Black"));
+    revision =
+        drafter.revise(current, List.of(), "冒牌路飞改成真名", userId, AssistantLanguage.ZH_CN, progress::add);
+    assertThat(revision.items().get(0).data().path("name").path("zh_CN").asText()).isEqualTo("丹马罗·布拉克");
+    assertThat(revision.notes()).isEmpty();
+  }
+
+  @Test
+  public void anImpostorNeverBecomesTheOneHeImpersonates() throws Exception {
+    // Drafted under Luffy's own name: the sources describe the real Luffy.
+    var current =
+        List.of(
+            drafted(
+                "c1",
+                ImportDto.CHARACTER,
+                data(character("c1", ""), "蒙奇·D·路飞", "Monkey D. Luffy"),
+                List.of(),
+                null,
+                null));
+    knownFacts.put("蒙奇·D·路飞", Map.of("canonical_zh_CN", "蒙奇·D·路飞", "canonical_en_US", "Monkey D. Luffy"));
+    deepSeek.plan =
+        request ->
+            """
+            {"targets":[{"key":"c1","refers_to":"这个路飞","action":"look_up","fields":["name"],
+                         "real_name":{"zh_CN":"丹马罗·布拉克","en_US":"Demaro Black"},
+                         "impersonates":{"zh_CN":"蒙奇·D·路飞","en_US":"Monkey D. Luffy"}}]}
+            """;
+    var revision =
+        drafter.revise(current, List.of(), "这个路飞是假的，改成他自己的真名", userId, AssistantLanguage.ZH_CN, progress::add);
+    assertThat(revision.items().get(0).data().path("name").path("zh_CN").asText()).isEqualTo("丹马罗·布拉克");
+
+    // A real name that is the impersonated one is refused.
+    deepSeek.plan =
+        request ->
+            """
+            {"targets":[{"key":"c1","refers_to":"这个路飞","action":"look_up","fields":["name"],
+                         "real_name":{"zh_CN":"蒙奇·D·路飞","en_US":"Monkey D. Luffy"},
+                         "impersonates":{"zh_CN":"蒙奇·D·路飞"}}]}
+            """;
+    revision =
+        drafter.revise(current, List.of(), "这个路飞是假的，改成他自己的真名", userId, AssistantLanguage.ZH_CN, progress::add);
+    assertThat(revision.changed()).isEmpty();
+    assertThat(revision.reply()).isEqualTo("「蒙奇·D·路飞」：没有查到可核实的真实姓名，保持原样。");
   }
 }

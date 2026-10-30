@@ -73,10 +73,12 @@ final class ImportPrompts {
       nothing yourself. The last user message holds the current draft as JSON and the request;
       earlier messages are the conversation so far. Answer with ONE JSON object:
 
-      {"targets":[{"key":"c1","action":"change","fields":["attack","defense"]},
-                  {"key":"c2","action":"look_up","fields":["bounty"]},
-                  {"key":"c3","action":"clear","fields":["age"]}],
-       "remove":["c4"],
+      {"targets":[{"key":"c1","refers_to":"鹰眼","action":"change","fields":["attack","defense"]},
+                  {"key":"c2","refers_to":"砂糖","action":"look_up","fields":["bounty"]},
+                  {"key":"c3","refers_to":"假路飞","action":"look_up","fields":["name"],
+                   "real_name":{"zh_CN":"丹马罗·布拉克","en_US":"Demaro Black"},
+                   "impersonates":{"zh_CN":"蒙奇·D·路飞","en_US":"Monkey D. Luffy"}}],
+       "remove":[{"key":"c4","refers_to":"黑胡子"}],
        "add":[{"type":"character","name":"维尔戈"}],
        "question":null,
        "answer":null}
@@ -86,8 +88,12 @@ final class ImportPrompts {
         stays exactly as it is: never add a field or an item "while at it", and never repeat an
         earlier request. When the request confirms or answers an earlier question, plan what it
         confirms.
-      - key: a draft item the request is about. "他/她/它/they" means the item(s) the
-        conversation was just about; "所有人/全部/每个/all" means every item of the kind meant.
+      - key: a draft item the request is about. Use everything you know about One Piece:
+        nicknames and epithets (鹰眼, 黑胡子, 明哥, 柯拉松), descriptions (那个女的, 最弱的) and the
+        conversation. "他/她/它/they" means the item(s) the conversation was just about;
+        "所有人/全部/每个/all" means every item of the kind meant.
+      - refers_to: the exact words of the CURRENT request that mean this item (a name, nickname,
+        description or pronoun), copied character for character.
         In "A的攻击，B的悬赏" each item gets only its own fields. In "A比B强" or "A的精力应该比B高"
         only A changes; B is a comparison.
       - action:
@@ -105,14 +111,16 @@ final class ImportPrompts {
         * a fruit's power / 系数 / 加成 → the fruit's *_slope / *_intercept of the stats meant
         * a character's fruit → "fruits"; their group or crew → "group"; their role → "position"
         * a name the request gives, or a translation → "change" of "name"; a wrong name or the
-          real name (真名, 本名) without giving it → "look_up" of "name". Use "name.zh_CN" or
-          "name.en_US" when only one language is meant (中文名, 英文名). For an impostor or an alias
-          (假路飞), the real name is that character's OWN name, never the one he impersonates; the
-          server verifies it in Baidu Baike and Bangumi.
+          real name (真名, 本名) without giving it → "look_up" of "name", with "real_name": the
+          character's own canonical name as you know it (zh_CN as on Chinese One Piece wikis,
+          en_US the usual English name). Use "name.zh_CN" or "name.en_US" when only one language
+          is meant (中文名, 英文名). For an impostor or an alias (假路飞) the real name is HIS OWN
+          name, never the one he impersonates; put that one in "impersonates". The server checks
+          your answer in Baidu Baike and Bangumi.
         * "avatar": only when the request explicitly asks for a new picture or portrait (换个头像).
           A rename never implies it.
-      - "remove": keys of items the request takes out of the draft. A character leaving a group is
-        a "change" of "group", not a removal.
+      - "remove": the items the request takes out of the draft, with refers_to as for targets. A
+        character leaving a group is a "change" of "group", not a removal.
       - "add": canon One Piece entities the request asks to add (type character, fruit or group).
       - "question": when you cannot tell which item or what change is meant, one short question in
         the language of the request, and no targets. Ask only when it is really unclear.
