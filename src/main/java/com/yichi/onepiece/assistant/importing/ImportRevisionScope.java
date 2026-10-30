@@ -38,15 +38,54 @@ final class ImportRevisionScope {
     ALIASES.put("position", "职位|职务|船长|副船长|position|captain");
   }
 
+  private static final String CLAUSES = "[，,；;。\\n]|然后|再把|并把";
+  private static final String BULK = "全部|所有|每个|每一|一律|大家|全员|整个|统一|\\b(all|every|everyone|each)\\b";
+  private static final String CLEAR =
+      "留空|清空|空着|不填|不要填|删掉|去掉|未知|不确定|不知道|查不到|\\b(clear|blank|unset|unknown)\\b";
+  private static final String UNSURE = "不确定|未知|不明|没把握|查不到|uncertain|unsure|unknown";
+  private static final String REMOVE =
+      "删|移除|去掉|拿掉|不要|剔除|踢|排除|换成|替换|不是|不属于|不算|"
+          + "\\b(remove|delete|drop|exclude|replace|without|not)\\b";
+  private static final String ADD =
+      "加|添|补|新增|漏|缺|少了|还有|换成|替换|\\b(add|include|missing|replace|also)\\b";
+  private static final String RENAME = "叫|称作|写作|写成|翻译|译名|\\b(call|spell|translat)";
+  private static final Set<String> RELATIONS = Set.of("fruits", "group", "position");
+  private static final Map<String, String> POSITIONS =
+      Map.ofEntries(
+          Map.entry("captain", "(?<!副)船长|\\bcaptain\\b"),
+          Map.entry("first_mate", "副船长|大副|first mate"),
+          Map.entry("combatant", "战斗员|干部|combatant"),
+          Map.entry("doctor", "船医|医生|doctor"),
+          Map.entry("cook", "厨师|cook"),
+          Map.entry("navigator", "航海士|navigator"),
+          Map.entry("musician", "音乐家|musician"),
+          Map.entry("shipwright", "船匠|shipwright"),
+          Map.entry("helmsman", "舵手|helmsman"),
+          Map.entry("scholar", "考古学家|学者|scholar"));
+
   private final Map<String, Set<String>> fields = new HashMap<>();
   private final Set<String> removals = new HashSet<>();
   private final Map<String, Set<String>> clears = new HashMap<>();
-  final boolean additions;
+  private final Map<String, Set<String>> lookUps = new HashMap<>();
+  private final Set<String> plannedAdditions = new LinkedHashSet<>();
+  boolean additions;
+  private boolean planned;
+  private String reply;
   private final String instruction;
   private final boolean englishName;
   private final boolean chineseName;
 
   ImportRevisionScope(List<ImportItem> items, List<Turn> history, String instruction) {
+    this(items, history, instruction, null);
+  }
+
+  /**
+   * With {@code plan}, the model's reading of the request ({@link ImportPrompts#PLAN}), the scope
+   * is the part of the plan the request grounds. Without a plan, or when it neither grounds a
+   * change nor asks a question, the scope is what the request's keywords name.
+   */
+  ImportRevisionScope(
+      List<ImportItem> items, List<Turn> history, String instruction, JsonNode plan) {
     String request = instruction == null ? "" : instruction;
     this.instruction = request;
     englishName = has(request, "英文|english|en_US");
@@ -81,7 +120,7 @@ final class ImportRevisionScope {
       }
     if (!named.isEmpty()) {
       Set<String> previous = Set.of();
-      for (String clause : request.split("[，,；;。\\n]|然后|再把|并把")) {
+      for (String clause : request.split(CLAUSES)) {
         Set<String> targets = named(items, clause);
         Set<String> wanted = requestedFields(clause);
         if (wanted.isEmpty()
@@ -146,22 +185,8 @@ final class ImportRevisionScope {
       }
       for (var item : items) if (targets.contains(item.key())) addFields(item, requested);
     }
-    // "Only A's attack, don't change B's bounty" must never grant the negative clause.
-    for (String clause : request.split("[，,；;。\\n]|然后|再把|并把")) {
-      if (!has(clause, "不要改|别改|不修改|不要动|别动|保持|不变|do not|don't|unchanged|keep")) continue;
-      Set<String> protectedFields = requestedFields(clause);
-      Set<String> protectedItems = named(items, clause);
-      for (var item : items)
-        if (protectedItems.isEmpty() || protectedItems.contains(item.key())) {
-          Set<String> granted = fields.get(item.key());
-          if (granted != null) {
-            if (has(clause, "其他|其余|other|rest")) continue;
-            if (protectedFields.isEmpty()) granted.clear();
-            else granted.removeAll(supported(item, protectedFields));
-          }
-        }
-    }
-    for (String clause : request.split("[，,；;。\\n]|然后|再把|并把")) {
+    protect(items, request, fields);
+    for (String clause : request.split(CLAUSES)) {
       boolean clear = has(clause, "留空|清空|不填|不要填|删掉|去掉|\\b(clear|blank|unset)\\b");
       boolean unknown = has(clause, "未知|\\bunknown\\b") && !has(clause, "查|核实|补|verify|look|find");
       if (!clear && !unknown) continue;
@@ -204,6 +229,145 @@ final class ImportRevisionScope {
             && !Collections.disjoint(item.fruits(), namedFruits))
           fields.computeIfAbsent(item.key(), k -> new HashSet<>()).add("fruits");
     }
+    if (plan != null && plan.isObject()) planned = plan(items, history, request, plan);
+  }
+
+  /** "Only A's attack, don't change B's bounty" must never grant the negative clause. */
+  private static void protect(
+      List<ImportItem> items, String request, Map<String, Set<String>> granted) {
+    for (String clause : request.split(CLAUSES)) {
+      if (!has(clause, "不要改|别改|不修改|不要动|别动|保持|不变|do not|don't|unchanged|keep")) continue;
+      if (has(clause, "其他|其余|other|rest")) continue;
+      Set<String> protectedFields = requestedFields(clause);
+      Set<String> protectedItems = named(items, clause);
+      for (var item : items)
+        if (protectedItems.isEmpty() || protectedItems.contains(item.key())) {
+          Set<String> fields = granted.get(item.key());
+          if (fields == null) continue;
+          if (protectedFields.isEmpty()) fields.clear();
+          else fields.removeAll(supported(item, protectedFields));
+        }
+    }
+    granted.values().removeIf(Set::isEmpty);
+  }
+
+  /**
+   * Replaces the keyword scope with the part of {@code plan} the request grounds, and says whether
+   * it did. A target must be one the request refers to ({@link #grounded}); fields the request
+   * names for an item bound the plan's fields for it, so "A's attack, B's bounty" cannot cross; a
+   * clear needs a word for blank or unknown, a removal a word for taking out, an addition its name
+   * or a word for adding. A plan that grounds no change but asks a question (or answers one)
+   * leaves nothing to change, and the question is the reply.
+   */
+  private boolean plan(List<ImportItem> items, List<Turn> history, String request, JsonNode plan) {
+    Map<String, ImportItem> byKey = new HashMap<>();
+    items.forEach(i -> byKey.put(i.key(), i));
+    Set<String> grounded = grounded(items, history, request);
+    boolean clearing = has(request, CLEAR);
+    boolean unsure = has(request, UNSURE);
+    boolean renaming = alias(request, ALIASES.get("name")) || has(request, RENAME);
+    Map<String, Set<String>> edits = new HashMap<>(), lookUp = new HashMap<>(), blank = new HashMap<>();
+    for (JsonNode target : plan.path("targets")) {
+      var item = byKey.get(target.path("key").asText());
+      if (item == null) continue;
+      Set<String> wanted = new LinkedHashSet<>();
+      for (JsonNode field : target.path("fields"))
+        if (Set.of("stats", "combat").contains(field.asText())) wanted.addAll(COMBAT);
+        else wanted.add(field.asText());
+      Set<String> granted = supported(item, wanted);
+      if (!renaming) granted.remove("name");
+      Set<String> explicit = fields.getOrDefault(item.key(), Set.of());
+      if (!explicit.isEmpty()) granted.retainAll(explicit);
+      String action = target.path("action").asText();
+      for (String field : granted) {
+        boolean data = !RELATIONS.contains(field) && !field.equals("name");
+        if (action.equals("clear")) {
+          // "Leave what is uncertain blank" is grounded by the item's own uncertain list.
+          if (data
+              && (clearing && grounded.contains(item.key())
+                  || unsure && item.uncertain() != null && item.uncertain().contains(field)))
+            blank.computeIfAbsent(item.key(), k -> new HashSet<>()).add(field);
+        } else if (grounded.contains(item.key()))
+          (action.equals("look_up") && data ? lookUp : edits)
+              .computeIfAbsent(item.key(), k -> new HashSet<>())
+              .add(field);
+      }
+    }
+    Set<String> removed = new LinkedHashSet<>();
+    if (has(request, REMOVE))
+      for (JsonNode key : plan.path("remove"))
+        if (byKey.containsKey(key.asText()) && grounded.contains(key.asText()))
+          removed.add(key.asText());
+    Set<String> added = new LinkedHashSet<>();
+    for (JsonNode add : plan.path("add")) {
+      String name = (add.isTextual() ? add.asText() : add.path("name").asText()).trim();
+      if (!name.isEmpty() && (mentions(request, name) || has(request, ADD))) added.add(name);
+    }
+    String question = text(plan.path("question"));
+    if (question == null) question = text(plan.path("answer"));
+    protect(items, request, edits);
+    protect(items, request, lookUp);
+    protect(items, request, blank);
+    if (edits.isEmpty() && lookUp.isEmpty() && blank.isEmpty() && removed.isEmpty() && added.isEmpty()
+        && question == null) return false;
+    fields.clear();
+    edits.forEach((key, set) -> fields.computeIfAbsent(key, k -> new HashSet<>()).addAll(set));
+    lookUp.forEach((key, set) -> fields.computeIfAbsent(key, k -> new HashSet<>()).addAll(set));
+    lookUps.putAll(lookUp);
+    clears.clear();
+    clears.putAll(blank);
+    removals.clear();
+    removals.addAll(removed);
+    plannedAdditions.addAll(added);
+    additions = !added.isEmpty();
+    reply = question;
+    return true;
+  }
+
+  /**
+   * The items the request refers to: by name; through a named item (a group's members, a
+   * character's fruit, a fruit's holders); by position ("the captain"); by an "all" word; or,
+   * when it names none ("him", "a bit higher"), the items the conversation named last. When even
+   * that finds nothing, the only item of a type in the draft is meant.
+   */
+  private static Set<String> grounded(List<ImportItem> items, List<Turn> history, String request) {
+    Set<String> named = named(items, request);
+    Set<String> result = new LinkedHashSet<>(named);
+    for (var item : items) {
+      if (!item.type().equals(CHARACTER)) continue;
+      var fruits = item.fruits() == null ? List.<String>of() : item.fruits();
+      if (named.contains(item.key())) result.addAll(fruits);
+      if (named.contains(item.group()) || fruits.stream().anyMatch(named::contains))
+        result.add(item.key());
+      if (item.position() != null
+          && POSITIONS.containsKey(item.position())
+          && has(request, POSITIONS.get(item.position()))) result.add(item.key());
+    }
+    if (has(request, BULK)) items.forEach(i -> result.add(i.key()));
+    if (named.isEmpty() && history != null)
+      for (int i = history.size() - 1; i >= 0; i--) {
+        Turn turn = history.get(i);
+        if (turn == null || turn.content() == null) continue;
+        var mentioned = named(items, turn.content());
+        result.addAll(mentioned);
+        if ("user".equals(turn.role()) && !mentioned.isEmpty()) break;
+      }
+    if (result.isEmpty())
+      for (String type : List.of(GROUP, FRUIT, CHARACTER)) {
+        var ofType = items.stream().filter(i -> type.equals(i.type())).toList();
+        if (ofType.size() == 1) result.add(ofType.get(0).key());
+      }
+    return result;
+  }
+
+  private static boolean mentions(String request, String name) {
+    if (request.toLowerCase(Locale.ROOT).contains(name.toLowerCase(Locale.ROOT))) return true;
+    String last = name.substring(name.lastIndexOf('·') + 1);
+    return last.length() >= 2 && !last.equals(name) && request.contains(last);
+  }
+
+  private static String text(JsonNode node) {
+    return node.isTextual() && !node.asText().isBlank() ? node.asText().trim() : null;
   }
 
   /**
@@ -233,8 +397,9 @@ final class ImportRevisionScope {
                 null,
                 List.of(),
                 List.of());
-        if (mentionIndex(fake, instruction) >= 0 || crewMembers && type.equals(CHARACTER))
-          allowed.add(key);
+        if (mentionIndex(fake, instruction) >= 0
+            || crewMembers && type.equals(CHARACTER)
+            || names(fake).stream().anyMatch(this::plannedAddition)) allowed.add(key);
       }
     // Adding a canon fruit necessarily needs a holder in this import; adding a character may need
     // their canon fruit. Do not expand to other crew members or groups as an accidental side
@@ -283,6 +448,54 @@ final class ImportRevisionScope {
     return result;
   }
 
+  private boolean plannedAddition(String name) {
+    String normalized = ExistingResources.normalize(name);
+    if (normalized.isEmpty()) return false;
+    for (String planned : plannedAdditions) {
+      String last = planned.substring(planned.lastIndexOf('·') + 1);
+      if (ExistingResources.normalize(planned).equals(normalized)
+          || last.length() >= 2 && ExistingResources.normalize(last).equals(normalized)) return true;
+    }
+    return false;
+  }
+
+  /** Whether a model plan, not the keywords, decided this scope. */
+  boolean planned() {
+    return planned;
+  }
+
+  /**
+   * Whether the edit call has anything to do: always under the keyword scope; under a plan only
+   * for field changes and additions (look-ups, clears and removals need no model).
+   */
+  boolean needsEdit() {
+    return !planned || additions || !describe().isEmpty();
+  }
+
+  /** The plan's question or answer, when it asks something back. */
+  String reply() {
+    return reply;
+  }
+
+  /** Fields of items to look up again, by key: the plan's "look_up" targets. */
+  Map<String, Set<String>> lookUps() {
+    return lookUps;
+  }
+
+  boolean looksUp(ImportItem item, String field) {
+    return lookUps.getOrDefault(item.key(), Set.of()).contains(field);
+  }
+
+  /** Items a plan takes out of the draft; empty under the keyword scope. */
+  Set<String> removals() {
+    return planned ? removals : Set.of();
+  }
+
+  /** What a plan adds, by name. */
+  Set<String> plannedAdditions() {
+    return plannedAdditions;
+  }
+
   boolean allows(ImportItem item, String field) {
     return fields.getOrDefault(item.key(), Set.of()).contains(field);
   }
@@ -318,8 +531,17 @@ final class ImportRevisionScope {
     return List.copyOf(allowed);
   }
 
+  /** The fields the edit call may change, by key: without look-ups and clears. */
   Map<String, Set<String>> describe() {
-    return fields;
+    Map<String, Set<String>> result = new TreeMap<>();
+    fields.forEach(
+        (key, set) -> {
+          Set<String> left = new TreeSet<>(set);
+          left.removeAll(lookUps.getOrDefault(key, Set.of()));
+          left.removeAll(clears.getOrDefault(key, Set.of()));
+          if (!left.isEmpty()) result.put(key, left);
+        });
+    return result;
   }
 
   private static Set<String> requestedFields(String text) {

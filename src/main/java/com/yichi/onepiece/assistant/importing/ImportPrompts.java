@@ -62,6 +62,63 @@ final class ImportPrompts {
       - fruit_type: Paramecia, Logia, Zoan, Ancient_Zoan, Mythical_Zoan or Artificial_Zoan.
       """;
 
+  /**
+   * The first step of a revision: what the reviewer's request asks for, before anything changes.
+   * The server keeps only the part the request itself grounds ({@link ImportRevisionScope}).
+   */
+  static final String PLAN =
+      """
+      You read a reviewer's request about a draft import for "One Piece Battles", an app of One
+      Piece characters, devil fruits and groups, and work out exactly what it asks for. You change
+      nothing yourself. The last user message holds the current draft as JSON and the request;
+      earlier messages are the conversation so far. Answer with ONE JSON object:
+
+      {"targets":[{"key":"c1","action":"change","fields":["attack","defense"]},
+                  {"key":"c2","action":"look_up","fields":["bounty"]},
+                  {"key":"c3","action":"clear","fields":["age"]}],
+       "remove":["c4"],
+       "add":[{"type":"character","name":"维尔戈"}],
+       "question":null,
+       "answer":null}
+
+      Rules:
+      - List only what the CURRENT request asks for. Every item and field it does not ask about
+        stays exactly as it is: never add a field or an item "while at it", and never repeat an
+        earlier request. When the request confirms or answers an earlier question, plan what it
+        confirms.
+      - key: a draft item the request is about. "他/她/它/they" means the item(s) the
+        conversation was just about; "所有人/全部/每个/all" means every item of the kind meant.
+        In "A的攻击，B的悬赏" each item gets only its own fields. In "A比B强" or "A的精力应该比B高"
+        only A changes; B is a comparison.
+      - action:
+        * "change": the request gives a value, a direction (higher, lower, stronger, weaker,
+          like another item) or a relation (eats a fruit, joins or leaves a group, a position).
+        * "look_up": the request says facts or stats are wrong, or asks to check or look them up
+          again, without giving the new value. They are looked up again (Baidu Baike, Bangumi)
+          and calibrated against the app's characters; what cannot be verified stays blank.
+        * "clear": leave the fields blank or unknown.
+      - fields, by what the words mean:
+        * stronger / weaker / 太强 / 太弱 / 战力 → attack, defense, blood, speed, intelligence
+          (energy and group_gain only when named)
+        * 资料 / 档案 / profile / facts → bounty, age, height, birth_place, date_of_birth
+        * 数据 / 属性 / all of an item → every field the item has, except name
+        * a fruit's power / 系数 / 加成 → the fruit's *_slope / *_intercept of the stats meant
+        * a character's fruit → "fruits"; their group or crew → "group"; their role → "position";
+          a translation or another name → "name"
+      - "remove": keys of items the request takes out of the draft. A character leaving a group is
+        a "change" of "group", not a removal.
+      - "add": canon One Piece entities the request asks to add (type character, fruit or group).
+      - "question": when you cannot tell which item or what change is meant, one short question in
+        the language of the request, and no targets. Ask only when it is really unclear.
+      - "answer": when the request asks something instead of asking for a change, a short answer in
+        the language of the request, and no targets.
+
+      Character fields: %s
+      Fruit fields: %s
+      Group fields: %s
+      """
+          .formatted(fieldNames("character"), fieldNames("fruit"), fieldNames("group"));
+
   /** Changes to a draft the reviewer asks for; the reply is written in {@code replyLanguage}. */
   static String revise(String replyLanguage) {
     return """
@@ -83,9 +140,13 @@ final class ImportPrompts {
 
         Rules:
         - The CURRENT request is the sole authority for changes. Earlier turns provide context,
-          not permission to repeat old edits. Preserve manual edits and every unnamed resource/field.
+          not permission to repeat old edits; when the request confirms an earlier question, do
+          what it confirms. Preserve manual edits and every unnamed resource/field.
         - Change only what the request asks for and leave everything else out of the answer.
-          The server supplies allowed fields per existing item. Stay within that scope.
+          The server sends the checked plan: "Allowed existing-item fields" are the only fields
+          you may change, per item key, and "Planned removals" / "Planned additions", when given,
+          the only items to remove or add. Anything else is discarded. Look-ups and blanks the
+          plan needs are done by the server: leave them out.
           For "A attack, B bounty", never cross the targets. An empty redraft field list is NOT all.
           Use data.field: null to clear an optional unknown fact. Never use 0 as "unknown".
           If a field or target is ambiguous, return no changes and ask a short question.
@@ -171,6 +232,20 @@ final class ImportPrompts {
         References: %s
         """
         .formatted(guide("character"), guide("fruit"), references);
+  }
+
+  /** The create fields of a resource type, without name. */
+  private static String fieldNames(String type) {
+    List<String> names = new ArrayList<>();
+    ActionSchemas.fields(type, true)
+        .path("properties")
+        .fieldNames()
+        .forEachRemaining(
+            name -> {
+              if (!name.equals("name")) names.add(name);
+            });
+    if (type.equals("character")) names.addAll(List.of("fruits", "group", "position"));
+    return String.join(", ", names);
   }
 
   /** "- attack: integer 10–1500" lines for every create field of a resource type. */

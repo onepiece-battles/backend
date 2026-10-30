@@ -1,5 +1,7 @@
 package com.yichi.onepiece.assistant.importing;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yichi.onepiece.model.I18nText;
 import java.io.IOException;
 import java.net.URI;
@@ -11,11 +13,19 @@ import java.util.*;
 import org.jsoup.Jsoup;
 import org.springframework.stereotype.Component;
 
-/** Reads public Baike infoboxes only. No scripts, anti-bot bypass or arbitrary URL fetching. */
+/**
+ * Reads the infobox ("card") of a Baidu Baike entry through Baike's public lemma card API, which
+ * answers JSON (the entry pages themselves answer a human check). Only an entry whose title is
+ * the character's name and which belongs to One Piece counts. No scripts, anti-bot bypass or
+ * arbitrary URL fetching.
+ */
 @Component
 public class BaiduCharacterFacts implements CharacterFacts {
   private static final int MAX_BYTES = 2_000_000;
   private static final Duration TIMEOUT = Duration.ofSeconds(6);
+  private static final String CARD_API =
+      "https://baike.baidu.com/api/openapi/BaikeLemmaCardApi?scope=103&format=json&appid=379020"
+          + "&bk_length=600&bk_key=";
   private static final Map<String, String> LABELS =
       Map.ofEntries(
           Map.entry("悬赏金", "悬赏金"),
@@ -27,6 +37,7 @@ public class BaiduCharacterFacts implements CharacterFacts {
           Map.entry("出生日期", "生日"),
           Map.entry("出生地", "出生地"),
           Map.entry("出生地点", "出生地"));
+  private static final ObjectMapper JSON = new ObjectMapper();
 
   @FunctionalInterface
   interface Transport {
@@ -59,6 +70,7 @@ public class BaiduCharacterFacts implements CharacterFacts {
             HttpRequest.newBuilder(uri)
                 .timeout(TIMEOUT)
                 .header("User-Agent", "onepiece-battles/1.0 (https://onepiece-battles.com)")
+                .header("Accept", "application/json")
                 .GET()
                 .build();
         var response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
@@ -85,8 +97,8 @@ public class BaiduCharacterFacts implements CharacterFacts {
     try {
       String encoded =
           URLEncoder.encode(name.getZhCN().trim(), StandardCharsets.UTF_8).replace("+", "%20");
-      String html = transport.get(URI.create("https://baike.baidu.com/item/" + encoded));
-      return html == null ? Map.of() : parse(html, name);
+      String card = transport.get(URI.create(CARD_API + encoded));
+      return card == null ? Map.of() : parse(card, name);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     } catch (IOException | RuntimeException e) {
@@ -95,36 +107,67 @@ public class BaiduCharacterFacts implements CharacterFacts {
     return Map.of();
   }
 
-  static Map<String, String> parse(String html, I18nText name) {
-    var page = Jsoup.parse(html);
-    page.select("script, style, sup").remove();
-    String text = page.text();
-    if (!(text.contains("航海王")
-        || text.contains("海贼王")
-        || text.toLowerCase(Locale.ROOT).contains("one piece"))) return Map.of();
-    String expected = BangumiCharacterFacts.normalize(name.getZhCN());
+  /**
+   * The card's facts by label, as single plain values. The entry must be One Piece's and be the
+   * character's: its title or Chinese name is the drafted name, or one of its foreign names is
+   * the drafted English name. A label with differing values is left out.
+   */
+  static Map<String, String> parse(String card, I18nText name) throws IOException {
+    JsonNode root = JSON.readTree(card);
+    if (root == null || !root.isObject()) return Map.of();
+    var entries = new HashMap<String, List<String>>();
+    for (var entry : root.path("card")) {
+      var values = new ArrayList<String>();
+      entry.path("value").forEach(v -> values.add(plain(v.asText())));
+      entries.computeIfAbsent(entry.path("name").asText(), k -> new ArrayList<>()).addAll(values);
+    }
+    String series =
+        (root.path("desc").asText() + " " + entries.getOrDefault("登场作品", List.of()))
+            .toLowerCase(Locale.ROOT);
+    if (!(series.contains("航海王") || series.contains("海贼王") || series.contains("one piece")))
+      return Map.of();
+    String zh = BangumiCharacterFacts.normalize(name.getZhCN());
+    String en = name.getEnUS() == null ? "" : BangumiCharacterFacts.normalize(name.getEnUS());
+    var titles = new ArrayList<>(entries.getOrDefault("中文名", List.of()));
+    titles.add(root.path("title").asText());
     boolean identity =
-        page.select("h1").stream()
-            .anyMatch(h -> BangumiCharacterFacts.normalize(h.text()).equals(expected));
+        titles.stream().anyMatch(t -> BangumiCharacterFacts.normalize(t).equals(zh))
+            || !en.isEmpty()
+                && entries.getOrDefault("外文名", List.of()).stream()
+                    .anyMatch(t -> BangumiCharacterFacts.normalize(t).equals(en));
     if (!identity) return Map.of();
+
     Map<String, String> facts = new LinkedHashMap<>();
     Set<String> conflicts = new HashSet<>();
-    for (var label :
-        page.select(
-            ".basic-info dt, [class*=basicInfo] dt, [class*=basicInfoItem] [class*=itemName]")) {
-      String key = LABELS.get(label.text().replaceAll("[\\s\\u00a0：:]", ""));
-      var value = label.nextElementSibling();
-      if (key == null
-          || value == null
-          || !(value.tagName().equals("dd") || value.className().contains("itemValue"))) continue;
-      String fact = value.text().trim();
-      if (fact.isEmpty() || fact.length() > 200 || conflicts.contains(key)) continue;
-      String old = facts.putIfAbsent(key, fact);
-      if (old != null && !old.equals(fact)) {
-        facts.remove(key);
-        conflicts.add(key);
-      }
-    }
+    entries.forEach(
+        (label, values) -> {
+          String key = LABELS.get(label.replaceAll("[\\s\\u00a0：:]", ""));
+          if (key == null) return;
+          for (String raw : values) {
+            String fact = latest(raw);
+            if (fact.isEmpty() || fact.length() > 200 || conflicts.contains(key)) continue;
+            String old = facts.putIfAbsent(key, fact);
+            if (old != null && !old.equals(fact)) {
+              facts.remove(key);
+              conflicts.add(key);
+            }
+          }
+        });
     return facts;
+  }
+
+  /** A card value as plain text: without reference marks, links or markup. */
+  static String plain(String html) {
+    return Jsoup.parse(html.replaceAll("(?s)<sup[^>]*>.*?</sup>", "")).text().trim();
+  }
+
+  /**
+   * The current value of a timeline like "17岁（出海）→19岁（进入新世界）": remarks in brackets
+   * dropped, the last step kept. Anything else (lists, ranges, "约…") stays as it is for {@link
+   * CharacterFactValues} to accept or reject.
+   */
+  static String latest(String value) {
+    String bare = value.replaceAll("\\([^()]*\\)|（[^（）]*）", "").trim();
+    return bare.substring(bare.lastIndexOf('→') + 1).trim();
   }
 }
