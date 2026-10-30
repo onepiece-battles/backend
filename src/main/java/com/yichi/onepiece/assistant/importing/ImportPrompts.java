@@ -32,11 +32,34 @@ final class ImportPrompts {
       - "fruits" lists the keys of the devil fruits a character has eaten; include every such fruit
         in "fruits". "group" is the key of the group the character currently belongs to.
       - List a devil fruit only together with the character who ate it: every fruit key must appear
-        in some character's "fruits".
+        in some character's "fruits". Go through every character and list the fruit they ate; a
+        character eats at most one fruit.
       - Include the groups the scope names; do not add every group a character ever belonged to.
       - At most 30 characters, 15 fruits and 5 groups. If the scope is larger, keep the most
         important ones and say what was left out in notes.
       - notes: short remarks for the person reviewing the draft, in Simplified Chinese.
+      """;
+
+  /**
+   * The second look at fruits: the roster call lists many entities at once and tends to miss a
+   * character's fruit or give it to the wrong person.
+   */
+  static final String FRUITS =
+      """
+      You check devil fruits for "One Piece Battles". The user sends JSON with the characters of a
+      draft: key, name, and the fruits a first pass listed for them (possibly wrong or missing).
+      For every character, answer which devil fruit they have eaten in the One Piece canon, as of
+      the latest arc. Answer with ONE JSON object:
+
+      {"characters":[{"key":"c1","fruit":{"zh_CN":"橡胶果实","en_US":"Gomu Gomu no Mi","fruit_type":"Paramecia"}},
+                     {"key":"c2","fruit":null}]}
+
+      Rules:
+      - Exactly one entry per character key; "fruit": null for a character who ate none.
+      - Only canon facts; correct the first pass where it is wrong.
+      - A character holds at most one fruit: give the one they hold now.
+      - zh_CN is the usual Simplified Chinese name, en_US the romanized name (e.g. Gomu Gomu no Mi).
+      - fruit_type: Paramecia, Logia, Zoan, Ancient_Zoan, Mythical_Zoan or Artificial_Zoan.
       """;
 
   /** Changes to a draft the reviewer asks for; the reply is written in {@code replyLanguage}. */
@@ -51,6 +74,7 @@ final class ImportPrompts {
          "remove":["c3"],
          "update":[{"key":"c2","name":{"zh_CN":"…","en_US":"…"},"data":{"bounty":71000000},
                     "fruits":["f1"],"group":"g1","position":"captain"}],
+         "redraft":[{"key":"c1","fields":["bounty","date_of_birth"]}],
          "add":{"groups":[{"key":"new_g1","name":{"zh_CN":"…","en_US":"…"},"group_category":"pirate"}],
                 "fruits":[{"key":"new_f1","name":{"zh_CN":"…","en_US":"…"},"fruit_type":"Zoan"}],
                 "characters":[{"key":"new_c1","name":{"zh_CN":"…","en_US":"…"},"fruits":["new_f1"],
@@ -65,9 +89,16 @@ final class ImportPrompts {
           "group": null takes the character out of its group. "data" holds create fields (below),
           never "name". Items marked "existing" are already in the app: only a character's fruits,
           group and position can change.
-        - Every devil fruit in the draft is eaten by a character in the draft. When you add a fruit,
-          give it to the character who ate it (add that character if needed). When you remove a
-          character, remove their fruits too unless someone else in the draft ate them.
+        - When the person says facts or stats of an item are wrong, or asks to look something up,
+          put the item in "redraft" with the fields to look up again (all fields when unsure)
+          instead of guessing values in "update": a dedicated step looks them up again, checking an
+          anime database for birthdays and heights and calibrating stats against the app's
+          characters, with the person's request as a hint. Use "update" for values the person
+          gives you.
+        - Every devil fruit in the draft is eaten by a character in the draft, and a character eats
+          at most one. When you add a fruit, give it to the character who ate it (add that
+          character if needed). When you remove a character, remove their fruit too unless someone
+          else in the draft ate it.
         - Only canon One Piece entities; never invent a person, fruit or group. If a request is not
           canon or unclear, change nothing and say why in "reply".
         - "reply": one or two short sentences to the person, in %s, saying what changed.
@@ -100,7 +131,11 @@ final class ImportPrompts {
         %s
         - date_of_birth like "5月5日"; birth_place in Simplified Chinese; height in cm;
           bounty in berries (latest known; leave out if the character has none).
-        - maximum_fruit_count is 2 only for a character who ate two fruits, otherwise 1.
+        - maximum_fruit_count is always 1: a character holds one devil fruit.
+        - "facts", when present, come from Bangumi, an anime database: use them for
+          date_of_birth, height and age (age as of the latest arc).
+        - "request", when present, is the reviewer's message about what is wrong with this item:
+          look the item up again with it in mind.
         - group_gain: how much the character profits from fighting alongside their crew.
 
         Fruit fields:

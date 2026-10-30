@@ -105,7 +105,8 @@ public final class ActionSchemas {
         prop(node, "birth_place", string(200));
         prop(node, "date_of_birth", string(100));
         prop(node, "bounty", number(10, 100000000000L, true));
-        prop(node, "maximum_fruit_count", number(1, 2, true));
+        // A new character holds one fruit; only Blackbeard held two, and he exists already.
+        prop(node, "maximum_fruit_count", number(1, create ? 1 : 2, true));
         prop(node, "group_gain", number(100, 200, true));
         prop(node, "attack", number(10, 1500, true));
         prop(node, "defense", number(10, 1400, true));

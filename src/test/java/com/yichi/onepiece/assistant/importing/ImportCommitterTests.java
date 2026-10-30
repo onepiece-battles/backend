@@ -100,9 +100,9 @@ public class ImportCommitterTests {
                 item("g1", GROUP, group("草帽一伙", "Straw Hat Pirates", "pirate")),
                 reuse("f1", FRUIT, gomuId, name("橡胶果实", "Gomu Gomu no Mi")),
                 item("f2", FRUIT, fruit("人人果实 幻兽种 模型尼卡", "Hito Hito no Mi, Model: Nika")),
-                member("c1", character("蒙奇·D·路飞", "Monkey D. Luffy", 2), List.of("f1", "f2"), "g1", "captain"),
+                member("c1", character("蒙奇·D·路飞", "Monkey D. Luffy", 1), List.of("f2"), "g1", "captain"),
                 new ImportItem("c2", CHARACTER, JSON.createObjectNode().set("name", name("罗罗诺亚·索隆", "Roronoa Zoro")),
-                    zoroId.toString(), List.of(), "g1", "combatant", List.of(), List.of())),
+                    zoroId.toString(), List.of("f1"), "g1", "combatant", List.of(), List.of())),
             userId,
             roleId,
             AssistantLanguage.ZH_CN);
@@ -112,10 +112,10 @@ public class ImportCommitterTests {
     order.verify(fruits).createFruit(any());
     var created = ArgumentCaptor.forClass(CreateCharacterRequest.class);
     order.verify(characters).createCharacter(created.capture());
-    order.verify(characters).eatFruit(luffyId, gomuId);
-    order.verify(characters).eatFruit(luffyId, newFruitId);
+    order.verify(characters).eatFruit(luffyId, newFruitId); // relations after every create
+    verify(characters).eatFruit(zoroId, gomuId);
     var joins = ArgumentCaptor.forClass(JoinGroupRequest.class);
-    order.verify(characters, times(2)).joinGroup(joins.capture());
+    verify(characters, times(2)).joinGroup(joins.capture());
     assertThat(created.getValue().getName().getZhCN()).isEqualTo("蒙奇·D·路飞");
     assertThat(created.getValue().getName().getEnUS()).isEqualTo("Monkey D. Luffy");
     var group = ArgumentCaptor.forClass(CreateGroupRequest.class);
