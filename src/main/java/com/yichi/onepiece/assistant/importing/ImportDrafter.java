@@ -177,7 +177,9 @@ public class ImportDrafter {
     if (toDetail.isEmpty()) return details;
     var found = new ConcurrentHashMap<String, Map<String, String>>();
     if (toDetail.stream().anyMatch(e -> e.type.equals(CHARACTER))) {
-      progress.accept(language.pick("正在查询角色资料（Bangumi）…", "Looking characters up on Bangumi…"));
+      progress.accept(
+          language.pick(
+              "正在核对角色资料（百度百科 / Bangumi）…", "Checking character facts (Baidu Baike / Bangumi)…"));
       toDetail.stream()
           .filter(e -> e.type.equals(CHARACTER))
           .map(
@@ -220,6 +222,25 @@ public class ImportDrafter {
       if (e.getCause() instanceof RuntimeException cause) throw cause;
       throw e;
     }
+    // Never turn the model's memory into a verified biography. Missing/conflicting source facts
+    // stay absent; combat values use the app's reference scale separately.
+    for (var entry : toDetail) {
+      if (!entry.type.equals(CHARACTER)) continue;
+      JsonNode detail = details.get(entry.key);
+      if (detail instanceof ObjectNode object) {
+        var data =
+            object.path("data") instanceof ObjectNode fields ? fields : json.createObjectNode();
+        object.set("data", data);
+        ImportRevisionScope.PROFILE.forEach(data::remove);
+        var verified = CharacterFactValues.read(found.getOrDefault(entry.key, Map.of()));
+        verified.forEach(data::set);
+        var oldUncertain = detail.path("uncertain");
+        var uncertain = object.putArray("uncertain");
+        for (var key : oldUncertain) if (!verified.containsKey(key.asText())) uncertain.add(key);
+        for (String key : ImportRevisionScope.PROFILE)
+          if (!verified.containsKey(key)) uncertain.add(key);
+      }
+    }
     return details;
   }
 
@@ -236,6 +257,7 @@ public class ImportDrafter {
       UUID userId,
       AssistantLanguage language,
       Consumer<String> progress) {
+    var scope = new ImportRevisionScope(current, history, instruction);
     var s = connect(language);
     progress.accept(language.pick("正在理解你的修改…", "Working out the changes…"));
     var messages = new ArrayList<ObjectNode>();
@@ -243,10 +265,19 @@ public class ImportDrafter {
         message("system", ImportPrompts.revise(language.pick("Simplified Chinese", "English"))));
     var turns = history == null ? List.<Turn>of() : history;
     for (var turn : turns.subList(Math.max(0, turns.size() - MAX_HISTORY), turns.size()))
-      if (turn != null && turn.content() != null && Set.of("user", "assistant").contains(turn.role()))
+      if (turn != null
+          && turn.content() != null
+          && Set.of("user", "assistant").contains(turn.role()))
         messages.add(message(turn.role(), truncate(turn.content(), MAX_TURN_LENGTH)));
     messages.add(
-        message("user", "Current draft:\n" + roster(current) + "\n\nRequest: " + instruction));
+        message(
+            "user",
+            "Current draft:\n"
+                + roster(current)
+                + "\n\nRequest: "
+                + instruction
+                + "\nAllowed existing-item fields: "
+                + json.valueToTree(scope.describe())));
     JsonNode changes = ask(s, messages);
 
     var items = new LinkedHashMap<String, ImportItem>();
@@ -256,7 +287,23 @@ public class ImportDrafter {
     var notes = new ArrayList<String>();
     for (var note : changes.path("notes")) if (note.isTextual()) notes.add(note.asText());
     var changed = new LinkedHashSet<String>();
-    for (var key : changes.path("remove")) items.remove(key.asText());
+    for (var key : changes.path("remove"))
+      if (scope.removes(key.asText())) items.remove(key.asText());
+    // A removed character's newly drafted fruit is a dependent item, unless another holder needs
+    // it.
+    var removedFruits = new HashSet<String>();
+    for (var item : current)
+      if (!items.containsKey(item.key()) && item.type().equals(CHARACTER) && item.fruits() != null)
+        removedFruits.addAll(item.fruits());
+    for (var item : items.values())
+      if (item.fruits() != null) removedFruits.removeAll(item.fruits());
+    items
+        .values()
+        .removeIf(
+            i ->
+                i.type().equals(FRUIT)
+                    && i.existingId() == null
+                    && removedFruits.contains(i.key()));
 
     // The model's keys for new items map to server keys after the current ones; a "new" item with
     // the name of a current one maps to that item.
@@ -265,13 +312,16 @@ public class ImportDrafter {
     for (var item : items.values()) {
       keys.put(item.key(), item.key());
       var name = name(item.data() == null ? MissingNode.getInstance() : item.data().path("name"));
-      if (name != null) named.put(item.type() + ":" + ExistingResources.normalize(display(name)), item.key());
+      if (name != null)
+        named.put(item.type() + ":" + ExistingResources.normalize(display(name)), item.key());
     }
     var added = new ArrayList<Entry>();
     var relations = new HashMap<Entry, JsonNode>();
-    JsonNode add = changes.path("add");
+    JsonNode add = scope.additions ? changes.path("add") : MissingNode.getInstance();
+    Set<String> allowedAdditions = scope.addedKeys(add);
     for (var section : List.of(GROUP, FRUIT, CHARACTER)) {
       for (var node : add.path(section + "s")) {
+        if (!allowedAdditions.contains(node.path("key").asText())) continue;
         var name = name(node.path("name"));
         if (name == null) continue;
         String same = named.get(section + ":" + ExistingResources.normalize(display(name)));
@@ -293,7 +343,8 @@ public class ImportDrafter {
             entry.rosterData.put("group_category", category);
         } else if (section.equals(FRUIT)) {
           String fruitType = node.path("fruit_type").asText();
-          if (validEnum(fruitType, FruitType.values())) entry.rosterData.put("fruit_type", fruitType);
+          if (validEnum(fruitType, FruitType.values()))
+            entry.rosterData.put("fruit_type", fruitType);
         } else relations.put(entry, node);
         keys.put(node.path("key").asText(), entry.key);
         named.put(section + ":" + ExistingResources.normalize(display(name)), entry.key);
@@ -316,15 +367,19 @@ public class ImportDrafter {
       }
     }
 
+    var inferredRedrafts = new LinkedHashMap<String, List<String>>();
     for (var update : changes.path("update")) {
       var item = items.get(update.path("key").asText());
       if (item == null) continue;
       boolean fresh = item.existingId() == null;
       var data = item.data() == null ? json.createObjectNode() : item.data().deepCopy();
       var uncertain = new ArrayList<>(item.uncertain() == null ? List.<String>of() : item.uncertain());
-      if (fresh && update.path("name").isObject()) {
+      if (fresh && scope.allows(item, "name") && update.path("name").isObject()) {
         var name = name(data.path("name"));
-        var patch = name(update.path("name"));
+        var localized = ((ObjectNode) update.path("name")).deepCopy();
+        for (String locale : List.of("zh_CN", "en_US"))
+          if (!scope.allowsName(locale)) localized.remove(locale);
+        var patch = name(localized);
         if (patch != null)
           data.set(
               "name",
@@ -333,22 +388,50 @@ public class ImportDrafter {
                       .zhCN(patch.getZhCN() != null ? patch.getZhCN() : name == null ? null : name.getZhCN())
                       .enUS(patch.getEnUS() != null ? patch.getEnUS() : name == null ? null : name.getEnUS())));
       }
-      if (fresh && update.path("data").isObject()) sanitize(item.type(), update.get("data"), data, uncertain);
+      if (fresh && update.path("data").isObject()) {
+        var patch = json.createObjectNode();
+        update
+            .path("data")
+            .fields()
+            .forEachRemaining(
+                field -> {
+                  String key = field.getKey();
+                  if (!scope.allows(item, key) || scope.clears(item, key)) return;
+                  if (ImportRevisionScope.PROFILE.contains(key)
+                      && !field.getValue().isNull()
+                      && !CharacterFactValues.given(instruction, key, field.getValue())) {
+                    inferredRedrafts.computeIfAbsent(item.key(), k -> new ArrayList<>()).add(key);
+                    return;
+                  }
+                  if (field.getValue().isNull()) {
+                    if (!required(item.type(), key)) {
+                      data.remove(key);
+                      uncertain.remove(key);
+                    }
+                  } else {
+                    patch.set(key, field.getValue());
+                    uncertain.remove(key);
+                  }
+                });
+        sanitize(item.type(), patch, data, uncertain);
+      }
       var fruits = item.fruits();
       var group = item.group();
       var position = item.position();
       if (item.type().equals(CHARACTER)) {
         var name = name(data.path("name"));
-        if (update.has("fruits"))
+        if (scope.allows(item, "fruits") && update.has("fruits"))
           fruits = linked(update.get("fruits"), FRUIT, name, keys, types, notes, language);
-        if (update.has("group")) {
+        if (scope.allows(item, "group") && update.has("group")) {
           var linked = linked(update.get("group"), GROUP, name, keys, types, notes, language);
           group = linked.isEmpty() ? null : linked.get(0);
           if (group == null) position = null;
           else if (position == null) position = "member";
         }
         String requested = update.path("position").asText();
-        if (group != null && validEnum(requested, GroupPosition.values())) position = requested;
+        if (scope.allows(item, "position")
+            && group != null
+            && validEnum(requested, GroupPosition.values())) position = requested;
       }
       items.put(
           item.key(),
@@ -357,14 +440,21 @@ public class ImportDrafter {
       changed.add(item.key());
     }
 
-    // Items to look up again: new characters and fruits, with the fields to replace (all if none).
-    var redrafts = new LinkedHashMap<String, List<String>>();
+    // Re-lookups replace only fields authorized by this request. Empty never means all.
+    var redrafts = new LinkedHashMap<String, List<String>>(inferredRedrafts);
     for (var redraft : changes.path("redraft")) {
       var item = items.get(redraft.path("key").asText());
       if (item == null || item.existingId() != null || item.type().equals(GROUP)) continue;
-      var fields = new ArrayList<String>();
-      redraft.path("fields").forEach(f -> fields.add(f.asText()));
-      redrafts.put(item.key(), fields);
+      var fields = scope.redraft(item, redraft.path("fields"));
+      if (!fields.isEmpty())
+        redrafts.merge(
+            item.key(),
+            fields,
+            (a, b) -> {
+              var merged = new LinkedHashSet<>(a);
+              merged.addAll(b);
+              return List.copyOf(merged);
+            });
     }
 
     if (!added.isEmpty() || !redrafts.isEmpty()) {
@@ -385,7 +475,13 @@ public class ImportDrafter {
       for (var key : redrafts.keySet()) {
         if (!byKey.containsKey(key)) continue;
         toDraft.add(byKey.get(key));
-        hints.put(key, instruction);
+        hints.put(
+            key,
+            instruction
+                + "\nReplace ONLY these fields: "
+                + redrafts.get(key)
+                + "\nPreserve all other current data: "
+                + items.get(key).data());
       }
       var details = details(s, toDraft, byKey, hints, userId, language, progress);
       for (var entry : added) {
@@ -400,7 +496,9 @@ public class ImportDrafter {
           notes.add(
               language.pick(
                   "没能重新查到「" + (name == null ? redraft.getKey() : display(name.name)) + "」的资料。",
-                  "Could not look " + (name == null ? redraft.getKey() : display(name.name)) + " up again."));
+                  "Could not look "
+                      + (name == null ? redraft.getKey() : display(name.name))
+                      + " up again."));
           continue;
         }
         items.put(item.key(), lookedUp(item, detail, redraft.getValue()));
@@ -410,14 +508,56 @@ public class ImportDrafter {
 
     progress.accept(language.pick("正在校验草稿…", "Checking the draft…"));
     var result = new ArrayList<ImportItem>();
-    for (var item : items.values()) result.add(checked(item, items.keySet(), language));
+    for (var item : items.values()) {
+      if (item.existingId() == null && item.data() != null) {
+        var data = item.data().deepCopy();
+        var uncertain =
+            new ArrayList<>(item.uncertain() == null ? List.<String>of() : item.uncertain());
+        for (String field : schemaFieldNames(item.type()))
+          if (scope.clears(item, field) && !required(item.type(), field)) {
+            data.remove(field);
+            uncertain.remove(field);
+          }
+        item =
+            new ImportItem(
+                item.key(),
+                item.type(),
+                data,
+                null,
+                item.fruits(),
+                item.group(),
+                item.position(),
+                uncertain,
+                item.problems());
+      }
+      result.add(checked(item, items.keySet(), language));
+    }
     var entries = new ArrayList<Entry>();
     for (var item : result) {
       var entry = entry(item);
       if (entry != null) entries.add(entry);
     }
     noteUnheldFruits(entries, notes, language);
-    String reply = changes.path("reply").asText("").trim();
+    // Report actual data changes, never the model's unverified claim that it changed something.
+    var previous = new HashMap<String, ImportItem>();
+    current.forEach(i -> previous.put(i.key(), i));
+    changed.clear();
+    for (var item : result)
+      if (!sameContent(previous.get(item.key()), item)) changed.add(item.key());
+    long removed = current.stream().filter(i -> !items.containsKey(i.key())).count();
+    String reply =
+        changed.isEmpty() && removed == 0
+            ? language.pick(
+                "草稿未变更。请明确要修改的角色或资源，以及具体字段；无法确认的资料会留空。",
+                "The draft is unchanged. Specify the resource and fields to change; unverified"
+                    + " facts stay blank.")
+            : language.pick(
+                "已更新 " + changed.size() + " 项，移除 " + removed + " 项。其余内容保持不变；无法核实的资料留空。",
+                "Updated "
+                    + changed.size()
+                    + " items and removed "
+                    + removed
+                    + ". Other content is preserved; unverified facts stay blank.");
     return new ImportRevision(
         result,
         notes,
@@ -426,8 +566,8 @@ public class ImportDrafter {
   }
 
   /**
-   * {@code item} with {@code fields} (every drafted field when empty) replaced by a fresh detail
-   * answer. A replaced field is uncertain only if the fresh answer says so.
+   * Replaces only the authorized fields. Missing optional facts clear their stale value; missing
+   * required attributes preserve the current value for review.
    */
   private ImportItem lookedUp(ImportItem item, JsonNode detail, List<String> fields) {
     var fresh = json.createObjectNode();
@@ -438,13 +578,15 @@ public class ImportDrafter {
         freshUncertain.add(field.asText());
     var data = item.data() == null ? json.createObjectNode() : item.data().deepCopy();
     var uncertain = new ArrayList<>(item.uncertain() == null ? List.<String>of() : item.uncertain());
-    var replace = new ArrayList<String>(fields);
-    if (replace.isEmpty()) fresh.fieldNames().forEachRemaining(replace::add);
-    for (var field : replace) {
-      if (!fresh.has(field)) continue;
-      data.set(field, fresh.get(field));
-      uncertain.remove(field);
-      if (freshUncertain.contains(field)) uncertain.add(field);
+    for (var field : fields) {
+      if (fresh.has(field) && !(freshUncertain.contains(field) && !required(item.type(), field))) {
+        data.set(field, fresh.get(field));
+        uncertain.remove(field);
+        if (freshUncertain.contains(field)) uncertain.add(field);
+      } else if (!required(item.type(), field)) {
+        data.remove(field);
+        if (!uncertain.contains(field)) uncertain.add(field);
+      }
     }
     return new ImportItem(
         item.key(), item.type(), data, null, item.fruits(), item.group(), item.position(),
@@ -511,7 +653,9 @@ public class ImportDrafter {
           notes.add(
               language.pick(
                   "「" + fruit + "」：核对后没有角色吃这个果实，已从草稿去掉；需要的话告诉 AI 它的持有者。",
-                  fruit + ": no character here ate this fruit, so it was left out; tell the AI who ate it if it belongs."));
+                  fruit
+                      + ": no character here ate this fruit, so it was left out; tell the AI who"
+                      + " ate it if it belongs."));
           return true;
         });
     return result;
@@ -591,7 +735,10 @@ public class ImportDrafter {
         notes.add(
             language.pick(
                 "「" + display(drafted.name) + "」就是已有的「" + display(match.name()) + "」，直接复用。",
-                display(drafted.name) + " is the existing " + display(match.name()) + "; it is reused."));
+                display(drafted.name)
+                    + " is the existing "
+                    + display(match.name())
+                    + "; it is reused."));
         drafted.name = match.name();
       }
       drafted.existingId = match.id().toString();
@@ -636,7 +783,8 @@ public class ImportDrafter {
         node.put("existing", item.existingId() != null);
         if (type.equals(CHARACTER)) {
           node.set("fruits", json.valueToTree(item.fruits() == null ? List.of() : item.fruits()));
-          if (item.group() != null) node.put("group", item.group()).put("position", item.position());
+          if (item.group() != null)
+            node.put("group", item.group()).put("position", item.position());
         }
         if (item.existingId() == null) {
           var fields = data.deepCopy();
@@ -666,7 +814,9 @@ public class ImportDrafter {
       String key = keys.get(ref.asText());
       if (key == null || !type.equals(types.get(key))) {
         if (character != null && !ref.asText().isBlank())
-          notes.add(droppedLink(character, ref.asText(), type.equals(FRUIT) ? "果实" : "团体", type, language));
+          notes.add(
+              droppedLink(
+                  character, ref.asText(), type.equals(FRUIT) ? "果实" : "团体", type, language));
       } else if (!result.contains(key)) result.add(key);
     }
     return result;
@@ -686,7 +836,6 @@ public class ImportDrafter {
     var uncertain = new ArrayList<>(item.uncertain() == null ? List.<String>of() : item.uncertain());
     var problems = new ArrayList<String>();
     if (item.type().equals(CHARACTER)) {
-      if (!data.has("hakis")) data.putArray("hakis");
       fitFruitCapacity(fruits.size(), data, problems, language);
     }
     missingRequired(item.type(), data, problems, language);
@@ -802,7 +951,8 @@ public class ImportDrafter {
 
     for (var g : limit(roster.path("groups"), MAX_GROUPS, notes, language, "团体", "groups")) {
       var name = name(g.path("name"));
-      if (name == null || !seen.add(GROUP + ":" + ExistingResources.normalize(display(name)))) continue;
+      if (name == null || !seen.add(GROUP + ":" + ExistingResources.normalize(display(name))))
+        continue;
       var entry = new Entry("g" + (groupKeys.size() + 1), GROUP, name);
       String category = g.path("group_category").asText();
       if (validEnum(category, GroupCategory.values()) && !category.equals("group"))
@@ -812,7 +962,8 @@ public class ImportDrafter {
     }
     for (var f : limit(roster.path("fruits"), MAX_FRUITS, notes, language, "果实", "fruits")) {
       var name = name(f.path("name"));
-      if (name == null || !seen.add(FRUIT + ":" + ExistingResources.normalize(display(name)))) continue;
+      if (name == null || !seen.add(FRUIT + ":" + ExistingResources.normalize(display(name))))
+        continue;
       var entry = new Entry("f" + (fruitKeys.size() + 1), FRUIT, name);
       String fruitType = f.path("fruit_type").asText();
       if (validEnum(fruitType, FruitType.values())) entry.rosterData.put("fruit_type", fruitType);
@@ -857,7 +1008,11 @@ public class ImportDrafter {
     notes.add(
         language.pick(
             "范围太大：" + zh + "只保留了前 " + max + " 个，其余请缩小范围后再起草。",
-            "Too large: only the first " + max + " " + en + " were kept; draft the rest separately."));
+            "Too large: only the first "
+                + max
+                + " "
+                + en
+                + " were kept; draft the rest separately."));
     return list.subList(0, max);
   }
 
@@ -932,13 +1087,15 @@ public class ImportDrafter {
         if (entry.rosterData.has("group_category")) data.setAll(entry.rosterData);
       } else {
         if (detail == null) {
-          problems.add(language.pick("AI 没有给出这一项的属性，请手动填写。", "No attributes were drafted; fill them in."));
+          problems.add(
+              language.pick("AI 没有给出这一项的属性，请手动填写。", "No attributes were drafted; fill them in."));
         } else {
           sanitize(entry.type, detail.path("data"), data, uncertain);
           for (var field : detail.path("uncertain"))
-            if (field.isTextual() && data.has(field.asText()) && !uncertain.contains(field.asText()))
+            if (field.isTextual() && !uncertain.contains(field.asText()))
               uncertain.add(field.asText());
         }
+        for (var field : uncertain) if (!required(entry.type, field)) data.remove(field);
         // The roster decided the fruit type; the detail call only received it as context.
         if (entry.type.equals(FRUIT) && entry.rosterData.has("fruit_type"))
           data.set("fruit_type", entry.rosterData.get("fruit_type"));
@@ -975,6 +1132,15 @@ public class ImportDrafter {
               String key = field.getKey();
               JsonNode schema = properties.get(key);
               if (key.equals("name") || schema == null || field.getValue().isNull()) return;
+              if (ImportRevisionScope.PROFILE.contains(key)) {
+                var fact =
+                    CharacterFactValues.read(Map.of(key, field.getValue().asText())).get(key);
+                if (fact == null) {
+                  data.remove(key);
+                  if (!uncertain.contains(key)) uncertain.add(key);
+                } else data.set(key, fact);
+                return;
+              }
               JsonNode value = repair(field.getValue(), schema);
               if (value == null) {
                 if (!uncertain.contains(key)) uncertain.add(key);
@@ -983,6 +1149,28 @@ public class ImportDrafter {
               if (!value.equals(field.getValue()) && !uncertain.contains(key)) uncertain.add(key);
               data.set(key, value);
             });
+  }
+
+  private static List<String> schemaFieldNames(String type) {
+    var fields = new ArrayList<String>();
+    ActionSchemas.fields(type, true).path("properties").fieldNames().forEachRemaining(fields::add);
+    return fields;
+  }
+
+  private static boolean required(String type, String field) {
+    for (var key : ActionSchemas.fields(type, true).path("required"))
+      if (key.asText().equals(field)) return true;
+    return false;
+  }
+
+  private static boolean sameContent(ImportItem a, ImportItem b) {
+    return a != null
+        && Objects.equals(a.data(), b.data())
+        && Objects.equals(a.fruits(), b.fruits())
+        && Objects.equals(a.group(), b.group())
+        && Objects.equals(a.position(), b.position())
+        && new HashSet<>(a.uncertain() == null ? List.of() : a.uncertain())
+            .equals(new HashSet<>(b.uncertain() == null ? List.of() : b.uncertain()));
   }
 
   /** A schema-valid version of {@code value}, or null when there is none. */
@@ -1000,7 +1188,10 @@ public class ImportDrafter {
           }
         } else return null;
         if (!Double.isFinite(number)) return null;
-        number = Math.max(schema.path("minimum").asDouble(), Math.min(schema.path("maximum").asDouble(), number));
+        number =
+            Math.max(
+                schema.path("minimum").asDouble(),
+                Math.min(schema.path("maximum").asDouble(), number));
         if (type.equals("integer")) {
           long rounded = Math.round(number);
           return value.isIntegralNumber() && value.asLong() == rounded
