@@ -42,7 +42,10 @@ public class ImportDrafterTests {
           var characters = answer.putArray("characters");
           for (var c : request.path("characters")) {
             var listed = c.path("listed_fruits");
-            characters.addObject().put("key", c.path("key").asText()).set("fruit", listed.isEmpty() ? null : listed.get(0));
+            characters
+                .addObject()
+                .put("key", c.path("key").asText())
+                .set("fruit", listed.isEmpty() ? null : listed.get(0));
           }
           return answer.toString();
         };
@@ -58,13 +61,15 @@ public class ImportDrafterTests {
         content = roster;
       else if (request.messages().get(0).path("content").asText().equals(ImportPrompts.FRUITS)) {
         try {
-          content = fruitCheck.apply(JSON.readTree(request.messages().get(1).path("content").asText()));
+          content =
+              fruitCheck.apply(JSON.readTree(request.messages().get(1).path("content").asText()));
         } catch (Exception e) {
           throw new IllegalStateException(e);
         }
       } else {
         try {
-          content = details.apply(JSON.readTree(request.messages().get(1).path("content").asText()));
+          content =
+              details.apply(JSON.readTree(request.messages().get(1).path("content").asText()));
         } catch (Exception e) {
           throw new IllegalStateException(e);
         }
@@ -121,14 +126,14 @@ public class ImportDrafterTests {
         .thenReturn(Optional.of(gomu));
     deepSeek.roster =
         """
-        {"groups":[{"key":"crew","name":{"zh_CN":"草帽一伙","en_US":"Straw Hat Pirates"},"group_category":"pirate"}],
-         "fruits":[{"key":"gomu","name":{"zh_CN":"橡胶果实","en_US":"Gomu Gomu no Mi"},"fruit_type":"Paramecia"},
-                   {"key":"hana","name":{"zh_CN":"花花果实","en_US":"Hana Hana no Mi"},"fruit_type":"Paramecia"}],
-         "characters":[{"key":"luffy","name":{"zh_CN":"蒙奇·D·路飞","en_US":"Monkey D. Luffy"},"fruits":["gomu"],"group":"crew","position":"captain"},
-                       {"key":"zoro","name":{"zh_CN":"罗罗诺亚·索隆","en_US":"Roronoa Zoro"},"fruits":["nope"],"group":"crew","position":"swordsman"},
-                       {"key":"robin","name":{"zh_CN":"妮可·罗宾","en_US":"Nico Robin"},"fruits":["hana"],"group":"crew","position":"scholar"}],
-         "notes":["只包含当前成员"]}
-        """;
+{"groups":[{"key":"crew","name":{"zh_CN":"草帽一伙","en_US":"Straw Hat Pirates"},"group_category":"pirate"}],
+ "fruits":[{"key":"gomu","name":{"zh_CN":"橡胶果实","en_US":"Gomu Gomu no Mi"},"fruit_type":"Paramecia"},
+           {"key":"hana","name":{"zh_CN":"花花果实","en_US":"Hana Hana no Mi"},"fruit_type":"Paramecia"}],
+ "characters":[{"key":"luffy","name":{"zh_CN":"蒙奇·D·路飞","en_US":"Monkey D. Luffy"},"fruits":["gomu"],"group":"crew","position":"captain"},
+               {"key":"zoro","name":{"zh_CN":"罗罗诺亚·索隆","en_US":"Roronoa Zoro"},"fruits":["nope"],"group":"crew","position":"swordsman"},
+               {"key":"robin","name":{"zh_CN":"妮可·罗宾","en_US":"Nico Robin"},"fruits":["hana"],"group":"crew","position":"scholar"}],
+ "notes":["只包含当前成员"]}
+""";
     var asked = new ArrayList<String>();
     deepSeek.details =
         request -> {
@@ -139,7 +144,9 @@ public class ImportDrafterTests {
 
     var draft = drafter.draft("草帽一伙", userId, AssistantLanguage.ZH_CN, progress::add);
 
-    assertThat(draft.items()).extracting(ImportItem::key).containsExactly("g1", "f1", "f2", "c1", "c2", "c3");
+    assertThat(draft.items())
+        .extracting(ImportItem::key)
+        .containsExactly("g1", "f1", "f2", "c1", "c2", "c3");
     assertThat(item(draft, "f1").existingId()).isEqualTo(gomu.toString());
     assertThat(asked).containsExactlyInAnyOrder("f2", "c1", "c2", "c3"); // not the reused fruit
     var luffy = item(draft, "c1");
@@ -175,15 +182,15 @@ public class ImportDrafterTests {
     // fruit nobody holds, the existing one too: it would only have been reused.
     deepSeek.roster =
         """
-        {"groups":[{"key":"crew","name":{"zh_CN":"月光莫利亚海贼团"},"group_category":"pirate"}],
-         "fruits":[{"key":"kage","name":{"zh_CN":"影子果实"},"fruit_type":"Paramecia"},
-                   {"key":"suke","name":{"zh_CN":"透明果实"},"fruit_type":"Paramecia"},
-                   {"key":"horo","name":{"zh_CN":"灵灵果实"},"fruit_type":"Paramecia"},
-                   {"key":"boar","name":{"zh_CN":"野猪果实"},"fruit_type":"Zoan"}],
-         "characters":[{"key":"moria","name":{"zh_CN":"杰克斯·莫利亚"},"fruits":["kage"],"group":"crew"},
-                       {"key":"perona","name":{"zh_CN":"佩罗娜"},"fruits":["灵灵果实"],"group":"月光莫利亚海贼团"},
-                       {"key":"absalom","name":{"zh_CN":"阿布萨罗姆"},"group":"crew"}]}
-        """;
+{"groups":[{"key":"crew","name":{"zh_CN":"月光莫利亚海贼团"},"group_category":"pirate"}],
+ "fruits":[{"key":"kage","name":{"zh_CN":"影子果实"},"fruit_type":"Paramecia"},
+           {"key":"suke","name":{"zh_CN":"透明果实"},"fruit_type":"Paramecia"},
+           {"key":"horo","name":{"zh_CN":"灵灵果实"},"fruit_type":"Paramecia"},
+           {"key":"boar","name":{"zh_CN":"野猪果实"},"fruit_type":"Zoan"}],
+ "characters":[{"key":"moria","name":{"zh_CN":"杰克斯·莫利亚"},"fruits":["kage"],"group":"crew"},
+               {"key":"perona","name":{"zh_CN":"佩罗娜"},"fruits":["灵灵果实"],"group":"月光莫利亚海贼团"},
+               {"key":"absalom","name":{"zh_CN":"阿布萨罗姆"},"group":"crew"}]}
+""";
 
     var draft = drafter.draft("月光莫利亚海贼团", userId, AssistantLanguage.ZH_CN, progress::add);
 
@@ -209,15 +216,18 @@ public class ImportDrafterTests {
     deepSeek.details =
         request ->
             "{\"items\":["
-                + character("c1", ",\"attack\":99999,\"bounty\":\"4,611,100,000\",\"hakis\":[\"Haoshoku\",\"Ryuo\"],\"favourite_food\":\"酒\"")
+                + character(
+                    "c1",
+                    ",\"attack\":99999,\"bounty\":\"4,611,100,000\",\"hakis\":[\"Haoshoku\",\"Ryuo\"],\"favourite_food\":\"酒\"")
                 + ",{\"key\":\"c2\",\"data\":{\"race\":\"TITAN\",\"attack\":1000},\"uncertain\":[\"attack\"]}]}";
 
     var draft = drafter.draft("四皇", userId, AssistantLanguage.ZH_CN, progress::add);
 
     var kaido = item(draft, "c1");
     assertThat(kaido.data().path("attack").asInt()).isEqualTo(1500);
-    assertThat(kaido.data().path("bounty").asLong()).isEqualTo(4611100000L);
-    assertThat(kaido.data().path("hakis")).containsExactly(JSON.getNodeFactory().textNode("Haoshoku"));
+    assertThat(kaido.data().has("bounty")).isFalse(); // model memory alone is not verified
+    assertThat(kaido.data().has("hakis")).isTrue();
+    assertThat(kaido.data().path("hakis")).isEmpty(); // uncertain optional facts stay blank
     assertThat(kaido.data().has("favourite_food")).isFalse();
     assertThat(kaido.uncertain()).contains("attack", "bounty", "hakis");
     assertThat(kaido.problems()).isEmpty();
@@ -232,41 +242,56 @@ public class ImportDrafterTests {
     // The roster gives Moria Perona's fruit, misses his own, and lists a fruit nobody ate.
     deepSeek.roster =
         """
-        {"fruits":[{"key":"horo","name":{"zh_CN":"灵灵果实","en_US":"Horo Horo no Mi"},"fruit_type":"Paramecia"},
-                   {"key":"boar","name":{"zh_CN":"野猪果实"},"fruit_type":"Zoan"}],
-         "characters":[{"key":"moria","name":{"zh_CN":"月光·莫利亚","en_US":"Gecko Moria"},"fruits":["horo"]},
-                       {"key":"perona","name":{"zh_CN":"佩罗娜","en_US":"Perona"}},
-                       {"key":"hogback","name":{"zh_CN":"霍古巴克","en_US":"Hogback"}}]}
-        """;
+{"fruits":[{"key":"horo","name":{"zh_CN":"灵灵果实","en_US":"Horo Horo no Mi"},"fruit_type":"Paramecia"},
+           {"key":"boar","name":{"zh_CN":"野猪果实"},"fruit_type":"Zoan"}],
+ "characters":[{"key":"moria","name":{"zh_CN":"月光·莫利亚","en_US":"Gecko Moria"},"fruits":["horo"]},
+               {"key":"perona","name":{"zh_CN":"佩罗娜","en_US":"Perona"}},
+               {"key":"hogback","name":{"zh_CN":"霍古巴克","en_US":"Hogback"}}]}
+""";
     var asked = new ArrayList<JsonNode>();
     deepSeek.fruitCheck =
         request -> {
           asked.add(request);
           return """
-              {"characters":[
-                {"key":"c1","fruit":{"zh_CN":"影子果实","en_US":"Kage Kage no Mi","fruit_type":"Paramecia"}},
-                {"key":"c2","fruit":{"zh_CN":"幽灵果实","en_US":"Horo Horo no Mi"}},
-                {"key":"c3","fruit":null}]}
-              """;
+{"characters":[
+  {"key":"c1","fruit":{"zh_CN":"影子果实","en_US":"Kage Kage no Mi","fruit_type":"Paramecia"}},
+  {"key":"c2","fruit":{"zh_CN":"幽灵果实","en_US":"Horo Horo no Mi"}},
+  {"key":"c3","fruit":null}]}
+""";
         };
     deepSeek.details =
         request -> {
           var items = new ArrayList<String>();
           request.forEach(
-              r -> items.add(
-                  r.path("type").asText().equals(FRUIT) ? fruit(r.path("key").asText()) : character(r.path("key").asText(), "")));
+              r ->
+                  items.add(
+                      r.path("type").asText().equals(FRUIT)
+                          ? fruit(r.path("key").asText())
+                          : character(r.path("key").asText(), "")));
           return "{\"items\":[" + String.join(",", items) + "]}";
         };
 
     var draft = drafter.draft("月光莫利亚海贼团", userId, AssistantLanguage.ZH_CN, progress::add);
 
-    assertThat(asked.get(0).path("characters").get(0).path("listed_fruits").get(0).path("zh_CN").asText())
+    assertThat(
+            asked
+                .get(0)
+                .path("characters")
+                .get(0)
+                .path("listed_fruits")
+                .get(0)
+                .path("zh_CN")
+                .asText())
         .isEqualTo("灵灵果实");
     // Fruits keep the roster's keys; the missed one gets the next key and sits with the fruits.
-    assertThat(draft.items()).extracting(ImportItem::key).containsExactly("f1", "f3", "c1", "c2", "c3");
+    assertThat(draft.items())
+        .extracting(ImportItem::key)
+        .containsExactly("f1", "f3", "c1", "c2", "c3");
     assertThat(item(draft, "c1").fruits()).containsExactly("f3"); // Moria: Kage Kage no Mi
-    assertThat(item(draft, "f3").data().path("name").path("en_US").asText()).isEqualTo("Kage Kage no Mi");
-    assertThat(item(draft, "c2").fruits()).containsExactly("f1"); // Perona: matched by romanized name
+    assertThat(item(draft, "f3").data().path("name").path("en_US").asText())
+        .isEqualTo("Kage Kage no Mi");
+    assertThat(item(draft, "c2").fruits())
+        .containsExactly("f1"); // Perona: matched by romanized name
     assertThat(item(draft, "c3").fruits()).isEmpty();
     assertThat(item(draft, "c1").data().path("maximum_fruit_count").asInt()).isEqualTo(1);
     assertThat(draft.notes())
@@ -280,8 +305,12 @@ public class ImportDrafterTests {
     var current =
         List.of(
             drafted(
-                "c1", ImportDto.CHARACTER, data(character("c1", ",\"bounty\":1000"), "佩罗娜", "Perona"),
-                List.of(), null, null));
+                "c1",
+                ImportDto.CHARACTER,
+                data(character("c1", ",\"bounty\":1000"), "佩罗娜", "Perona"),
+                List.of(),
+                null,
+                null));
     deepSeek.scripted.add(
         "{\"reply\":\"我重新查了佩罗娜的悬赏。\",\"redraft\":[{\"key\":\"c1\",\"fields\":[\"bounty\"]}]}");
     var asked = new ArrayList<JsonNode>();
@@ -292,16 +321,25 @@ public class ImportDrafterTests {
         };
 
     var revision =
-        drafter.revise(current, List.of(), "佩罗娜的悬赏不对，查一下", userId, AssistantLanguage.ZH_CN, progress::add);
+        drafter.revise(
+            current, List.of(), "佩罗娜的悬赏不对，查一下", userId, AssistantLanguage.ZH_CN, progress::add);
 
     var perona = revision.items().get(0);
-    assertThat(perona.data().path("bounty").asLong()).isEqualTo(71000000L);
+    assertThat(perona.data().has("bounty")).isFalse(); // no verified bounty in either source
+    assertThat(perona.uncertain()).contains("bounty");
     assertThat(perona.data().path("attack").asInt()).isEqualTo(800); // only the bounty was replaced
     assertThat(revision.changed()).containsExactly("c1");
-    assertThat(asked).singleElement().satisfies(request -> {
-      assertThat(request.path("request").asText()).isEqualTo("佩罗娜的悬赏不对，查一下");
-      assertThat(request.path("facts").path("生日").asText()).isEqualTo("6月7日");
-    });
+    assertThat(asked)
+        .singleElement()
+        .satisfies(
+            request -> {
+              assertThat(request.path("request").asText())
+                  .contains(
+                      "佩罗娜的悬赏不对，查一下",
+                      "Replace ONLY these fields: [bounty]",
+                      "Preserve all other current data:");
+              assertThat(request.path("facts").path("生日").asText()).isEqualTo("6月7日");
+            });
   }
 
   @Test
@@ -313,18 +351,21 @@ public class ImportDrafterTests {
     when(existing.find(eq(ImportDto.CHARACTER), argThat(n -> "佩罗娜".equals(n.getZhCN())), any()))
         .thenReturn(Optional.of(perona));
     when(existing.heldFruits(moria))
-        .thenReturn(List.of(new ExistingResources.Held(kage, new I18nText().zhCN("影子果实").enUS("Kage Kage no Mi"))));
+        .thenReturn(
+            List.of(
+                new ExistingResources.Held(
+                    kage, new I18nText().zhCN("影子果实").enUS("Kage Kage no Mi"))));
     when(existing.heldFruits(perona))
         .thenReturn(List.of(new ExistingResources.Held(horo, new I18nText().zhCN("灵灵果实"))));
     // The draft names Moria's fruit differently and gives Perona none.
     deepSeek.roster =
         """
-        {"fruits":[{"key":"kage","name":{"zh_CN":"影影果实"},"fruit_type":"Paramecia"},
-                   {"key":"suke","name":{"zh_CN":"透明果实","en_US":"Suke Suke no Mi"},"fruit_type":"Paramecia"}],
-         "characters":[{"key":"moria","name":{"zh_CN":"月光·莫利亚"},"fruits":["kage"]},
-                       {"key":"perona","name":{"zh_CN":"佩罗娜"}},
-                       {"key":"absalom","name":{"zh_CN":"阿布萨罗姆"},"fruits":["suke"]}]}
-        """;
+{"fruits":[{"key":"kage","name":{"zh_CN":"影影果实"},"fruit_type":"Paramecia"},
+           {"key":"suke","name":{"zh_CN":"透明果实","en_US":"Suke Suke no Mi"},"fruit_type":"Paramecia"}],
+ "characters":[{"key":"moria","name":{"zh_CN":"月光·莫利亚"},"fruits":["kage"]},
+               {"key":"perona","name":{"zh_CN":"佩罗娜"}},
+               {"key":"absalom","name":{"zh_CN":"阿布萨罗姆"},"fruits":["suke"]}]}
+""";
     var asked = new ArrayList<String>();
     deepSeek.details =
         request -> {
@@ -349,13 +390,22 @@ public class ImportDrafterTests {
   public void aNewCharacterHoldsOneFruit() throws Exception {
     var current =
         List.of(
-            drafted("f1", FRUIT, data(fruit("f1"), "暗暗果实", "Yami Yami no Mi"), List.of(), null, null),
-            drafted("f2", FRUIT, data(fruit("f2"), "震震果实", "Gura Gura no Mi"), List.of(), null, null),
-            drafted("c1", ImportDto.CHARACTER, data(character("c1", ""), "测试角色", "Test"), List.of("f1"), null, null));
+            drafted(
+                "f1", FRUIT, data(fruit("f1"), "暗暗果实", "Yami Yami no Mi"), List.of(), null, null),
+            drafted(
+                "f2", FRUIT, data(fruit("f2"), "震震果实", "Gura Gura no Mi"), List.of(), null, null),
+            drafted(
+                "c1",
+                ImportDto.CHARACTER,
+                data(character("c1", ""), "测试角色", "Test"),
+                List.of("f1"),
+                null,
+                null));
     deepSeek.scripted.add(
         "{\"reply\":\"好的。\",\"update\":[{\"key\":\"c1\",\"fruits\":[\"f1\",\"f2\"],\"data\":{\"maximum_fruit_count\":2}}]}");
 
-    var revision = drafter.revise(current, List.of(), "两个都给他", userId, AssistantLanguage.ZH_CN, progress::add);
+    var revision =
+        drafter.revise(current, List.of(), "两个都给他", userId, AssistantLanguage.ZH_CN, progress::add);
 
     var character = revision.items().get(2);
     assertThat(character.data().path("maximum_fruit_count").asInt()).isEqualTo(1);
@@ -364,7 +414,8 @@ public class ImportDrafterTests {
 
   @Test
   public void aReplyThatIsNotJsonIsRetriedOnceThenReported() {
-    deepSeek.roster = "{\"groups\":[{\"key\":\"g\",\"name\":{\"zh_CN\":\"海军\"},\"group_category\":\"marine\"}]}";
+    deepSeek.roster =
+        "{\"groups\":[{\"key\":\"g\",\"name\":{\"zh_CN\":\"海军\"},\"group_category\":\"marine\"}]}";
     deepSeek.scripted.add("Sure! Here is the roster:");
     var draft = drafter.draft("海军", userId, AssistantLanguage.ZH_CN, progress::add);
     assertThat(draft.items()).extracting(ImportItem::key).containsExactly("g1");
@@ -388,7 +439,8 @@ public class ImportDrafterTests {
     assertThat(draft.notes()).singleElement().asString().contains("30");
 
     deepSeek.roster = "{\"characters\":[]}";
-    assertThatThrownBy(() -> drafter.draft("nobody", userId, AssistantLanguage.EN_US, progress::add))
+    assertThatThrownBy(
+            () -> drafter.draft("nobody", userId, AssistantLanguage.EN_US, progress::add))
         .isInstanceOf(AssistantException.class)
         .extracting(e -> ((AssistantException) e).code())
         .isEqualTo(AssistantException.INVALID_REQUEST);
@@ -418,7 +470,9 @@ public class ImportDrafterTests {
 
   private static ImportItem crew() {
     var data = JSON.createObjectNode().put("group_category", "pirate");
-    data.set("name", JSON.createObjectNode().put("zh_CN", "月光·莫利亚海贼团").put("en_US", "Thriller Bark Pirates"));
+    data.set(
+        "name",
+        JSON.createObjectNode().put("zh_CN", "月光·莫利亚海贼团").put("en_US", "Thriller Bark Pirates"));
     return drafted("g1", GROUP, data, List.of(), null, null);
   }
 
@@ -428,21 +482,32 @@ public class ImportDrafterTests {
     var current =
         List.of(
             crew(),
-            drafted("f1", FRUIT, data(fruit("f1"), "影子果实", "Kage Kage no Mi"), List.of(), null, null),
             drafted(
-                "c1", ImportDto.CHARACTER, data(character("c1", ",\"bounty\":320000000"), "月光·莫利亚", "Gecko Moria"),
-                List.of("f1"), "g1", "captain"),
-            drafted("c2", ImportDto.CHARACTER, data(character("c2", ""), "霍古巴克", "Hogback"), List.of(), "g1", "member"));
+                "f1", FRUIT, data(fruit("f1"), "影子果实", "Kage Kage no Mi"), List.of(), null, null),
+            drafted(
+                "c1",
+                ImportDto.CHARACTER,
+                data(character("c1", ",\"bounty\":320000000"), "月光·莫利亚", "Gecko Moria"),
+                List.of("f1"),
+                "g1",
+                "captain"),
+            drafted(
+                "c2",
+                ImportDto.CHARACTER,
+                data(character("c2", ""), "霍古巴克", "Hogback"),
+                List.of(),
+                "g1",
+                "member"));
     deepSeek.scripted.add(
         """
-        {"reply":"去掉了霍古巴克，加上了佩罗娜和她的灵灵果实。",
-         "remove":["c2"],
-         "update":[{"key":"c1","name":{"en_US":"Gecko Moria (Warlord)"},"data":{"speed":999}}],
-         "add":{"fruits":[{"key":"horo","name":{"zh_CN":"灵灵果实","en_US":"Horo Horo no Mi"},"fruit_type":"Paramecia"}],
-                "characters":[{"key":"perona","name":{"zh_CN":"佩罗娜","en_US":"Perona"},"fruits":["horo"],
-                               "group":"g1","position":"combatant"}]},
-         "notes":["佩罗娜是幽灵公主"]}
-        """);
+{"reply":"去掉了霍古巴克，加上了佩罗娜和她的灵灵果实。",
+ "remove":["c2"],
+ "update":[{"key":"c1","name":{"en_US":"Gecko Moria (Warlord)"},"data":{"speed":999}}],
+ "add":{"fruits":[{"key":"horo","name":{"zh_CN":"灵灵果实","en_US":"Horo Horo no Mi"},"fruit_type":"Paramecia"}],
+        "characters":[{"key":"perona","name":{"zh_CN":"佩罗娜","en_US":"Perona"},"fruits":["horo"],
+                       "group":"g1","position":"combatant"}]},
+ "notes":["佩罗娜是幽灵公主"]}
+""");
     var asked = new ArrayList<String>();
     deepSeek.details =
         request -> {
@@ -453,19 +518,23 @@ public class ImportDrafterTests {
         List.of(new Turn("user", "月光·莫利亚海贼团"), new Turn("assistant", "起草了 1 个团体、1 个果实、2 个角色。"));
 
     var revision =
-        drafter.revise(current, history, "去掉霍古巴克，加上佩罗娜", userId, AssistantLanguage.ZH_CN, progress::add);
+        drafter.revise(
+            current, history, "去掉霍古巴克，加上佩罗娜", userId, AssistantLanguage.ZH_CN, progress::add);
 
-    assertThat(revision.reply()).isEqualTo("去掉了霍古巴克，加上了佩罗娜和她的灵灵果实。");
+    assertThat(revision.reply()).contains("已更新 2 项，移除 1 项");
     // A removed key is never handed out again: Perona is c3, not c2.
-    assertThat(revision.items()).extracting(ImportItem::key).containsExactly("g1", "f1", "c1", "f2", "c3");
-    assertThat(revision.changed()).containsExactly("c1", "f2", "c3");
+    assertThat(revision.items())
+        .extracting(ImportItem::key)
+        .containsExactly("g1", "f1", "c1", "f2", "c3");
+    assertThat(revision.changed()).containsExactly("f2", "c3");
     assertThat(asked).containsExactlyInAnyOrder("f2", "c3");
     var moria = item(new ImportDraft(revision.items(), revision.notes()), "c1");
     assertThat(moria.data().path("bounty").asLong()).isEqualTo(320000000L);
-    assertThat(moria.data().path("speed").asInt()).isEqualTo(200); // clamped to the range
-    assertThat(moria.uncertain()).contains("speed");
+    assertThat(moria.data().path("speed").asInt())
+        .isEqualTo(110); // unrequested model patch rejected
+    assertThat(moria.uncertain()).doesNotContain("speed");
     assertThat(moria.data().path("name").path("zh_CN").asText()).isEqualTo("月光·莫利亚");
-    assertThat(moria.data().path("name").path("en_US").asText()).isEqualTo("Gecko Moria (Warlord)");
+    assertThat(moria.data().path("name").path("en_US").asText()).isEqualTo("Gecko Moria");
     assertThat(moria.fruits()).containsExactly("f1");
     var perona = item(new ImportDraft(revision.items(), revision.notes()), "c3");
     assertThat(perona.fruits()).containsExactly("f2");
@@ -486,9 +555,14 @@ public class ImportDrafterTests {
     var current =
         List.of(
             crew(),
-            drafted("f1", FRUIT, data(fruit("f1"), "影子果实", "Kage Kage no Mi"), List.of(), null, null),
             drafted(
-                "c1", ImportDto.CHARACTER, data(character("c1", ""), "月光·莫利亚", "Gecko Moria"), List.of("f1"), "g1",
+                "f1", FRUIT, data(fruit("f1"), "影子果实", "Kage Kage no Mi"), List.of(), null, null),
+            drafted(
+                "c1",
+                ImportDto.CHARACTER,
+                data(character("c1", ""), "月光·莫利亚", "Gecko Moria"),
+                List.of("f1"),
+                "g1",
                 "captain"));
     // The model drops Moria but keeps his fruit, names a fruit instead of its key and points at the
     // crew it just removed.
@@ -500,17 +574,15 @@ public class ImportDrafterTests {
         """);
     deepSeek.details = request -> "{\"items\":[" + character("c2", "") + "]}";
 
-    var revision = drafter.revise(current, List.of(), "换成阿布萨罗姆", userId, AssistantLanguage.ZH_CN, progress::add);
+    var revision =
+        drafter.revise(
+            current, List.of(), "换成阿布萨罗姆", userId, AssistantLanguage.ZH_CN, progress::add);
 
-    assertThat(revision.items()).extracting(ImportItem::key).containsExactly("f1", "c2");
+    assertThat(revision.items()).extracting(ImportItem::key).containsExactly("g1", "c2");
     var absalom = revision.items().get(1);
     assertThat(absalom.fruits()).isEmpty();
-    assertThat(absalom.group()).isNull();
-    assertThat(revision.notes())
-        .containsExactly(
-            "「阿布萨罗姆」的果实「透明果实」不在名单里，已忽略，请确认。",
-            "「阿布萨罗姆」的团体「g1」不在名单里，已忽略，请确认。",
-            "「影子果实」：草稿里没有角色吃这个果实，请确认是否需要导入。");
+    assertThat(absalom.group()).isEqualTo("g1");
+    assertThat(revision.notes()).containsExactly("「阿布萨罗姆」的果实「透明果实」不在名单里，已忽略，请确认。");
   }
 
   @Test
@@ -519,18 +591,162 @@ public class ImportDrafterTests {
     name.set("name", JSON.createObjectNode().put("zh_CN", "佩罗娜").put("en_US", "Perona"));
     var current =
         List.of(
-            drafted("f1", FRUIT, data(fruit("f1"), "灵灵果实", "Horo Horo no Mi"), List.of(), null, null),
-            new ImportItem("c1", ImportDto.CHARACTER, name, UUID.randomUUID().toString(), List.of(), null, null,
-                List.of(), List.of()));
+            drafted(
+                "f1", FRUIT, data(fruit("f1"), "灵灵果实", "Horo Horo no Mi"), List.of(), null, null),
+            new ImportItem(
+                "c1",
+                ImportDto.CHARACTER,
+                name,
+                UUID.randomUUID().toString(),
+                List.of(),
+                null,
+                null,
+                List.of(),
+                List.of()));
     deepSeek.scripted.add(
         "{\"reply\":\"好的。\",\"update\":[{\"key\":\"c1\",\"data\":{\"attack\":100},\"fruits\":[\"f1\"]}]}");
 
-    var revision = drafter.revise(current, null, "灵灵果实给佩罗娜", userId, AssistantLanguage.ZH_CN, progress::add);
+    var revision =
+        drafter.revise(current, null, "灵灵果实给佩罗娜", userId, AssistantLanguage.ZH_CN, progress::add);
 
     var perona = revision.items().get(1);
     assertThat(perona.data().has("attack")).isFalse();
     assertThat(perona.fruits()).containsExactly("f1");
     assertThat(revision.notes()).isEmpty();
     assertThat(deepSeek.requests).hasSize(1); // nothing new to draft
+  }
+
+  @Test
+  public void anEmptyRedraftCannotOverwriteOtherFieldsAndAnExplicitNullClearsAnOptionalFact()
+      throws Exception {
+    var current =
+        List.of(
+            drafted(
+                "c1",
+                ImportDto.CHARACTER,
+                data(character("c1", ",\"bounty\":1000,\"height\":160"), "佩罗娜", "Perona"),
+                List.of(),
+                null,
+                null));
+    knownFacts.put("佩罗娜", Map.of("身高", "161cm"));
+    deepSeek.scripted.add("{\"redraft\":[{\"key\":\"c1\",\"fields\":[]}]}");
+    deepSeek.details =
+        request ->
+            "{\"items\":["
+                + character("c1", ",\"bounty\":71000000,\"attack\":1,\"height\":999")
+                + "]}";
+    var revision =
+        drafter.revise(
+            current, List.of(), "佩罗娜悬赏重新查，其他不变", userId, AssistantLanguage.ZH_CN, progress::add);
+    var changed = revision.items().get(0);
+    assertThat(changed.data().has("bounty")).isFalse();
+    assertThat(changed.data().path("height").asInt()).isEqualTo(160);
+    assertThat(changed.data().path("attack").asInt()).isEqualTo(800);
+    assertThat(current.get(0).data().path("bounty").asInt()).isEqualTo(1000); // input never mutated
+
+    deepSeek.scripted.add(
+        "{\"update\":[{\"key\":\"c1\",\"data\":{\"height\":null,\"attack\":50}}]}");
+    var cleared =
+        drafter
+            .revise(current, List.of(), "佩罗娜身高留空", userId, AssistantLanguage.ZH_CN, progress::add)
+            .items()
+            .get(0);
+    assertThat(cleared.data().has("height")).isFalse();
+    assertThat(cleared.data().path("attack").asInt()).isEqualTo(800);
+  }
+
+  @Test
+  public void verifiedFactsOverrideModelGuessesButOnlyRequestedFieldsOnRevision() throws Exception {
+    var current =
+        List.of(
+            drafted(
+                "c1",
+                ImportDto.CHARACTER,
+                data(character("c1", ",\"bounty\":1000,\"height\":160"), "佩罗娜", "Perona"),
+                List.of(),
+                null,
+                null));
+    knownFacts.put("佩罗娜", Map.of("悬赏金", "7100万贝里", "身高", "161cm"));
+    deepSeek.scripted.add(
+        "{\"redraft\":[{\"key\":\"c1\",\"fields\":[\"bounty\",\"height\",\"attack\"]}]}");
+    deepSeek.details =
+        request -> "{\"items\":[" + character("c1", ",\"bounty\":99,\"height\":999") + "]}";
+    var updated =
+        drafter
+            .revise(
+                current, List.of(), "佩罗娜悬赏不对，重新核实", userId, AssistantLanguage.ZH_CN, progress::add)
+            .items()
+            .get(0);
+    assertThat(updated.data().path("bounty").asLong()).isEqualTo(71000000);
+    assertThat(updated.data().path("height").asInt()).isEqualTo(160);
+    assertThat(updated.uncertain()).doesNotContain("bounty");
+
+    deepSeek.scripted.add("{\"update\":[{\"key\":\"c1\",\"data\":{\"bounty\":400000000}}]}");
+    var explicit =
+        drafter
+            .revise(current, List.of(), "佩罗娜悬赏改成4亿", userId, AssistantLanguage.ZH_CN, progress::add)
+            .items()
+            .get(0);
+    assertThat(explicit.data().path("bounty").asLong()).isEqualTo(400000000);
+  }
+
+  @Test
+  public void ambiguousTargetsAndProtectedFieldsStayUntouched() throws Exception {
+    var a =
+        drafted(
+            "c1",
+            ImportDto.CHARACTER,
+            data(character("c1", ""), "莫利亚", "Moria"),
+            List.of(),
+            null,
+            null);
+    var b =
+        drafted(
+            "c2",
+            ImportDto.CHARACTER,
+            data(character("c2", ""), "佩罗娜", "Perona"),
+            List.of(),
+            null,
+            null);
+    deepSeek.scripted.add(
+        "{\"update\":[{\"key\":\"c2\",\"data\":{\"attack\":500,\"speed\":150}}],\"remove\":[\"c1\"]}");
+    var revision =
+        drafter.revise(
+            List.of(a, b),
+            List.of(),
+            "佩罗娜攻击改500，不要改速度",
+            userId,
+            AssistantLanguage.ZH_CN,
+            progress::add);
+    assertThat(revision.items()).hasSize(2);
+    assertThat(revision.items().get(1).data().path("attack").asInt()).isEqualTo(500);
+    assertThat(revision.items().get(1).data().path("speed").asInt()).isEqualTo(110);
+    deepSeek.scripted.add("{\"update\":[{\"key\":\"c2\",\"data\":{\"attack\":300}}]}");
+    var unclear =
+        drafter.revise(
+            List.of(a, b), List.of(), "攻击改300", userId, AssistantLanguage.ZH_CN, progress::add);
+    assertThat(unclear.changed()).isEmpty();
+    assertThat(unclear.items().get(1).data()).isEqualTo(b.data());
+  }
+
+  @Test
+  public void explicitClearingWinsEvenIfTheModelTriesToRedraftAndPopulateIt() throws Exception {
+    var current =
+        List.of(
+            drafted(
+                "c1",
+                ImportDto.CHARACTER,
+                data(character("c1", ",\"bounty\":1000"), "佩罗娜", "Perona"),
+                List.of(),
+                null,
+                null));
+    knownFacts.put("佩罗娜", Map.of("悬赏金", "7100万贝里"));
+    deepSeek.scripted.add(
+        "{\"update\":[{\"key\":\"c1\",\"data\":{\"bounty\":71000000}}],\"redraft\":[{\"key\":\"c1\",\"fields\":[\"bounty\"]}]}");
+    var revision =
+        drafter.revise(
+            current, List.of(), "佩罗娜悬赏留空", userId, AssistantLanguage.ZH_CN, progress::add);
+    assertThat(revision.items().get(0).data().has("bounty")).isFalse();
+    assertThat(deepSeek.requests).hasSize(1); // no lookup is needed for an explicit clear
   }
 }

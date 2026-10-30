@@ -112,3 +112,29 @@ History restores current pending, completed, cancelled or expired states, includ
 text-only proposal answers whose codes can be verified in that store. Unknown or unpublished
 codes do not produce cards. Existing clients may continue to use the textual instructions;
 the original `battleProposal` field remains compatible with legacy replies.
+
+## Import draft revisions
+
+`/assistant/import/revise` still returns the same item DTOs. A revision is now bounded on the server
+by the current instruction's resource names and fields. Earlier turns resolve an unambiguous follow-up;
+they do not authorize replaying earlier edits. Unnamed fields and reviewer edits are preserved. Empty
+`redraft.fields` no longer means every field: it can only select the fields of the current request.
+Explicit optional-field clearing is supported. Negated instructions protect their fields. Ambiguous
+requests leave the draft unchanged so the reviewer can name the target/field. Actual item differences,
+rather than the model's claim, determine `changed`. Additions keep necessary fruit/holder dependencies
+but exclude unsolicited members/groups. Removing a new character also removes a newly drafted fruit
+that no remaining character holds.
+
+Biographical values (bounty, age, height, birthplace and birthday) use public Baidu Baike infoboxes plus
+Bangumi. Baike must match the drafted Chinese name and identify One Piece. Requests are restricted to
+HTTPS on `baike.baidu.com`, with bounded responses, timeouts and no scripts or anti-bot bypass. A 403,
+network failure, mismatched identity, ambiguous timeline or conflicting normalized source values means
+unknown. Unknown optional facts are omitted, never converted to zero or clamped into a plausible value.
+A reviewer may supply an explicit value in conversation or manually in the editor. Required combat
+attributes remain estimates calibrated to the app's reference resources, separate from biography facts.
+External infobox text is untrusted reference data, never instructions.
+
+The frontend derives a field-by-field before/after review and offers undo of the last AI revision.
+Undo preserves the pre-revision selection/avatar state; a later manual edit invalidates that snapshot
+so undo cannot discard the reviewer's newer work. Normal create/commit permission checks and the
+explicit import action are unchanged. No database migration or new API shape is required.
