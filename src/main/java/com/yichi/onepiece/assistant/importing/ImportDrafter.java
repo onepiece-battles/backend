@@ -26,7 +26,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,9 +58,9 @@ public class ImportDrafter {
   static final double TEMPERATURE = 0.2;
   static final int MAX_TOKENS = 4000;
   /**
-   * DeepSeek's thinking model ("深度思考") reads revision requests: it resolves nicknames,
-   * context and real names far better than the chat model. Its thinking counts toward its output
-   * limit.
+   * DeepSeek's thinking model ("深度思考") does the import's knowledge work: listing a crew,
+   * checking fruits, drafting facts and reading revision requests, nicknames, context and real
+   * names included. Its thinking counts toward its output limit.
    */
   static final String REASONING_MODEL = "deepseek-reasoner";
   static final int REASONING_MAX_TOKENS = 32000;
@@ -134,7 +133,7 @@ public class ImportDrafter {
     var notes = new ArrayList<String>();
 
     progress.accept(language.pick("正在梳理名单…", "Listing who and what is in scope…"));
-    JsonNode roster = ask(s, ImportPrompts.ROSTER, scope);
+    JsonNode roster = think(s, ImportPrompts.ROSTER, scope);
     List<Entry> entries = readRoster(roster, notes, language);
     if (!entries.isEmpty()) {
       progress.accept(language.pick("正在核对每个角色的果实…", "Checking each character's devil fruit…"));
@@ -157,7 +156,7 @@ public class ImportDrafter {
 
     var byKey = new HashMap<String, Entry>();
     entries.forEach(e -> byKey.put(e.key, e));
-    var details = details(s, entries, byKey, Map.of(), userId, language, progress);
+    var details = details(s, entries, byKey, userId, language, progress);
 
     progress.accept(language.pick("正在校验草稿…", "Checking the draft…"));
     var items = new ArrayList<ImportItem>();
@@ -168,14 +167,12 @@ public class ImportDrafter {
   /**
    * Drafts the create fields of the new characters and fruits among {@code entries}, in parallel
    * batches, by entry key. {@code byKey} names their relations for context; characters also get
-   * the facts {@link CharacterFacts} finds, and {@code hints} adds the reviewer's request for an
-   * item being looked up again.
+   * the facts {@link CharacterFacts} finds.
    */
   private Map<String, JsonNode> details(
       Settings s,
       List<Entry> entries,
       Map<String, Entry> byKey,
-      Map<String, String> hints,
       UUID userId,
       AssistantLanguage language,
       Consumer<String> progress) {
@@ -215,10 +212,10 @@ public class ImportDrafter {
                 batch ->
                     CompletableFuture.supplyAsync(
                         () ->
-                            ask(
+                            think(
                                 s,
                                 ImportPrompts.detail(references),
-                                detailRequest(batch, byKey, found, hints)),
+                                detailRequest(batch, byKey, found)),
                         detailExecutor))
             .toList();
     try {
@@ -230,8 +227,8 @@ public class ImportDrafter {
       if (e.getCause() instanceof RuntimeException cause) throw cause;
       throw e;
     }
-    // Never turn the model's memory into a verified biography. Missing/conflicting source facts
-    // stay absent; combat values use the app's reference scale separately.
+    // A source's fact wins over the model's memory; a fact the model is unsure of and no source
+    // gives stays blank.
     for (var entry : toDetail) {
       if (!entry.type.equals(CHARACTER)) continue;
       JsonNode detail = details.get(entry.key);
@@ -239,28 +236,29 @@ public class ImportDrafter {
         var data =
             object.path("data") instanceof ObjectNode fields ? fields : json.createObjectNode();
         object.set("data", data);
-        ImportRevisionScope.PROFILE.forEach(data::remove);
         var verified = CharacterFactValues.read(found.getOrDefault(entry.key, Map.of()));
-        verified.forEach(data::set);
-        var oldUncertain = detail.path("uncertain");
-        var uncertain = object.putArray("uncertain");
-        for (var key : oldUncertain) if (!verified.containsKey(key.asText())) uncertain.add(key);
+        var unsure = new LinkedHashSet<String>();
+        detail.path("uncertain").forEach(key -> unsure.add(key.asText()));
         for (String key : ImportRevisionScope.PROFILE)
-          if (!verified.containsKey(key)) uncertain.add(key);
+          if (verified.containsKey(key)) {
+            data.set(key, verified.get(key));
+            unsure.remove(key);
+          } else if (unsure.contains(key)) data.remove(key);
+        var uncertain = object.putArray("uncertain");
+        unsure.forEach(uncertain::add);
       }
     }
     return details;
   }
 
   /**
-   * Applies a reviewer's request to the current draft in two steps. First the model reads the
-   * request into a plan (which items, which fields, change / look up / clear), and the server keeps
-   * only the part the request itself grounds ({@link ImportRevisionScope}); a plan that asks a
-   * question changes nothing. Then, for field changes and additions, the model answers with
-   * changes only, which are applied as far as the scope allows, so everything else keeps the
-   * reviewer's own edits. Look-ups draft the planned fields again as in {@link #draft}, leaving
-   * unverified facts blank. Afterwards every item is checked again, the notes are worked out
-   * afresh and the reply says exactly what changed.
+   * Applies a reviewer's request to the current draft with one call to DeepSeek's thinking model
+   * ({@link ImportPrompts#REVISE}): it works out what the request means in the conversation and
+   * finds the values itself, real names, facts and stats on the app's scale included. The server
+   * keeps the answer to what the request refers to ({@link ImportRevisionScope}), lets Baidu Baike
+   * and Bangumi correct facts (what neither the model nor a source knows stays blank), and drafts
+   * added items as in {@link #draft}. Everything else keeps the reviewer's own edits, and the
+   * reply says exactly what changed.
    */
   public ImportRevision revise(
       List<ImportItem> current,
@@ -272,42 +270,38 @@ public class ImportDrafter {
     var s = connect(language);
     progress.accept(
         language.pick("DeepSeek 正在深度思考你的修改…", "DeepSeek is thinking the changes through…"));
-    var turns = history == null ? List.<Turn>of() : history;
+    var scope = new ImportRevisionScope(current, history, instruction);
     var conversation = new ArrayList<ObjectNode>();
+    var turns = history == null ? List.<Turn>of() : history;
     for (var turn : turns.subList(Math.max(0, turns.size() - MAX_HISTORY), turns.size()))
       if (turn != null
           && turn.content() != null
           && Set.of("user", "assistant").contains(turn.role()))
         conversation.add(message(turn.role(), truncate(turn.content(), MAX_TURN_LENGTH)));
-    String request = "Current draft:\n" + roster(current) + "\n\nRequest: " + instruction;
-    var scope = new ImportRevisionScope(current, history, instruction, plan(s, conversation, request));
-    JsonNode changes = json.createObjectNode();
-    if (scope.needsEdit()) {
-      var messages = new ArrayList<ObjectNode>();
-      messages.add(
-          message("system", ImportPrompts.revise(language.pick("Simplified Chinese", "English"))));
-      messages.addAll(conversation);
-      String checked = "\nAllowed existing-item fields: " + json.valueToTree(scope.describe());
-      if (scope.planned())
-        checked +=
-            "\nPlanned removals: "
-                + json.valueToTree(scope.removals())
-                + "\nPlanned additions: "
-                + json.valueToTree(scope.plannedAdditions());
-      messages.add(message("user", request + checked));
-      changes = ask(s, messages);
-    }
+    conversation.add(
+        message(
+            "user",
+            "Current draft:\n"
+                + roster(current)
+                + "\n\nReference characters and fruits of the app: "
+                + references(userId)
+                + "\n\nRequest: "
+                + instruction));
+    var messages = new ArrayList<ObjectNode>();
+    messages.add(message("system", ImportPrompts.REVISE));
+    messages.addAll(alternating(conversation));
+    JsonNode answer = think(s, messages);
 
     var items = new LinkedHashMap<String, ImportItem>();
     for (var item : current) if (item != null && item.key() != null) items.put(item.key(), item);
     // Keys of removed items are not handed out again: the page keeps per-key review state.
     var taken = Set.copyOf(items.keySet());
     var notes = new ArrayList<String>();
-    for (var note : changes.path("notes")) if (note.isTextual()) notes.add(note.asText());
-    var changed = new LinkedHashSet<String>();
-    for (var key : changes.path("remove"))
-      if (scope.removes(key.asText())) items.remove(key.asText());
-    scope.removals().forEach(items::remove);
+    for (var note : answer.path("notes")) if (note.isTextual()) notes.add(note.asText());
+    for (var entry : answer.path("remove")) {
+      var item = items.get(entry.isObject() ? entry.path("key").asText() : entry.asText());
+      if (item != null && scope.reaches(item, entry.path("refers_to"))) items.remove(item.key());
+    }
     // A removed character's newly drafted fruit is a dependent item, unless another holder needs
     // it.
     var removedFruits = new HashSet<String>();
@@ -336,17 +330,8 @@ public class ImportDrafter {
     }
     var added = new ArrayList<Entry>();
     var relations = new HashMap<Entry, JsonNode>();
-    JsonNode add = changes.path("add");
-    Set<String> allowedAdditions = new HashSet<>(scope.additions ? scope.addedKeys(add) : Set.of());
-    // A new fruit or group that an allowed relation change points to comes with that change.
-    for (var update : changes.path("update")) {
-      var item = items.get(update.path("key").asText());
-      if (item == null || !item.type().equals(CHARACTER)) continue;
-      if (scope.allows(item, "fruits"))
-        update.path("fruits").forEach(f -> allowedAdditions.add(f.asText()));
-      if (scope.allows(item, "group") && update.path("group").isTextual())
-        allowedAdditions.add(update.path("group").asText());
-    }
+    JsonNode add = answer.path("add");
+    Set<String> allowedAdditions = allowedAdditions(add, answer.path("changes"), items, scope);
     for (var section : List.of(GROUP, FRUIT, CHARACTER)) {
       for (var node : add.path(section + "s")) {
         if (!allowedAdditions.contains(node.path("key").asText())) continue;
@@ -395,92 +380,22 @@ public class ImportDrafter {
       }
     }
 
-    var inferredRedrafts = new LinkedHashMap<String, List<String>>();
-    for (var update : changes.path("update")) {
-      var item = items.get(update.path("key").asText());
-      if (item == null) continue;
-      boolean fresh = item.existingId() == null;
-      var data = item.data() == null ? json.createObjectNode() : item.data().deepCopy();
-      var uncertain = new ArrayList<>(item.uncertain() == null ? List.<String>of() : item.uncertain());
-      if (fresh
-          && scope.allows(item, "name")
-          && !scope.looksUpName(item)
-          && update.path("name").isObject()) {
-        var name = name(data.path("name"));
-        var localized = ((ObjectNode) update.path("name")).deepCopy();
-        for (String locale : List.of("zh_CN", "en_US"))
-          if (!scope.allowsName(locale)) localized.remove(locale);
-        var patch = name(localized);
-        if (patch != null)
-          data.set(
-              "name",
-              nameNode(
-                  new I18nText()
-                      .zhCN(patch.getZhCN() != null ? patch.getZhCN() : name == null ? null : name.getZhCN())
-                      .enUS(patch.getEnUS() != null ? patch.getEnUS() : name == null ? null : name.getEnUS())));
-      }
-      if (fresh && update.path("data").isObject()) {
-        var patch = json.createObjectNode();
-        update
-            .path("data")
-            .fields()
-            .forEachRemaining(
-                field -> {
-                  String key = field.getKey();
-                  if (!scope.allows(item, key)
-                      || scope.clears(item, key)
-                      || scope.looksUp(item, key)) return;
-                  if (ImportRevisionScope.PROFILE.contains(key)
-                      && !field.getValue().isNull()
-                      && !CharacterFactValues.given(instruction, key, field.getValue())) {
-                    inferredRedrafts.computeIfAbsent(item.key(), k -> new ArrayList<>()).add(key);
-                    return;
-                  }
-                  if (field.getValue().isNull()) {
-                    if (!required(item.type(), key)) {
-                      data.remove(key);
-                      uncertain.remove(key);
-                    }
-                  } else {
-                    patch.set(key, field.getValue());
-                    uncertain.remove(key);
-                  }
-                });
-        sanitize(item.type(), patch, data, uncertain);
-      }
-      var fruits = item.fruits();
-      var group = item.group();
-      var position = item.position();
-      if (item.type().equals(CHARACTER)) {
-        var name = name(data.path("name"));
-        if (scope.allows(item, "fruits") && update.has("fruits"))
-          fruits = linked(update.get("fruits"), FRUIT, name, keys, types, notes, language);
-        if (scope.allows(item, "group") && update.has("group")) {
-          var linked = linked(update.get("group"), GROUP, name, keys, types, notes, language);
-          group = linked.isEmpty() ? null : linked.get(0);
-          if (group == null) position = null;
-          else if (position == null) position = "member";
-        }
-        String requested = update.path("position").asText();
-        if (scope.allows(item, "position")
-            && group != null
-            && validEnum(requested, GroupPosition.values())) position = requested;
-      }
-      items.put(
-          item.key(),
-          new ImportItem(
-              item.key(), item.type(), data, item.existingId(), fruits, group, position, uncertain, List.of()));
-      changed.add(item.key());
+    var revision =
+        new Revision(scope, instruction, items, keys, types, notes, new ArrayList<>(),
+            new LinkedHashMap<>(), new ArrayList<>(), new HashSet<>(), language);
+    for (var change : answer.path("changes")) {
+      var item = items.get(change.path("key").asText());
+      if (item != null && scope.reaches(item, change.path("refers_to")))
+        items.put(item.key(), apply(item, change, revision));
     }
 
-    // A new fruit that an allowed change took from its holder, and nobody else eats, goes too:
-    // every fruit in the draft has a holder.
+    // A new fruit that a change took from its holder, and nobody else eats, goes too: every fruit
+    // in the draft has a holder.
     var holders = new HashSet<String>();
     for (var item : items.values()) if (item.fruits() != null) holders.addAll(item.fruits());
     added.forEach(e -> holders.addAll(e.fruits));
     for (var before : current) {
-      if (!before.type().equals(CHARACTER) || before.fruits() == null || !scope.allows(before, "fruits"))
-        continue;
+      if (!revision.refruited().contains(before.key()) || before.fruits() == null) continue;
       for (var key : before.fruits()) {
         var fruit = items.get(key);
         if (fruit == null || fruit.existingId() != null || holders.contains(key)) continue;
@@ -494,244 +409,343 @@ public class ImportDrafter {
       }
     }
 
-    // A real name asked for ("改成其真名") is the thinking model's answer, checked against the
-    // sources: one that knows the drafted name as an alias wins; else they confirm the model's
-    // name and give its usual spelling; else the model's name stands, with a remark. An impostor
-    // never becomes the one he impersonates.
-    var remarks = new ArrayList<String>();
-    if (!scope.nameLookUps().isEmpty())
-      progress.accept(
-          language.pick(
-              "正在核实名字（DeepSeek / 百度百科 / Bangumi）…",
-              "Checking names (DeepSeek / Baidu Baike / Bangumi)…"));
-    for (var key : scope.nameLookUps()) {
-      var item = items.get(key);
-      if (item == null
-          || item.existingId() != null
-          || !item.type().equals(CHARACTER)
-          || !(item.data() != null && item.data().path("name") instanceof ObjectNode old)) continue;
-      var drafted = name(old);
-      if (drafted == null) continue;
-      var impersonates =
-          scope.impersonated(key) == null ? null : name(scope.impersonated(key));
-      var found = facts.find(drafted);
-      // Drafted under the name he impersonates, the sources describe the other man.
-      if (impersonates != null && ExistingResources.sameName(canonical(found), impersonates))
-        found = Map.of();
-      var answer = scope.realName(key) == null ? null : name(scope.realName(key));
-      boolean anotherItems =
-          answer != null
-              && items.values().stream()
-                  .filter(other -> !other.key().equals(key) && other.data() != null)
-                  .anyMatch(
-                      other -> ExistingResources.sameName(name(other.data().path("name")), answer));
-      var proposed =
-          answer == null
-                  || anotherItems
-                  || impersonates != null && ExistingResources.sameName(impersonates, answer)
-              ? null
-              : answer;
-      Map<String, String> confirmed = proposed == null ? Map.of() : facts.find(proposed);
-      var renamed = old.deepCopy();
-      var missing = new ArrayList<String>();
-      boolean modelOnly = false;
-      for (String locale : List.of("zh_CN", "en_US")) {
-        if (!scope.allowsName(locale)) continue;
-        String value = found.get("canonical_" + locale);
-        if (value == null || value.isBlank()) value = confirmed.get("canonical_" + locale);
-        if ((value == null || value.isBlank()) && proposed != null) {
-          value = locale.equals("zh_CN") ? proposed.getZhCN() : proposed.getEnUS();
-          modelOnly |= value != null && !value.isBlank();
-        }
-        if (value == null || value.isBlank()) missing.add(locale);
-        else renamed.put(locale, truncate(value.trim(), 100));
-      }
-      String who = language.displayName(drafted);
-      if (modelOnly && !renamed.equals(old))
-        remarks.add(
-            language.pick(
-                "「" + who + "」的真名来自 DeepSeek，百度百科 / Bangumi 里没有查到，请确认。",
-                who + "'s real name comes from DeepSeek; Baidu Baike / Bangumi do not list it, so"
-                    + " check it."));
-      if (!missing.isEmpty()) {
-        boolean both = missing.size() == 2;
-        String zh = both ? "真实姓名" : missing.contains("zh_CN") ? "中文名" : "英文名";
-        String en = both ? "real name" : missing.contains("zh_CN") ? "Chinese name" : "English name";
-        remarks.add(
-            language.pick(
-                "「" + who + "」：没有查到可核实的" + zh + "，保持原样。",
-                who + ": no source verifies the " + en + ", so it stays as it is."));
-      } else if (renamed.equals(old))
-        remarks.add(language.pick("「" + who + "」的名字已核实，与资料一致。", who + "'s name checks out."));
-      if (renamed.equals(old)) continue;
-      var data = item.data().deepCopy();
-      data.set("name", renamed);
-      items.put(
-          key,
-          new ImportItem(
-              item.key(), item.type(), data, null, item.fruits(), item.group(), item.position(),
-              item.uncertain(), item.problems()));
-    }
-    notes.addAll(remarks);
-
-    // Re-lookups replace only fields authorized by this request. Empty never means all.
-    var redrafts = new LinkedHashMap<String, List<String>>();
-    BiConsumer<String, Collection<String>> lookUp =
-        (key, fields) -> {
-          var item = items.get(key);
-          if (item == null || item.existingId() != null || item.type().equals(GROUP)) return;
-          var merged = new LinkedHashSet<>(redrafts.getOrDefault(key, List.of()));
-          merged.addAll(fields);
-          if (!merged.isEmpty()) redrafts.put(key, List.copyOf(merged));
-        };
-    scope.lookUps().forEach(lookUp);
-    inferredRedrafts.forEach(lookUp);
-    for (var asked : changes.path("redraft")) {
-      var item = items.get(asked.path("key").asText());
-      if (item != null) lookUp.accept(item.key(), scope.redraft(item, asked.path("fields")));
-    }
-
-    if (!added.isEmpty() || !redrafts.isEmpty()) {
+    if (!added.isEmpty()) {
       progress.accept(language.pick("正在核对已有数据…", "Checking what already exists…"));
       for (var entry : added)
         existing.find(entry.type, entry.name, userId).ifPresent(id -> entry.existingId = id.toString());
       var reused = reuseHeldFruits(added, notes, language);
-      added.clear();
-      added.addAll(reused);
       var byKey = new HashMap<String, Entry>();
       for (var item : items.values()) {
         var entry = entry(item);
         if (entry != null) byKey.put(entry.key, entry);
       }
-      added.forEach(e -> byKey.put(e.key, e));
-      var toDraft = new ArrayList<>(added);
-      var hints = new HashMap<String, String>();
-      for (var key : redrafts.keySet()) {
-        if (!byKey.containsKey(key)) continue;
-        toDraft.add(byKey.get(key));
-        hints.put(
-            key,
-            instruction
-                + "\nReplace ONLY these fields: "
-                + redrafts.get(key)
-                + "\nPreserve all other current data: "
-                + items.get(key).data());
-      }
-      var details = details(s, toDraft, byKey, hints, userId, language, progress);
-      for (var entry : added) {
-        items.put(entry.key, toItem(entry, details.get(entry.key), language));
-        changed.add(entry.key);
-      }
-      for (var redraft : redrafts.entrySet()) {
-        var item = items.get(redraft.getKey());
-        var detail = details.get(redraft.getKey());
-        if (detail == null) {
-          var name = byKey.get(redraft.getKey());
-          notes.add(
-              language.pick(
-                  "没能重新查到「" + (name == null ? redraft.getKey() : display(name.name)) + "」的资料。",
-                  "Could not look "
-                      + (name == null ? redraft.getKey() : display(name.name))
-                      + " up again."));
-          continue;
-        }
-        items.put(item.key(), lookedUp(item, detail, redraft.getValue()));
-        changed.add(item.key());
-      }
+      reused.forEach(e -> byKey.put(e.key, e));
+      var details = details(s, reused, byKey, userId, language, progress);
+      for (var entry : reused) items.put(entry.key, toItem(entry, details.get(entry.key), language));
     }
 
     progress.accept(language.pick("正在校验草稿…", "Checking the draft…"));
     var result = new ArrayList<ImportItem>();
-    for (var item : items.values()) {
-      if (item.existingId() == null && item.data() != null) {
-        var data = item.data().deepCopy();
-        var uncertain =
-            new ArrayList<>(item.uncertain() == null ? List.<String>of() : item.uncertain());
-        for (String field : schemaFieldNames(item.type()))
-          if (scope.clears(item, field) && !required(item.type(), field)) {
-            data.remove(field);
-            uncertain.remove(field);
-          }
-        item =
-            new ImportItem(
-                item.key(),
-                item.type(),
-                data,
-                null,
-                item.fruits(),
-                item.group(),
-                item.position(),
-                uncertain,
-                item.problems());
-      }
-      result.add(checked(item, items.keySet(), language));
-    }
+    for (var item : items.values()) result.add(checked(item, items.keySet(), language));
     var entries = new ArrayList<Entry>();
     for (var item : result) {
       var entry = entry(item);
       if (entry != null) entries.add(entry);
     }
     noteUnheldFruits(entries, notes, language);
+    notes.addAll(revision.remarks());
     // Report actual data changes, never the model's unverified claim that it changed something.
     var previous = new HashMap<String, ImportItem>();
     current.forEach(i -> previous.put(i.key(), i));
-    changed.clear();
+    var changed = new LinkedHashSet<String>();
     for (var item : result)
       if (!sameContent(previous.get(item.key()), item)) changed.add(item.key());
-    // Facts looked up again that no source verifies stay blank; say so.
-    var unverified = new LinkedHashMap<String, List<String>>();
-    for (var item : result) {
-      var fields = redrafts.getOrDefault(item.key(), List.of());
-      var blank =
-          fields.stream()
-              .filter(f -> ImportRevisionScope.PROFILE.contains(f))
-              .filter(f -> item.data() == null || !item.data().has(f))
-              .toList();
-      if (!blank.isEmpty()) unverified.put(item.key(), blank);
-    }
     // The page looks the portrait up again; a rename alone never asks it to.
-    var refreshAvatars = scope.portraits().stream().filter(items::containsKey).toList();
+    var refreshAvatars = revision.portraits().stream().filter(items::containsKey).toList();
     changed.addAll(refreshAvatars);
-    String reply = ImportRevisionSummary.reply(current, result, unverified, refreshAvatars, language);
+    String asked = text(answer.path("question"));
+    if (asked == null) asked = text(answer.path("answer"));
+    String reply =
+        ImportRevisionSummary.reply(
+            current, result, revision.unverified(), refreshAvatars, language);
     if (reply == null)
       reply =
-          scope.reply() != null
-              ? scope.reply()
-              : !remarks.isEmpty()
-                  ? String.join(" ", remarks)
+          asked != null
+              ? asked
+              : !revision.remarks().isEmpty()
+                  ? String.join(" ", revision.remarks())
                   : language.pick(
-                      "草稿未变更。请说明要改哪一项（名字）和改什么；无法核实的资料会留空。",
-                      "The draft is unchanged. Say which item (by name) and what to change;"
-                          + " unverified facts stay blank.");
+                      "草稿未变更。请说明要改哪一项和改什么。",
+                      "The draft is unchanged. Say which item and what to change.");
     else {
-      if (!remarks.isEmpty()) reply += " " + String.join(" ", remarks);
-      if (scope.reply() != null) reply += " " + scope.reply();
+      if (!revision.remarks().isEmpty()) reply += " " + String.join(" ", revision.remarks());
+      if (asked != null) reply += " " + asked;
     }
     return new ImportRevision(result, notes, reply, List.copyOf(changed), refreshAvatars);
   }
 
   /**
-   * The model's reading of a revision request ({@link ImportPrompts#PLAN}), or null when it fails:
-   * the keyword scope then decides alone.
+   * What applying the changes of one revision needs, and what it collects: remarks for the
+   * reply, facts that stay blank, portraits to look up again and characters whose fruits changed.
    */
-  private JsonNode plan(Settings s, List<ObjectNode> conversation, String request) {
-    var messages = new ArrayList<ObjectNode>();
-    messages.add(message("system", ImportPrompts.PLAN));
-    messages.addAll(conversation);
-    messages.add(message("user", request));
+  private record Revision(
+      ImportRevisionScope scope,
+      String instruction,
+      Map<String, ImportItem> items,
+      Map<String, String> keys,
+      Map<String, String> types,
+      List<String> notes,
+      List<String> remarks,
+      Map<String, List<String>> unverified,
+      List<String> portraits,
+      Set<String> refruited,
+      AssistantLanguage language) {}
+
+  /**
+   * One change of the model's answer, as far as the scope allows it: a new name ({@link #rename}),
+   * create fields (a source's fact wins over the model's unless the reviewer gave the value;
+   * what the model is unsure of and no source knows stays blank), relations and a portrait.
+   */
+  private ImportItem apply(ImportItem item, JsonNode change, Revision revision) {
+    var scope = revision.scope();
+    boolean fresh = item.existingId() == null;
+    var data = item.data() == null ? json.createObjectNode() : item.data().deepCopy();
+    var uncertain = new ArrayList<>(item.uncertain() == null ? List.<String>of() : item.uncertain());
+    JsonNode set = change.path("set");
+    var unsure = new LinkedHashSet<String>();
+    change.path("unsure").forEach(f -> unsure.add(f.asText()));
+    if (fresh
+        && item.type().equals(CHARACTER)
+        && (set.has("name") || unsure.contains("name"))
+        && scope.allows(item, "name")) {
+      var renamed = rename(item, set.path("name"), change.path("impersonates"), revision);
+      if (renamed != null) data.set("name", renamed);
+    } else if (fresh && set.path("name").isObject() && scope.allows(item, "name")) {
+      var renamed = renamedAsGiven(data.path("name"), set.get("name"), scope);
+      if (renamed != null) data.set("name", renamed);
+    }
+    if (fresh) {
+      var patch = json.createObjectNode();
+      var blank = new LinkedHashSet<String>();
+      set.fields()
+          .forEachRemaining(
+              field -> {
+                String key = field.getKey();
+                if (key.equals("name")
+                    || key.equals("avatar")
+                    || ImportRevisionScope.RELATIONS.contains(key)
+                    || !scope.allows(item, key)) return;
+                if (field.getValue().isNull() || unsure.contains(key)) blank.add(key);
+                else patch.set(key, field.getValue());
+              });
+      var who = name(data.path("name"));
+      if (item.type().equals(CHARACTER)
+          && who != null
+          && ImportRevisionScope.PROFILE.stream().anyMatch(f -> patch.has(f) || unsure.contains(f))) {
+        var verified = CharacterFactValues.read(facts.find(who));
+        for (String key : ImportRevisionScope.PROFILE) {
+          if (!verified.containsKey(key) || !scope.allows(item, key)) continue;
+          if (patch.has(key) && !CharacterFactValues.given(revision.instruction(), key, patch.get(key))
+              || blank.contains(key) && unsure.contains(key)) {
+            patch.set(key, verified.get(key));
+            blank.remove(key);
+          }
+        }
+      }
+      for (String key : blank) {
+        if (required(item.type(), key)) continue;
+        data.remove(key);
+        uncertain.remove(key);
+        if (unsure.contains(key)) {
+          uncertain.add(key);
+          revision.unverified().computeIfAbsent(item.key(), k -> new ArrayList<>()).add(key);
+        }
+      }
+      patch.fieldNames().forEachRemaining(uncertain::remove);
+      sanitize(item.type(), patch, data, uncertain);
+    }
+    var fruits = item.fruits();
+    var group = item.group();
+    var position = item.position();
+    if (item.type().equals(CHARACTER)) {
+      var who = name(data.path("name"));
+      var language = revision.language();
+      JsonNode newFruits = change.has("fruits") ? change.get("fruits") : set.get("fruits");
+      if (newFruits != null && scope.allows(item, "fruits")) {
+        fruits =
+            linked(newFruits, FRUIT, who, revision.keys(), revision.types(), revision.notes(), language);
+        revision.refruited().add(item.key());
+      }
+      JsonNode newGroup = change.has("group") ? change.get("group") : set.get("group");
+      if (newGroup != null && scope.allows(item, "group")) {
+        var linked =
+            linked(newGroup, GROUP, who, revision.keys(), revision.types(), revision.notes(), language);
+        group = linked.isEmpty() ? null : linked.get(0);
+        if (group == null) position = null;
+        else if (position == null) position = "member";
+      }
+      String requested =
+          (change.has("position") ? change.path("position") : set.path("position")).asText();
+      if (scope.allows(item, "position")
+          && group != null
+          && validEnum(requested, GroupPosition.values())) position = requested;
+    }
+    if ((change.path("avatar").asBoolean(false) || set.path("avatar").asBoolean(false))
+        && scope.allows(item, "avatar")) revision.portraits().add(item.key());
+    return new ImportItem(
+        item.key(), item.type(), data, item.existingId(), fruits, group, position, uncertain,
+        List.of());
+  }
+
+  /** A name the request gives a fruit or group, in the languages it may change. */
+  private ObjectNode renamedAsGiven(JsonNode old, JsonNode given, ImportRevisionScope scope) {
+    var renamed = old instanceof ObjectNode o ? o.deepCopy() : json.createObjectNode();
+    for (String locale : List.of("zh_CN", "en_US")) {
+      String value = given.path(locale).asText("").trim();
+      if (!value.isEmpty() && scope.allowsName(locale)) renamed.put(locale, truncate(value, 100));
+    }
+    return renamed;
+  }
+
+  /**
+   * The name a change gives a new character: as the request gives it; else DeepSeek's answer,
+   * spelled as Baidu Baike or Bangumi spell it when they know it; else, when DeepSeek has none,
+   * the name a source knows the drafted one as an alias of (假路飞 → 丹马罗·布拉克). The name of
+   * the one he impersonates, or of another item, is not taken.
+   */
+  private ObjectNode rename(
+      ImportItem item, JsonNode proposed, JsonNode impersonates, Revision revision) {
+    var language = revision.language();
+    var old = item.data() != null && item.data().path("name") instanceof ObjectNode n ? n : null;
+    var drafted = old == null ? null : name(old);
+    String who = drafted == null ? item.key() : language.displayName(drafted);
+    var impostor = impersonates.isObject() ? name(impersonates) : null;
+    var answer = proposed.isObject() ? name(proposed) : null;
+    Map<String, String> known = Map.of();
+    boolean given = answer != null && literal(revision.instruction(), answer);
+    if (answer != null && !given) known = facts.find(answer);
+    else if (answer == null && drafted != null) {
+      known = facts.find(drafted);
+      if (impostor != null && ExistingResources.sameName(canonical(known), impostor)) known = Map.of();
+      var alias = canonical(known);
+      if (alias.getZhCN() != null || alias.getEnUS() != null) answer = alias;
+    }
+    if (answer == null) {
+      revision
+          .remarks()
+          .add(
+              language.pick(
+                  "「" + who + "」：DeepSeek 和百度百科 / Bangumi 都没有给出可靠的真实姓名，名字保持不变。",
+                  who + ": neither DeepSeek nor Baidu Baike / Bangumi knows the real name, so it"
+                      + " stays."));
+      return null;
+    }
+    var candidate = answer;
+    boolean someoneElse =
+        impostor != null && ExistingResources.sameName(impostor, candidate)
+            || revision.items().values().stream()
+                .filter(other -> !other.key().equals(item.key()) && other.data() != null)
+                .anyMatch(
+                    other -> ExistingResources.sameName(name(other.data().path("name")), candidate));
+    if (someoneElse) {
+      revision
+          .remarks()
+          .add(
+              language.pick(
+                  "「" + who + "」：「" + language.displayName(candidate) + "」是另一个角色的名字，没有采用。",
+                  who + ": " + language.displayName(candidate) + " is someone else's name, so it"
+                      + " was not used."));
+      return null;
+    }
+    var renamed = old == null ? json.createObjectNode() : old.deepCopy();
+    var scope = revision.scope();
+    for (String locale : List.of("zh_CN", "en_US")) {
+      if (!scope.allowsName(locale)) continue;
+      String value = locale.equals("zh_CN") ? candidate.getZhCN() : candidate.getEnUS();
+      if (value == null || value.isBlank()) continue;
+      String spelled = given ? null : known.get("canonical_" + locale);
+      renamed.put(locale, truncate((spelled == null || spelled.isBlank() ? value : spelled).trim(), 100));
+    }
+    if (!given && known.isEmpty() && !renamed.equals(old))
+      revision
+          .notes()
+          .add(
+              language.pick(
+                  "「" + who + "」的真名来自 DeepSeek，百度百科 / Bangumi 里没有收录，可以再确认一下。",
+                  who + "'s real name comes from DeepSeek; Baidu Baike / Bangumi do not list it."));
+    return renamed;
+  }
+
+  /** Whether the request itself gives this name. */
+  private static boolean literal(String instruction, I18nText name) {
+    if (instruction == null) return false;
+    return name.getZhCN() != null && instruction.contains(name.getZhCN())
+        || name.getEnUS() != null
+            && instruction.toLowerCase(Locale.ROOT).contains(name.getEnUS().toLowerCase(Locale.ROOT));
+  }
+
+  /**
+   * The additions the request asks for ({@link ImportRevisionScope#allowsAddition}) and what they
+   * need: an added character's fruit, an added fruit's holder, and the new fruit or group a
+   * change to an item the request refers to points at. Never other new items.
+   */
+  private static Set<String> allowedAdditions(
+      JsonNode add, JsonNode changes, Map<String, ImportItem> items, ImportRevisionScope scope) {
+    Set<String> allowed = new HashSet<>();
+    Map<String, JsonNode> characters = new LinkedHashMap<>();
+    Set<String> fruits = new HashSet<>();
+    for (String type : List.of(GROUP, FRUIT, CHARACTER))
+      for (JsonNode node : add.path(type + "s")) {
+        String key = node.path("key").asText();
+        if (type.equals(CHARACTER)) characters.put(key, node);
+        if (type.equals(FRUIT)) fruits.add(key);
+        String zh = node.path("name").path("zh_CN").asText("").trim();
+        String en = node.path("name").path("en_US").asText("").trim();
+        if (scope.allowsAddition(
+            new I18nText().zhCN(zh.isEmpty() ? null : zh).enUS(en.isEmpty() ? null : en)))
+          allowed.add(key);
+      }
+    for (var change : changes) {
+      var item = items.get(change.path("key").asText());
+      if (item == null || !scope.reaches(item, change.path("refers_to"))) continue;
+      if (scope.allows(item, "fruits")) {
+        change.path("fruits").forEach(f -> allowed.add(f.asText()));
+        change.path("set").path("fruits").forEach(f -> allowed.add(f.asText()));
+      }
+      if (scope.allows(item, "group")) {
+        if (change.path("group").isTextual()) allowed.add(change.path("group").asText());
+        if (change.path("set").path("group").isTextual())
+          allowed.add(change.path("set").path("group").asText());
+      }
+    }
+    for (var character : characters.entrySet()) {
+      if (!allowed.contains(character.getKey()))
+        for (JsonNode fruit : character.getValue().path("fruits"))
+          if (allowed.contains(fruit.asText()) && fruits.contains(fruit.asText())) {
+            allowed.add(character.getKey());
+            break;
+          }
+      if (allowed.contains(character.getKey()))
+        for (JsonNode fruit : character.getValue().path("fruits"))
+          if (fruits.contains(fruit.asText())) allowed.add(fruit.asText());
+    }
+    return allowed;
+  }
+
+  /**
+   * One JSON answer from DeepSeek's thinking model ("深度思考"), or from the chat model when the
+   * thinking model is not available (another provider, an outage).
+   */
+  private JsonNode think(Settings s, List<ObjectNode> messages) {
     if (!s.model().equals(REASONING_MODEL))
       try {
         return ask(
             new Settings(s.baseUrl(), s.apiKey(), REASONING_MODEL), messages, REASONING_MAX_TOKENS);
-      } catch (RuntimeException e) {
-        logger.warn("import revision plan with {} failed; trying {}", REASONING_MODEL, s.model(), e);
+      } catch (AssistantException e) {
+        logger.warn("import call with {} failed; using {}", REASONING_MODEL, s.model(), e);
       }
-    try {
-      return ask(s, messages, MAX_TOKENS);
-    } catch (RuntimeException e) {
-      logger.warn("import revision plan failed; using the keyword scope", e);
-      return null;
+    return ask(s, messages, MAX_TOKENS);
+  }
+
+  /**
+   * The conversation as the thinking model takes it: starting with the reviewer and alternating,
+   * so consecutive turns of one side (a request that failed, say) are joined.
+   */
+  private static List<ObjectNode> alternating(List<ObjectNode> turns) {
+    var result = new ArrayList<ObjectNode>();
+    for (var turn : turns) {
+      String role = turn.path("role").asText();
+      if (result.isEmpty() && !role.equals("user")) continue;
+      var last = result.isEmpty() ? null : result.get(result.size() - 1);
+      if (last != null && last.path("role").asText().equals(role))
+        last.put("content", last.path("content").asText() + "\n\n" + turn.path("content").asText());
+      else result.add(turn.deepCopy());
     }
+    return result;
+  }
+
+  private JsonNode think(Settings s, String system, String user) {
+    return think(s, List.of(message("system", system), message("user", user)));
   }
 
   /** The names a source gives as the character's own. */
@@ -739,32 +753,8 @@ public class ImportDrafter {
     return new I18nText().zhCN(found.get("canonical_zh_CN")).enUS(found.get("canonical_en_US"));
   }
 
-  /**
-   * Replaces only the authorized fields. Missing optional facts clear their stale value; missing
-   * required attributes preserve the current value for review.
-   */
-  private ImportItem lookedUp(ImportItem item, JsonNode detail, List<String> fields) {
-    var fresh = json.createObjectNode();
-    var freshUncertain = new ArrayList<String>();
-    sanitize(item.type(), detail.path("data"), fresh, freshUncertain);
-    for (var field : detail.path("uncertain"))
-      if (fresh.has(field.asText()) && !freshUncertain.contains(field.asText()))
-        freshUncertain.add(field.asText());
-    var data = item.data() == null ? json.createObjectNode() : item.data().deepCopy();
-    var uncertain = new ArrayList<>(item.uncertain() == null ? List.<String>of() : item.uncertain());
-    for (var field : fields) {
-      if (fresh.has(field) && !(freshUncertain.contains(field) && !required(item.type(), field))) {
-        data.set(field, fresh.get(field));
-        uncertain.remove(field);
-        if (freshUncertain.contains(field)) uncertain.add(field);
-      } else if (!required(item.type(), field)) {
-        data.remove(field);
-        if (!uncertain.contains(field)) uncertain.add(field);
-      }
-    }
-    return new ImportItem(
-        item.key(), item.type(), data, null, item.fruits(), item.group(), item.position(),
-        uncertain, List.of());
+  private static String text(JsonNode node) {
+    return node.isTextual() && !node.asText().isBlank() ? node.asText().trim() : null;
   }
 
   /**
@@ -789,7 +779,7 @@ public class ImportDrafter {
     }
     JsonNode answer;
     try {
-      answer = ask(s, ImportPrompts.FRUITS, request.toString());
+      answer = think(s, ImportPrompts.FRUITS, request.toString());
     } catch (RuntimeException e) {
       logger.warn("import fruit check failed; keeping the roster's fruits", e);
       return entries;
@@ -1058,14 +1048,6 @@ public class ImportDrafter {
   }
 
   /** One JSON-mode completion; a reply that is not a JSON object is retried once. */
-  private JsonNode ask(Settings s, String system, String user) {
-    return ask(s, List.of(message("system", system), message("user", user)));
-  }
-
-  private JsonNode ask(Settings s, List<ObjectNode> messages) {
-    return ask(s, messages, MAX_TOKENS);
-  }
-
   private JsonNode ask(Settings s, List<ObjectNode> messages, int maxTokens) {
     for (int attempt = 1; ; attempt++) {
       var completion =
@@ -1223,10 +1205,7 @@ public class ImportDrafter {
 
   /** What one detail call is asked to fill in, with relations, facts and hints as context. */
   private String detailRequest(
-      List<Entry> batch,
-      Map<String, Entry> byKey,
-      Map<String, Map<String, String>> facts,
-      Map<String, String> hints) {
+      List<Entry> batch, Map<String, Entry> byKey, Map<String, Map<String, String>> facts) {
     ArrayNode request = json.createArrayNode();
     for (var entry : batch) {
       var node = request.addObject();
@@ -1234,7 +1213,6 @@ public class ImportDrafter {
       node.put("type", entry.type);
       node.set("name", nameNode(entry.name));
       if (facts.containsKey(entry.key)) node.set("facts", json.valueToTree(facts.get(entry.key)));
-      if (hints.containsKey(entry.key)) node.put("request", hints.get(entry.key));
       if (entry.type.equals(FRUIT) && entry.rosterData.has("fruit_type"))
         node.set("fruit_type", entry.rosterData.get("fruit_type"));
       if (!entry.fruits.isEmpty()) {
@@ -1329,12 +1307,6 @@ public class ImportDrafter {
               if (!value.equals(field.getValue()) && !uncertain.contains(key)) uncertain.add(key);
               data.set(key, value);
             });
-  }
-
-  private static List<String> schemaFieldNames(String type) {
-    var fields = new ArrayList<String>();
-    ActionSchemas.fields(type, true).path("properties").fieldNames().forEachRemaining(fields::add);
-    return fields;
   }
 
   private static boolean required(String type, String field) {
