@@ -332,4 +332,41 @@ public class ImportRevisionScopeTests {
     assertThat(planned("砂糖改名，头像别动", plan).portraits()).isEmpty();
     assertThat(planned("砂糖的英文名改成Sugar", plan).portraits()).isEmpty();
   }
+
+  @Test
+  public void nicknamesTheNamesCannotMatchReachTheirItem() throws Exception {
+    var crew =
+        List.of(
+            member("c1", CHARACTER, "乔拉可尔·米霍克", "captain", List.of(), List.of()),
+            member("c2", CHARACTER, "马歇尔·D·蒂奇", "combatant", List.of(), List.of()),
+            member("c3", CHARACTER, "香克斯", "combatant", List.of(), List.of()));
+    var scope =
+        new ImportRevisionScope(
+            crew,
+            List.of(),
+            "鹰眼的攻击再高一点，把黑胡子删了",
+            json.readTree(
+                """
+                {"targets":[{"key":"c1","refers_to":"鹰眼","action":"change","fields":["attack"]},
+                            {"key":"c3","refers_to":"红发","action":"change","fields":["attack"]}],
+                 "remove":[{"key":"c2","refers_to":"黑胡子"}]}
+                """));
+    assertThat(scope.allows(crew.get(0), "attack")).isTrue();
+    assertThat(scope.allows(crew.get(2), "attack")).isFalse(); // 红发 is not in the request
+    assertThat(scope.removals()).containsExactly("c2");
+
+    // Words that name another item, or a bare pronoun, do not reach an item.
+    scope =
+        new ImportRevisionScope(
+            crew,
+            List.of(),
+            "他的攻击和香克斯一样",
+            json.readTree(
+                """
+                {"targets":[{"key":"c1","refers_to":"香克斯","action":"change","fields":["attack"]},
+                            {"key":"c2","refers_to":"他","action":"change","fields":["attack"]}]}
+                """));
+    assertThat(scope.allows(crew.get(0), "attack")).isFalse();
+    assertThat(scope.allows(crew.get(1), "attack")).isFalse();
+  }
 }

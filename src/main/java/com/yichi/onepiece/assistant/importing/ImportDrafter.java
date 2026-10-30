@@ -58,6 +58,13 @@ public class ImportDrafter {
   static final int REFERENCE_FRUITS = 6;
   static final double TEMPERATURE = 0.2;
   static final int MAX_TOKENS = 4000;
+  /**
+   * DeepSeek's thinking model ("深度思考") reads revision requests: it resolves nicknames,
+   * context and real names far better than the chat model. Its thinking counts toward its output
+   * limit.
+   */
+  static final String REASONING_MODEL = "deepseek-reasoner";
+  static final int REASONING_MAX_TOKENS = 32000;
   static final int MAX_HISTORY = 12;
   static final int MAX_TURN_LENGTH = 2000;
 
@@ -263,7 +270,8 @@ public class ImportDrafter {
       AssistantLanguage language,
       Consumer<String> progress) {
     var s = connect(language);
-    progress.accept(language.pick("正在理解你的修改…", "Working out the changes…"));
+    progress.accept(
+        language.pick("DeepSeek 正在深度思考你的修改…", "DeepSeek is thinking the changes through…"));
     var turns = history == null ? List.<Turn>of() : history;
     var conversation = new ArrayList<ObjectNode>();
     for (var turn : turns.subList(Math.max(0, turns.size() - MAX_HISTORY), turns.size()))
@@ -486,12 +494,16 @@ public class ImportDrafter {
       }
     }
 
-    // A real name asked for ("改成其真名") comes from the sources, never the model's memory: an
-    // impostor must not turn into the one he impersonates. Unverified, the name stays.
+    // A real name asked for ("改成其真名") is the thinking model's answer, checked against the
+    // sources: one that knows the drafted name as an alias wins; else they confirm the model's
+    // name and give its usual spelling; else the model's name stands, with a remark. An impostor
+    // never becomes the one he impersonates.
     var remarks = new ArrayList<String>();
     if (!scope.nameLookUps().isEmpty())
       progress.accept(
-          language.pick("正在核实名字（百度百科 / Bangumi）…", "Checking names (Baidu Baike / Bangumi)…"));
+          language.pick(
+              "正在核实名字（DeepSeek / 百度百科 / Bangumi）…",
+              "Checking names (DeepSeek / Baidu Baike / Bangumi)…"));
     for (var key : scope.nameLookUps()) {
       var item = items.get(key);
       if (item == null
@@ -500,16 +512,47 @@ public class ImportDrafter {
           || !(item.data() != null && item.data().path("name") instanceof ObjectNode old)) continue;
       var drafted = name(old);
       if (drafted == null) continue;
+      var impersonates =
+          scope.impersonated(key) == null ? null : name(scope.impersonated(key));
       var found = facts.find(drafted);
+      // Drafted under the name he impersonates, the sources describe the other man.
+      if (impersonates != null && ExistingResources.sameName(canonical(found), impersonates))
+        found = Map.of();
+      var answer = scope.realName(key) == null ? null : name(scope.realName(key));
+      boolean anotherItems =
+          answer != null
+              && items.values().stream()
+                  .filter(other -> !other.key().equals(key) && other.data() != null)
+                  .anyMatch(
+                      other -> ExistingResources.sameName(name(other.data().path("name")), answer));
+      var proposed =
+          answer == null
+                  || anotherItems
+                  || impersonates != null && ExistingResources.sameName(impersonates, answer)
+              ? null
+              : answer;
+      Map<String, String> confirmed = proposed == null ? Map.of() : facts.find(proposed);
       var renamed = old.deepCopy();
       var missing = new ArrayList<String>();
+      boolean modelOnly = false;
       for (String locale : List.of("zh_CN", "en_US")) {
         if (!scope.allowsName(locale)) continue;
-        String verified = found.get("canonical_" + locale);
-        if (verified == null || verified.isBlank()) missing.add(locale);
-        else renamed.put(locale, truncate(verified.trim(), 100));
+        String value = found.get("canonical_" + locale);
+        if (value == null || value.isBlank()) value = confirmed.get("canonical_" + locale);
+        if ((value == null || value.isBlank()) && proposed != null) {
+          value = locale.equals("zh_CN") ? proposed.getZhCN() : proposed.getEnUS();
+          modelOnly |= value != null && !value.isBlank();
+        }
+        if (value == null || value.isBlank()) missing.add(locale);
+        else renamed.put(locale, truncate(value.trim(), 100));
       }
       String who = language.displayName(drafted);
+      if (modelOnly && !renamed.equals(old))
+        remarks.add(
+            language.pick(
+                "「" + who + "」的真名来自 DeepSeek，百度百科 / Bangumi 里没有查到，请确认。",
+                who + "'s real name comes from DeepSeek; Baidu Baike / Bangumi do not list it, so"
+                    + " check it."));
       if (!missing.isEmpty()) {
         boolean both = missing.size() == 2;
         String zh = both ? "真实姓名" : missing.contains("zh_CN") ? "中文名" : "英文名";
@@ -676,12 +719,24 @@ public class ImportDrafter {
     messages.add(message("system", ImportPrompts.PLAN));
     messages.addAll(conversation);
     messages.add(message("user", request));
+    if (!s.model().equals(REASONING_MODEL))
+      try {
+        return ask(
+            new Settings(s.baseUrl(), s.apiKey(), REASONING_MODEL), messages, REASONING_MAX_TOKENS);
+      } catch (RuntimeException e) {
+        logger.warn("import revision plan with {} failed; trying {}", REASONING_MODEL, s.model(), e);
+      }
     try {
-      return ask(s, messages);
+      return ask(s, messages, MAX_TOKENS);
     } catch (RuntimeException e) {
       logger.warn("import revision plan failed; using the keyword scope", e);
       return null;
     }
+  }
+
+  /** The names a source gives as the character's own. */
+  private static I18nText canonical(Map<String, String> found) {
+    return new I18nText().zhCN(found.get("canonical_zh_CN")).enUS(found.get("canonical_en_US"));
   }
 
   /**
@@ -1008,11 +1063,15 @@ public class ImportDrafter {
   }
 
   private JsonNode ask(Settings s, List<ObjectNode> messages) {
+    return ask(s, messages, MAX_TOKENS);
+  }
+
+  private JsonNode ask(Settings s, List<ObjectNode> messages, int maxTokens) {
     for (int attempt = 1; ; attempt++) {
       var completion =
           client.complete(
               new CompletionRequest(
-                  s.baseUrl(), s.apiKey(), s.model(), messages, null, TEMPERATURE, MAX_TOKENS, true),
+                  s.baseUrl(), s.apiKey(), s.model(), messages, null, TEMPERATURE, maxTokens, true),
               text -> {});
       try {
         JsonNode node = json.readTree(completion.content() == null ? "" : completion.content());

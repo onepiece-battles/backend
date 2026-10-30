@@ -52,6 +52,8 @@ final class ImportRevisionScope {
   private static final String RENAME = "叫|称作|写作|写成|翻译|正式名|\\b(call|spell|translat|real name)";
   private static final String PORTRAIT =
       "头像|肖像|照片|图片|画像|\\b(avatar|portrait|photo|picture|image)s?\\b";
+  private static final String PRONOUN =
+      "他|她|它|他们|她们|它们|这个|那个|这位|那位|此人|\\b(he|she|him|her|it|they|them|this|that)\\b";
   /** Name parts too common to tie a request to one item ("果实攻击都高一点"). */
   private static final Set<String> GENERIC = Set.of("果实", "海贼", "贼团", "一伙", "家族");
   private static final Set<String> RELATIONS = Set.of("fruits", "group", "position");
@@ -76,6 +78,8 @@ final class ImportRevisionScope {
   private final Set<String> nameLookUps = new LinkedHashSet<>();
   private final Set<String> nameLocales = new HashSet<>();
   private final Set<String> portraits = new LinkedHashSet<>();
+  private final Map<String, JsonNode> realNames = new HashMap<>();
+  private final Map<String, JsonNode> impersonated = new HashMap<>();
   boolean additions;
   private boolean planned;
   private String reply;
@@ -261,7 +265,8 @@ final class ImportRevisionScope {
 
   /**
    * Replaces the keyword scope with the part of {@code plan} the request grounds, and says whether
-   * it did. A target must be one the request refers to ({@link #grounded}); fields the request
+   * it did. A target must be one the request refers to ({@link #grounded}), or one the model says
+   * the request's own words mean ({@link #referred}: a nickname like 鹰眼); fields the request
    * names for an item bound the plan's fields for it, so "A's attack, B's bounty" cannot cross; a
    * clear needs a word for blank or unknown, a removal a word for taking out, an addition its name
    * or a word for adding. A plan that grounds no change but asks a question (or answers one)
@@ -280,6 +285,8 @@ final class ImportRevisionScope {
     for (JsonNode target : plan.path("targets")) {
       var item = byKey.get(target.path("key").asText());
       if (item == null) continue;
+      boolean reached =
+          grounded.contains(item.key()) || referred(target.path("refers_to"), request, items, item);
       Set<String> wanted = new LinkedHashSet<>();
       for (JsonNode field : target.path("fields")) {
         String name = field.asText();
@@ -290,7 +297,7 @@ final class ImportRevisionScope {
         } else if (Set.of("avatar", "portrait").contains(name)) {
           // A portrait is looked up again only when asked for; a rename never implies it.
           if (portrait
-              && grounded.contains(item.key())
+              && reached
               && item.type().equals(CHARACTER)
               && item.existingId() == null) pictures.add(item.key());
         } else wanted.add(name);
@@ -305,12 +312,17 @@ final class ImportRevisionScope {
         if (action.equals("clear")) {
           // "Leave what is uncertain blank" is grounded by the item's own uncertain list.
           if (data
-              && (clearing && grounded.contains(item.key())
+              && (clearing && reached
                   || unsure && item.uncertain() != null && item.uncertain().contains(field)))
             blank.computeIfAbsent(item.key(), k -> new HashSet<>()).add(field);
-        } else if (grounded.contains(item.key())) {
-          // A name looked up again comes from the sources, so it may still change.
-          if (field.equals("name") && action.equals("look_up")) names.add(item.key());
+        } else if (reached) {
+          // A name looked up again is the model's answer, checked against the sources.
+          if (field.equals("name") && action.equals("look_up")) {
+            names.add(item.key());
+            if (target.path("real_name").isObject()) realNames.put(item.key(), target.get("real_name"));
+            if (target.path("impersonates").isObject())
+              impersonated.put(item.key(), target.get("impersonates"));
+          }
           (action.equals("look_up") && data ? lookUp : edits)
               .computeIfAbsent(item.key(), k -> new HashSet<>())
               .add(field);
@@ -319,9 +331,13 @@ final class ImportRevisionScope {
     }
     Set<String> removed = new LinkedHashSet<>();
     if (has(request, REMOVE))
-      for (JsonNode key : plan.path("remove"))
-        if (byKey.containsKey(key.asText()) && grounded.contains(key.asText()))
-          removed.add(key.asText());
+      for (JsonNode entry : plan.path("remove")) {
+        String key = entry.isObject() ? entry.path("key").asText() : entry.asText();
+        var item = byKey.get(key);
+        if (item != null
+            && (grounded.contains(key) || referred(entry.path("refers_to"), request, items, item)))
+          removed.add(key);
+      }
     Set<String> added = new LinkedHashSet<>();
     for (JsonNode add : plan.path("add")) {
       String name = (add.isTextual() ? add.asText() : add.path("name").asText()).trim();
@@ -333,6 +349,8 @@ final class ImportRevisionScope {
     protect(items, request, lookUp);
     protect(items, request, blank);
     names.removeIf(key -> !edits.getOrDefault(key, Set.of()).contains("name"));
+    realNames.keySet().retainAll(names);
+    impersonated.keySet().retainAll(names);
     if (edits.isEmpty()
         && lookUp.isEmpty()
         && blank.isEmpty()
@@ -395,6 +413,21 @@ final class ImportRevisionScope {
         if (ofType.size() == 1) result.add(ofType.get(0).key());
       }
     return result;
+  }
+
+  /**
+   * Whether the request's own {@code words} that the model says mean {@code item} are in the
+   * request and do not name another item: a nickname (鹰眼, 黑胡子) or a description (那个女的)
+   * the names cannot match. A pronoun is not enough; it must reach the item through the
+   * conversation ({@link #grounded}).
+   */
+  private static boolean referred(
+      JsonNode words, String request, List<ImportItem> items, ImportItem item) {
+    String text = words.isTextual() ? words.asText().trim() : "";
+    if (text.length() < 2 || !request.contains(text)) return false;
+    if (has(text, "^(?:" + PRONOUN + ")$")) return false;
+    Set<String> named = named(items, text);
+    return named.isEmpty() || named.contains(item.key());
   }
 
   /** Items with two consecutive Chinese characters of their name in the request. */
@@ -582,6 +615,16 @@ final class ImportRevisionScope {
 
   boolean looksUpName(ImportItem item) {
     return nameLookUps.contains(item.key());
+  }
+
+  /** The real name the model gives for an item whose name is looked up, if any. */
+  JsonNode realName(String key) {
+    return realNames.get(key);
+  }
+
+  /** Whom the model says the item impersonates (假路飞 → 蒙奇·D·路飞), if anyone. */
+  JsonNode impersonated(String key) {
+    return impersonated.get(key);
   }
 
   /** New characters whose portrait the reviewer asked to look up again. */
