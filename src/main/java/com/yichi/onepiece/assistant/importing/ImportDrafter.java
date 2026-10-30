@@ -394,7 +394,10 @@ public class ImportDrafter {
       boolean fresh = item.existingId() == null;
       var data = item.data() == null ? json.createObjectNode() : item.data().deepCopy();
       var uncertain = new ArrayList<>(item.uncertain() == null ? List.<String>of() : item.uncertain());
-      if (fresh && scope.allows(item, "name") && update.path("name").isObject()) {
+      if (fresh
+          && scope.allows(item, "name")
+          && !scope.looksUpName(item)
+          && update.path("name").isObject()) {
         var name = name(data.path("name"));
         var localized = ((ObjectNode) update.path("name")).deepCopy();
         for (String locale : List.of("zh_CN", "en_US"))
@@ -482,6 +485,51 @@ public class ImportDrafter {
                 display + " is no longer eaten by anyone here, so it left the draft."));
       }
     }
+
+    // A real name asked for ("改成其真名") comes from the sources, never the model's memory: an
+    // impostor must not turn into the one he impersonates. Unverified, the name stays.
+    var remarks = new ArrayList<String>();
+    if (!scope.nameLookUps().isEmpty())
+      progress.accept(
+          language.pick("正在核实名字（百度百科 / Bangumi）…", "Checking names (Baidu Baike / Bangumi)…"));
+    for (var key : scope.nameLookUps()) {
+      var item = items.get(key);
+      if (item == null
+          || item.existingId() != null
+          || !item.type().equals(CHARACTER)
+          || !(item.data() != null && item.data().path("name") instanceof ObjectNode old)) continue;
+      var drafted = name(old);
+      if (drafted == null) continue;
+      var found = facts.find(drafted);
+      var renamed = old.deepCopy();
+      var missing = new ArrayList<String>();
+      for (String locale : List.of("zh_CN", "en_US")) {
+        if (!scope.allowsName(locale)) continue;
+        String verified = found.get("canonical_" + locale);
+        if (verified == null || verified.isBlank()) missing.add(locale);
+        else renamed.put(locale, truncate(verified.trim(), 100));
+      }
+      String who = language.displayName(drafted);
+      if (!missing.isEmpty()) {
+        boolean both = missing.size() == 2;
+        String zh = both ? "真实姓名" : missing.contains("zh_CN") ? "中文名" : "英文名";
+        String en = both ? "real name" : missing.contains("zh_CN") ? "Chinese name" : "English name";
+        remarks.add(
+            language.pick(
+                "「" + who + "」：没有查到可核实的" + zh + "，保持原样。",
+                who + ": no source verifies the " + en + ", so it stays as it is."));
+      } else if (renamed.equals(old))
+        remarks.add(language.pick("「" + who + "」的名字已核实，与资料一致。", who + "'s name checks out."));
+      if (renamed.equals(old)) continue;
+      var data = item.data().deepCopy();
+      data.set("name", renamed);
+      items.put(
+          key,
+          new ImportItem(
+              item.key(), item.type(), data, null, item.fruits(), item.group(), item.position(),
+              item.uncertain(), item.problems()));
+    }
+    notes.addAll(remarks);
 
     // Re-lookups replace only fields authorized by this request. Empty never means all.
     var redrafts = new LinkedHashMap<String, List<String>>();
@@ -598,17 +646,25 @@ public class ImportDrafter {
               .toList();
       if (!blank.isEmpty()) unverified.put(item.key(), blank);
     }
-    String reply = ImportRevisionSummary.reply(current, result, unverified, language);
+    // The page looks the portrait up again; a rename alone never asks it to.
+    var refreshAvatars = scope.portraits().stream().filter(items::containsKey).toList();
+    changed.addAll(refreshAvatars);
+    String reply = ImportRevisionSummary.reply(current, result, unverified, refreshAvatars, language);
     if (reply == null)
       reply =
           scope.reply() != null
               ? scope.reply()
-              : language.pick(
-                  "草稿未变更。请说明要改哪一项（名字）和改什么；无法核实的资料会留空。",
-                  "The draft is unchanged. Say which item (by name) and what to change; unverified"
-                      + " facts stay blank.");
-    else if (scope.reply() != null) reply += " " + scope.reply();
-    return new ImportRevision(result, notes, reply, List.copyOf(changed));
+              : !remarks.isEmpty()
+                  ? String.join(" ", remarks)
+                  : language.pick(
+                      "草稿未变更。请说明要改哪一项（名字）和改什么；无法核实的资料会留空。",
+                      "The draft is unchanged. Say which item (by name) and what to change;"
+                          + " unverified facts stay blank.");
+    else {
+      if (!remarks.isEmpty()) reply += " " + String.join(" ", remarks);
+      if (scope.reply() != null) reply += " " + scope.reply();
+    }
+    return new ImportRevision(result, notes, reply, List.copyOf(changed), refreshAvatars);
   }
 
   /**

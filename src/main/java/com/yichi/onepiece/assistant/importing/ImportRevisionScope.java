@@ -31,7 +31,8 @@ final class ImportRevisionScope {
     ALIASES.put("race", "种族|race");
     ALIASES.put("battle_style", "战斗风格|战斗方式|battle_style|fighting style");
     ALIASES.put("hakis", "霸气|haki");
-    ALIASES.put("name", "名字|名称|姓名|改名|译名|中文名|英文名|rename|\\bname\\b");
+    ALIASES.put(
+        "name", "名字|名称|姓名|改名|译名|中文名|英文名|真名|本名|原名|全名|真实姓名|rename|\\bname\\b");
     ALIASES.put("fruit_type", "果实类型|果实种类|fruit_type|fruit type");
     ALIASES.put("energy_consume", "精力消耗|能量消耗|energy_consume|energy cost");
     ALIASES.put("group_category", "团体类型|团体种类|阵营|group_category|group type");
@@ -48,7 +49,11 @@ final class ImportRevisionScope {
           + "\\b(remove|delete|drop|exclude|replace|without|not)\\b";
   private static final String ADD =
       "加|添|补|新增|漏|缺|少了|还有|换成|替换|\\b(add|include|missing|replace|also)\\b";
-  private static final String RENAME = "叫|称作|写作|写成|翻译|译名|\\b(call|spell|translat)";
+  private static final String RENAME = "叫|称作|写作|写成|翻译|正式名|\\b(call|spell|translat|real name)";
+  private static final String PORTRAIT =
+      "头像|肖像|照片|图片|画像|\\b(avatar|portrait|photo|picture|image)s?\\b";
+  /** Name parts too common to tie a request to one item ("果实攻击都高一点"). */
+  private static final Set<String> GENERIC = Set.of("果实", "海贼", "贼团", "一伙", "家族");
   private static final Set<String> RELATIONS = Set.of("fruits", "group", "position");
   private static final Map<String, String> POSITIONS =
       Map.ofEntries(
@@ -68,6 +73,9 @@ final class ImportRevisionScope {
   private final Map<String, Set<String>> clears = new HashMap<>();
   private final Map<String, Set<String>> lookUps = new HashMap<>();
   private final Set<String> plannedAdditions = new LinkedHashSet<>();
+  private final Set<String> nameLookUps = new LinkedHashSet<>();
+  private final Set<String> nameLocales = new HashSet<>();
+  private final Set<String> portraits = new LinkedHashSet<>();
   boolean additions;
   private boolean planned;
   private String reply;
@@ -266,14 +274,27 @@ final class ImportRevisionScope {
     boolean clearing = has(request, CLEAR);
     boolean unsure = has(request, UNSURE);
     boolean renaming = alias(request, ALIASES.get("name")) || has(request, RENAME);
+    boolean portrait = asksForPortrait(request);
     Map<String, Set<String>> edits = new HashMap<>(), lookUp = new HashMap<>(), blank = new HashMap<>();
+    Set<String> names = new LinkedHashSet<>(), locales = new HashSet<>(), pictures = new LinkedHashSet<>();
     for (JsonNode target : plan.path("targets")) {
       var item = byKey.get(target.path("key").asText());
       if (item == null) continue;
       Set<String> wanted = new LinkedHashSet<>();
-      for (JsonNode field : target.path("fields"))
-        if (Set.of("stats", "combat").contains(field.asText())) wanted.addAll(COMBAT);
-        else wanted.add(field.asText());
+      for (JsonNode field : target.path("fields")) {
+        String name = field.asText();
+        if (Set.of("stats", "combat").contains(name)) wanted.addAll(COMBAT);
+        else if (Set.of("name.zh_CN", "name.en_US").contains(name)) {
+          wanted.add("name");
+          locales.add(name.substring("name.".length()));
+        } else if (Set.of("avatar", "portrait").contains(name)) {
+          // A portrait is looked up again only when asked for; a rename never implies it.
+          if (portrait
+              && grounded.contains(item.key())
+              && item.type().equals(CHARACTER)
+              && item.existingId() == null) pictures.add(item.key());
+        } else wanted.add(name);
+      }
       Set<String> granted = supported(item, wanted);
       if (!renaming) granted.remove("name");
       Set<String> explicit = fields.getOrDefault(item.key(), Set.of());
@@ -287,10 +308,13 @@ final class ImportRevisionScope {
               && (clearing && grounded.contains(item.key())
                   || unsure && item.uncertain() != null && item.uncertain().contains(field)))
             blank.computeIfAbsent(item.key(), k -> new HashSet<>()).add(field);
-        } else if (grounded.contains(item.key()))
+        } else if (grounded.contains(item.key())) {
+          // A name looked up again comes from the sources, so it may still change.
+          if (field.equals("name") && action.equals("look_up")) names.add(item.key());
           (action.equals("look_up") && data ? lookUp : edits)
               .computeIfAbsent(item.key(), k -> new HashSet<>())
               .add(field);
+        }
       }
     }
     Set<String> removed = new LinkedHashSet<>();
@@ -308,7 +332,13 @@ final class ImportRevisionScope {
     protect(items, request, edits);
     protect(items, request, lookUp);
     protect(items, request, blank);
-    if (edits.isEmpty() && lookUp.isEmpty() && blank.isEmpty() && removed.isEmpty() && added.isEmpty()
+    names.removeIf(key -> !edits.getOrDefault(key, Set.of()).contains("name"));
+    if (edits.isEmpty()
+        && lookUp.isEmpty()
+        && blank.isEmpty()
+        && removed.isEmpty()
+        && added.isEmpty()
+        && pictures.isEmpty()
         && question == null) return false;
     fields.clear();
     edits.forEach((key, set) -> fields.computeIfAbsent(key, k -> new HashSet<>()).addAll(set));
@@ -319,6 +349,10 @@ final class ImportRevisionScope {
     removals.clear();
     removals.addAll(removed);
     plannedAdditions.addAll(added);
+    nameLookUps.addAll(names);
+    locales.retainAll(Set.of("zh_CN", "en_US"));
+    nameLocales.addAll(locales);
+    portraits.addAll(pictures);
     additions = !added.isEmpty();
     reply = question;
     return true;
@@ -326,9 +360,10 @@ final class ImportRevisionScope {
 
   /**
    * The items the request refers to: by name; through a named item (a group's members, a
-   * character's fruit, a fruit's holders); by position ("the captain"); by an "all" word; or,
-   * when it names none ("him", "a bit higher"), the items the conversation named last. When even
-   * that finds nothing, the only item of a type in the draft is meant.
+   * character's fruit, a fruit's holders); by position ("the captain"); by an "all" word. When it
+   * names none, by part of a name (假路飞 for 冒牌路飞) or else ("him", "a bit higher") the items
+   * the conversation named last. When even that finds nothing, the only item of a type in the
+   * draft is meant.
    */
   private static Set<String> grounded(List<ImportItem> items, List<Turn> history, String request) {
     Set<String> named = named(items, request);
@@ -344,7 +379,9 @@ final class ImportRevisionScope {
           && has(request, POSITIONS.get(item.position()))) result.add(item.key());
     }
     if (has(request, BULK)) items.forEach(i -> result.add(i.key()));
-    if (named.isEmpty() && history != null)
+    Set<String> partly = named.isEmpty() ? partlyNamed(items, request) : Set.of();
+    result.addAll(partly);
+    if (named.isEmpty() && partly.isEmpty() && history != null)
       for (int i = history.size() - 1; i >= 0; i--) {
         Turn turn = history.get(i);
         if (turn == null || turn.content() == null) continue;
@@ -358,6 +395,34 @@ final class ImportRevisionScope {
         if (ofType.size() == 1) result.add(ofType.get(0).key());
       }
     return result;
+  }
+
+  /** Items with two consecutive Chinese characters of their name in the request. */
+  private static Set<String> partlyNamed(List<ImportItem> items, String request) {
+    Set<String> result = new LinkedHashSet<>();
+    for (var item : items) {
+      String name =
+          item.data() == null ? "" : item.data().path("name").path("zh_CN").asText().replaceAll("[\\s·・•.]", "");
+      for (int i = 0; i + 2 <= name.length(); i++) {
+        String part = name.substring(i, i + 2);
+        if (part.codePoints().allMatch(c -> Character.UnicodeScript.of(c) == Character.UnicodeScript.HAN)
+            && !GENERIC.contains(part)
+            && request.contains(part)) {
+          result.add(item.key());
+          break;
+        }
+      }
+    }
+    return result;
+  }
+
+  /** Whether some clause asks for a new picture ("换个头像"), not to keep one ("头像别动"). */
+  private static boolean asksForPortrait(String request) {
+    for (String clause : request.split(CLAUSES))
+      if (has(clause, PORTRAIT)
+          && !has(clause, "不要|别|不用|保留|不变|不动|不改|\\b(keep|don't|do not|unchanged)\\b"))
+        return true;
+    return false;
   }
 
   private static boolean mentions(String request, String name) {
@@ -500,10 +565,28 @@ final class ImportRevisionScope {
     return fields.getOrDefault(item.key(), Set.of()).contains(field);
   }
 
+  /**
+   * Whether a rename may touch this language: the one the request names ("英文名"), else the ones
+   * the plan names, else both.
+   */
   boolean allowsName(String language) {
-    return !englishName && !chineseName
-        || language.equals("en_US") && englishName
-        || language.equals("zh_CN") && chineseName;
+    if (englishName || chineseName)
+      return language.equals("en_US") && englishName || language.equals("zh_CN") && chineseName;
+    return nameLocales.isEmpty() || nameLocales.contains(language);
+  }
+
+  /** Items whose real name is to be looked up in the sources rather than taken from the model. */
+  Set<String> nameLookUps() {
+    return nameLookUps;
+  }
+
+  boolean looksUpName(ImportItem item) {
+    return nameLookUps.contains(item.key());
+  }
+
+  /** New characters whose portrait the reviewer asked to look up again. */
+  Set<String> portraits() {
+    return portraits;
   }
 
   boolean clears(ImportItem item, String field) {
@@ -539,6 +622,7 @@ final class ImportRevisionScope {
           Set<String> left = new TreeSet<>(set);
           left.removeAll(lookUps.getOrDefault(key, Set.of()));
           left.removeAll(clears.getOrDefault(key, Set.of()));
+          if (nameLookUps.contains(key)) left.remove("name");
           if (!left.isEmpty()) result.put(key, left);
         });
     return result;

@@ -103,8 +103,14 @@ final class ImportPrompts {
         * 资料 / 档案 / profile / facts → bounty, age, height, birth_place, date_of_birth
         * 数据 / 属性 / all of an item → every field the item has, except name
         * a fruit's power / 系数 / 加成 → the fruit's *_slope / *_intercept of the stats meant
-        * a character's fruit → "fruits"; their group or crew → "group"; their role → "position";
-          a translation or another name → "name"
+        * a character's fruit → "fruits"; their group or crew → "group"; their role → "position"
+        * a name the request gives, or a translation → "change" of "name"; a wrong name or the
+          real name (真名, 本名) without giving it → "look_up" of "name". Use "name.zh_CN" or
+          "name.en_US" when only one language is meant (中文名, 英文名). For an impostor or an alias
+          (假路飞), the real name is that character's OWN name, never the one he impersonates; the
+          server verifies it in Baidu Baike and Bangumi.
+        * "avatar": only when the request explicitly asks for a new picture or portrait (换个头像).
+          A rename never implies it.
       - "remove": keys of items the request takes out of the draft. A character leaving a group is
         a "change" of "group", not a removal.
       - "add": canon One Piece entities the request asks to add (type character, fruit or group).

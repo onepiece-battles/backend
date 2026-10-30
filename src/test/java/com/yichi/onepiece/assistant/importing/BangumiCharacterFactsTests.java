@@ -47,6 +47,7 @@ public class BangumiCharacterFactsTests {
         bangumi(Map.of("月光·莫利亚", MORIA), calls).find(new I18nText().zhCN("月光·莫利亚").enUS("Gecko Moria"));
     assertThat(facts)
         .containsExactly(
+            Map.entry("canonical_zh_CN", "月光·摩利亚"),
             Map.entry("生日", "9月6日"), Map.entry("身高", "692cm"), Map.entry("年龄", "48岁（第一部）、50岁（第二部）"));
     assertThat(calls).containsExactly("POST /v0/search/characters?limit=5", "GET /v0/characters/4287/subjects");
   }
@@ -71,5 +72,19 @@ public class BangumiCharacterFactsTests {
               throw new IOException("unreachable");
             });
     assertThat(facts.find(new I18nText().zhCN("佩罗娜"))).isEmpty();
+  }
+
+  @Test
+  public void anAliasFindsTheCharactersRealName() {
+    String demaro =
+        """
+        {"id":106737,"name":"デマロ・ブラック","infobox":[
+          {"key":"简体中文名","value":"丹马罗·布拉克"},
+          {"key":"别名","value":[{"v":"假路飞"},{"k":"英文名","v":"Demaro Black"},{"k":"日文名","v":"偽ルフィ"}]}]}
+        """;
+    var facts = bangumi(Map.of("假路飞", demaro), new ArrayList<>()).find(new I18nText().zhCN("假路飞"));
+    assertThat(facts)
+        .containsEntry("canonical_zh_CN", "丹马罗·布拉克")
+        .containsEntry("canonical_en_US", "Demaro Black");
   }
 }

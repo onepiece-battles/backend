@@ -68,6 +68,41 @@ public class CharacterFactValuesTests {
   }
 
   @Test
+  public void aBaikeRedirectFromAnAliasGivesOnlyTheRealName() throws Exception {
+    String card =
+        """
+        {"key":"假路飞","title":"丹马罗·布拉克","desc":"日本漫画《航海王》及其衍生作品中的角色",
+         "redirect":{"from":"假路飞","to":"丹马罗·布拉克"},"card":[
+          {"name":"中文名","value":["丹马罗·布拉克"]},
+          {"name":"外文名","value":["デマロ・ブラック","Demaro Black"]},
+          {"name":"身高","value":["180 cm"]}]}
+        """;
+    assertThat(BaiduCharacterFacts.parse(card, new I18nText().zhCN("假路飞")))
+        .containsExactly(
+            Map.entry("canonical_zh_CN", "丹马罗·布拉克"), Map.entry("canonical_en_US", "Demaro Black"));
+    // Without the redirect another entry is not this character.
+    assertThat(BaiduCharacterFacts.parse(card.replace("\"from\":\"假路飞\"", "\"from\":\"别人\""), new I18nText().zhCN("假路飞")))
+        .isEmpty();
+    // Its own entry gives the names and the facts.
+    assertThat(BaiduCharacterFacts.parse(card, new I18nText().zhCN("丹马罗·布拉克")))
+        .containsEntry("canonical_zh_CN", "丹马罗·布拉克")
+        .containsEntry("身高", "180 cm");
+  }
+
+  @Test
+  public void theRealNameIsBaikesChineseAndBangumisEnglish() {
+    var bangumi = mock(BangumiCharacterFacts.class);
+    var baidu = mock(BaiduCharacterFacts.class);
+    var fake = new I18nText().zhCN("假路飞");
+    when(bangumi.find(fake))
+        .thenReturn(Map.of("canonical_zh_CN", "丹马罗·布拉克", "canonical_en_US", "Demaro Black"));
+    when(baidu.find(fake)).thenReturn(Map.of("canonical_zh_CN", "德马罗·布莱克"));
+    assertThat(new VerifiedCharacterFacts(bangumi, baidu).find(fake))
+        .containsEntry("canonical_zh_CN", "德马罗·布莱克")
+        .containsEntry("canonical_en_US", "Demaro Black");
+  }
+
+  @Test
   public void unclearBaikeValuesStayUnknown() throws Exception {
     String card =
         """

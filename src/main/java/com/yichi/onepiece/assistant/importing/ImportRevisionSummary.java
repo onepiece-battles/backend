@@ -45,12 +45,14 @@ final class ImportRevisionSummary {
 
   /**
    * The reply, or null when nothing changed and nothing needs saying. {@code unverified} lists, by
-   * key, the facts that were looked up again and stay blank.
+   * key, the facts that were looked up again and stay blank; {@code portraits} the characters
+   * whose portrait the page looks up again.
    */
   static String reply(
       List<ImportItem> before,
       List<ImportItem> after,
       Map<String, List<String>> unverified,
+      List<String> portraits,
       AssistantLanguage language) {
     var previous = new HashMap<String, ImportItem>();
     before.forEach(i -> previous.put(i.key(), i));
@@ -61,7 +63,9 @@ final class ImportRevisionSummary {
     var added = new ArrayList<String>();
     var removed = new ArrayList<String>();
     var blank = new ArrayList<String>();
+    var pictures = new ArrayList<String>();
     for (var item : after) {
+      if (portraits.contains(item.key())) pictures.add(name(item, language));
       var old = previous.get(item.key());
       if (old == null) {
         added.add(name(item, language));
@@ -73,8 +77,11 @@ final class ImportRevisionSummary {
         labels.add(
             label(field, language)
                 + (has(old, field) && !has(item, field) ? language.pick("（留空）", " (blank)") : ""));
-      if (!labels.isEmpty())
-        modified.add(name(item, language) + language.pick("：", ": ") + String.join(comma, labels));
+      String who =
+          fields.contains("name")
+              ? name(old, language) + " → " + name(item, language)
+              : name(item, language);
+      if (!labels.isEmpty()) modified.add(who + language.pick("：", ": ") + String.join(comma, labels));
       var still =
           unverified.getOrDefault(item.key(), List.of()).stream()
               .filter(f -> !fields.contains(f))
@@ -83,7 +90,11 @@ final class ImportRevisionSummary {
       if (!still.isEmpty()) blank.add(name(item, language) + " " + String.join(comma, still));
     }
     for (var item : before) if (!kept.contains(item.key())) removed.add(name(item, language));
-    if (modified.isEmpty() && added.isEmpty() && removed.isEmpty() && blank.isEmpty()) return null;
+    if (modified.isEmpty()
+        && added.isEmpty()
+        && removed.isEmpty()
+        && blank.isEmpty()
+        && pictures.isEmpty()) return null;
 
     var parts = new ArrayList<String>();
     String semicolon = language.pick("；", "; ");
@@ -92,6 +103,10 @@ final class ImportRevisionSummary {
     if (!added.isEmpty()) parts.add(language.pick("已新增 ", "Added ") + list(added, comma, language));
     if (!removed.isEmpty())
       parts.add(language.pick("已移除 ", "Removed ") + list(removed, comma, language));
+    if (!pictures.isEmpty())
+      parts.add(
+          language.pick("重新查找头像：", "Looking for a new portrait: ")
+              + list(pictures, comma, language));
     if (!blank.isEmpty())
       parts.add(
           language.pick("没有可核实的来源，保持留空：", "No source verifies these, so they stay blank: ")
