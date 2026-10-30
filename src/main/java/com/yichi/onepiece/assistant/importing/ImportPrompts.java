@@ -137,6 +137,10 @@ final class ImportPrompts {
         - "request", when present, is the reviewer's message about what is wrong with this item:
           look the item up again with it in mind.
         - group_gain: how much the character profits from fighting alongside their crew.
+        - energy: stamina for long fights. Judge it from the character's strength and how they
+          hold up in long battles in the story: minor fighters near the bottom of the range, the
+          strongest near the top. Men a little higher than women of similar strength. Compare with
+          the references' energy.
 
         Fruit fields:
         %s

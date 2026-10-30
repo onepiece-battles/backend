@@ -38,6 +38,46 @@ public class ExistingResources {
     return name == null ? "" : name.replaceAll("[\\s·・•.]", "").toLowerCase(Locale.ROOT);
   }
 
+  /**
+   * A fruit name without what its variants differ in: case, spaces, hyphens and other
+   * punctuation, and a trailing "no Mi" / "Fruit" / "果实". "Gomu-Gomu no Mi" and "gomu gomu no
+   * mi" are both "gomugomu".
+   */
+  static String fruitCore(String name) {
+    String core =
+        name == null ? "" : name.toLowerCase(Locale.ROOT).replaceAll("[\\p{Punct}\\s·・•，。：（）]", "");
+    return core.replaceFirst("(nomi|fruit|果实)$", "");
+  }
+
+  /** The same fruit: equal names, or equal cores in the same language. */
+  static boolean sameFruit(I18nText existing, I18nText drafted) {
+    if (sameName(existing, drafted)) return true;
+    if (existing == null || drafted == null) return false;
+    for (var pair : List.of(
+        List.of(String.valueOf(existing.getZhCN()), String.valueOf(drafted.getZhCN())),
+        List.of(String.valueOf(existing.getEnUS()), String.valueOf(drafted.getEnUS())))) {
+      String a = fruitCore(pair.get(0)), b = fruitCore(pair.get(1));
+      if (!a.isEmpty() && !a.equals("null") && a.equals(b)) return true;
+    }
+    return false;
+  }
+
+  /** A fruit an existing character holds now. */
+  public record Held(UUID id, I18nText name) {}
+
+  /** The fruits the existing character holds now; none if it is gone. */
+  public List<Held> heldFruits(UUID characterId) {
+    try {
+      var view = characters.getCharacterFullView(characterId);
+      var held = new ArrayList<Held>();
+      if (view != null && view.getFruits() != null)
+        for (var fruit : view.getFruits()) held.add(new Held(fruit.getId(), fruit.getName()));
+      return held;
+    } catch (NoSuchElementException e) {
+      return List.of();
+    }
+  }
+
   static boolean sameName(I18nText existing, I18nText drafted) {
     if (existing == null || drafted == null) return false;
     for (String a : new String[] {existing.getZhCN(), existing.getEnUS()})
@@ -61,9 +101,26 @@ public class ExistingResources {
     return terms;
   }
 
+  /**
+   * A fruit's terms also reach its name variants: the Chinese name without "果实" and the first
+   * word of the romanized one ("Gomu" for "Gomu-Gomu no Mi").
+   */
+  private static List<Map.Entry<LanguageCode, String>> fruitTerms(I18nText name) {
+    var terms = new ArrayList<>(terms(name));
+    if (name.getZhCN() != null) {
+      String zh = name.getZhCN().trim().replaceFirst("果实$", "");
+      if (zh.length() >= 2) terms.add(Map.entry(LanguageCode.ZH_CN, zh));
+    }
+    if (name.getEnUS() != null) {
+      String word = name.getEnUS().trim().split("[^A-Za-z]+")[0];
+      if (word.length() >= 3) terms.add(Map.entry(LanguageCode.EN_US, word));
+    }
+    return terms;
+  }
+
   /** The id of the resource of this type whose name equals the drafted one, if any. */
   public Optional<UUID> find(String type, I18nText name, UUID userId) {
-    for (var term : terms(name)) {
+    for (var term : type.equals(FRUIT) ? fruitTerms(name) : terms(name)) {
       Optional<UUID> found =
           switch (type) {
             case CHARACTER -> {
@@ -104,7 +161,7 @@ public class ExistingResources {
               yield page == null
                   ? Optional.empty()
                   : page.getFruits().stream()
-                      .filter(f -> sameName(f.getName(), name))
+                      .filter(f -> sameFruit(f.getName(), name))
                       .map(FruitListView::getId)
                       .findFirst();
             }

@@ -96,7 +96,7 @@ public class ImportDrafter {
   private static final class Entry {
     final String key;
     final String type;
-    final I18nText name;
+    I18nText name;
     final ObjectNode rosterData = JsonNodeFactory.instance.objectNode();
     final List<String> fruits = new ArrayList<>();
     String group;
@@ -144,6 +144,7 @@ public class ImportDrafter {
     for (var entry : entries) {
       existing.find(entry.type, entry.name, userId).ifPresent(id -> entry.existingId = id.toString());
     }
+    entries = reuseHeldFruits(entries, notes, language);
     noteUnheldFruits(entries, notes, language);
 
     var byKey = new HashMap<String, Entry>();
@@ -370,6 +371,9 @@ public class ImportDrafter {
       progress.accept(language.pick("正在核对已有数据…", "Checking what already exists…"));
       for (var entry : added)
         existing.find(entry.type, entry.name, userId).ifPresent(id -> entry.existingId = id.toString());
+      var reused = reuseHeldFruits(added, notes, language);
+      added.clear();
+      added.addAll(reused);
       var byKey = new HashMap<String, Entry>();
       for (var item : items.values()) {
         var entry = entry(item);
@@ -511,6 +515,97 @@ public class ImportDrafter {
           return true;
         });
     return result;
+  }
+
+  /**
+   * A drafted character who already exists in the app may already hold their fruit, perhaps
+   * under a slightly different name than the draft's: reuse it instead of creating a
+   * near-duplicate. A new fruit drafted for them becomes the one they hold (named as in the app);
+   * a held fruit the draft did not give them is linked; a drafted duplicate is dropped.
+   */
+  private List<Entry> reuseHeldFruits(
+      List<Entry> entries, List<String> notes, AssistantLanguage language) {
+    var result = new ArrayList<>(entries);
+    var byKey = new HashMap<String, Entry>();
+    entries.forEach(e -> byKey.put(e.key, e));
+    var merged = new HashSet<String>();
+    for (var character : entries) {
+      if (!character.type.equals(CHARACTER) || character.existingId == null) continue;
+      List<ExistingResources.Held> held;
+      try {
+        held = existing.heldFruits(UUID.fromString(character.existingId));
+      } catch (RuntimeException e) {
+        continue;
+      }
+      if (held == null || held.isEmpty()) continue;
+      var remaining = new ArrayList<>(held);
+      var fruits = new ArrayList<String>();
+      for (var key : character.fruits) {
+        var fruit = byKey.get(key);
+        ExistingResources.Held match = null;
+        if (fruit != null) {
+          for (var h : remaining)
+            if (fruit.existingId != null
+                ? h.id().toString().equals(fruit.existingId)
+                : ExistingResources.sameFruit(h.name(), fruit.name)) match = h;
+          // Someone holds one fruit: a new one drafted for them is that one under another name.
+          if (match == null && fruit.existingId == null && remaining.size() == 1)
+            match = remaining.get(0);
+        }
+        if (match == null) {
+          fruits.add(key);
+          continue;
+        }
+        remaining.remove(match);
+        fruits.add(reuse(result, fruit, match, merged, notes, language).key);
+      }
+      for (var match : remaining) fruits.add(reuse(result, null, match, merged, notes, language).key);
+      character.fruits.clear();
+      fruits.stream().distinct().forEach(character.fruits::add);
+    }
+    var holders = new HashSet<String>();
+    result.forEach(e -> holders.addAll(e.fruits));
+    result.removeIf(e -> merged.contains(e.key) && !holders.contains(e.key));
+    return result;
+  }
+
+  /**
+   * The draft's entry for the held fruit {@code match}: one already reusing it, else {@code
+   * drafted} turned into it, else a new reused entry. A drafted fruit that turns out to duplicate
+   * another entry is marked {@code merged}.
+   */
+  private Entry reuse(
+      List<Entry> result,
+      Entry drafted,
+      ExistingResources.Held match,
+      Set<String> merged,
+      List<String> notes,
+      AssistantLanguage language) {
+    for (var entry : result)
+      if (entry.type.equals(FRUIT) && match.id().toString().equals(entry.existingId)) {
+        if (drafted != null && drafted != entry) merged.add(drafted.key);
+        return entry;
+      }
+    if (drafted != null) {
+      if (match.name() != null && !ExistingResources.sameName(match.name(), drafted.name)) {
+        notes.add(
+            language.pick(
+                "「" + display(drafted.name) + "」就是已有的「" + display(match.name()) + "」，直接复用。",
+                display(drafted.name) + " is the existing " + display(match.name()) + "; it is reused."));
+        drafted.name = match.name();
+      }
+      drafted.existingId = match.id().toString();
+      return drafted;
+    }
+    var keys = new HashSet<String>();
+    result.forEach(e -> keys.add(e.key));
+    var entry = new Entry(nextKey(FRUIT, keys, List.of()), FRUIT, match.name());
+    entry.existingId = match.id().toString();
+    int firstCharacter = -1;
+    for (int i = 0; i < result.size() && firstCharacter < 0; i++)
+      if (result.get(i).type.equals(CHARACTER)) firstCharacter = i;
+    result.add(firstCharacter < 0 ? result.size() : firstCharacter, entry);
+    return entry;
   }
 
   private static void indexFruit(Map<String, Entry> byName, Entry fruit) {
