@@ -27,8 +27,11 @@ public interface CharacterToGroupDao extends BaseDao<CharacterToGroupEntity, UUI
       + "group.system_resource, "
       + "group.group_category as category ";
 
+  // id stays the character's id (CHARACTER_FIELDS), as clients have long read it; character_id
+  // and group_id are filled too, so code reading characterId gets it.
   @Select({
       "select `character_to_group`.`position`, `character_to_group`.`once_belonged_to`, ",
+      "`character_to_group`.`character_id`, `character_to_group`.`group_id`, ",
       CHARACTER_FIELDS,
       "from character_to_group ",
       "left join `character` on `character`.`id` = character_to_group.character_id ",
