@@ -24,6 +24,7 @@ import com.yichi.onepiece.model.I18nText;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
@@ -62,6 +63,7 @@ public class ImportDrafter {
   private final AiSettingService settings;
   private final ChatCompletionClient client;
   private final ExistingResources existing;
+  private final CharacterFacts facts;
   private final Executor detailExecutor;
   private final ObjectMapper json = new ObjectMapper();
 
@@ -70,18 +72,21 @@ public class ImportDrafter {
       AiSettingService settings,
       ChatCompletionClient client,
       ExistingResources existing,
+      CharacterFacts facts,
       AssistantExecutors executors) {
-    this(settings, client, existing, executors.tools());
+    this(settings, client, existing, facts, executors.tools());
   }
 
   ImportDrafter(
       AiSettingService settings,
       ChatCompletionClient client,
       ExistingResources existing,
+      CharacterFacts facts,
       Executor detailExecutor) {
     this.settings = settings;
     this.client = client;
     this.existing = existing;
+    this.facts = facts;
     this.detailExecutor = detailExecutor;
   }
 
@@ -123,6 +128,10 @@ public class ImportDrafter {
     progress.accept(language.pick("正在梳理名单…", "Listing who and what is in scope…"));
     JsonNode roster = ask(s, ImportPrompts.ROSTER, scope);
     List<Entry> entries = readRoster(roster, notes, language);
+    if (!entries.isEmpty()) {
+      progress.accept(language.pick("正在核对每个角色的果实…", "Checking each character's devil fruit…"));
+      entries = checkFruits(s, entries, notes, language);
+    }
     if (entries.isEmpty()) {
       throw new AssistantException(
           AssistantException.INVALID_REQUEST,
@@ -139,7 +148,7 @@ public class ImportDrafter {
 
     var byKey = new HashMap<String, Entry>();
     entries.forEach(e -> byKey.put(e.key, e));
-    var details = details(s, entries, byKey, userId, language, progress);
+    var details = details(s, entries, byKey, Map.of(), userId, language, progress);
 
     progress.accept(language.pick("正在校验草稿…", "Checking the draft…"));
     var items = new ArrayList<ImportItem>();
@@ -149,12 +158,15 @@ public class ImportDrafter {
 
   /**
    * Drafts the create fields of the new characters and fruits among {@code entries}, in parallel
-   * batches, by entry key. {@code byKey} names their relations for context.
+   * batches, by entry key. {@code byKey} names their relations for context; characters also get
+   * the facts {@link CharacterFacts} finds, and {@code hints} adds the reviewer's request for an
+   * item being looked up again.
    */
   private Map<String, JsonNode> details(
       Settings s,
       List<Entry> entries,
       Map<String, Entry> byKey,
+      Map<String, String> hints,
       UUID userId,
       AssistantLanguage language,
       Consumer<String> progress) {
@@ -162,6 +174,22 @@ public class ImportDrafter {
         entries.stream().filter(e -> e.existingId == null && !e.type.equals(GROUP)).toList();
     Map<String, JsonNode> details = new HashMap<>();
     if (toDetail.isEmpty()) return details;
+    var found = new ConcurrentHashMap<String, Map<String, String>>();
+    if (toDetail.stream().anyMatch(e -> e.type.equals(CHARACTER))) {
+      progress.accept(language.pick("正在查询角色资料（Bangumi）…", "Looking characters up on Bangumi…"));
+      toDetail.stream()
+          .filter(e -> e.type.equals(CHARACTER))
+          .map(
+              e ->
+                  CompletableFuture.runAsync(
+                      () -> {
+                        var known = facts.find(e.name);
+                        if (!known.isEmpty()) found.put(e.key, known);
+                      },
+                      detailExecutor))
+          .toList()
+          .forEach(CompletableFuture::join);
+    }
     String references = references(userId);
     var batches = new ArrayList<List<Entry>>();
     for (int i = 0; i < toDetail.size(); i += BATCH_SIZE)
@@ -175,7 +203,11 @@ public class ImportDrafter {
             .map(
                 batch ->
                     CompletableFuture.supplyAsync(
-                        () -> ask(s, ImportPrompts.detail(references), detailRequest(batch, byKey)),
+                        () ->
+                            ask(
+                                s,
+                                ImportPrompts.detail(references),
+                                detailRequest(batch, byKey, found, hints)),
                         detailExecutor))
             .toList();
     try {
@@ -324,7 +356,17 @@ public class ImportDrafter {
       changed.add(item.key());
     }
 
-    if (!added.isEmpty()) {
+    // Items to look up again: new characters and fruits, with the fields to replace (all if none).
+    var redrafts = new LinkedHashMap<String, List<String>>();
+    for (var redraft : changes.path("redraft")) {
+      var item = items.get(redraft.path("key").asText());
+      if (item == null || item.existingId() != null || item.type().equals(GROUP)) continue;
+      var fields = new ArrayList<String>();
+      redraft.path("fields").forEach(f -> fields.add(f.asText()));
+      redrafts.put(item.key(), fields);
+    }
+
+    if (!added.isEmpty() || !redrafts.isEmpty()) {
       progress.accept(language.pick("正在核对已有数据…", "Checking what already exists…"));
       for (var entry : added)
         existing.find(entry.type, entry.name, userId).ifPresent(id -> entry.existingId = id.toString());
@@ -334,10 +376,31 @@ public class ImportDrafter {
         if (entry != null) byKey.put(entry.key, entry);
       }
       added.forEach(e -> byKey.put(e.key, e));
-      var details = details(s, added, byKey, userId, language, progress);
+      var toDraft = new ArrayList<>(added);
+      var hints = new HashMap<String, String>();
+      for (var key : redrafts.keySet()) {
+        if (!byKey.containsKey(key)) continue;
+        toDraft.add(byKey.get(key));
+        hints.put(key, instruction);
+      }
+      var details = details(s, toDraft, byKey, hints, userId, language, progress);
       for (var entry : added) {
         items.put(entry.key, toItem(entry, details.get(entry.key), language));
         changed.add(entry.key);
+      }
+      for (var redraft : redrafts.entrySet()) {
+        var item = items.get(redraft.getKey());
+        var detail = details.get(redraft.getKey());
+        if (detail == null) {
+          var name = byKey.get(redraft.getKey());
+          notes.add(
+              language.pick(
+                  "没能重新查到「" + (name == null ? redraft.getKey() : display(name.name)) + "」的资料。",
+                  "Could not look " + (name == null ? redraft.getKey() : display(name.name)) + " up again."));
+          continue;
+        }
+        items.put(item.key(), lookedUp(item, detail, redraft.getValue()));
+        changed.add(item.key());
       }
     }
 
@@ -356,6 +419,113 @@ public class ImportDrafter {
         notes,
         reply.isEmpty() ? language.pick("草稿已更新。", "The draft is updated.") : reply,
         List.copyOf(changed));
+  }
+
+  /**
+   * {@code item} with {@code fields} (every drafted field when empty) replaced by a fresh detail
+   * answer. A replaced field is uncertain only if the fresh answer says so.
+   */
+  private ImportItem lookedUp(ImportItem item, JsonNode detail, List<String> fields) {
+    var fresh = json.createObjectNode();
+    var freshUncertain = new ArrayList<String>();
+    sanitize(item.type(), detail.path("data"), fresh, freshUncertain);
+    for (var field : detail.path("uncertain"))
+      if (fresh.has(field.asText()) && !freshUncertain.contains(field.asText()))
+        freshUncertain.add(field.asText());
+    var data = item.data() == null ? json.createObjectNode() : item.data().deepCopy();
+    var uncertain = new ArrayList<>(item.uncertain() == null ? List.<String>of() : item.uncertain());
+    var replace = new ArrayList<String>(fields);
+    if (replace.isEmpty()) fresh.fieldNames().forEachRemaining(replace::add);
+    for (var field : replace) {
+      if (!fresh.has(field)) continue;
+      data.set(field, fresh.get(field));
+      uncertain.remove(field);
+      if (freshUncertain.contains(field)) uncertain.add(field);
+    }
+    return new ImportItem(
+        item.key(), item.type(), data, null, item.fruits(), item.group(), item.position(),
+        uncertain, List.of());
+  }
+
+  /**
+   * Asks once more, per character, which devil fruit they ate: the roster call lists many entities
+   * at once and tends to miss a fruit or give it to the wrong person. Missing fruits are added and
+   * wrong holders corrected; a drafted fruit nobody ate is dropped with a note. If the check fails
+   * the roster stands.
+   */
+  private List<Entry> checkFruits(
+      Settings s, List<Entry> entries, List<String> notes, AssistantLanguage language) {
+    var characters = entries.stream().filter(e -> e.type.equals(CHARACTER)).toList();
+    if (characters.isEmpty()) return entries;
+    var byKey = new HashMap<String, Entry>();
+    entries.forEach(e -> byKey.put(e.key, e));
+    var request = json.createObjectNode();
+    var list = request.putArray("characters");
+    for (var character : characters) {
+      var node = list.addObject().put("key", character.key);
+      node.set("name", nameNode(character.name));
+      var listed = node.putArray("listed_fruits");
+      character.fruits.forEach(k -> listed.add(nameNode(byKey.get(k).name)));
+    }
+    JsonNode answer;
+    try {
+      answer = ask(s, ImportPrompts.FRUITS, request.toString());
+    } catch (RuntimeException e) {
+      logger.warn("import fruit check failed; keeping the roster's fruits", e);
+      return entries;
+    }
+
+    var result = new ArrayList<>(entries);
+    var fruitsByName = new HashMap<String, Entry>();
+    for (var entry : entries) if (entry.type.equals(FRUIT)) indexFruit(fruitsByName, entry);
+    for (var item : answer.path("characters")) {
+      var character = byKey.get(item.path("key").asText());
+      if (character == null || !character.type.equals(CHARACTER) || !item.has("fruit")) continue;
+      character.fruits.clear();
+      var name = item.get("fruit").isObject() ? name(item.get("fruit")) : null;
+      if (name == null) continue;
+      var fruit = findFruit(fruitsByName, name);
+      if (fruit == null) {
+        if (result.stream().filter(e -> e.type.equals(FRUIT)).count() >= MAX_FRUITS) continue;
+        var keys = new HashSet<String>();
+        result.forEach(e -> keys.add(e.key));
+        fruit = new Entry(nextKey(FRUIT, keys, List.of()), FRUIT, name);
+        String fruitType = item.get("fruit").path("fruit_type").asText();
+        if (validEnum(fruitType, FruitType.values())) fruit.rosterData.put("fruit_type", fruitType);
+        int firstCharacter = result.indexOf(characters.get(0));
+        result.add(firstCharacter < 0 ? result.size() : firstCharacter, fruit);
+        indexFruit(fruitsByName, fruit);
+      }
+      character.fruits.add(fruit.key);
+    }
+    var held = new HashSet<String>();
+    characters.forEach(c -> held.addAll(c.fruits));
+    result.removeIf(
+        e -> {
+          if (!e.type.equals(FRUIT) || held.contains(e.key)) return false;
+          String fruit = language.displayName(e.name);
+          notes.add(
+              language.pick(
+                  "「" + fruit + "」：核对后没有角色吃这个果实，已从草稿去掉；需要的话告诉 AI 它的持有者。",
+                  fruit + ": no character here ate this fruit, so it was left out; tell the AI who ate it if it belongs."));
+          return true;
+        });
+    return result;
+  }
+
+  private static void indexFruit(Map<String, Entry> byName, Entry fruit) {
+    for (var text : new String[] {fruit.name.getEnUS(), fruit.name.getZhCN()})
+      if (text != null && !text.isBlank()) byName.putIfAbsent(ExistingResources.normalize(text), fruit);
+  }
+
+  /** The drafted fruit with this name, by its romanized name first (translations vary). */
+  private static Entry findFruit(Map<String, Entry> byName, I18nText name) {
+    for (var text : new String[] {name.getEnUS(), name.getZhCN()}) {
+      if (text == null || text.isBlank()) continue;
+      var fruit = byName.get(ExistingResources.normalize(text));
+      if (fruit != null) return fruit;
+    }
+    return null;
   }
 
   /** The draft as the revise prompt shows it: relations, and the editable fields of new items. */
@@ -422,7 +592,7 @@ public class ImportDrafter {
     var problems = new ArrayList<String>();
     if (item.type().equals(CHARACTER)) {
       if (!data.has("hakis")) data.putArray("hakis");
-      fitFruitCapacity(fruits.size(), data, uncertain, problems, language);
+      fitFruitCapacity(fruits.size(), data, problems, language);
     }
     missingRequired(item.type(), data, problems, language);
     return new ImportItem(
@@ -621,14 +791,20 @@ public class ImportDrafter {
     return refs.toString();
   }
 
-  /** What one detail call is asked to fill in, with the relations as context. */
-  private String detailRequest(List<Entry> batch, Map<String, Entry> byKey) {
+  /** What one detail call is asked to fill in, with relations, facts and hints as context. */
+  private String detailRequest(
+      List<Entry> batch,
+      Map<String, Entry> byKey,
+      Map<String, Map<String, String>> facts,
+      Map<String, String> hints) {
     ArrayNode request = json.createArrayNode();
     for (var entry : batch) {
       var node = request.addObject();
       node.put("key", entry.key);
       node.put("type", entry.type);
       node.set("name", nameNode(entry.name));
+      if (facts.containsKey(entry.key)) node.set("facts", json.valueToTree(facts.get(entry.key)));
+      if (hints.containsKey(entry.key)) node.put("request", hints.get(entry.key));
       if (entry.type.equals(FRUIT) && entry.rosterData.has("fruit_type"))
         node.set("fruit_type", entry.rosterData.get("fruit_type"));
       if (!entry.fruits.isEmpty()) {
@@ -673,7 +849,7 @@ public class ImportDrafter {
           data.set("fruit_type", entry.rosterData.get("fruit_type"));
         if (entry.type.equals(CHARACTER)) {
           if (!data.has("hakis")) data.putArray("hakis");
-          fitFruitCapacity(entry.fruits.size(), data, uncertain, problems, language);
+          fitFruitCapacity(entry.fruits.size(), data, problems, language);
         }
       }
       missingRequired(entry.type, data, problems, language);
@@ -775,22 +951,14 @@ public class ImportDrafter {
     return text.length() <= max ? text : text.substring(0, max);
   }
 
-  /** A character that eats more fruits than its capacity gets the capacity raised (max 2). */
+  /** A new character holds one devil fruit; only Blackbeard ever held two, and he exists. */
   private void fitFruitCapacity(
-      int fruits,
-      ObjectNode data,
-      List<String> uncertain,
-      List<String> problems,
-      AssistantLanguage language) {
-    if (fruits > 2) {
+      int fruits, ObjectNode data, List<String> problems, AssistantLanguage language) {
+    data.put("maximum_fruit_count", 1);
+    if (fruits > 1)
       problems.add(
           language.pick(
-              "一个角色最多吃 2 个果实，请删掉多余的果实。",
-              "A character can hold at most 2 fruits; remove the extra ones."));
-    } else if (fruits > data.path("maximum_fruit_count").asInt(0)) {
-      data.put("maximum_fruit_count", Math.max(fruits, 1));
-      if (!uncertain.contains("maximum_fruit_count")) uncertain.add("maximum_fruit_count");
-    }
+              "新角色只能吃 1 个果实，请去掉多余的。", "A new character holds one fruit; remove the others."));
   }
 
   private static void missingRequired(

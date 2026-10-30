@@ -25,11 +25,26 @@ public class ImportDrafterTests {
   private FakeDeepSeek deepSeek;
   private ImportDrafter drafter;
   private final List<String> progress = new ArrayList<>();
+  /** What the fake Bangumi knows, by Chinese name. */
+  private final Map<String, Map<String, String>> knownFacts = new HashMap<>();
 
-  /** Answers the roster prompt with {@link #roster} and each detail call with {@link #details}. */
+  /**
+   * Answers the roster prompt with {@link #roster}, the fruit check with {@link #fruitCheck} (by
+   * default confirming the roster's fruits) and each detail call with {@link #details}.
+   */
   static final class FakeDeepSeek implements ChatCompletionClient {
     String roster;
     Function<JsonNode, String> details = request -> "{\"items\":[]}";
+    Function<JsonNode, String> fruitCheck =
+        request -> {
+          var answer = JSON.createObjectNode();
+          var characters = answer.putArray("characters");
+          for (var c : request.path("characters")) {
+            var listed = c.path("listed_fruits");
+            characters.addObject().put("key", c.path("key").asText()).set("fruit", listed.isEmpty() ? null : listed.get(0));
+          }
+          return answer.toString();
+        };
     final List<CompletionRequest> requests = Collections.synchronizedList(new ArrayList<>());
     final Deque<String> scripted = new ArrayDeque<>();
 
@@ -40,7 +55,13 @@ public class ImportDrafterTests {
       if (!scripted.isEmpty()) content = scripted.poll();
       else if (request.messages().get(0).path("content").asText().equals(ImportPrompts.ROSTER))
         content = roster;
-      else {
+      else if (request.messages().get(0).path("content").asText().equals(ImportPrompts.FRUITS)) {
+        try {
+          content = fruitCheck.apply(JSON.readTree(request.messages().get(1).path("content").asText()));
+        } catch (Exception e) {
+          throw new IllegalStateException(e);
+        }
+      } else {
         try {
           content = details.apply(JSON.readTree(request.messages().get(1).path("content").asText()));
         } catch (Exception e) {
@@ -64,7 +85,14 @@ public class ImportDrafterTests {
         .thenReturn(List.of(JSON.createObjectNode().put("name", "路飞").put("attack", 900)));
     when(existing.referenceFruits(any(), anyInt())).thenReturn(List.of());
     deepSeek = new FakeDeepSeek();
-    drafter = new ImportDrafter(settings, deepSeek, existing, Runnable::run);
+    knownFacts.clear();
+    drafter =
+        new ImportDrafter(
+            settings,
+            deepSeek,
+            existing,
+            name -> knownFacts.getOrDefault(name.getZhCN(), Map.of()),
+            Runnable::run);
     progress.clear();
   }
 
@@ -128,7 +156,7 @@ public class ImportDrafterTests {
     assertThat(draft.notes()).hasSize(2).first().isEqualTo("只包含当前成员");
     assertThat(draft.notes().get(1)).contains("罗罗诺亚·索隆", "「nope」");
     assertThat(progress).isNotEmpty();
-    var detailRequest = deepSeek.requests.get(1);
+    var detailRequest = deepSeek.requests.get(2); // after the roster and the fruit check
     assertThat(detailRequest.jsonOutput()).isTrue();
     assertThat(detailRequest.tools()).isNull();
     assertThat(detailRequest.messages().get(0).path("content").asText())
@@ -137,12 +165,13 @@ public class ImportDrafterTests {
   }
 
   @Test
-  public void notesFruitsNobodyEatsAndRelationsItCouldNotLink() {
+  public void notesRelationsItCouldNotLinkAndDropsFruitsNobodyAte() {
     when(existing.find(
             eq(FRUIT), argThat(n -> Set.of("影子果实", "透明果实").contains(n.getZhCN())), any()))
         .thenReturn(Optional.of(UUID.randomUUID()));
-    // The model names Perona's fruit and crew instead of using their keys, and adds a fruit
-    // that no one in the crew eats. An unheld fruit that already exists is only reused: no note.
+    // The model names Perona's fruit and crew instead of using their keys, and adds a fruit that
+    // no one in the crew eats. The fruit check (here confirming the roster) then drops every
+    // fruit nobody holds, the existing one too: it would only have been reused.
     deepSeek.roster =
         """
         {"groups":[{"key":"crew","name":{"zh_CN":"月光莫利亚海贼团"},"group_category":"pirate"}],
@@ -163,8 +192,9 @@ public class ImportDrafterTests {
         .containsExactly(
             "「佩罗娜」的果实「灵灵果实」不在名单里，已忽略，请确认。",
             "「佩罗娜」的团体「月光莫利亚海贼团」不在名单里，已忽略，请确认。",
-            "「灵灵果实」：草稿里没有角色吃这个果实，请确认是否需要导入。",
-            "「野猪果实」：草稿里没有角色吃这个果实，请确认是否需要导入。");
+            "「透明果实」：核对后没有角色吃这个果实，已从草稿去掉；需要的话告诉 AI 它的持有者。",
+            "「灵灵果实」：核对后没有角色吃这个果实，已从草稿去掉；需要的话告诉 AI 它的持有者。",
+            "「野猪果实」：核对后没有角色吃这个果实，已从草稿去掉；需要的话告诉 AI 它的持有者。");
     assertThat(item(draft, "c1").fruits()).containsExactly("f1");
   }
 
@@ -197,15 +227,27 @@ public class ImportDrafterTests {
   }
 
   @Test
-  public void aCharacterWithTwoFruitsGetsCapacityTwoAndThreeFruitsIsAProblem() {
+  public void theFruitCheckAddsMissedFruitsFixesHoldersAndDropsTheRest() {
+    // The roster gives Moria Perona's fruit, misses his own, and lists a fruit nobody ate.
     deepSeek.roster =
         """
-        {"fruits":[{"key":"a","name":{"zh_CN":"暗暗果实"},"fruit_type":"Logia"},
-                   {"key":"b","name":{"zh_CN":"震震果实"},"fruit_type":"Paramecia"},
-                   {"key":"c","name":{"zh_CN":"虚构果实"},"fruit_type":"Paramecia"}],
-         "characters":[{"key":"x","name":{"zh_CN":"马歇尔·D·蒂奇"},"fruits":["a","b"]},
-                       {"key":"y","name":{"zh_CN":"测试角色"},"fruits":["a","b","c"]}]}
+        {"fruits":[{"key":"horo","name":{"zh_CN":"灵灵果实","en_US":"Horo Horo no Mi"},"fruit_type":"Paramecia"},
+                   {"key":"boar","name":{"zh_CN":"野猪果实"},"fruit_type":"Zoan"}],
+         "characters":[{"key":"moria","name":{"zh_CN":"月光·莫利亚","en_US":"Gecko Moria"},"fruits":["horo"]},
+                       {"key":"perona","name":{"zh_CN":"佩罗娜","en_US":"Perona"}},
+                       {"key":"hogback","name":{"zh_CN":"霍古巴克","en_US":"Hogback"}}]}
         """;
+    var asked = new ArrayList<JsonNode>();
+    deepSeek.fruitCheck =
+        request -> {
+          asked.add(request);
+          return """
+              {"characters":[
+                {"key":"c1","fruit":{"zh_CN":"影子果实","en_US":"Kage Kage no Mi","fruit_type":"Paramecia"}},
+                {"key":"c2","fruit":{"zh_CN":"幽灵果实","en_US":"Horo Horo no Mi"}},
+                {"key":"c3","fruit":null}]}
+              """;
+        };
     deepSeek.details =
         request -> {
           var items = new ArrayList<String>();
@@ -215,14 +257,67 @@ public class ImportDrafterTests {
           return "{\"items\":[" + String.join(",", items) + "]}";
         };
 
-    var draft = drafter.draft("黑胡子", userId, AssistantLanguage.ZH_CN, progress::add);
+    var draft = drafter.draft("月光莫利亚海贼团", userId, AssistantLanguage.ZH_CN, progress::add);
 
-    var teach = item(draft, "c1");
-    assertThat(teach.data().path("maximum_fruit_count").asInt()).isEqualTo(2);
-    assertThat(teach.uncertain()).contains("maximum_fruit_count");
-    assertThat(teach.problems()).isEmpty();
-    assertThat(item(draft, "c2").problems()).isNotEmpty();
-    assertThat(item(draft, "f1").data().path("fruit_type").asText()).isEqualTo("Logia");
+    assertThat(asked.get(0).path("characters").get(0).path("listed_fruits").get(0).path("zh_CN").asText())
+        .isEqualTo("灵灵果实");
+    // Fruits keep the roster's keys; the missed one gets the next key and sits with the fruits.
+    assertThat(draft.items()).extracting(ImportItem::key).containsExactly("f1", "f3", "c1", "c2", "c3");
+    assertThat(item(draft, "c1").fruits()).containsExactly("f3"); // Moria: Kage Kage no Mi
+    assertThat(item(draft, "f3").data().path("name").path("en_US").asText()).isEqualTo("Kage Kage no Mi");
+    assertThat(item(draft, "c2").fruits()).containsExactly("f1"); // Perona: matched by romanized name
+    assertThat(item(draft, "c3").fruits()).isEmpty();
+    assertThat(item(draft, "c1").data().path("maximum_fruit_count").asInt()).isEqualTo(1);
+    assertThat(draft.notes())
+        .containsExactly("「野猪果实」：核对后没有角色吃这个果实，已从草稿去掉；需要的话告诉 AI 它的持有者。");
+    assertThat(progress).contains("正在核对每个角色的果实…");
+  }
+
+  @Test
+  public void aRevisionLooksWrongFactsUpAgainWithTheRequestAndBangumi() throws Exception {
+    knownFacts.put("佩罗娜", Map.of("生日", "6月7日", "身高", "160cm"));
+    var current =
+        List.of(
+            drafted(
+                "c1", ImportDto.CHARACTER, data(character("c1", ",\"bounty\":1000"), "佩罗娜", "Perona"),
+                List.of(), null, null));
+    deepSeek.scripted.add(
+        "{\"reply\":\"我重新查了佩罗娜的悬赏。\",\"redraft\":[{\"key\":\"c1\",\"fields\":[\"bounty\"]}]}");
+    var asked = new ArrayList<JsonNode>();
+    deepSeek.details =
+        request -> {
+          request.forEach(asked::add);
+          return "{\"items\":[" + character("c1", ",\"bounty\":71000000,\"attack\":1") + "]}";
+        };
+
+    var revision =
+        drafter.revise(current, List.of(), "佩罗娜的悬赏不对，查一下", userId, AssistantLanguage.ZH_CN, progress::add);
+
+    var perona = revision.items().get(0);
+    assertThat(perona.data().path("bounty").asLong()).isEqualTo(71000000L);
+    assertThat(perona.data().path("attack").asInt()).isEqualTo(800); // only the bounty was replaced
+    assertThat(revision.changed()).containsExactly("c1");
+    assertThat(asked).singleElement().satisfies(request -> {
+      assertThat(request.path("request").asText()).isEqualTo("佩罗娜的悬赏不对，查一下");
+      assertThat(request.path("facts").path("生日").asText()).isEqualTo("6月7日");
+    });
+  }
+
+  @Test
+  public void aNewCharacterHoldsOneFruit() throws Exception {
+    var current =
+        List.of(
+            drafted("f1", FRUIT, data(fruit("f1"), "暗暗果实", "Yami Yami no Mi"), List.of(), null, null),
+            drafted("f2", FRUIT, data(fruit("f2"), "震震果实", "Gura Gura no Mi"), List.of(), null, null),
+            drafted("c1", ImportDto.CHARACTER, data(character("c1", ""), "测试角色", "Test"), List.of("f1"), null, null));
+    deepSeek.scripted.add(
+        "{\"reply\":\"好的。\",\"update\":[{\"key\":\"c1\",\"fruits\":[\"f1\",\"f2\"],\"data\":{\"maximum_fruit_count\":2}}]}");
+
+    var revision = drafter.revise(current, List.of(), "两个都给他", userId, AssistantLanguage.ZH_CN, progress::add);
+
+    var character = revision.items().get(2);
+    assertThat(character.data().path("maximum_fruit_count").asInt()).isEqualTo(1);
+    assertThat(character.problems()).containsExactly("新角色只能吃 1 个果实，请去掉多余的。");
   }
 
   @Test
