@@ -20,6 +20,9 @@ import org.springframework.stereotype.Component;
  * facts the model often misremembers. A search hit counts only when Bangumi lists one of the
  * drafted names (its Simplified Chinese name or an alias such as the English one) and the
  * character appears in One Piece, as for the import's avatars. Any failure means no facts.
+ *
+ * <p>The hit's own names come along as {@code canonical_zh_CN} / {@code canonical_en_US}: a
+ * drafted alias such as 假路飞 finds 丹马罗·布拉克 (Demaro Black), the character's real name.
  */
 @Component
 public class BangumiCharacterFacts implements CharacterFacts {
@@ -128,8 +131,16 @@ public class BangumiCharacterFacts implements CharacterFacts {
     var facts = new LinkedHashMap<String, String>();
     for (var field : candidate.path("infobox")) {
       String key = field.path("key").asText();
-      if (!FIELDS.contains(key)) continue;
       var value = field.path("value");
+      if (key.equals("简体中文名") && value.isTextual() && !value.asText().isBlank())
+        facts.put("canonical_zh_CN", value.asText().trim());
+      if (key.equals("英文名") && value.isTextual() && !value.asText().isBlank())
+        facts.put("canonical_en_US", value.asText().trim());
+      if (key.equals("别名"))
+        for (var alias : value)
+          if (alias.path("k").asText().equals("英文名") && !alias.path("v").asText().isBlank())
+            facts.putIfAbsent("canonical_en_US", alias.path("v").asText().trim());
+      if (!FIELDS.contains(key)) continue;
       var parts = new ArrayList<String>();
       if (value.isTextual()) parts.add(value.asText());
       for (var part : value) if (part.path("v").isTextual()) parts.add(part.path("v").asText());

@@ -895,4 +895,110 @@ public class ImportDrafterTests {
     assertThat(sugar.data().path("speed").asInt()).isEqualTo(110);
     assertThat(deepSeek.requests).hasSize(3); // the plan twice (not JSON), then the edit
   }
+
+  /** The fake Straw Hats' captain, drafted under his nickname, and his crewmate. */
+  private List<ImportItem> impostors() throws Exception {
+    return List.of(
+        drafted(
+            "c1",
+            ImportDto.CHARACTER,
+            data(character("c1", ",\"height\":180"), "假路飞", "Fake Luffy"),
+            List.of(),
+            null,
+            null),
+        drafted(
+            "c2",
+            ImportDto.CHARACTER,
+            data(character("c2", ""), "假索隆", "Fake Zoro"),
+            List.of(),
+            null,
+            null));
+  }
+
+  @Test
+  public void aRealNameComesFromTheSourcesAndChangesNothingElse() throws Exception {
+    var current = impostors();
+    knownFacts.put("假路飞", Map.of("canonical_zh_CN", "丹马罗·布拉克", "canonical_en_US", "Demaro Black"));
+    deepSeek.plan =
+        request -> "{\"targets\":[{\"key\":\"c1\",\"action\":\"look_up\",\"fields\":[\"name\"]}]}";
+
+    var revision =
+        drafter.revise(current, List.of(), "把假路飞改成其真名", userId, AssistantLanguage.ZH_CN, progress::add);
+
+    var demaro = revision.items().get(0);
+    assertThat(demaro.data().path("name").path("zh_CN").asText()).isEqualTo("丹马罗·布拉克");
+    assertThat(demaro.data().path("name").path("en_US").asText()).isEqualTo("Demaro Black");
+    var unchanged = demaro.data().deepCopy();
+    unchanged.set("name", current.get(0).data().get("name"));
+    assertThat(unchanged).isEqualTo(current.get(0).data()); // stats and facts stay
+    assertThat(revision.items().get(1).data()).isEqualTo(current.get(1).data());
+    assertThat(revision.changed()).containsExactly("c1");
+    assertThat(revision.refreshAvatars()).isEmpty(); // a rename keeps the portrait
+    assertThat(edits()).isEmpty(); // no model writes the name
+    assertThat(revision.reply()).isEqualTo("已修改 假路飞 → 丹马罗·布拉克：名字。其他内容未改动。");
+  }
+
+  @Test
+  public void anUnverifiedRealNameStaysAsItIsWhateverTheModelSays() throws Exception {
+    var current = impostors();
+    deepSeek.plan =
+        request ->
+            """
+            {"targets":[{"key":"c1","action":"look_up","fields":["name"]},
+                        {"key":"c1","action":"change","fields":["attack"]}]}
+            """;
+    // The edit call would turn the impostor into the real Luffy.
+    deepSeek.scripted.add(
+        """
+        {"update":[{"key":"c1","name":{"zh_CN":"蒙奇·D·路飞","en_US":"Monkey D. Luffy"},"data":{"attack":600}}]}
+        """);
+
+    var revision =
+        drafter.revise(
+            current, List.of(), "假路飞的真名不对，攻击改成600", userId, AssistantLanguage.ZH_CN, progress::add);
+
+    var fake = revision.items().get(0);
+    assertThat(fake.data().path("name")).isEqualTo(current.get(0).data().get("name"));
+    assertThat(fake.data().path("attack").asInt()).isEqualTo(600);
+    assertThat(revision.notes()).containsExactly("「假路飞」：没有查到可核实的真实姓名，保持原样。");
+    assertThat(revision.reply())
+        .isEqualTo("已修改 假路飞：攻击。其他内容未改动。 「假路飞」：没有查到可核实的真实姓名，保持原样。");
+  }
+
+  @Test
+  public void anEnglishNameFixKeepsTheChineseOne() throws Exception {
+    var current = impostors();
+    knownFacts.put("假路飞", Map.of("canonical_zh_CN", "丹马罗·布拉克", "canonical_en_US", "Demaro Black"));
+    deepSeek.plan =
+        request -> "{\"targets\":[{\"key\":\"c1\",\"action\":\"look_up\",\"fields\":[\"name.en_US\"]}]}";
+
+    var revision =
+        drafter.revise(current, List.of(), "假路飞的英文名写错了", userId, AssistantLanguage.ZH_CN, progress::add);
+
+    var name = revision.items().get(0).data().path("name");
+    assertThat(name.path("zh_CN").asText()).isEqualTo("假路飞");
+    assertThat(name.path("en_US").asText()).isEqualTo("Demaro Black");
+  }
+
+  @Test
+  public void aPortraitIsLookedUpAgainOnlyWhenAskedFor() throws Exception {
+    var current = impostors();
+    deepSeek.plan =
+        request -> "{\"targets\":[{\"key\":\"c2\",\"action\":\"change\",\"fields\":[\"avatar\"]}]}";
+
+    var revision =
+        drafter.revise(current, List.of(), "假索隆换个头像", userId, AssistantLanguage.ZH_CN, progress::add);
+
+    assertThat(revision.refreshAvatars()).containsExactly("c2");
+    assertThat(revision.changed()).containsExactly("c2");
+    assertThat(revision.items()).extracting(ImportItem::data).containsExactlyElementsOf(current.stream().map(ImportItem::data).toList());
+    assertThat(revision.reply()).isEqualTo("重新查找头像：假索隆。其他内容未改动。");
+    assertThat(edits()).isEmpty();
+
+    // Keeping the portrait grounds nothing, so the keyword scope decides: nothing to change.
+    deepSeek.scripted.add("{}");
+    var kept =
+        drafter.revise(current, List.of(), "假索隆的头像别动", userId, AssistantLanguage.ZH_CN, progress::add);
+    assertThat(kept.refreshAvatars()).isEmpty();
+  }
 }

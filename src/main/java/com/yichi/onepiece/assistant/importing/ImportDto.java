@@ -48,10 +48,20 @@ public final class ImportDto {
 
   /**
    * The draft after a revision. {@code reply} answers the reviewer; {@code changed} lists the keys
-   * of the items that were added or modified.
+   * of the items that were added or modified; {@code refreshAvatars} the characters whose portrait
+   * the reviewer asked to look up again (a rename alone never does).
    */
   public record ImportRevision(
-      List<ImportItem> items, List<String> notes, String reply, List<String> changed) {}
+      List<ImportItem> items,
+      List<String> notes,
+      String reply,
+      List<String> changed,
+      List<String> refreshAvatars) {
+    public ImportRevision(
+        List<ImportItem> items, List<String> notes, String reply, List<String> changed) {
+      this(items, notes, reply, changed, List.of());
+    }
+  }
 
   public record CommitRequest(List<ImportItem> items, String language) {}
 

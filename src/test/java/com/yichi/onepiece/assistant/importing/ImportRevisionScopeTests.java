@@ -271,4 +271,65 @@ public class ImportRevisionScopeTests {
     var unasked = planned("多弗朗明哥的攻击调到1300", "{\"add\":[{\"type\":\"character\",\"name\":\"莫奈\"}]}");
     assertThat(unasked.additions).isFalse();
   }
+
+  @Test
+  public void aRealNameIsLookedUpForTheCharacterTheRequestMeans() throws Exception {
+    var fakes =
+        List.of(
+            member("c1", CHARACTER, "冒牌路飞", "captain", List.of(), List.of()),
+            member("c2", CHARACTER, "冒牌索隆", "combatant", List.of(), List.of()));
+    // 假路飞 names 冒牌路飞 only in part; the other impostor is not meant.
+    var scope =
+        new ImportRevisionScope(
+            fakes,
+            List.of(),
+            "把假路飞改成其真名",
+            json.readTree(
+                """
+                {"targets":[{"key":"c1","action":"look_up","fields":["name"]},
+                            {"key":"c2","action":"look_up","fields":["name"]}]}
+                """));
+    assertThat(scope.nameLookUps()).containsExactly("c1");
+    assertThat(scope.describe()).isEmpty(); // the name comes from the sources, not the edit call
+    assertThat(scope.needsEdit()).isFalse();
+    assertThat(scope.allowsName("zh_CN")).isTrue();
+    assertThat(scope.allowsName("en_US")).isTrue();
+    // One language when only that one is meant.
+    scope =
+        new ImportRevisionScope(
+            fakes,
+            List.of(),
+            "冒牌路飞的名字不对",
+            json.readTree(
+                """
+                {"targets":[{"key":"c1","action":"look_up","fields":["name.en_US"]}]}
+                """));
+    assertThat(scope.allowsName("en_US")).isTrue();
+    assertThat(scope.allowsName("zh_CN")).isFalse();
+    // Without a word for the name, the plan cannot rename.
+    scope =
+        new ImportRevisionScope(
+            fakes,
+            List.of(),
+            "冒牌路飞再强一点",
+            json.readTree(
+                """
+                {"targets":[{"key":"c1","action":"look_up","fields":["name","attack"]}]}
+                """));
+    assertThat(scope.nameLookUps()).isEmpty();
+    assertThat(scope.lookUps().get("c1")).containsExactly("attack");
+  }
+
+  @Test
+  public void aPortraitIsRefreshedOnlyWhenAskedFor() throws Exception {
+    String plan =
+        """
+        {"targets":[{"key":"c2","action":"change","fields":["avatar"]}]}
+        """;
+    var asked = planned("砂糖换个头像", plan);
+    assertThat(asked.portraits()).containsExactly("c2");
+    assertThat(asked.needsEdit()).isFalse();
+    assertThat(planned("砂糖改名，头像别动", plan).portraits()).isEmpty();
+    assertThat(planned("砂糖的英文名改成Sugar", plan).portraits()).isEmpty();
+  }
 }

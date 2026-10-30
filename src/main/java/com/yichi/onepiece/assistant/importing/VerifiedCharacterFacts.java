@@ -5,7 +5,10 @@ import java.util.*;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
-/** Independent sources fill gaps; conflicting values are deliberately left unknown. */
+/**
+ * Independent sources fill gaps; conflicting values are deliberately left unknown. The real name
+ * is Baike's Chinese and Bangumi's English one, each falling back to the other source.
+ */
 @Component
 @Primary
 public class VerifiedCharacterFacts implements CharacterFacts {
@@ -19,8 +22,10 @@ public class VerifiedCharacterFacts implements CharacterFacts {
 
   @Override
   public Map<String, String> find(I18nText name) {
-    var first = CharacterFactValues.read(bangumi.find(name));
-    var second = CharacterFactValues.read(baidu.find(name));
+    var fromBangumi = bangumi.find(name);
+    var fromBaidu = baidu.find(name);
+    var first = CharacterFactValues.read(fromBangumi);
+    var second = CharacterFactValues.read(fromBaidu);
     Map<String, String> result = new LinkedHashMap<>();
     var fields = new HashSet<>(first.keySet());
     fields.addAll(second.keySet());
@@ -30,6 +35,19 @@ public class VerifiedCharacterFacts implements CharacterFacts {
       if (a != null && b != null && !a.equals(b)) continue;
       result.put(field, (a == null ? b : a).asText());
     }
+    putFirst(result, "canonical_zh_CN", fromBaidu, fromBangumi);
+    putFirst(result, "canonical_en_US", fromBangumi, fromBaidu);
     return result;
+  }
+
+  private static void putFirst(
+      Map<String, String> result, String key, Map<String, String> first, Map<String, String> second) {
+    for (var source : List.of(first, second)) {
+      String value = source.get(key);
+      if (value != null && !value.isBlank()) {
+        result.put(key, value);
+        return;
+      }
+    }
   }
 }

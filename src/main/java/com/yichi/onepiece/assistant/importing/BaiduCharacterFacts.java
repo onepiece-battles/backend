@@ -18,6 +18,10 @@ import org.springframework.stereotype.Component;
  * answers JSON (the entry pages themselves answer a human check). Only an entry whose title is
  * the character's name and which belongs to One Piece counts. No scripts, anti-bot bypass or
  * arbitrary URL fetching.
+ *
+ * <p>The entry's own names come along as {@code canonical_zh_CN} / {@code canonical_en_US}, also
+ * when Baike redirects the drafted name to it (假路飞 → 丹马罗·布拉克): then the redirect, not a
+ * matching title, identifies the character, and only the names are taken.
  */
 @Component
 public class BaiduCharacterFacts implements CharacterFacts {
@@ -108,9 +112,9 @@ public class BaiduCharacterFacts implements CharacterFacts {
   }
 
   /**
-   * The card's facts by label, as single plain values. The entry must be One Piece's and be the
-   * character's: its title or Chinese name is the drafted name, or one of its foreign names is
-   * the drafted English name. A label with differing values is left out.
+   * The card's facts by label, as single plain values, and its names. The entry must be One
+   * Piece's and be the character's: its title or Chinese name is the drafted name, or one of its
+   * foreign names is the drafted English name. A label with differing values is left out.
    */
   static Map<String, String> parse(String card, I18nText name) throws IOException {
     JsonNode root = JSON.readTree(card);
@@ -135,9 +139,20 @@ public class BaiduCharacterFacts implements CharacterFacts {
             || !en.isEmpty()
                 && entries.getOrDefault("外文名", List.of()).stream()
                     .anyMatch(t -> BangumiCharacterFacts.normalize(t).equals(en));
-    if (!identity) return Map.of();
+    boolean redirected =
+        BangumiCharacterFacts.normalize(root.path("redirect").path("from").asText()).equals(zh)
+            && root.path("redirect").path("to").asText().equals(root.path("title").asText());
+    if (!identity && !redirected) return Map.of();
 
     Map<String, String> facts = new LinkedHashMap<>();
+    String title =
+        titles.stream().filter(t -> !t.isBlank()).findFirst().orElse(root.path("title").asText());
+    if (!title.isBlank()) facts.put("canonical_zh_CN", title.trim());
+    entries.getOrDefault("外文名", List.of()).stream()
+        .filter(t -> t.matches("[A-Za-z][A-Za-z .'\\-]*"))
+        .findFirst()
+        .ifPresent(latin -> facts.put("canonical_en_US", latin.trim()));
+    if (!identity) return facts;
     Set<String> conflicts = new HashSet<>();
     entries.forEach(
         (label, values) -> {
