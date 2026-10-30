@@ -26,6 +26,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -245,10 +246,14 @@ public class ImportDrafter {
   }
 
   /**
-   * Applies a reviewer's request to the current draft. The model answers with changes only
-   * (remove / add / update), so everything it does not mention keeps the reviewer's own edits.
-   * Added characters and fruits get their create fields drafted as in {@link #draft}; afterwards
-   * every item is checked again and the notes are worked out afresh.
+   * Applies a reviewer's request to the current draft in two steps. First the model reads the
+   * request into a plan (which items, which fields, change / look up / clear), and the server keeps
+   * only the part the request itself grounds ({@link ImportRevisionScope}); a plan that asks a
+   * question changes nothing. Then, for field changes and additions, the model answers with
+   * changes only, which are applied as far as the scope allows, so everything else keeps the
+   * reviewer's own edits. Look-ups draft the planned fields again as in {@link #draft}, leaving
+   * unverified facts blank. Afterwards every item is checked again, the notes are worked out
+   * afresh and the reply says exactly what changed.
    */
   public ImportRevision revise(
       List<ImportItem> current,
@@ -257,28 +262,33 @@ public class ImportDrafter {
       UUID userId,
       AssistantLanguage language,
       Consumer<String> progress) {
-    var scope = new ImportRevisionScope(current, history, instruction);
     var s = connect(language);
     progress.accept(language.pick("正在理解你的修改…", "Working out the changes…"));
-    var messages = new ArrayList<ObjectNode>();
-    messages.add(
-        message("system", ImportPrompts.revise(language.pick("Simplified Chinese", "English"))));
     var turns = history == null ? List.<Turn>of() : history;
+    var conversation = new ArrayList<ObjectNode>();
     for (var turn : turns.subList(Math.max(0, turns.size() - MAX_HISTORY), turns.size()))
       if (turn != null
           && turn.content() != null
           && Set.of("user", "assistant").contains(turn.role()))
-        messages.add(message(turn.role(), truncate(turn.content(), MAX_TURN_LENGTH)));
-    messages.add(
-        message(
-            "user",
-            "Current draft:\n"
-                + roster(current)
-                + "\n\nRequest: "
-                + instruction
-                + "\nAllowed existing-item fields: "
-                + json.valueToTree(scope.describe())));
-    JsonNode changes = ask(s, messages);
+        conversation.add(message(turn.role(), truncate(turn.content(), MAX_TURN_LENGTH)));
+    String request = "Current draft:\n" + roster(current) + "\n\nRequest: " + instruction;
+    var scope = new ImportRevisionScope(current, history, instruction, plan(s, conversation, request));
+    JsonNode changes = json.createObjectNode();
+    if (scope.needsEdit()) {
+      var messages = new ArrayList<ObjectNode>();
+      messages.add(
+          message("system", ImportPrompts.revise(language.pick("Simplified Chinese", "English"))));
+      messages.addAll(conversation);
+      String checked = "\nAllowed existing-item fields: " + json.valueToTree(scope.describe());
+      if (scope.planned())
+        checked +=
+            "\nPlanned removals: "
+                + json.valueToTree(scope.removals())
+                + "\nPlanned additions: "
+                + json.valueToTree(scope.plannedAdditions());
+      messages.add(message("user", request + checked));
+      changes = ask(s, messages);
+    }
 
     var items = new LinkedHashMap<String, ImportItem>();
     for (var item : current) if (item != null && item.key() != null) items.put(item.key(), item);
@@ -289,6 +299,7 @@ public class ImportDrafter {
     var changed = new LinkedHashSet<String>();
     for (var key : changes.path("remove"))
       if (scope.removes(key.asText())) items.remove(key.asText());
+    scope.removals().forEach(items::remove);
     // A removed character's newly drafted fruit is a dependent item, unless another holder needs
     // it.
     var removedFruits = new HashSet<String>();
@@ -317,8 +328,17 @@ public class ImportDrafter {
     }
     var added = new ArrayList<Entry>();
     var relations = new HashMap<Entry, JsonNode>();
-    JsonNode add = scope.additions ? changes.path("add") : MissingNode.getInstance();
-    Set<String> allowedAdditions = scope.addedKeys(add);
+    JsonNode add = changes.path("add");
+    Set<String> allowedAdditions = new HashSet<>(scope.additions ? scope.addedKeys(add) : Set.of());
+    // A new fruit or group that an allowed relation change points to comes with that change.
+    for (var update : changes.path("update")) {
+      var item = items.get(update.path("key").asText());
+      if (item == null || !item.type().equals(CHARACTER)) continue;
+      if (scope.allows(item, "fruits"))
+        update.path("fruits").forEach(f -> allowedAdditions.add(f.asText()));
+      if (scope.allows(item, "group") && update.path("group").isTextual())
+        allowedAdditions.add(update.path("group").asText());
+    }
     for (var section : List.of(GROUP, FRUIT, CHARACTER)) {
       for (var node : add.path(section + "s")) {
         if (!allowedAdditions.contains(node.path("key").asText())) continue;
@@ -396,7 +416,9 @@ public class ImportDrafter {
             .forEachRemaining(
                 field -> {
                   String key = field.getKey();
-                  if (!scope.allows(item, key) || scope.clears(item, key)) return;
+                  if (!scope.allows(item, key)
+                      || scope.clears(item, key)
+                      || scope.looksUp(item, key)) return;
                   if (ImportRevisionScope.PROFILE.contains(key)
                       && !field.getValue().isNull()
                       && !CharacterFactValues.given(instruction, key, field.getValue())) {
@@ -440,21 +462,42 @@ public class ImportDrafter {
       changed.add(item.key());
     }
 
+    // A new fruit that an allowed change took from its holder, and nobody else eats, goes too:
+    // every fruit in the draft has a holder.
+    var holders = new HashSet<String>();
+    for (var item : items.values()) if (item.fruits() != null) holders.addAll(item.fruits());
+    added.forEach(e -> holders.addAll(e.fruits));
+    for (var before : current) {
+      if (!before.type().equals(CHARACTER) || before.fruits() == null || !scope.allows(before, "fruits"))
+        continue;
+      for (var key : before.fruits()) {
+        var fruit = items.get(key);
+        if (fruit == null || fruit.existingId() != null || holders.contains(key)) continue;
+        items.remove(key);
+        var name = name(fruit.data() == null ? MissingNode.getInstance() : fruit.data().path("name"));
+        String display = name == null ? key : language.displayName(name);
+        notes.add(
+            language.pick(
+                "「" + display + "」不再有人吃，已从草稿去掉。",
+                display + " is no longer eaten by anyone here, so it left the draft."));
+      }
+    }
+
     // Re-lookups replace only fields authorized by this request. Empty never means all.
-    var redrafts = new LinkedHashMap<String, List<String>>(inferredRedrafts);
-    for (var redraft : changes.path("redraft")) {
-      var item = items.get(redraft.path("key").asText());
-      if (item == null || item.existingId() != null || item.type().equals(GROUP)) continue;
-      var fields = scope.redraft(item, redraft.path("fields"));
-      if (!fields.isEmpty())
-        redrafts.merge(
-            item.key(),
-            fields,
-            (a, b) -> {
-              var merged = new LinkedHashSet<>(a);
-              merged.addAll(b);
-              return List.copyOf(merged);
-            });
+    var redrafts = new LinkedHashMap<String, List<String>>();
+    BiConsumer<String, Collection<String>> lookUp =
+        (key, fields) -> {
+          var item = items.get(key);
+          if (item == null || item.existingId() != null || item.type().equals(GROUP)) return;
+          var merged = new LinkedHashSet<>(redrafts.getOrDefault(key, List.of()));
+          merged.addAll(fields);
+          if (!merged.isEmpty()) redrafts.put(key, List.copyOf(merged));
+        };
+    scope.lookUps().forEach(lookUp);
+    inferredRedrafts.forEach(lookUp);
+    for (var asked : changes.path("redraft")) {
+      var item = items.get(asked.path("key").asText());
+      if (item != null) lookUp.accept(item.key(), scope.redraft(item, asked.path("fields")));
     }
 
     if (!added.isEmpty() || !redrafts.isEmpty()) {
@@ -544,25 +587,45 @@ public class ImportDrafter {
     changed.clear();
     for (var item : result)
       if (!sameContent(previous.get(item.key()), item)) changed.add(item.key());
-    long removed = current.stream().filter(i -> !items.containsKey(i.key())).count();
-    String reply =
-        changed.isEmpty() && removed == 0
-            ? language.pick(
-                "草稿未变更。请明确要修改的角色或资源，以及具体字段；无法确认的资料会留空。",
-                "The draft is unchanged. Specify the resource and fields to change; unverified"
-                    + " facts stay blank.")
-            : language.pick(
-                "已更新 " + changed.size() + " 项，移除 " + removed + " 项。其余内容保持不变；无法核实的资料留空。",
-                "Updated "
-                    + changed.size()
-                    + " items and removed "
-                    + removed
-                    + ". Other content is preserved; unverified facts stay blank.");
-    return new ImportRevision(
-        result,
-        notes,
-        reply.isEmpty() ? language.pick("草稿已更新。", "The draft is updated.") : reply,
-        List.copyOf(changed));
+    // Facts looked up again that no source verifies stay blank; say so.
+    var unverified = new LinkedHashMap<String, List<String>>();
+    for (var item : result) {
+      var fields = redrafts.getOrDefault(item.key(), List.of());
+      var blank =
+          fields.stream()
+              .filter(f -> ImportRevisionScope.PROFILE.contains(f))
+              .filter(f -> item.data() == null || !item.data().has(f))
+              .toList();
+      if (!blank.isEmpty()) unverified.put(item.key(), blank);
+    }
+    String reply = ImportRevisionSummary.reply(current, result, unverified, language);
+    if (reply == null)
+      reply =
+          scope.reply() != null
+              ? scope.reply()
+              : language.pick(
+                  "草稿未变更。请说明要改哪一项（名字）和改什么；无法核实的资料会留空。",
+                  "The draft is unchanged. Say which item (by name) and what to change; unverified"
+                      + " facts stay blank.");
+    else if (scope.reply() != null) reply += " " + scope.reply();
+    return new ImportRevision(result, notes, reply, List.copyOf(changed));
+  }
+
+  /**
+   * The model's reading of a revision request ({@link ImportPrompts#PLAN}), or null when it fails:
+   * the keyword scope then decides alone.
+   */
+  private JsonNode plan(Settings s, List<ObjectNode> conversation, String request) {
+    var messages = new ArrayList<ObjectNode>();
+    messages.add(message("system", ImportPrompts.PLAN));
+    messages.addAll(conversation);
+    messages.add(message("user", request));
+    try {
+      return ask(s, messages);
+    } catch (RuntimeException e) {
+      logger.warn("import revision plan failed; using the keyword scope", e);
+      return null;
+    }
   }
 
   /**
@@ -790,6 +853,8 @@ public class ImportDrafter {
           var fields = data.deepCopy();
           fields.remove("name");
           node.set("data", fields);
+          if (item.uncertain() != null && !item.uncertain().isEmpty())
+            node.set("uncertain", json.valueToTree(item.uncertain()));
         }
       }
     }

@@ -5,6 +5,8 @@ import static org.mockito.Mockito.*;
 
 import com.yichi.onepiece.model.I18nText;
 import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.Map;
 import org.testng.annotations.Test;
 
@@ -29,22 +31,78 @@ public class CharacterFactValuesTests {
         .isEmpty();
   }
 
+  /** A Baike lemma card as the card API answers it, trimmed to what the parser reads. */
+  private static final String DOFLAMINGO_CARD =
+      """
+      {"title":"唐吉诃德·多弗朗明哥","desc":"日本漫画《航海王》及其衍生作品中的角色","card":[
+        {"name":"中文名","value":["唐吉诃德·多弗朗明哥"]},
+        {"name":"外文名","value":["Donquixote Doflamingo","ドンキホーテ·ドフラミンゴ "]},
+        {"name":"登场作品","value":["漫画《航海王》及其衍生作品"]},
+        {"name":"生日","value":["10月23日(日本)<sup>2</sup><a name=\\"ref_2\\"></a>"]},
+        {"name":"年龄","value":["39岁（初登场）→41岁（新世界）<sup>1</sup>"]},
+        {"name":"身高","value":["305 cm<sup>1</sup><a name=\\"ref_1\\"></a>"]},
+        {"name":"出生地","value":["<a target=_blank href=\\"/item/x\\">玛丽乔亚</a><sup>3</sup>"]},
+        {"name":"悬赏金","value":["3亿4000万贝里<sup>4</sup>"]}]}
+      """;
+
   @Test
-  public void baikeChecksIdentityAndSeriesAndExtractsOnlyInfoboxFields() {
-    String html =
-        "<h1>佩罗娜</h1><p>《航海王》中的角色；推测悬赏一亿元</p><dl class=basic-info>"
-            + "<dt>身&nbsp;高</dt><dd>160cm<sup>[1]</sup></dd>"
-            + "<dt>生日</dt><dd>6月7日</dd><dt>悬赏金</dt><dd>不明</dd></dl>";
-    var facts = BaiduCharacterFacts.parse(html, perona);
+  public void baikeCardsGiveTheCurrentValueOfTheCharactersOwnEntry() throws Exception {
+    var doflamingo = new I18nText().zhCN("唐吉诃德·多弗朗明哥").enUS("Donquixote Doflamingo");
+    var facts = BaiduCharacterFacts.parse(DOFLAMINGO_CARD, doflamingo);
     assertThat(facts)
-        .containsEntry("身高", "160cm")
-        .containsEntry("生日", "6月7日")
-        .containsEntry("悬赏金", "不明");
-    assertThat(CharacterFactValues.read(facts)).doesNotContainKey("bounty");
-    assertThat(BaiduCharacterFacts.parse(html.replace("佩罗娜", "同名人物"), perona)).isEmpty();
-    assertThat(BaiduCharacterFacts.parse(html.replace("航海王", "其他作品"), perona)).isEmpty();
-    assertThat(BaiduCharacterFacts.parse(html + "<dl class=basic-info><dt>身高</dt><dd>170cm</dd></dl>", perona))
-        .doesNotContainKey("身高");
+        .containsEntry("生日", "10月23日")
+        .containsEntry("年龄", "41岁") // the last step of a timeline is the current value
+        .containsEntry("身高", "305 cm")
+        .containsEntry("出生地", "玛丽乔亚")
+        .containsEntry("悬赏金", "3亿4000万贝里");
+    var values = CharacterFactValues.read(facts);
+    assertThat(values.get("bounty").asLong()).isEqualTo(340000000L);
+    assertThat(values.get("age").asInt()).isEqualTo(41);
+    assertThat(values.get("height").asInt()).isEqualTo(305);
+    // A short Chinese name still matches through the English one; another name or series does not.
+    assertThat(BaiduCharacterFacts.parse(DOFLAMINGO_CARD, new I18nText().zhCN("多弗朗明哥").enUS("Donquixote Doflamingo")))
+        .containsKey("身高");
+    assertThat(BaiduCharacterFacts.parse(DOFLAMINGO_CARD, new I18nText().zhCN("多弗朗明哥"))).isEmpty();
+    assertThat(BaiduCharacterFacts.parse(DOFLAMINGO_CARD.replace("航海王", "其他作品"), doflamingo)).isEmpty();
+    assertThat(BaiduCharacterFacts.parse("{}", doflamingo)).isEmpty();
+  }
+
+  @Test
+  public void unclearBaikeValuesStayUnknown() throws Exception {
+    String card =
+        """
+        {"title":"佩罗娜","desc":"《海贼王》中的角色","card":[
+          {"name":"身高","value":["160cm","170cm"]},
+          {"name":"悬赏金","value":["不明"]},
+          {"name":"年龄","value":["约25岁"]},
+          {"name":"生日","value":["6月7日"]}]}
+        """;
+    var facts = BaiduCharacterFacts.parse(card, perona);
+    assertThat(facts).doesNotContainKey("身高"); // two different values
+    var values = CharacterFactValues.read(facts);
+    assertThat(values).containsOnlyKeys("date_of_birth");
+  }
+
+  @Test
+  public void baikeIsAskedThroughTheCardApiByTheChineseName() {
+    var asked = new ArrayList<URI>();
+    var baidu =
+        new BaiduCharacterFacts(
+            uri -> {
+              asked.add(uri);
+              return DOFLAMINGO_CARD;
+            });
+    assertThat(baidu.find(new I18nText().zhCN("唐吉诃德·多弗朗明哥"))).containsEntry("年龄", "41岁");
+    assertThat(asked)
+        .singleElement()
+        .satisfies(
+            uri -> {
+              assertThat(uri.getHost()).isEqualTo("baike.baidu.com");
+              assertThat(uri.getPath()).isEqualTo("/api/openapi/BaikeLemmaCardApi");
+              assertThat(uri.getQuery()).contains("bk_key=唐吉诃德·多弗朗明哥");
+            });
+    assertThat(baidu.find(new I18nText().enUS("Doflamingo"))).isEmpty();
+    assertThat(asked).hasSize(1); // no Chinese name, no request
   }
 
   @Test
