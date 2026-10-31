@@ -1,237 +1,257 @@
 package com.yichi.onepiece.battle.core;
 
-import com.yichi.onepiece.battle.model.BattleProcessDetailEntity;
-import com.yichi.onepiece.battle.model.BattleProcessDetailEntityBuilder;
-import com.yichi.onepiece.battle.model.BattleStatusDetailEntity;
-import com.yichi.onepiece.battle.model.BattleStatusDetailEntityBuilder;
-import com.yichi.onepiece.model.I18nText;
-import com.yichi.onepiece.utils.RandomGenerator;
+import static com.yichi.onepiece.battle.skill.CombatModels.*;
+
+import com.yichi.onepiece.battle.model.*;
+import com.yichi.onepiece.model.Haki;
 import java.util.*;
 
+/** Seeded, bounded rule execution. AI supplies only optional skill preferences. */
 public class Battlefield {
-  private static final int MAXIMUM_INTELLIGENCE = 260;
-  private static final int MINIMUM_INTELLIGENCE = 70;
-  private static final int MAXIMUM_SPEED = 200;
-  private static final int MINIMUM_SPEED = 10;
-
-  // hide index is 100 based.
-  private static final int BASE_HIDE_INDEX = 30;
-  private static final int READ_HIDE_INDEX_WEIGHT = 70;
-
-  // hide index is speed and intelligence related and 100 based.
-  private int MAX_HIDE_INDEX_DIFF;
-  private Map<UUID, Integer> hideIndexMap;
-  private Map<UUID, CharacterInBattle> idToCharacterMap;
-  private Map<UUID, Boolean> characterReverseMap;
   private final UUID battleId;
-  private final CharacterInBattle characterInit;
-  private final CharacterInBattle characterReceive;
-  private final List<UUID> characterIds;
-  private List<BattleStatusDetailEntity> battleStatusDetailEntities;
-  private List<BattleProcessDetailEntity> battleProcessDetailEntities;
+  private final CharacterInBattle starter, receiver;
+  private final SplittableRandom random;
+  private final String locale;
+  private final Tactics tactics;
+  private final List<BattleStatusDetailEntity> statuses = new ArrayList<>();
+  private final List<BattleProcessDetailEntity> processes = new ArrayList<>();
+  private final List<Event> events = new ArrayList<>();
+  private CharacterInBattle attacker, defender;
 
-  private UUID currentAttackerId;
-  private UUID currentDefenderId;
-
-  private Map<UUID, Integer> attackLikelihoodMap;
-
-  private int battleStatusCount;
-  private int battleProcessCount;
+  public Battlefield(CharacterInBattle starter, CharacterInBattle receiver, UUID battleId) {
+    this(
+        starter,
+        receiver,
+        battleId,
+        battleId.getMostSignificantBits() ^ battleId.getLeastSignificantBits(),
+        "zh_CN",
+        Tactics.rules());
+  }
 
   public Battlefield(
-      CharacterInBattle characterInit, CharacterInBattle characterReceive, UUID battleId) {
-    this.characterInit = characterInit;
-    this.characterReceive = characterReceive;
+      CharacterInBattle starter,
+      CharacterInBattle receiver,
+      UUID battleId,
+      long seed,
+      String locale,
+      Tactics tactics) {
+    this.starter = starter;
+    this.receiver = receiver;
     this.battleId = battleId;
-    this.currentAttackerId = characterInit.getCharacterId();
-    this.currentDefenderId = characterReceive.getCharacterId();
-    characterIds = List.of(characterInit.getCharacterId(), characterReceive.getCharacterId());
-    initBattle(characterInit, characterReceive);
-  }
-
-  private void initBattle(CharacterInBattle characterInit, CharacterInBattle characterReceive) {
-    characterReverseMap = new HashMap<>();
-    idToCharacterMap = new HashMap<>();
-    battleStatusDetailEntities = new ArrayList<>();
-    battleProcessDetailEntities = new ArrayList<>();
-    battleStatusCount = 0;
-    battleProcessCount = 0;
-    characterReverseMap.put(characterInit.getCharacterId(), Boolean.FALSE);
-    characterReverseMap.put(characterReceive.getCharacterId(), Boolean.FALSE);
-    idToCharacterMap.put(characterInit.getCharacterId(), characterInit);
-    idToCharacterMap.put(characterReceive.getCharacterId(), characterReceive);
-    this.MAX_HIDE_INDEX_DIFF = MAXIMUM_SPEED - MINIMUM_SPEED;
-    calculateHideIndex();
-    calculateAttackLikelihood();
-  }
-
-  private void calculateHideIndex() {
-    hideIndexMap = new HashMap<>();
-    UUID initId = characterInit.getCharacterId();
-    int initSpeed = characterInit.getSpeed();
-    int initIntelligence = characterInit.getIntelligence();
-    UUID receiveId = characterReceive.getCharacterId();
-    int receiveSpeed = characterReceive.getSpeed();
-    int receiveIntelligence = characterReceive.getIntelligence();
-    int REAL_HIDE_INDEX_DIFF =
-        Math.abs(initSpeed + initIntelligence - receiveSpeed - receiveIntelligence);
-    int initHideIndex = BASE_HIDE_INDEX;
-    int receiveHideIndex = BASE_HIDE_INDEX;
-    if ((initSpeed + initIntelligence) > (receiveSpeed - receiveIntelligence)) {
-      initHideIndex =
-          (BASE_HIDE_INDEX + REAL_HIDE_INDEX_DIFF / MAX_HIDE_INDEX_DIFF * READ_HIDE_INDEX_WEIGHT);
-      receiveHideIndex =
-          (BASE_HIDE_INDEX - REAL_HIDE_INDEX_DIFF / MAX_HIDE_INDEX_DIFF * READ_HIDE_INDEX_WEIGHT);
-      receiveHideIndex = Math.max(receiveHideIndex, 0);
-    }
-    if ((initSpeed + initIntelligence) < (receiveSpeed - receiveIntelligence)) {
-      receiveHideIndex =
-          (BASE_HIDE_INDEX + REAL_HIDE_INDEX_DIFF / MAX_HIDE_INDEX_DIFF * READ_HIDE_INDEX_WEIGHT);
-      initHideIndex =
-          (BASE_HIDE_INDEX - REAL_HIDE_INDEX_DIFF / MAX_HIDE_INDEX_DIFF * READ_HIDE_INDEX_WEIGHT);
-      initHideIndex = Math.max(initHideIndex, 0);
-    }
-    hideIndexMap.put(initId, initHideIndex);
-    hideIndexMap.put(receiveId, receiveHideIndex);
-  }
-
-  private void calculateAttackLikelihood() {
-    attackLikelihoodMap = new HashMap<>();
-    int attackEnhance =
-            (int)
-                    (200
-                            * ((double)
-                            Math.abs(
-                                    characterInit.getIntelligence() - characterReceive.getIntelligence())
-                            / MAXIMUM_INTELLIGENCE));
-    if (characterInit.getIntelligence() > characterReceive.getIntelligence()) {
-      attackLikelihoodMap.put(characterInit.getCharacterId(), 100 + attackEnhance);
-      attackLikelihoodMap.put(characterReceive.getCharacterId(), 100);
-    } else {
-      attackLikelihoodMap.put(characterInit.getCharacterId(), 100);
-      attackLikelihoodMap.put(characterReceive.getCharacterId(), 100 + attackEnhance);
-    }
+    this.random = new SplittableRandom(seed);
+    this.locale = locale;
+    this.tactics = tactics;
+    attacker = starter;
+    defender = receiver;
+    refreshAttackSide();
   }
 
   public boolean allAlive() {
-    return characterInit.isAlive() && characterReceive.isAlive();
+    return starter.isAlive() && receiver.isAlive();
+  }
+
+  public boolean mutualDefeat() {
+    return !starter.isAlive() && !receiver.isAlive();
   }
 
   public CharacterInBattle getWinner() {
-    if (characterInit.isAlive()) {
-      return characterInit;
-    } else {
-      return characterReceive;
-    }
+    return starter.isAlive() ? starter : receiver;
   }
 
   public CharacterInBattle getLoser() {
-    if (characterInit.isAlive()) {
-      return characterReceive;
-    } else {
-      return characterInit;
-    }
-  }
-
-  public void completeFinalStatus() {
-    battleStatusCount++;
-    BattleStatusDetailEntity battleStatusDetailEntity =
-        BattleStatusDetailEntityBuilder.newBuilder()
-            .setBattleId(battleId)
-            .setBattleStatusRoundNumber(battleStatusCount)
-            .setInitSide(characterInit.getCurrentCharacterEntity())
-            .setReceiveSide(characterReceive.getCurrentCharacterEntity())
-            .build();
-    battleStatusDetailEntities.add(battleStatusDetailEntity);
-  }
-
-  public List<BattleProcessDetailEntity> getBattleProcessDetailEntities() {
-    return this.battleProcessDetailEntities;
-  }
-
-  public List<BattleStatusDetailEntity> getBattleStatusDetailEntities() {
-    return battleStatusDetailEntities;
-  }
-
-  public void processBattle() {
-    battleStatusCount++;
-    battleProcessCount++;
-    var attackSide = getAttackSide();
-    var defenseSide = getDefenseSide();
-    BattleStatusDetailEntity battleStatusDetailEntity =
-        BattleStatusDetailEntityBuilder.newBuilder()
-            .setBattleId(battleId)
-            .setBattleStatusRoundNumber(battleStatusCount)
-            .setInitSide(characterInit.getCurrentCharacterEntity())
-            .setReceiveSide(characterReceive.getCurrentCharacterEntity())
-            .build();
-    battleStatusDetailEntities.add(battleStatusDetailEntity);
-    BattleProcessDetailEntityBuilder battleProcessDetailEntityBuilder =
-        BattleProcessDetailEntityBuilder.newBuilder();
-    battleProcessDetailEntityBuilder
-        .setBattleId(battleId)
-        .setAttackerId(currentAttackerId)
-        .setBattleProcessRoundNumber(battleProcessCount)
-        .setAttackerEnergyLoss(attackSide.getEnergyConsume())
-        .setAttackSkill("");
-    var attackEntity = attackSide.attack();
-    // update attacker information
-    if (!hideSuccess()) {
-      battleProcessDetailEntityBuilder.setAttackMissed(Boolean.FALSE);
-      // the order of return list is: blood loss, magic loss and energy loss.
-      var defenseResult = defenseSide.defend(attackEntity);
-      battleProcessDetailEntityBuilder
-          .setDefenderBloodLoss(defenseResult.get(0))
-          .setDefenderEnergyLoss(defenseResult.get(1));
-    } else {
-      battleProcessDetailEntityBuilder.setAttackMissed(Boolean.TRUE).setDefenderBloodLoss(0).setDefenderEnergyLoss(0);
-    }
-    battleProcessDetailEntities.add(battleProcessDetailEntityBuilder.build());
-  }
-
-  public void checkReverse() {
-    if (characterInit.getReversed() && !characterReverseMap.get(characterInit.getCharacterId())) {
-      updateBattleIndex();
-      characterReverseMap.put(characterInit.getCharacterId(), Boolean.TRUE);
-    }
-    if (characterReceive.getReversed()
-        && !characterReverseMap.get(characterReceive.getCharacterId())) {
-      updateBattleIndex();
-      characterReverseMap.put(characterReceive.getCharacterId(), Boolean.TRUE);
-    }
-  }
-
-  // this function is used to determine which character got the chance to attack.
-  // |------------attack---------|----defend----| which zone the number locate in determines which side got the chance
-  // to attack.
-  public void refreshAttackSide() {
-    int value = RandomGenerator.generateInteger(
-            1,
-            attackLikelihoodMap.get(characterInit.getCharacterId())+ attackLikelihoodMap.get(characterReceive.getCharacterId()));
-    if (value<=attackLikelihoodMap.get(characterInit.getCharacterId())) {
-      currentAttackerId = characterInit.getCharacterId();
-      currentDefenderId = characterReceive.getCharacterId();
-    } else {
-      currentDefenderId = characterInit.getCharacterId();
-      currentAttackerId = characterReceive.getCharacterId();
-    }
-  }
-
-  private boolean hideSuccess() {
-    int hideIndex = hideIndexMap.get(characterIds.get(1));
-    return RandomGenerator.generateInteger(1, 100) < hideIndex;
-  }
-
-  private void updateBattleIndex() {
-    calculateHideIndex();
-    calculateAttackLikelihood();
+    return starter.isAlive() ? receiver : starter;
   }
 
   public CharacterInBattle getAttackSide() {
-    return idToCharacterMap.get(currentAttackerId);
+    return attacker;
   }
 
   public CharacterInBattle getDefenseSide() {
-    return idToCharacterMap.get(currentDefenderId);
+    return defender;
+  }
+
+  public List<BattleStatusDetailEntity> getBattleStatusDetailEntities() {
+    return statuses;
+  }
+
+  public List<BattleProcessDetailEntity> getBattleProcessDetailEntities() {
+    return processes;
+  }
+
+  public List<Event> events() {
+    return List.copyOf(events);
+  }
+
+  public void completeFinalStatus() {
+    snapshot();
+  }
+
+  public void checkReverse() {
+    /* Fruit reversion is checked at the actor's action boundary. */
+  }
+
+  private void snapshot() {
+    statuses.add(
+        BattleStatusDetailEntityBuilder.newBuilder()
+            .setBattleId(battleId)
+            .setBattleStatusRoundNumber(statuses.size() + 1)
+            .setInitSide(starter.getCurrentCharacterEntity())
+            .setReceiveSide(receiver.getCurrentCharacterEntity())
+            .build());
+  }
+
+  public double dodgeChance(CharacterInBattle source, CharacterInBattle target) {
+    double delta =
+        (target.getSpeed() + .5 * target.getIntelligence())
+            - (source.getSpeed() + .5 * source.getIntelligence());
+    return Math.max(.05, Math.min(.75, .22 + delta / 600 + target.evasion()));
+  }
+
+  public void refreshAttackSide() {
+    double first = initiative(starter), second = initiative(receiver);
+    attacker = random.nextDouble() * (first + second) < first ? starter : receiver;
+    defender = attacker == starter ? receiver : starter;
+  }
+
+  private static double initiative(CharacterInBattle actor) {
+    return Math.max(1, actor.getIntelligence() + .25 * actor.getSpeed());
+  }
+
+  private Skill choose() {
+    var legal = attacker.legalSkills();
+    double basic =
+        Math.max(0, attacker.attackPower() - defender.defensePower())
+            / Math.max(1.0, defender.maxBlood())
+            * 100;
+    return legal.stream()
+        .max(Comparator.comparingDouble(s -> utility(s, attacker, defender)))
+        .filter(s -> utility(s, attacker, defender) > basic)
+        .orElse(null);
+  }
+
+  private double utility(Skill skill, CharacterInBattle self, CharacterInBattle enemy) {
+    if (skill.target() != Target.SELF && enemy.immuneTo(skill)) return -Double.MAX_VALUE;
+    double score = 0;
+    for (var effect : skill.effects())
+      score +=
+          switch (effect.type()) {
+            case DAMAGE ->
+                Math.max(0, self.attackPower() * effect.power() - enemy.defensePower())
+                    / Math.max(1.0, enemy.maxBlood())
+                    * 100;
+            case HEAL -> (1 - (double) self.getBlood() / self.maxBlood()) * 60;
+            case SHIELD, GUARD ->
+                (self.getBlood() < self.maxBlood() * .65 ? 10 : 1)
+                    * (self.status(EffectType.GUARD) > 0 ? .1 : 1);
+            case EVASION -> self.status(EffectType.EVASION) > 0 ? 0 : 8;
+            case ATTACK_UP -> self.status(EffectType.ATTACK_UP) > 0 ? 0 : 14;
+            case ATTACK_DOWN -> enemy.status(EffectType.ATTACK_DOWN) > 0 ? 0 : 12;
+            case DEFENSE_DOWN -> enemy.status(EffectType.DEFENSE_DOWN) > 0 ? 0 : 12;
+            case POISON -> enemy.status(EffectType.POISON) > 0 ? 0 : 11;
+            case STUN -> 8;
+            case ENERGY -> 18;
+            case COATING -> 22;
+          };
+    score -= skill.energy() * .2;
+    var order = tactics.priorities().getOrDefault(self.getCharacterId().toString(), List.of());
+    int rank = order.indexOf(skill.id());
+    if (rank >= 0) score += Math.min(5, (order.size() - rank) * 1.5);
+    return score;
+  }
+
+  public void processBattle() {
+    snapshot();
+    int round = processes.size() + 1;
+    var outcomes = new ArrayList<>(attacker.beginAction());
+    attacker.maintainCoating();
+    if (!attacker.isAlive()) {
+      record(
+          round,
+          null,
+          false,
+          0,
+          0,
+          0,
+          outcomes,
+          english() ? "Defeated by damage over time" : "持续伤害耗尽");
+      return;
+    }
+    if (attacker.consumeControl()) {
+      outcomes.add(
+          new Outcome("CONTROL_SKIP", attacker.getCharacterId().toString(), 1, 0, "ACTIONS"));
+      record(round, null, false, 0, 0, 0, outcomes, english() ? "Action interrupted" : "行动受阻");
+      return;
+    }
+    Skill skill = choose();
+    int spent = attacker.spendAction(skill), damage = 0, defenseCost = 0;
+    boolean missed = false;
+    var effects = skill == null ? List.of(new Effect(EffectType.DAMAGE, 1, 0)) : skill.effects();
+    boolean hostile = skill == null || skill.target() != Target.SELF;
+    if (hostile) missed = random.nextDouble() < dodgeChance(attacker, defender);
+    if (hostile && defender.immuneTo(skill))
+      outcomes.add(new Outcome("IMMUNE", defender.getCharacterId().toString(), 0, 0, "NONE"));
+    else if (!missed) {
+      double coating = attacker.coating() ? .08 * attacker.profile().coatingLevel() : 0;
+      double piercing = attacker.coating() ? .05 * attacker.profile().coatingLevel() : 0;
+      for (var effect : effects) {
+        if (effect.type() == EffectType.DAMAGE) {
+          double raw =
+              attacker.attackPower()
+                  * effect.power()
+                  * (1 + coating)
+                  * (attacker.hasHaki(Haki.BUSOSHOKU) ? 1.04 : 1);
+          int amount = defender.receive(raw, piercing);
+          damage += amount;
+          outcomes.add(new Outcome("DAMAGE", defender.getCharacterId().toString(), amount, 0));
+        } else
+          outcomes.add(
+              (hostile ? defender : attacker)
+                  .apply(effect, skill.origin(), attacker.getCharacterId()));
+      }
+      if (hostile) defenseCost = defender.spendDefense();
+    }
+    String label = skill == null ? (english() ? "Basic attack" : "普通攻击") : skill.label(locale);
+    if (attacker.coating() && hostile) label += (english() ? " · Conqueror coating" : " · 霸缠");
+    StringBuilder summary = new StringBuilder(label);
+    for (var effect : outcomes)
+      if (effect.type().equals("HEAL"))
+        summary.append(english() ? " · HP +" : " · 回复 ").append(effect.amount());
+    record(round, skill, missed, spent, damage, defenseCost, outcomes, summary.toString());
+  }
+
+  private boolean english() {
+    return locale != null && locale.startsWith("en");
+  }
+
+  private void record(
+      int round,
+      Skill skill,
+      boolean missed,
+      int spent,
+      int damage,
+      int defenseCost,
+      List<Outcome> outcomes,
+      String label) {
+    processes.add(
+        BattleProcessDetailEntityBuilder.newBuilder()
+            .setBattleId(battleId)
+            .setBattleProcessRoundNumber(round)
+            .setAttackerId(attacker.getCharacterId())
+            .setAttackSkill(label)
+            .setAttackMissed(missed)
+            .setAttackerEnergyLoss(spent)
+            .setDefenderBloodLoss(damage)
+            .setDefenderEnergyLoss(defenseCost)
+            .build());
+    events.add(
+        new Event(
+            round,
+            attacker.getCharacterId().toString(),
+            skill == null ? "basic" : skill.id(),
+            skill == null ? 1 : skill.version(),
+            label,
+            missed,
+            spent,
+            outcomes));
   }
 }
