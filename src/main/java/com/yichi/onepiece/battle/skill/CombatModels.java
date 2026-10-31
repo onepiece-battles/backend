@@ -6,7 +6,9 @@ import java.util.*;
 public final class CombatModels {
   private CombatModels() {}
 
-  public static final String ENGINE_VERSION = "skills-v1";
+  public static final String ENGINE_VERSION = "skills-v2";
+  private static final Set<String> INTERACTION_TAGS =
+      Set.of("NEGATIVE_HOLLOW", "PURE_LIGHTNING", "HANCOCK_MELLOW");
 
   public enum Origin {
     TECHNIQUE,
@@ -155,7 +157,7 @@ public final class CombatModels {
       effects = List.copyOf(effects == null ? List.of() : effects);
       evidence = List.copyOf(evidence == null ? List.of() : evidence);
       tags = List.copyOf(tags == null ? List.of() : tags);
-      if (!Set.of("NEGATIVE_HOLLOW").containsAll(tags))
+      if (!INTERACTION_TAGS.containsAll(tags))
         throw new IllegalArgumentException("Unknown skill tags");
       if (effects.isEmpty() || effects.size() > 4 || evidence.isEmpty())
         throw new IllegalArgumentException("Effects and provenance required");
@@ -223,8 +225,7 @@ public final class CombatModels {
       skills = List.copyOf(skills == null ? List.of() : skills);
       evidence = List.copyOf(evidence == null ? List.of() : evidence);
       immunities = List.copyOf(immunities == null ? List.of() : immunities);
-      if (!Set.of("NEGATIVE_HOLLOW").containsAll(immunities)
-          || !immunities.isEmpty() && evidence.isEmpty())
+      if (!INTERACTION_TAGS.containsAll(immunities) || !immunities.isEmpty() && evidence.isEmpty())
         throw new IllegalArgumentException("Invalid immunity or missing provenance");
       if (skills.size() > 8 || skills.stream().map(Skill::id).distinct().count() != skills.size())
         throw new IllegalArgumentException("At most eight unique skills");

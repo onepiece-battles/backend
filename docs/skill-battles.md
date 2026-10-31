@@ -1,6 +1,6 @@
-# Versioned skill battles (engine `skills-v1`)
+# Versioned skill battles (current engine `skills-v2`)
 
-This release adds 50 curated character presets and 115 active skill configurations. It covers
+The October 2026 catalogue revision contains 50 character presets and 131 skill configurations. It covers
 single-target/area damage, healing, shields, guarding, evasion, attack buffs/debuffs, defense debuffs,
 poison, bounded interruption, energy recovery and Conqueror coating. Area attacks hit the one
 opponent in the existing single-battle mode; this does not introduce group battles or summoned units.
@@ -12,13 +12,19 @@ Do not infer an unlisted advanced ability from bounty, score, position, or ordin
 
 ## Identity, versions and future skills
 
-`battle/catalog-v1.json` is the reviewed bootstrap catalogue. Only system characters whose full name
+`battle/catalog-v2.json` is the current bootstrap catalogue; the original `catalog-v1.json` remains
+unchanged as the exact comparison baseline for upgrades. Only system characters whose full name
 or curated exact alias matches a preset receive that preset. Matching is not substring search; fake
 Luffy does not inherit Luffy's powers, and contradictory Chinese/English matches receive a generic
 profile. User-created characters start with basic actions unless NIKA explicitly publishes a profile.
 
 On first use, the complete profile is persisted **by character UUID**. A later rename/image edit or
-catalogue edit cannot silently replace it. Existing profiles always come from storage. Skill cooldowns,
+catalogue edit cannot reassign its identity. For this researched release, a stored **system** profile
+equal in every field to the original v1 preset advances to v2 on its next battle, under the same row
+lock. A read-only detail preview shows that v2 without writing. Existing v1 rows and all battle
+snapshots remain intact. Any customized payload, explicitly published later version or user-created
+resource is excluded. A renamed character upgrades by its stored identity, not its new name. New
+preset assignments start at catalogue profile v2; generic profiles still start at v1. Skill cooldowns,
 remaining uses, shields, control immunity and buffs live only inside the per-battle actor and reset
 for the next battle. Fruit moves require the actual matching held fruit. Coating requires both a
 nonzero reviewed coating level and the stored Haoshoku tag; possessing Haoshoku alone never grants it.
@@ -64,6 +70,18 @@ per action and expiry on the actor's action opportunities. These initial values 
 Usopp's sourced Negative Hollow immunity is a specific tag interaction, not immunity to all control or
 Perona's explosive attacks.
 
+Engine `skills-v2` also distinguishes pure electrical attacks and Hancock's emotional Mellow beam.
+Luffy's reviewed profile resists the former only with an actually held rubber/Nika fruit. This bodily
+property persists through the existing low-energy skill-reversion rule. Kaido's Thunder Bagua is a
+physical club strike and is not tagged as pure electricity. Hancock's beam exception never exempts
+Luffy from Perfume Femur. Mixed attacks are not tagged as pure lightning. The old engine version and
+definitions remain recorded in existing snapshots; this does not recompute earlier results.
+
+The [research and before/after inventory](skill-research-2026-10.md) identifies the cutoff, sources,
+translation/animation distinctions, and deliberate abstractions. Dark Vortex models attraction only,
+not full temporary fruit nullification; barriers, petrification, forms and summons still use bounded
+duel primitives. Those limits are documented rather than presented as literal manga physics.
+
 ## AI tactics
 
 The existing server-held DeepSeek settings/client are reused. There is at most one short pre-battle
@@ -97,7 +115,8 @@ owner or explicit share scope. Publication and the complete match inventory requ
 - `GET /api/onepiece/combat/characters/{id}`: latest stored profile, or its read-only initial preview.
 - `POST /api/onepiece/combat/characters/{id}/publish`: `{expectedVersion, confirmed:true, profile}`.
   Read the profile, review the entire next version, increment `profile.version`, and explicitly confirm.
-  A preview at v1 can be published as v2; its initial v1 is saved in the same transaction. Brand-new
+  Read the current preview version and submit its next version (a v2 preset preview publishes v3).
+  The initial/current preset is saved in the same transaction when needed. Brand-new
   custom publication may instead use expectedVersion 0 / profile.version 1. Stale versions return 409.
   Invalid effects/values return 400. AI never calls this endpoint automatically.
 - `GET /api/onepiece/combat/battles/{id}`: `{snapshot, events}`; legacy battles return a null snapshot.
