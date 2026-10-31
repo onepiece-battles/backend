@@ -86,7 +86,7 @@ public class CombatEngineTests {
             catalog.catalog().characters().stream()
                 .mapToInt(c -> c.profile().skills().size())
                 .sum())
-        .isEqualTo(115);
+        .isEqualTo(131);
     assertThat(catalog.find(new I18nText().zhCN("假路飞").enUS("Fake Luffy"))).isEmpty();
     assertThat(catalog.find(new I18nText().zhCN("凯多").enUS("Shanks"))).isEmpty();
     assertThat(catalog.find(new I18nText().zhCN("路飞")).orElseThrow().profile().coatingLevel())

@@ -24,7 +24,16 @@ public class CombatProfiles {
   }
 
   public Profile preview(CharacterEntity character) {
-    return dao.latest(character.getId()).map(this::decode).orElseGet(() -> initial(character));
+    return dao.latest(character.getId())
+        .map(this::decode)
+        .map(p -> current(character, p))
+        .orElseGet(() -> initial(character));
+  }
+
+  private Profile current(CharacterEntity character, Profile stored) {
+    return Boolean.TRUE.equals(character.getSystemResource())
+        ? catalog.replacement(stored).orElse(stored)
+        : stored;
   }
 
   private Profile initial(CharacterEntity character) {
@@ -41,7 +50,13 @@ public class CombatProfiles {
     if (dao.lockCharacter(character.getId()) == null)
       throw new IllegalArgumentException("Character does not exist");
     var stored = dao.latest(character.getId());
-    if (stored.isPresent()) return decode(stored.get());
+    if (stored.isPresent()) {
+      var previous = decode(stored.get());
+      var next = current(character, previous);
+      if (!next.equals(previous))
+        dao.insert(character.getId(), next.version(), encode(next), clock.millis());
+      return next;
+    }
     var profile = initial(character);
     dao.insert(character.getId(), profile.version(), encode(profile), clock.millis());
     return profile;

@@ -81,7 +81,7 @@ public class CombatController {
     if (!request.confirmed() || request.profile() == null)
       throw new IllegalArgumentException(
           "Review and explicitly confirm the profile before publishing");
-    if (request.expectedVersion() == 1)
+    if (request.expectedVersion() > 0)
       profiles.freeze(
           characters
               .findById(id)

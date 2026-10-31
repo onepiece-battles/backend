@@ -183,7 +183,23 @@ public class CharacterInBattle {
   }
 
   public boolean immuneTo(Skill skill) {
-    return skill != null && !Collections.disjoint(profile.immunities(), skill.tags());
+    if (skill == null) return false;
+    for (String tag : skill.tags()) {
+      if (!profile.immunities().contains(tag)) continue;
+      if (!tag.equals("PURE_LIGHTNING")
+          || hasFruitNamedAny(
+              List.of(
+                  "橡胶果实",
+                  "ゴムゴムの実",
+                  "Gomu Gomu no Mi",
+                  "人人果实幻兽种尼卡形态",
+                  "人人果实尼卡形态",
+                  "人人果实太阳神尼卡形态",
+                  "人人果实模型尼卡",
+                  "Human-Human Fruit Model Nika",
+                  "Hito Hito no Mi Model Nika"))) return true;
+    }
+    return false;
   }
 
   public boolean canUse(Skill skill) {
@@ -204,8 +220,12 @@ public class CharacterInBattle {
   }
 
   private boolean hasRequiredFruit(Skill skill) {
+    return hasFruitNamedAny(skill.requiredFruits());
+  }
+
+  private boolean hasFruitNamedAny(List<String> names) {
     for (var fruit : fruits)
-      for (String required : skill.requiredFruits()) {
+      for (String required : names) {
         var name = fruit.getName();
         if (name == null) continue;
         if (fruitName(required).equals(fruitName(name.getZhCN()))

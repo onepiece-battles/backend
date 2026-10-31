@@ -1,0 +1,5508 @@
+{
+  "version": 2,
+  "characters": [
+    {
+      "code": "luffy",
+      "names": [
+        "蒙奇·D·路飞",
+        "Monkey D. Luffy",
+        "路飞"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "luffy",
+        "era": "蛋头岛—艾尔巴夫（五档掌握后） · 资料截至2026-10",
+        "coatingLevel": 2,
+        "skills": [
+          {
+            "id": "luffy.gear-five",
+            "version": 1,
+            "name": "五档",
+            "englishName": "Gear Five",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 20,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "橡胶果实",
+              "ゴムゴムの実",
+              "Gomu Gomu no Mi",
+              "人人果实幻兽种尼卡形态",
+              "人人果实尼卡形态",
+              "Hito Hito no Mi Model Nika",
+              "人人果实太阳神尼卡形态",
+              "Human-Human Fruit Model Nika",
+              "人人果实模型尼卡",
+              "Human-Human Fruit Model Nika"
+            ],
+            "effects": [
+              {
+                "type": "ATTACK_UP",
+                "power": 0.24,
+                "duration": 3
+              },
+              {
+                "type": "EVASION",
+                "power": 0.12,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/66166/index.html",
+                "note": "动画1100：五档与觉醒路奇。形态带来灵活战斗能力；不是治疗或无限体力；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "luffy.dawn-gatling",
+            "version": 1,
+            "name": "橡胶橡胶·白色枪乱打",
+            "englishName": "Gum-Gum Dawn Gatling",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "橡胶果实",
+              "ゴムゴムの実",
+              "Gomu Gomu no Mi",
+              "人人果实幻兽种尼卡形态",
+              "人人果实尼卡形态",
+              "Hito Hito no Mi Model Nika",
+              "人人果实太阳神尼卡形态",
+              "Human-Human Fruit Model Nika",
+              "人人果实模型尼卡",
+              "Human-Human Fruit Model Nika"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.55,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/74686/index.html",
+                "note": "动画1141：白色枪乱打。五档连续拳击；不是凭空生成追击技能；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "luffy.white-star-gun",
+            "version": 1,
+            "name": "橡胶橡胶·白星枪",
+            "englishName": "Gum-Gum White Star Gun",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 20,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "橡胶果实",
+              "ゴムゴムの実",
+              "Gomu Gomu no Mi",
+              "人人果实幻兽种尼卡形态",
+              "人人果实尼卡形态",
+              "Hito Hito no Mi Model Nika",
+              "人人果实太阳神尼卡形态",
+              "Human-Human Fruit Model Nika",
+              "人人果实模型尼卡",
+              "Human-Human Fruit Model Nika"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.85,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/72495/index.html",
+                "note": "动画1128：白星枪。对黄猿的五档拳击；不将星星特效当成必定眩晕；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "luffy.bajrang-gun",
+            "version": 1,
+            "name": "橡胶橡胶·猿神枪",
+            "englishName": "Gum-Gum Bajrang Gun",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 30,
+            "cooldown": 6,
+            "maxUses": 1,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "橡胶果实",
+              "ゴムゴムの実",
+              "Gomu Gomu no Mi",
+              "人人果实幻兽种尼卡形态",
+              "人人果实尼卡形态",
+              "Hito Hito no Mi Model Nika",
+              "人人果实太阳神尼卡形态",
+              "Human-Human Fruit Model Nika",
+              "人人果实模型尼卡",
+              "Human-Human Fruit Model Nika"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 2,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/63846/index.html",
+                "note": "动画1076：猿神枪与火焰八卦。和之国决战的终结重拳；高消耗且限制次数；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "luffy.king-cobra",
+            "version": 1,
+            "name": "橡胶橡胶·眼镜王蛇",
+            "englishName": "Gum-Gum King Cobra",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "橡胶果实",
+              "ゴムゴムの実",
+              "Gomu Gomu no Mi",
+              "人人果实幻兽种尼卡形态",
+              "人人果实尼卡形态",
+              "Hito Hito no Mi Model Nika",
+              "人人果实太阳神尼卡形态",
+              "Human-Human Fruit Model Nika",
+              "人人果实模型尼卡",
+              "Human-Human Fruit Model Nika"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.65,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o4949/index.html",
+                "note": "动画870：蛇人、眼镜王蛇与斩切年糕。四档蛇人攻击仍属已掌握招式；并不借用卡塔库栗的果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "luffy.coating",
+            "version": 2,
+            "name": "霸王色缠绕",
+            "englishName": "Conqueror coating",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 5,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "COATING",
+                "power": 0,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/63846/index.html",
+                "note": "动画1076：猿神枪与火焰八卦。已展示霸王色缠绕；普通霸王色标签不自动授予此技能；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/66166/index.html",
+            "note": "动画1100：五档与觉醒路奇。形态带来灵活战斗能力；不是治疗或无限体力；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/74686/index.html",
+            "note": "动画1141：白色枪乱打。五档连续拳击；不是凭空生成追击技能；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/72495/index.html",
+            "note": "动画1128：白星枪。对黄猿的五档拳击；不将星星特效当成必定眩晕；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/63846/index.html",
+            "note": "动画1076：猿神枪与火焰八卦。已展示霸王色缠绕；普通霸王色标签不自动授予此技能；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o4949/index.html",
+            "note": "动画870：蛇人、眼镜王蛇与斩切年糕。四档蛇人攻击仍属已掌握招式；并不借用卡塔库栗的果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/182/index.html",
+            "note": "动画182：橡胶身体不受艾尼路电击影响。纯电击例外需要实际持有橡胶／尼卡果实；不抵消金棒、剑斩或复合攻击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/412/index.html",
+            "note": "动画412：甜甜甘风对路飞无效。路飞对汉库克甜甜甘风的特定例外不推广至芳香脚；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": [
+          "PURE_LIGHTNING",
+          "HANCOCK_MELLOW"
+        ]
+      }
+    },
+    {
+      "code": "zoro",
+      "names": [
+        "罗罗诺亚·索隆",
+        "Roronoa Zoro",
+        "索隆",
+        "卓洛"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "zoro",
+        "era": "蛋头岛（阎王三刀流掌握后） · 资料截至2026-10",
+        "coatingLevel": 1,
+        "skills": [
+          {
+            "id": "zoro.hahava-leopard-hunt",
+            "version": 1,
+            "name": "三刀流·虎虎婆·彪狩",
+            "englishName": "Three-Sword Style: Hahava Leopard Hunt",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/75128/index.html",
+                "note": "动画1144：虎虎婆·彪狩。蛋头岛对路奇使用的斩击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "zoro.dragon-damnation",
+            "version": 1,
+            "name": "阎王三刀龙·一百三情·飞龙侍极",
+            "englishName": "King of Hell: Dragon Damnation",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 27,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 2,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/61675/index.html",
+                "note": "动画1062：阎王三刀龙与御守火龙皇。对烬的终结斩击；不是元素火焰持续伤害；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "zoro.flying-dragon-blaze",
+            "version": 1,
+            "name": "一刀流·飞龙火焰",
+            "englishName": "One-Sword Style: Flying Dragon Blaze",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 11,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.5,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6093/index.html",
+                "note": "动画1017：屋顶交战与飞龙火焰。使用阎魔的飞斩；不把名称中的火焰当成果实能力；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "zoro.coating",
+            "version": 2,
+            "name": "霸王色缠绕",
+            "englishName": "Conqueror coating",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 5,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "COATING",
+                "power": 0,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/61675/index.html",
+                "note": "动画1062：阎王三刀龙与御守火龙皇。阎王三刀流对应已展示的高级霸王色运用；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/75128/index.html",
+            "note": "动画1144：虎虎婆·彪狩。蛋头岛对路奇使用的斩击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/61675/index.html",
+            "note": "动画1062：阎王三刀龙与御守火龙皇。阎王三刀流对应已展示的高级霸王色运用；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o6093/index.html",
+            "note": "动画1017：屋顶交战与飞龙火焰。使用阎魔的飞斩；不把名称中的火焰当成果实能力；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "sanji",
+      "names": [
+        "山治",
+        "Sanji",
+        "文斯莫克·山治",
+        "香吉士"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "sanji",
+        "era": "和之国—蛋头岛（外骨骼觉醒后） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "sanji.boeuf-burst",
+            "version": 1,
+            "name": "魔神风脚·牛肉爆裂",
+            "englishName": "Ifrit Jambe: Boeuf Burst",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 19,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.8,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/61599/index.html",
+                "note": "动画1061：魔神风脚、高速移动与杰尔马改造。漫画1034、动画1061的蓝焰连踢终结击；招式名对照 https://onepiece.fandom.com/wiki/Chapter_1034 ；不是恶魔果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "sanji.bien-cuit-grill-shot",
+            "version": 1,
+            "name": "恶魔风脚·熟烧·烤架烧",
+            "englishName": "Diable Jambe: Bien Cuit Grill Shot",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 10,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.45,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6403/index.html",
+                "note": "动画1053：恶魔风脚、外骨骼恢复与腕龙盘绕。对奎因使用的踢击；不因火焰名自动附加中毒；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "sanji.exoskeleton",
+            "version": 1,
+            "name": "外骨骼",
+            "englishName": "Exoskeleton",
+            "origin": "RACIAL",
+            "target": "SELF",
+            "energy": 10,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "GUARD",
+                "power": 0.22,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6403/index.html",
+                "note": "动画1053：恶魔风脚、外骨骼恢复与腕龙盘绕。以减伤表现杰尔马体质；不无条件重复恢复骨折血量；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "sanji.high-speed-movement",
+            "version": 1,
+            "name": "高速移动（动作描述）",
+            "englishName": "High-speed movement (descriptive)",
+            "origin": "TECHNIQUE",
+            "target": "SELF",
+            "energy": 10,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "EVASION",
+                "power": 0.22,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/61599/index.html",
+                "note": "动画1061：魔神风脚、高速移动与杰尔马改造。通过高速移动消失；不是隐形果实或继续使用已毁战斗服；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/61599/index.html",
+            "note": "动画1061：魔神风脚、高速移动与杰尔马改造。通过高速移动消失；不是隐形果实或继续使用已毁战斗服；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o6403/index.html",
+            "note": "动画1053：恶魔风脚、外骨骼恢复与腕龙盘绕。以减伤表现杰尔马体质；不无条件重复恢复骨折血量；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "nami",
+      "names": [
+        "娜美",
+        "Nami"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "nami",
+        "era": "和之国—艾尔巴夫（宙斯天候棒） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "nami.raitei",
+            "version": 1,
+            "name": "雷霆",
+            "englishName": "Raitei (Zeus Thunderbolt)",
+            "origin": "EQUIPMENT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.6,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/67261/index.html",
+                "note": "动画1110：娜美与宙斯的雷霆。由宙斯和天候棒发动；娜美不是响雷果实能力者；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": [
+              "PURE_LIGHTNING"
+            ]
+          },
+          {
+            "id": "nami.mirage-tempo",
+            "version": 1,
+            "name": "海市蜃楼天候",
+            "englishName": "Mirage Tempo",
+            "origin": "EQUIPMENT",
+            "target": "SELF",
+            "energy": 8,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "EVASION",
+                "power": 0.2,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/295/index.html",
+                "note": "动画295：海市蜃楼天候。气象折射制造幻象，映射回避而非实体分身；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/67261/index.html",
+            "note": "动画1110：娜美与宙斯的雷霆。由宙斯和天候棒发动；娜美不是响雷果实能力者；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/295/index.html",
+            "note": "动画295：海市蜃楼天候。气象折射制造幻象，映射回避而非实体分身；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/79633/index.html",
+            "note": "动画1157（2026-04-12）：宙斯雷击仍在使用。确认2026年艾尔巴夫篇仍在使用宙斯，不推定尚未证实的新能力；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "usopp",
+      "names": [
+        "乌索普",
+        "Usopp",
+        "撒谎布"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "usopp",
+        "era": "两年后（Pop Green狙击） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "usopp.pop-green",
+            "version": 1,
+            "name": "必杀·绿星",
+            "englishName": "Special Attack: Green Star",
+            "origin": "EQUIPMENT",
+            "target": "ENEMY",
+            "energy": 7,
+            "cooldown": 1,
+            "maxUses": 8,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.3,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/usopp/index.html",
+                "note": "官方角色资料：Pop Green弹药与消极幽灵免疫。Pop Green弹药系列；不是超人系果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "usopp.sargasso",
+            "version": 1,
+            "name": "绿星·海藻草",
+            "englishName": "Green Star: Sargasso",
+            "origin": "EQUIPMENT",
+            "target": "ENEMY",
+            "energy": 10,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6289/index.html",
+                "note": "动画1037：绿星·海藻草。植物束缚短暂打断行动，并非永久控制；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/character/usopp/index.html",
+            "note": "官方角色资料：Pop Green弹药与消极幽灵免疫。Pop Green弹药系列；不是超人系果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o6289/index.html",
+            "note": "动画1037：绿星·海藻草。植物束缚短暂打断行动，并非永久控制；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/character/usopp/index.html",
+            "note": "官方角色资料：Pop Green弹药与消极幽灵免疫。只有消极幽灵的特定免疫，不免疫幽灵爆炸或全部控制；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": [
+          "NEGATIVE_HOLLOW"
+        ]
+      }
+    },
+    {
+      "code": "chopper",
+      "names": [
+        "托尼托尼·乔巴",
+        "Tony Tony Chopper",
+        "乔巴"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "chopper",
+        "era": "两年后（可控制怪物强化） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "chopper.monster-point",
+            "version": 1,
+            "name": "怪物强化",
+            "englishName": "Monster Point",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 15,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "人人果实",
+              "ヒトヒトの実",
+              "Hito Hito no Mi",
+              "Human-Human Fruit"
+            ],
+            "effects": [
+              {
+                "type": "ATTACK_UP",
+                "power": 0.28,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o3083/index.html",
+                "note": "动画781：柔力强化和怪物强化。蓝波球控制的巨大形态，以有限强化窗口表现；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "chopper.kung-fu-point",
+            "version": 1,
+            "name": "柔力强化",
+            "englishName": "Kung Fu Point",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "人人果实",
+              "ヒトヒトの実",
+              "Hito Hito no Mi",
+              "Human-Human Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o3083/index.html",
+                "note": "动画781：柔力强化和怪物强化。以柔力强化形态进行体术攻击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "chopper.guard-point",
+            "version": 1,
+            "name": "毛皮强化",
+            "englishName": "Guard Point",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 8,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "人人果实",
+              "ヒトヒトの実",
+              "Hito Hito no Mi",
+              "Human-Human Fruit"
+            ],
+            "effects": [
+              {
+                "type": "GUARD",
+                "power": 0.25,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/chopper/index.html",
+                "note": "官方角色资料：人人果实、蓝波球与形态变化。防御形态，不创造治疗药或无限回复；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o3083/index.html",
+            "note": "动画781：柔力强化和怪物强化。以柔力强化形态进行体术攻击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/character/chopper/index.html",
+            "note": "官方角色资料：人人果实、蓝波球与形态变化。防御形态，不创造治疗药或无限回复；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "robin",
+      "names": [
+        "妮可·罗宾",
+        "Nico Robin",
+        "罗宾"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "robin",
+        "era": "和之国以后（恶魔开花） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "robin.demonio-fleur",
+            "version": 1,
+            "name": "恶魔开花",
+            "englishName": "Demonio Fleur",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 16,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "花花果实",
+              "ハナハナの実",
+              "Hana Hana no Mi",
+              "Flower-Flower Fruit"
+            ],
+            "effects": [
+              {
+                "type": "ATTACK_UP",
+                "power": 0.25,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6341/index.html",
+                "note": "动画1044：恶魔开花、大涡潮·离合与管弦乐。巨大分身形态；黑色外观不能据此认定武装色；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "robin.sea-serpent",
+            "version": 1,
+            "name": "海龙花",
+            "englishName": "Sea Serpent",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 11,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "花花果实",
+              "ハナハナの実",
+              "Hana Hana no Mi",
+              "Flower-Flower Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.35,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6339/index.html",
+                "note": "动画1043：海龙花与布鲁克的寒气剑术。多臂攻击，不附加毒或元素能力；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "robin.grand-jacuzzi-clutch",
+            "version": 1,
+            "name": "大涡潮·离合",
+            "englishName": "Grand Jacuzzi Clutch",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 19,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "花花果实",
+              "ハナハナの実",
+              "Hana Hana no Mi",
+              "Flower-Flower Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.55,
+                "duration": 0
+              },
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6341/index.html",
+                "note": "动画1044：恶魔开花、大涡潮·离合与管弦乐。拘束后关节技；用一次行动打断表达，非永久锁死；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o6341/index.html",
+            "note": "动画1044：恶魔开花、大涡潮·离合与管弦乐。拘束后关节技；用一次行动打断表达，非永久锁死；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o6339/index.html",
+            "note": "动画1043：海龙花与布鲁克的寒气剑术。多臂攻击，不附加毒或元素能力；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "franky",
+      "names": [
+        "弗兰奇",
+        "Franky",
+        "佛朗基"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "franky",
+        "era": "两年后（弗兰奇将军） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "franky.radical-beam",
+            "version": 1,
+            "name": "激光光线",
+            "englishName": "Radical Beam",
+            "origin": "EQUIPMENT",
+            "target": "ENEMY",
+            "energy": 14,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.65,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6337/index.html",
+                "note": "动画1042：将军炮与激光光线。改造人激光，不依赖恶魔果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "franky.general-cannon",
+            "version": 1,
+            "name": "将军炮",
+            "englishName": "General Cannon",
+            "origin": "EQUIPMENT",
+            "target": "ALL_ENEMIES",
+            "energy": 14,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.5,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6337/index.html",
+                "note": "动画1042：将军炮与激光光线。弗兰奇将军的空气炮，不生成独立召唤单位；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "franky.general-suplex",
+            "version": 1,
+            "name": "将军过肩摔",
+            "englishName": "General Suplex",
+            "origin": "EQUIPMENT",
+            "target": "ENEMY",
+            "energy": 8,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.35,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6329/index.html",
+                "note": "动画1041：将军过肩摔。机甲近身摔技，不凭空附加眩晕；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o6337/index.html",
+            "note": "动画1042：将军炮与激光光线。弗兰奇将军的空气炮，不生成独立召唤单位；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o6329/index.html",
+            "note": "动画1041：将军过肩摔。机甲近身摔技，不凭空附加眩晕；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "brook",
+      "names": [
+        "布鲁克",
+        "Brook"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "brook",
+        "era": "两年后（黄泉能力掌握后） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "brook.soul-solid",
+            "version": 1,
+            "name": "灵魂之丧剑（寒气剑术）",
+            "englishName": "Soul Solid (chilling swordsmanship)",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "黄泉果实",
+              "ヨミヨミの実",
+              "Yomi Yomi no Mi",
+              "Revive-Revive Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/565/index.html",
+                "note": "动画565：灵魂之丧剑与黄泉能力。武器和能力描述，不虚构专属招式名；寒气来自黄泉能力；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "brook.fleur-darmes-orchestra",
+            "version": 1,
+            "name": "击剑·管弦乐",
+            "englishName": "Fleur d’Armes: Orchestra",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 13,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "黄泉果实",
+              "ヨミヨミの実",
+              "Yomi Yomi no Mi",
+              "Revive-Revive Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.55,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6341/index.html",
+                "note": "动画1044：恶魔开花、大涡潮·离合与管弦乐。对百鬼夜行使用的群体剑技，不是果实持续毒伤；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/565/index.html",
+            "note": "动画565：灵魂之丧剑与黄泉能力。武器和能力描述，不虚构专属招式名；寒气来自黄泉能力；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o6341/index.html",
+            "note": "动画1044：恶魔开花、大涡潮·离合与管弦乐。对百鬼夜行使用的群体剑技，不是果实持续毒伤；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "jinbe",
+      "names": [
+        "甚平",
+        "Jinbe",
+        "吉贝尔"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "jinbe",
+        "era": "和之国（鱼人空手道奥义） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "jinbe.onigawara-seiken",
+            "version": 1,
+            "name": "鱼人空手道奥义·鬼瓦正拳",
+            "englishName": "Fish-Man Karate: Onigawara Seiken",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 18,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.8,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6327/index.html",
+                "note": "动画1040：鱼人空手道·鬼瓦正拳。以武装色配合拳法的终结攻击，不要求恶魔果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "jinbe.yari-nami",
+            "version": 1,
+            "name": "鱼人柔术·枪波",
+            "englishName": "Fish-Man Jujutsu: Yari Nami",
+            "origin": "TECHNIQUE",
+            "target": "ALL_ENEMIES",
+            "energy": 10,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/450/index.html",
+                "note": "动画450：甚平的枪波；麦哲伦的毒之巨兵。水流投射攻击，保留水系技术表现而非果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o6327/index.html",
+            "note": "动画1040：鱼人空手道·鬼瓦正拳。以武装色配合拳法的终结攻击，不要求恶魔果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/450/index.html",
+            "note": "动画450：甚平的枪波；麦哲伦的毒之巨兵。水流投射攻击，保留水系技术表现而非果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "shanks",
+      "names": [
+        "香克斯",
+        "Shanks",
+        "红发香克斯",
+        "红发"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "shanks",
+        "era": "新世界（基德交战时） · 资料截至2026-10",
+        "coatingLevel": 3,
+        "skills": [
+          {
+            "id": "shanks.divine-departure",
+            "version": 1,
+            "name": "神避",
+            "englishName": "Divine Departure",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 25,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 2,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/67527/index.html",
+                "note": "动画1112：预见未来、神避与电磁炮。对基德使用的斩击；不制造同名追击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "shanks.future-sight",
+            "version": 1,
+            "name": "预见未来（见闻色）",
+            "englishName": "Future Sight",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 10,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "EVASION",
+                "power": 0.24,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/67527/index.html",
+                "note": "动画1112：预见未来、神避与电磁炮。预见电磁炮造成的后果，以回避窗口抽象，不保证无敌；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "shanks.coating",
+            "version": 2,
+            "name": "霸王色缠绕",
+            "englishName": "Conqueror coating",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 5,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "COATING",
+                "power": 0,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/67527/index.html",
+                "note": "动画1112：预见未来、神避与电磁炮。已展示的高级霸王色斩击；不添加游戏原创的命名剑技；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/67527/index.html",
+            "note": "动画1112：预见未来、神避与电磁炮。已展示的高级霸王色斩击；不添加游戏原创的命名剑技；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "whitebeard",
+      "names": [
+        "爱德华·纽盖特",
+        "Edward Newgate",
+        "白胡子"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "whitebeard",
+        "era": "顶上战争 · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "whitebeard.quake-strike",
+            "version": 1,
+            "name": "震动冲击（动作描述）",
+            "englishName": "Quake strike (descriptive)",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 17,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "震震果实",
+              "グラグラの実",
+              "Gura Gura no Mi",
+              "震动果实",
+              "Tremor-Tremor Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/487/index.html",
+                "note": "动画487：震震能力与大佛形态。震震果实冲击；原作未给此动作统一命名；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "whitebeard.murakumogiri",
+            "version": 1,
+            "name": "薙刀·丛云切（斩击）",
+            "englishName": "Murakumogiri slash (descriptive)",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 10,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.5,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/463/index.html",
+                "note": "动画463：黑刀斩击、钻石防御、马尔高与八尺琼勾玉。以薙刀作战的动作描述，不采用海贼无双原创招式名；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/487/index.html",
+            "note": "动画487：震震能力与大佛形态。震震果实冲击；原作未给此动作统一命名；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/463/index.html",
+            "note": "动画463：黑刀斩击、钻石防御、马尔高与八尺琼勾玉。以薙刀作战的动作描述，不采用海贼无双原创招式名；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "roger",
+      "names": [
+        "哥尔·D·罗杰",
+        "Gol D. Roger",
+        "罗杰",
+        "哥尔D罗杰",
+        "Gol D Roger"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "roger",
+        "era": "生前（御田回想时期） · 资料截至2026-10",
+        "coatingLevel": 3,
+        "skills": [
+          {
+            "id": "roger.divine-departure",
+            "version": 1,
+            "name": "神避",
+            "englishName": "Divine Departure",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 25,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 2,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o5691/index.html",
+                "note": "动画966：罗杰与白胡子的霸王色碰撞。回想中的斩击；不因招式少补造第二个命名招式；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "roger.coating",
+            "version": 2,
+            "name": "霸王色缠绕",
+            "englishName": "Conqueror coating",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 5,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "COATING",
+                "power": 0,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o5691/index.html",
+                "note": "动画966：罗杰与白胡子的霸王色碰撞。与白胡子交锋时的高级霸王色运用；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o5691/index.html",
+            "note": "动画966：罗杰与白胡子的霸王色碰撞。与白胡子交锋时的高级霸王色运用；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "kaido",
+      "names": [
+        "凯多",
+        "Kaido",
+        "百兽凯多",
+        "Kaidou"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "kaido",
+        "era": "和之国决战 · 资料截至2026-10",
+        "coatingLevel": 3,
+        "skills": [
+          {
+            "id": "kaido.thunder-bagua",
+            "version": 1,
+            "name": "雷鸣八卦",
+            "englishName": "Thunder Bagua",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 17,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.75,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o5289/index.html",
+                "note": "动画915：雷鸣八卦是金棒打击。实质是金棒重击，不把雷鸣一词当纯雷电；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "kaido.blast-breath",
+            "version": 1,
+            "name": "热息",
+            "englishName": "Blast Breath",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 13,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "鱼鱼果实青龙形态",
+              "鱼鱼果实幻兽种青龙形态",
+              "Uo Uo no Mi Model Seiryu",
+              "鱼鱼果实青龙型态",
+              "Fish-Fish Fruit Model Azure Dragon"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.5,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o5271/index.html",
+                "note": "动画914：龙形热息。青龙形态的火焰吐息，非毒素；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "kaido.flaming-drum-dragon",
+            "version": 1,
+            "name": "升龙·火焰八卦",
+            "englishName": "Flaming Drum Dragon: Rising Dragon Flame Bagua",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 30,
+            "cooldown": 6,
+            "maxUses": 1,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "鱼鱼果实青龙形态",
+              "鱼鱼果实幻兽种青龙形态",
+              "Uo Uo no Mi Model Seiryu",
+              "鱼鱼果实青龙型态",
+              "Fish-Fish Fruit Model Azure Dragon"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 2,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/63846/index.html",
+                "note": "动画1076：猿神枪与火焰八卦。火龙形态的终结攻击，长冷却限制次数；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "kaido.coating",
+            "version": 2,
+            "name": "霸王色缠绕",
+            "englishName": "Conqueror coating",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 5,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "COATING",
+                "power": 0,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/63846/index.html",
+                "note": "动画1076：猿神枪与火焰八卦。已掌握霸王色缠绕，不是普通霸王色造成永久加攻；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o5289/index.html",
+            "note": "动画915：雷鸣八卦是金棒打击。实质是金棒重击，不把雷鸣一词当纯雷电；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o5271/index.html",
+            "note": "动画914：龙形热息。青龙形态的火焰吐息，非毒素；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/63846/index.html",
+            "note": "动画1076：猿神枪与火焰八卦。已掌握霸王色缠绕，不是普通霸王色造成永久加攻；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "bigmom",
+      "names": [
+        "夏洛特·玲玲",
+        "Charlotte Linlin",
+        "大妈",
+        "BIG MOM",
+        "Big Mom"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "bigmom",
+        "era": "和之国决战（赫拉加入后） · 资料截至2026-10",
+        "coatingLevel": 2,
+        "skills": [
+          {
+            "id": "bigmom.ikoku",
+            "version": 1,
+            "name": "威国",
+            "englishName": "Ikoku (Sovereignty)",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "魂魂果实",
+              "灵魂果实",
+              "Soru Soru no Mi",
+              "Soul-Soul Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.65,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o4765/index.html",
+                "note": "动画844：巨人之枪·威国。用拿破仑发动的巨人之枪式斩击，不复制路飞的果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "bigmom.tenman-tenjin",
+            "version": 1,
+            "name": "天满大自在天神",
+            "englishName": "Tenman Daijizai Tenjin",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 14,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "魂魂果实",
+              "灵魂果实",
+              "Soru Soru no Mi",
+              "Soul-Soul Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.5,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6093/index.html",
+                "note": "动画1017：天满大自在天神。雷电范围攻击；不混同物理剑斩；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": [
+              "PURE_LIGHTNING"
+            ]
+          },
+          {
+            "id": "bigmom.misery",
+            "version": 1,
+            "name": "母访炮·三千里",
+            "englishName": "Mother’s Visit Cannon: Misery",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 24,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "魂魂果实",
+              "灵魂果实",
+              "Soru Soru no Mi",
+              "Soul-Soul Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.9,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/62293/index.html",
+                "note": "动画1066：母访炮·三千里、付与、穿刺波动和电磁炮。拿破仑、赫拉、普罗米修斯组合能力；不创建独立场上单位；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "bigmom.coating",
+            "version": 2,
+            "name": "霸王色缠绕",
+            "englishName": "Conqueror coating",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 5,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "COATING",
+                "power": 0,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6093/index.html",
+                "note": "动画1017：天满大自在天神。保留既有已展示的霸王色运用；不让普通拥有者自动获得；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o4765/index.html",
+            "note": "动画844：巨人之枪·威国。用拿破仑发动的巨人之枪式斩击，不复制路飞的果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o6093/index.html",
+            "note": "动画1017：天满大自在天神。保留既有已展示的霸王色运用；不让普通拥有者自动获得；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/62293/index.html",
+            "note": "动画1066：母访炮·三千里、付与、穿刺波动和电磁炮。拿破仑、赫拉、普罗米修斯组合能力；不创建独立场上单位；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "blackbeard",
+      "names": [
+        "马歇尔·D·蒂奇",
+        "Marshall D. Teach",
+        "黑胡子",
+        "蒂奇"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "blackbeard",
+        "era": "新世界（取得震震果实后） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "blackbeard.black-vortex",
+            "version": 1,
+            "name": "暗水",
+            "englishName": "Black Vortex",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 11,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "暗暗果实",
+              "ヤミヤミの実",
+              "Yami Yami no Mi",
+              "黑暗果实",
+              "Dark-Dark Fruit"
+            ],
+            "effects": [
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/447/index.html",
+                "note": "动画447：暗水引力捕获与接触封能力。只映射引力捕获为短打断；接触封果实能力未在此引擎完整模拟；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "blackbeard.black-hole",
+            "version": 1,
+            "name": "暗穴道",
+            "englishName": "Black Hole",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 14,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "暗暗果实",
+              "ヤミヤミの実",
+              "Yami Yami no Mi",
+              "黑暗果实",
+              "Dark-Dark Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.5,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/325/index.html",
+                "note": "动画325：黑暗的引力与艾斯交战。黑暗吞噬的攻击抽象；不永久夺取目标技能；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "blackbeard.quake-strike",
+            "version": 1,
+            "name": "震动冲击（动作描述）",
+            "englishName": "Quake strike (descriptive)",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 21,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "震震果实",
+              "グラグラの実",
+              "Gura Gura no Mi",
+              "震动果实",
+              "Tremor-Tremor Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.8,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/487/index.html",
+                "note": "动画487：震震能力与大佛形态。取得震震果实后才能使用；不能以暗暗果实单独解锁；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/447/index.html",
+            "note": "动画447：暗水引力捕获与接触封能力。只映射引力捕获为短打断；接触封果实能力未在此引擎完整模拟；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/325/index.html",
+            "note": "动画325：黑暗的引力与艾斯交战。黑暗吞噬的攻击抽象；不永久夺取目标技能；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/487/index.html",
+            "note": "动画487：震震能力与大佛形态。取得震震果实后才能使用；不能以暗暗果实单独解锁；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "akainu",
+      "names": [
+        "萨卡斯基",
+        "Sakazuki",
+        "赤犬",
+        "Akainu"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "akainu",
+        "era": "元帅时期（沿用已公开招式） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "akainu.great-eruption",
+            "version": 1,
+            "name": "大喷火",
+            "englishName": "Great Eruption",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 14,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "岩浆果实",
+              "マグマグの実",
+              "Magu Magu no Mi",
+              "Mag-Mag Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.65,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/news/81041/index.html",
+                "note": "2026年官方招式主题说明：大喷火、冰河时代、八尺琼勾玉。岩浆拳击；不凭空编造元帅时期新招式；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "akainu.meteor-volcano",
+            "version": 1,
+            "name": "流星火山",
+            "englishName": "Meteor Volcano",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 24,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "岩浆果实",
+              "マグマグの実",
+              "Magu Magu no Mi",
+              "Mag-Mag Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.9,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/474/index.html",
+                "note": "动画474：流星火山。向战场投射岩浆拳的范围攻击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/news/81041/index.html",
+            "note": "2026年官方招式主题说明：大喷火、冰河时代、八尺琼勾玉。岩浆拳击；不凭空编造元帅时期新招式；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/474/index.html",
+            "note": "动画474：流星火山。向战场投射岩浆拳的范围攻击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "kuzan",
+      "names": [
+        "库赞",
+        "Kuzan",
+        "青雉",
+        "Aokiji"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "kuzan",
+        "era": "蜂巢岛交战 · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "kuzan.ice-ball",
+            "version": 1,
+            "name": "冰球",
+            "englishName": "Ice Ball",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "冰冻果实",
+              "冰冰果实",
+              "ヒエヒエの実",
+              "Hie Hie no Mi",
+              "冷冷果实",
+              "Ice-Ice Fruit"
+            ],
+            "effects": [
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/68212/index.html",
+                "note": "动画1115：冰球与海底落下。冰冻束缚映射短打断；不能无条件永久冻结强者；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "kuzan.ice-age",
+            "version": 1,
+            "name": "冰河时代",
+            "englishName": "Ice Age",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 20,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "冰冻果实",
+              "冰冰果实",
+              "ヒエヒエの実",
+              "Hie Hie no Mi",
+              "冷冷果实",
+              "Ice-Ice Fruit"
+            ],
+            "effects": [
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/news/81041/index.html",
+                "note": "2026年官方招式主题说明：大喷火、冰河时代、八尺琼勾玉。大范围结冰；本模式只有一个敌人；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "kuzan.close-combat",
+            "version": 1,
+            "name": "近身拳击（动作描述）",
+            "englishName": "Close-quarters punch (descriptive)",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/69144/index.html",
+                "note": "动画1121：库赞与卡普的近身交锋。与卡普近身对拳，不把体术强制绑定果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/68212/index.html",
+            "note": "动画1115：冰球与海底落下。冰冻束缚映射短打断；不能无条件永久冻结强者；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/news/81041/index.html",
+            "note": "2026年官方招式主题说明：大喷火、冰河时代、八尺琼勾玉。大范围结冰；本模式只有一个敌人；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/69144/index.html",
+            "note": "动画1121：库赞与卡普的近身交锋。与卡普近身对拳，不把体术强制绑定果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "kizaru",
+      "names": [
+        "波鲁萨利诺",
+        "Borsalino",
+        "黄猿",
+        "Kizaru"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "kizaru",
+        "era": "蛋头岛交战 · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "kizaru.ama-no-murakumo",
+            "version": 1,
+            "name": "天丛云剑",
+            "englishName": "Ama no Murakumo Sword",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 11,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "闪闪果实",
+              "闪光果实",
+              "ピカピカの実",
+              "Pika Pika no Mi",
+              "Glint-Glint Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.5,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/74474/index.html",
+                "note": "动画1139：黄猿以天丛云剑斩断真空火箭。以光组成剑的近身斩击，与光弹群射分开；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "kizaru.yasakani-magatama",
+            "version": 1,
+            "name": "八尺琼勾玉",
+            "englishName": "Yasakani Sacred Jewel",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 15,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "闪闪果实",
+              "闪光果实",
+              "ピカピカの実",
+              "Pika Pika no Mi",
+              "Glint-Glint Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.6,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/72451/index.html",
+                "note": "动画1127：光能力与八尺琼勾玉。光弹群射；不是持续治疗或毒伤；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "kizaru.laser",
+            "version": 1,
+            "name": "镭射（能力）",
+            "englishName": "Laser (ability)",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 8,
+            "cooldown": 1,
+            "maxUses": 8,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "闪闪果实",
+              "闪光果实",
+              "ピカピカの実",
+              "Pika Pika no Mi",
+              "Glint-Glint Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.35,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/463/index.html",
+                "note": "动画463：黑刀斩击、钻石防御、马尔高与八尺琼勾玉。已展示的镭射光束；用能力名称而非虚构招式名；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/74474/index.html",
+            "note": "动画1139：黄猿以天丛云剑斩断真空火箭。以光组成剑的近身斩击，与光弹群射分开；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/72451/index.html",
+            "note": "动画1127：光能力与八尺琼勾玉。光弹群射；不是持续治疗或毒伤；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/463/index.html",
+            "note": "动画463：黑刀斩击、钻石防御、马尔高与八尺琼勾玉。已展示的镭射光束；用能力名称而非虚构招式名；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "fujitora",
+      "names": [
+        "一笑",
+        "Issho",
+        "藤虎",
+        "Fujitora"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "fujitora",
+        "era": "德雷斯罗萨 · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "fujitora.fierce-tiger",
+            "version": 1,
+            "name": "重力刀·猛虎",
+            "englishName": "Gravity Blade: Fierce Tiger",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "重重果实",
+              "ズシズシの実",
+              "Zushi Zushi no Mi",
+              "重力果实",
+              "Press-Press Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o2783/index.html",
+                "note": "动画695：藤虎的横向重力刀·猛虎。横向重力与剑技合击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "fujitora.gravity-pressure",
+            "version": 1,
+            "name": "重力压制（能力）",
+            "englishName": "Gravity pressure (ability)",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "重重果实",
+              "ズシズシの実",
+              "Zushi Zushi no Mi",
+              "重力果实",
+              "Press-Press Fruit"
+            ],
+            "effects": [
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o2783/index.html",
+                "note": "动画695：藤虎的横向重力刀·猛虎。重力牵制抽象为一次行动打断，不恒定锁死；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o2783/index.html",
+            "note": "动画695：藤虎的横向重力刀·猛虎。重力牵制抽象为一次行动打断，不恒定锁死；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "garp",
+      "names": [
+        "蒙奇·D·卡普",
+        "Monkey D. Garp",
+        "卡普",
+        "Garp"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "garp",
+        "era": "蜂巢岛救援战 · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "garp.galaxy-impact",
+            "version": 1,
+            "name": "拳骨冲突",
+            "englishName": "Galaxy Impact",
+            "origin": "HAKI",
+            "target": "ALL_ENEMIES",
+            "energy": 23,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.9,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/news/73560/index.html",
+                "note": "官方动画场景商品说明：拳骨冲突。范围拳击冲击；资料没有明确细分时不凭黑雷推定霸缠；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "garp.blue-hole",
+            "version": 1,
+            "name": "海底落下",
+            "englishName": "Blue Hole",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 11,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.5,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/68212/index.html",
+                "note": "动画1115：冰球与海底落下。抓住对手的近身投摔攻击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "garp.galaxy-divide",
+            "version": 1,
+            "name": "拳骨唐竹割",
+            "englishName": "Galaxy Divide",
+            "origin": "HAKI",
+            "target": "ENEMY",
+            "energy": 27,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 2,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/69263/index.html",
+                "note": "动画1122：拳骨唐竹割。对岛岛能力本体的重击，不借用克比的实直拳骨；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/news/73560/index.html",
+            "note": "官方动画场景商品说明：拳骨冲突。范围拳击冲击；资料没有明确细分时不凭黑雷推定霸缠；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/68212/index.html",
+            "note": "动画1115：冰球与海底落下。抓住对手的近身投摔攻击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/69263/index.html",
+            "note": "动画1122：拳骨唐竹割。对岛岛能力本体的重击，不借用克比的实直拳骨；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "sengoku",
+      "names": [
+        "战国",
+        "Sengoku"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "sengoku",
+        "era": "顶上战争 · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "sengoku.daibutsu",
+            "version": 1,
+            "name": "大佛形态",
+            "englishName": "Daibutsu form",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 13,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "人人果实大佛形态",
+              "人人果实幻兽种大佛形态",
+              "Hito Hito no Mi Model Daibutsu"
+            ],
+            "effects": [
+              {
+                "type": "ATTACK_UP",
+                "power": 0.2,
+                "duration": 3
+              },
+              {
+                "type": "GUARD",
+                "power": 0.16,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/487/index.html",
+                "note": "动画487：震震能力与大佛形态。佛形态强化窗口，不是治疗或霸王色缠绕；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "sengoku.shockwave",
+            "version": 1,
+            "name": "大佛冲击波（能力）",
+            "englishName": "Daibutsu shockwave (ability)",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 15,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "人人果实大佛形态",
+              "人人果实幻兽种大佛形态",
+              "Hito Hito no Mi Model Daibutsu"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.65,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/487/index.html",
+                "note": "动画487：震震能力与大佛形态。原作无统一招式名的能力描述；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/487/index.html",
+            "note": "动画487：震震能力与大佛形态。原作无统一招式名的能力描述；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "rayleigh",
+      "names": [
+        "西尔巴兹·雷利",
+        "Silvers Rayleigh",
+        "雷利",
+        "冥王雷利"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "rayleigh",
+        "era": "老年（香波地与两年修行时期） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "rayleigh.armament-emission",
+            "version": 1,
+            "name": "武装色外放（能力）",
+            "englishName": "Armament emission (ability)",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 10,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "GUARD",
+                "power": 0.22,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/516/index.html",
+                "note": "动画516：雷利教授武装色和见闻色。将外放防御映射减伤；不能混淆流樱与霸王色缠绕；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "rayleigh.observation",
+            "version": 1,
+            "name": "见闻色感知（能力）",
+            "englishName": "Observation (ability)",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 9,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "EVASION",
+                "power": 0.22,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/516/index.html",
+                "note": "动画516：雷利教授武装色和见闻色。以感知形成回避窗口，不杜撰命名剑招；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/516/index.html",
+            "note": "动画516：雷利教授武装色和见闻色。以感知形成回避窗口，不杜撰命名剑招；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "mihawk",
+      "names": [
+        "乔拉可尔·米霍克",
+        "Dracule Mihawk",
+        "鹰眼",
+        "米霍克",
+        "Mihawk"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "mihawk",
+        "era": "顶上战争已展示剑术 · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "mihawk.yoru-slash",
+            "version": 1,
+            "name": "黑刀·夜（斩击）",
+            "englishName": "Yoru slash (descriptive)",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.65,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/470/index.html",
+                "note": "动画470：米霍克的黑刀斩击。明确是动作描述，不使用游戏原创黑刀一闪；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "mihawk.flying-slash",
+            "version": 1,
+            "name": "飞翔斩击（动作描述）",
+            "englishName": "Flying slash (descriptive)",
+            "origin": "TECHNIQUE",
+            "target": "ALL_ENEMIES",
+            "energy": 19,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.8,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/463/index.html",
+                "note": "动画463：黑刀斩击、钻石防御、马尔高与八尺琼勾玉。远距离斩击动作；不把世界最强斩击当正式招式名；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/470/index.html",
+            "note": "动画470：米霍克的黑刀斩击。明确是动作描述，不使用游戏原创黑刀一闪；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/463/index.html",
+            "note": "动画463：黑刀斩击、钻石防御、马尔高与八尺琼勾玉。远距离斩击动作；不把世界最强斩击当正式招式名；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "law",
+      "names": [
+        "特拉法尔加·罗",
+        "Trafalgar Law",
+        "特拉法尔加·D·瓦铁尔·罗",
+        "罗"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "law",
+        "era": "和之国以后（果实觉醒后） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "law.gamma-knife",
+            "version": 1,
+            "name": "伽马刀",
+            "englishName": "Gamma Knife",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 17,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "手术果实",
+              "オペオペの実",
+              "Ope Ope no Mi",
+              "Ope-Ope Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.35,
+                "duration": 0
+              },
+              {
+                "type": "DEFENSE_DOWN",
+                "power": 0.16,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o2837/index.html",
+                "note": "动画722：伽马刀内伤与ROOM换位。内伤以伤害和暂时破防抽象；不是普通外伤治疗；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "law.puncture-wille",
+            "version": 1,
+            "name": "K·ROOM·穿刺波动",
+            "englishName": "K-ROOM: Puncture Wille",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 27,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "手术果实",
+              "オペオペの実",
+              "Ope Ope no Mi",
+              "Ope-Ope Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 2,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/62293/index.html",
+                "note": "动画1066：母访炮·三千里、付与、穿刺波动和电磁炮。觉醒穿刺与冲击，作为高消耗终结攻击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "law.shambles",
+            "version": 1,
+            "name": "ROOM·屠宰场",
+            "englishName": "ROOM: Shambles",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 11,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "手术果实",
+              "オペオペの実",
+              "Ope Ope no Mi",
+              "Ope-Ope Fruit"
+            ],
+            "effects": [
+              {
+                "type": "EVASION",
+                "power": 0.23,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o2837/index.html",
+                "note": "动画722：伽马刀内伤与ROOM换位。通过ROOM换位避开攻击，不是凭空回血；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o2837/index.html",
+            "note": "动画722：伽马刀内伤与ROOM换位。通过ROOM换位避开攻击，不是凭空回血；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/62293/index.html",
+            "note": "动画1066：母访炮·三千里、付与、穿刺波动和电磁炮。觉醒穿刺与冲击，作为高消耗终结攻击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "kid",
+      "names": [
+        "尤斯塔斯·基德",
+        "Eustass Kid",
+        "基德",
+        "Eustass Kidd"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "kid",
+        "era": "和之国以后（果实觉醒后） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "kid.punk-rotten",
+            "version": 1,
+            "name": "磁气魔人",
+            "englishName": "Punk Rotten",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 13,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "磁磁果实",
+              "ジキジキの実",
+              "Jiki Jiki no Mi",
+              "磁力果实",
+              "Magnet-Magnet Fruit"
+            ],
+            "effects": [
+              {
+                "type": "ATTACK_UP",
+                "power": 0.22,
+                "duration": 3
+              },
+              {
+                "type": "GUARD",
+                "power": 0.12,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6093/index.html",
+                "note": "动画1017：屋顶交战与飞龙火焰。金属构装而非永久变更基础属性；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "kid.assign",
+            "version": 1,
+            "name": "付与",
+            "englishName": "Assign",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 13,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "磁磁果实",
+              "ジキジキの実",
+              "Jiki Jiki no Mi",
+              "磁力果实",
+              "Magnet-Magnet Fruit"
+            ],
+            "effects": [
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/61287/index.html",
+                "note": "动画1056：磁力付与、磁气冲撞和KROOM。磁极付与和吸附映射短牵制，不让所有动作都必定命中；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "kid.damned-punk",
+            "version": 1,
+            "name": "电磁炮",
+            "englishName": "Damned Punk",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 27,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "磁磁果实",
+              "ジキジキの実",
+              "Jiki Jiki no Mi",
+              "磁力果实",
+              "Magnet-Magnet Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 2,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/62293/index.html",
+                "note": "动画1066：母访炮·三千里、付与、穿刺波动和电磁炮。觉醒后的电磁炮，需要磁磁果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o6093/index.html",
+            "note": "动画1017：屋顶交战与飞龙火焰。金属构装而非永久变更基础属性；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/61287/index.html",
+            "note": "动画1056：磁力付与、磁气冲撞和KROOM。磁极付与和吸附映射短牵制，不让所有动作都必定命中；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/62293/index.html",
+            "note": "动画1066：母访炮·三千里、付与、穿刺波动和电磁炮。觉醒后的电磁炮，需要磁磁果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "killer",
+      "names": [
+        "基拉",
+        "Killer",
+        "杀戮武人基拉"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "killer",
+        "era": "和之国（惩罚者双刃） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "killer.beheading-claws",
+            "version": 1,
+            "name": "斩首爪",
+            "englishName": "Beheading Claws",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 10,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.5,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/61286/index.html",
+                "note": "动画1054：惩罚者双刃，不把失败SMILE当动物能力。漫画1001、1029与动画1054的双刃斩击；名称对照 https://onepiece.fandom.com/wiki/Punishers ；非果实能力；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "killer.scyther-sonic",
+            "version": 1,
+            "name": "镰阿音击",
+            "englishName": "Scyther Sonic",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 16,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              },
+              {
+                "type": "DEFENSE_DOWN",
+                "power": 0.14,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6093/index.html",
+                "note": "动画1017：屋顶交战与飞龙火焰。漫画1002、动画1017的内伤攻击；名称对照 https://onepiece.fandom.com/wiki/Punishers ；破防是游戏折算；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "killer.spin-sonic",
+            "version": 1,
+            "name": "刃音击",
+            "englishName": "Spin & Sonic",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 18,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.75,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/61286/index.html",
+                "note": "动画1054：惩罚者双刃，不把失败SMILE当动物能力。漫画1029、动画1054终结霍金斯；名称对照 https://onepiece.fandom.com/wiki/Punishers；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/61286/index.html",
+            "note": "动画1054：惩罚者双刃，不把失败SMILE当动物能力。漫画1029、动画1054终结霍金斯；名称对照 https://onepiece.fandom.com/wiki/Punishers；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o6093/index.html",
+            "note": "动画1017：屋顶交战与飞龙火焰。漫画1002、动画1017的内伤攻击；名称对照 https://onepiece.fandom.com/wiki/Punishers ；破防是游戏折算；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "yamato",
+      "names": [
+        "大和",
+        "Yamato"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "yamato",
+        "era": "和之国决战（大口真神形态） · 资料截至2026-10",
+        "coatingLevel": 1,
+        "skills": [
+          {
+            "id": "yamato.thunder-bagua",
+            "version": 1,
+            "name": "雷鸣八卦",
+            "englishName": "Thunder Bagua",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 15,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.65,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6367/index.html",
+                "note": "动画1049：雷鸣八卦、镜山与冰诸斩。金棒体术不是纯雷电伤害；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "yamato.himorogiri",
+            "version": 1,
+            "name": "冰诸斩",
+            "englishName": "Himorogiri",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "犬犬果实大口真神形态",
+              "犬犬果实幻兽种大口真神形态",
+              "Inu Inu no Mi Model Okuchi no Makami",
+              "Dog-Dog Fruit Model Okuchi no Makami"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.5,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6367/index.html",
+                "note": "动画1049：雷鸣八卦、镜山与冰诸斩。幻兽形态下的冰系斩击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "yamato.mirror-mountain",
+            "version": 1,
+            "name": "镜山",
+            "englishName": "Mirror Mountain",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "犬犬果实大口真神形态",
+              "犬犬果实幻兽种大口真神形态",
+              "Inu Inu no Mi Model Okuchi no Makami",
+              "Dog-Dog Fruit Model Okuchi no Makami"
+            ],
+            "effects": [
+              {
+                "type": "SHIELD",
+                "power": 0.24,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6367/index.html",
+                "note": "动画1049：雷鸣八卦、镜山与冰诸斩。冰甲防御；护盾数值上限为游戏折算，不是治疗；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "yamato.coating",
+            "version": 2,
+            "name": "霸王色缠绕",
+            "englishName": "Conqueror coating",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 5,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "COATING",
+                "power": 0,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6367/index.html",
+                "note": "动画1049：雷鸣八卦、镜山与冰诸斩。与凯多交战的高级霸王色运用；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o6367/index.html",
+            "note": "动画1049：雷鸣八卦、镜山与冰诸斩。与凯多交战的高级霸王色运用；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "oden",
+      "names": [
+        "光月·御田",
+        "Kozuki Oden",
+        "光月御田",
+        "御田"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "oden",
+        "era": "生前（御田回想时期） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "oden.togen-totsuka",
+            "version": 1,
+            "name": "御田二刀流·桃源十拳",
+            "englishName": "Oden Two-Sword Style: Togen Totsuka",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 23,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.9,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o5993/index.html",
+                "note": "动画1004：御田二刀流·桃源十拳。赤鞘继承御田秘剑，御田原型不获得不存在的新招式；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "oden.togen-shirataki",
+            "version": 1,
+            "name": "御田二刀流·桃源白泷",
+            "englishName": "Oden Two-Sword Style: Togen Shirataki",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.55,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o5669/index.html",
+                "note": "动画961：御田二刀流·桃源白泷。对山神使用的双刀斩击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o5993/index.html",
+            "note": "动画1004：御田二刀流·桃源十拳。赤鞘继承御田秘剑，御田原型不获得不存在的新招式；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o5669/index.html",
+            "note": "动画961：御田二刀流·桃源白泷。对山神使用的双刀斩击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "ace",
+      "names": [
+        "波特卡斯·D·艾斯",
+        "Portgas D. Ace",
+        "艾斯",
+        "Ace"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "ace",
+        "era": "生前（巴拿罗岛交战时期） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "ace.fire-fist",
+            "version": 1,
+            "name": "火拳",
+            "englishName": "Fire Fist",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 11,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "烧烧果实",
+              "メラメラの実",
+              "Mera Mera no Mi",
+              "火焰果实",
+              "Flame-Flame Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.5,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o2749/index.html",
+                "note": "动画678：继承自艾斯的烧烧果实和火拳。沿用原作火拳，不杜撰死后新招；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "ace.flame-emperor",
+            "version": 1,
+            "name": "大炎戒·炎帝",
+            "englishName": "Great Flame Commandment: Flame Emperor",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 28,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "烧烧果实",
+              "メラメラの実",
+              "Mera Mera no Mi",
+              "火焰果实",
+              "Flame-Flame Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 2,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/figure/82135/index.html",
+                "note": "官方原作场景商品说明：大炎戒·炎帝。大型火球终结攻击，不附加不死鸟再生；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o2749/index.html",
+            "note": "动画678：继承自艾斯的烧烧果实和火拳。沿用原作火拳，不杜撰死后新招；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/figure/82135/index.html",
+            "note": "官方原作场景商品说明：大炎戒·炎帝。大型火球终结攻击，不附加不死鸟再生；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "sabo",
+      "names": [
+        "萨博",
+        "Sabo",
+        "炎帝萨博"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "sabo",
+        "era": "德雷斯罗萨以后（取得烧烧果实后） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "sabo.dragon-claw",
+            "version": 1,
+            "name": "龙爪拳",
+            "englishName": "Dragon Claw Fist",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o2867/index.html",
+                "note": "动画737：龙爪拳。本身体术，不必持有烧烧果实才可使用；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "sabo.fire-fist",
+            "version": 1,
+            "name": "火拳",
+            "englishName": "Fire Fist",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "烧烧果实",
+              "メラメラの実",
+              "Mera Mera no Mi",
+              "火焰果实",
+              "Flame-Flame Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.55,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o2749/index.html",
+                "note": "动画678：萨博继承烧烧果实与火拳。继承艾斯果实后才能使用的火焰拳；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "sabo.flame-dragon-king",
+            "version": 1,
+            "name": "火炎龙王（动画）",
+            "englishName": "Flame Dragon King (anime)",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 20,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "烧烧果实",
+              "メラメラの実",
+              "Mera Mera no Mi",
+              "火焰果实",
+              "Flame-Flame Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.8,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o2851/index.html",
+                "note": "动画729：火炎龙王（本次采用动画表现）。明确采用动画729的表现，不冒充漫画新增招式；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o2867/index.html",
+            "note": "动画737：龙爪拳。本身体术，不必持有烧烧果实才可使用；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o2749/index.html",
+            "note": "动画678：萨博继承烧烧果实与火拳。继承艾斯果实后才能使用的火焰拳；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o2851/index.html",
+            "note": "动画729：火炎龙王（本次采用动画表现）。明确采用动画729的表现，不冒充漫画新增招式；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "marco",
+      "names": [
+        "马尔高",
+        "Marco",
+        "马尔科"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "marco",
+        "era": "和之国（不死鸟形态） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "marco.phoenix-regeneration",
+            "version": 1,
+            "name": "不死鸟再生（能力）",
+            "englishName": "Phoenix regeneration (ability)",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 16,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 0.7,
+            "requiredFruits": [
+              "鸟鸟果实不死鸟形态",
+              "鸟鸟果实不死鸟型态",
+              "鸟鸟果实幻兽种不死鸟形态",
+              "鸟鸟果实幻兽种不死鸟型态",
+              "Tori Tori no Mi Model Phoenix",
+              "Bird-Bird Fruit Model Phoenix"
+            ],
+            "effects": [
+              {
+                "type": "HEAL",
+                "power": 0.24,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/marco/index.html",
+                "note": "官方角色资料：不死鸟再生，并非燃烧伤害。自身蓝炎再生，不当作燃烧敌人的火焰；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "marco.phoenix-brand",
+            "version": 1,
+            "name": "凤凰印",
+            "englishName": "Phoenix Brand",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 11,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "鸟鸟果实不死鸟形态",
+              "鸟鸟果实不死鸟型态",
+              "鸟鸟果实幻兽种不死鸟形态",
+              "鸟鸟果实幻兽种不死鸟型态",
+              "Tori Tori no Mi Model Phoenix",
+              "Bird-Bird Fruit Model Phoenix"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.5,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6181/index.html",
+                "note": "动画1022：马尔高拦截奎因的激光。漫画1006、动画1022的冲击；招式名对照 https://onepiece.fandom.com/wiki/Marco ；蓝炎不自动附加灼烧；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "marco.bluebird",
+            "version": 1,
+            "name": "青炎雁",
+            "englishName": "Bluebird",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 17,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "鸟鸟果实不死鸟形态",
+              "鸟鸟果实不死鸟型态",
+              "鸟鸟果实幻兽种不死鸟形态",
+              "鸟鸟果实幻兽种不死鸟型态",
+              "Tori Tori no Mi Model Phoenix",
+              "Bird-Bird Fruit Model Phoenix"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6181/index.html",
+                "note": "动画1022：马尔高拦截奎因的激光。漫画1006对烬的蓝炎投射冲击；招式名对照 https://onepiece.fandom.com/wiki/Marco ；不附加毒或燃烧；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/character/marco/index.html",
+            "note": "官方角色资料：不死鸟再生，并非燃烧伤害。自身蓝炎再生，不当作燃烧敌人的火焰；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o6181/index.html",
+            "note": "动画1022：马尔高拦截奎因的激光。漫画1006对烬的蓝炎投射冲击；招式名对照 https://onepiece.fandom.com/wiki/Marco ；不附加毒或燃烧；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "jozu",
+      "names": [
+        "乔兹",
+        "Jozu"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "jozu",
+        "era": "顶上战争（钻石化） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "jozu.diamond-body",
+            "version": 1,
+            "name": "钻石化（能力）",
+            "englishName": "Diamond body (ability)",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 10,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "闪亮果实",
+              "钻石果实",
+              "キラキラの実",
+              "Kira Kira no Mi",
+              "Twinkle-Twinkle Fruit"
+            ],
+            "effects": [
+              {
+                "type": "GUARD",
+                "power": 0.28,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/jozu/index.html",
+                "note": "官方角色资料：钻石化提高攻防。身体硬化，以减伤表示而非凭空回复血量；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "jozu.brilliant-punk",
+            "version": 1,
+            "name": "闪耀·冲撞",
+            "englishName": "Brilliant Punk",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 13,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "闪亮果实",
+              "钻石果实",
+              "キラキラの実",
+              "Kira Kira no Mi",
+              "Twinkle-Twinkle Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.6,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/jozu/index.html",
+                "note": "官方角色资料：钻石化提高攻防。钻石化冲撞；招式名对照 https://onepiece.fandom.com/wiki/Kira_Kira_no_Mi ，不采用游戏原创Cabochon Knuckle；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/character/jozu/index.html",
+            "note": "官方角色资料：钻石化提高攻防。钻石化冲撞；招式名对照 https://onepiece.fandom.com/wiki/Kira_Kira_no_Mi ，不采用游戏原创Cabochon Knuckle；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "vista",
+      "names": [
+        "比斯塔",
+        "Vista",
+        "花剑比斯塔"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "vista",
+        "era": "顶上战争（花剑二刀流） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "vista.two-sword-style",
+            "version": 1,
+            "name": "花剑·二刀流（剑术）",
+            "englishName": "Flower Sword: two-sword style (descriptive)",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 11,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.55,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/bista/index.html",
+                "note": "官方角色资料：花剑比斯塔的二刀流。原作未公开可独立核实的命名绝招；不补造追击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/character/bista/index.html",
+            "note": "官方角色资料：花剑比斯塔的二刀流。原作未公开可独立核实的命名绝招；不补造追击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "katakuri",
+      "names": [
+        "夏洛特·卡塔库栗",
+        "Charlotte Katakuri",
+        "卡塔库栗"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "katakuri",
+        "era": "万国（觉醒与未来视） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "katakuri.buzz-cut-mochi",
+            "version": 1,
+            "name": "斩·切·年糕",
+            "englishName": "Buzz Cut Mochi",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 23,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "糯糯果实",
+              "モチモチの実",
+              "Mochi Mochi no Mi",
+              "糯米丸果实",
+              "Mochi-Mochi Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.9,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o4949/index.html",
+                "note": "动画870：蛇人、眼镜王蛇与斩切年糕。与眼镜王蛇对撞的旋转重击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "katakuri.future-sight",
+            "version": 1,
+            "name": "预见未来（见闻色）",
+            "englishName": "Future Sight",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 10,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "EVASION",
+                "power": 0.26,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o4869/index.html",
+                "note": "动画857：冷静和见闻色影响卡塔库栗回避。通过见闻色和变形避开攻击，非无条件永久免疫；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o4949/index.html",
+            "note": "动画870：蛇人、眼镜王蛇与斩切年糕。与眼镜王蛇对撞的旋转重击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o4869/index.html",
+            "note": "动画857：冷静和见闻色影响卡塔库栗回避。通过见闻色和变形避开攻击，非无条件永久免疫；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "cracker",
+      "names": [
+        "夏洛特·克力架",
+        "Charlotte Cracker",
+        "克力架"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "cracker",
+        "era": "万国（饼干构装） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "cracker.hard-biscuit",
+            "version": 1,
+            "name": "硬饼干",
+            "englishName": "Hard Biscuit",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "饼干果实",
+              "ビスビスの実",
+              "Bisu Bisu no Mi",
+              "Bis-Bis Fruit"
+            ],
+            "effects": [
+              {
+                "type": "SHIELD",
+                "power": 0.28,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o4471/index.html",
+                "note": "动画799：硬饼干防御。饼干防御；盾值是游戏折算，不视为治疗；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "cracker.biscuit-soldiers",
+            "version": 1,
+            "name": "饼干士兵（能力）",
+            "englishName": "Biscuit soldiers (ability)",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 12,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "饼干果实",
+              "ビスビスの実",
+              "Bisu Bisu no Mi",
+              "Bis-Bis Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.5,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o4473/index.html",
+                "note": "动画800：饼干士兵攻击与重建。士兵挥砍折算本人的一次攻击，不生成无限独立行动单位；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o4471/index.html",
+            "note": "动画799：硬饼干防御。饼干防御；盾值是游戏折算，不视为治疗；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o4473/index.html",
+            "note": "动画800：饼干士兵攻击与重建。士兵挥砍折算本人的一次攻击，不生成无限独立行动单位；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "king",
+      "names": [
+        "烬",
+        "King",
+        "炎灾烬"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "king",
+        "era": "和之国（露娜利亚族／翼龙形态） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "king.imperial-flame-dragon",
+            "version": 1,
+            "name": "御守火龙皇",
+            "englishName": "Imperial Flame Dragon",
+            "origin": "RACIAL",
+            "target": "ALL_ENEMIES",
+            "energy": 25,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.95,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/61675/index.html",
+                "note": "动画1062：阎王三刀龙与御守火龙皇。露娜利亚族火焰，不错误要求翼龙果实才能使用火；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "king.lunarian-flame",
+            "version": 1,
+            "name": "背部火焰（露娜利亚族）",
+            "englishName": "Lunarian flame defense",
+            "origin": "RACIAL",
+            "target": "SELF",
+            "energy": 11,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "GUARD",
+                "power": 0.28,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/61675/index.html",
+                "note": "动画1062：阎王三刀龙与御守火龙皇。背部有火时的防御特性；未模拟开关时速度交换；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "king.tempura-udon",
+            "version": 1,
+            "name": "貂自尊皇",
+            "englishName": "Tempura Udon",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 15,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "龙龙果实无齿翼龙形态",
+              "龙龙果实古代种无齿翼龙形态",
+              "Ryu Ryu no Mi Model Pteranodon",
+              "Dragon-Dragon Fruit Model Pteranodon"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.65,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/61434/index.html",
+                "note": "动画1058：貂自尊皇。拉伸翼龙头部的攻击，依赖翼龙果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/61675/index.html",
+            "note": "动画1062：阎王三刀龙与御守火龙皇。背部有火时的防御特性；未模拟开关时速度交换；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/61434/index.html",
+            "note": "动画1058：貂自尊皇。拉伸翼龙头部的攻击，依赖翼龙果实；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "queen",
+      "names": [
+        "奎因",
+        "Queen",
+        "疫灾奎因"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "queen",
+        "era": "和之国（改造人／腕龙形态） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "queen.brachio-bomber",
+            "version": 1,
+            "name": "腕龙炸弹",
+            "englishName": "Brachio Bomber",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 17,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "龙龙果实腕龙形态",
+              "龙龙果实古代种腕龙形态",
+              "Ryu Ryu no Mi Model Brachiosaurus",
+              "Dragon-Dragon Fruit Model Brachiosaurus"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o5503/index.html",
+                "note": "动画946：腕龙炸弹。腕龙形态从高处砸落；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "queen.brachio-coil",
+            "version": 1,
+            "name": "腕龙盘绕",
+            "englishName": "Brachio Coil",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 18,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "龙龙果实腕龙形态",
+              "龙龙果实古代种腕龙形态",
+              "Ryu Ryu no Mi Model Brachiosaurus",
+              "Dragon-Dragon Fruit Model Brachiosaurus"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.2,
+                "duration": 0
+              },
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o6403/index.html",
+                "note": "动画1053：恶魔风脚、外骨骼恢复与腕龙盘绕。分离缠绕的束缚攻击；不永远锁住对手；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "queen.cyborg-laser",
+            "version": 1,
+            "name": "改造人镭射（能力）",
+            "englishName": "Cyborg laser (ability)",
+            "origin": "EQUIPMENT",
+            "target": "ENEMY",
+            "energy": 10,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/61599/index.html",
+                "note": "动画1061：魔神风脚、高速移动与杰尔马改造。科技复制的镭射，不要求腕龙果实来解锁机器；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o5503/index.html",
+            "note": "动画946：腕龙炸弹。腕龙形态从高处砸落；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o6403/index.html",
+            "note": "动画1053：恶魔风脚、外骨骼恢复与腕龙盘绕。分离缠绕的束缚攻击；不永远锁住对手；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/61599/index.html",
+            "note": "动画1061：魔神风脚、高速移动与杰尔马改造。科技复制的镭射，不要求腕龙果实来解锁机器；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "jack",
+      "names": [
+        "杰克",
+        "Jack",
+        "旱灾杰克"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "jack",
+        "era": "和之国（猛犸象形态） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "jack.mammoth-form",
+            "version": 1,
+            "name": "猛犸象形态",
+            "englishName": "Mammoth form",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "象象果实猛犸象形态",
+              "象象果实古代种猛犸象形态",
+              "Zou Zou no Mi Model Mammoth",
+              "象象果实长毛象型态",
+              "Elephant-Elephant Fruit Model Mammoth"
+            ],
+            "effects": [
+              {
+                "type": "ATTACK_UP",
+                "power": 0.2,
+                "duration": 3
+              },
+              {
+                "type": "GUARD",
+                "power": 0.15,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/Jack/index.html",
+                "note": "官方角色资料：象象果实古代种猛犸象。古代种动物形态，不添加旱灾字面造成的诅咒；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "jack.mammoth-sweep",
+            "version": 1,
+            "name": "猛犸横扫（动作描述）",
+            "englishName": "Mammoth sweep (descriptive)",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 12,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "象象果实猛犸象形态",
+              "象象果实古代种猛犸象形态",
+              "Zou Zou no Mi Model Mammoth",
+              "象象果实长毛象型态",
+              "Elephant-Elephant Fruit Model Mammoth"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.55,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o5991/index.html",
+                "note": "动画1003：猛犸象横扫。巨体和象鼻横扫，非原作命名必杀技；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/character/Jack/index.html",
+            "note": "官方角色资料：象象果实古代种猛犸象。古代种动物形态，不添加旱灾字面造成的诅咒；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o5991/index.html",
+            "note": "动画1003：猛犸象横扫。巨体和象鼻横扫，非原作命名必杀技；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "doflamingo",
+      "names": [
+        "唐吉诃德·多弗朗明哥",
+        "Donquixote Doflamingo",
+        "多弗朗明哥",
+        "明哥"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "doflamingo",
+        "era": "德雷斯罗萨（果实觉醒） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "doflamingo.god-thread",
+            "version": 1,
+            "name": "十六发神圣凶弹·神诛杀",
+            "englishName": "Sixteen Holy Bullets: God Thread",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 27,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "线线果实",
+              "イトイトの実",
+              "Ito Ito no Mi",
+              "String-String Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 2,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o2859/index.html",
+                "note": "动画733：觉醒线与神诛杀。觉醒线终结攻击；不套用没有剧情依据的毒伤；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "doflamingo.five-colored-strings",
+            "version": 1,
+            "name": "五色线",
+            "englishName": "Five-Colored Strings",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 10,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "线线果实",
+              "イトイトの実",
+              "Ito Ito no Mi",
+              "String-String Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.45,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/greg/o20151104_0481/index.html",
+                "note": "官方原作讲座：五色线是已命名近身攻击。已命名的近身线斩，不因动画上色杜撰额外五种元素；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o2859/index.html",
+            "note": "动画733：觉醒线与神诛杀。觉醒线终结攻击；不套用没有剧情依据的毒伤；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/greg/o20151104_0481/index.html",
+            "note": "官方原作讲座：五色线是已命名近身攻击。已命名的近身线斩，不因动画上色杜撰额外五种元素；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "crocodile",
+      "names": [
+        "克洛克达尔",
+        "Crocodile",
+        "沙鳄鱼",
+        "沙·克洛克达尔"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "crocodile",
+        "era": "阿拉巴斯坦—顶上战争已公开招式 · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "crocodile.desert-la-spada",
+            "version": 1,
+            "name": "沙漠金刚宝刀",
+            "englishName": "Desert La Spada",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 19,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "沙沙果实",
+              "スナスナの実",
+              "Suna Suna no Mi",
+              "沙砾果实",
+              "Sand-Sand Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.75,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/news/o20210709_12783/index.html",
+                "note": "官方阿拉巴斯坦回顾：沙漠金刚宝刀。阿拉巴斯坦决战中的强化沙刃攻击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "crocodile.sables",
+            "version": 1,
+            "name": "沙岚",
+            "englishName": "Sables",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 13,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "沙沙果实",
+              "スナスナの実",
+              "Suna Suna no Mi",
+              "沙砾果实",
+              "Sand-Sand Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.55,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/110/index.html",
+                "note": "动画110：沙暴与沙化。沙暴攻击而非元素治疗；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "crocodile.dehydration",
+            "version": 1,
+            "name": "水分吸收（能力）",
+            "englishName": "Dehydration (ability)",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 13,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "沙沙果实",
+              "スナスナの実",
+              "Suna Suna no Mi",
+              "沙砾果实",
+              "Sand-Sand Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.2,
+                "duration": 0
+              },
+              {
+                "type": "DEFENSE_DOWN",
+                "power": 0.15,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/92/index.html",
+                "note": "动画92：克洛克达尔让敌人干枯。接触脱水以伤害和暂时削弱抽象，不给自身吸血；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/news/o20210709_12783/index.html",
+            "note": "官方阿拉巴斯坦回顾：沙漠金刚宝刀。阿拉巴斯坦决战中的强化沙刃攻击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/110/index.html",
+            "note": "动画110：沙暴与沙化。沙暴攻击而非元素治疗；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/92/index.html",
+            "note": "动画92：克洛克达尔让敌人干枯。接触脱水以伤害和暂时削弱抽象，不给自身吸血；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "enel",
+      "names": [
+        "艾尼路",
+        "Enel",
+        "Eneru"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "enel",
+        "era": "空岛 · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "enel.el-thor",
+            "version": 1,
+            "name": "神之制裁",
+            "englishName": "El Thor",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 15,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "响雷果实",
+              "ゴロゴロの実",
+              "Goro Goro no Mi",
+              "轰雷果实",
+              "Rumble-Rumble Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.65,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/158/index.html",
+                "note": "动画158：神之制裁。纯雷电攻击；不把其视作实体武器打击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": [
+              "PURE_LIGHTNING"
+            ]
+          },
+          {
+            "id": "enel.mantra",
+            "version": 1,
+            "name": "心网",
+            "englishName": "Mantra",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 9,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "EVASION",
+                "power": 0.22,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/skypiea/index.html",
+                "note": "官方空岛回顾：心网与雷电；雷迎需额外雷云条件。感知与预判的回避窗口；雷迎需额外雷云不列为随时可用技能；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/158/index.html",
+            "note": "动画158：神之制裁。纯雷电攻击；不把其视作实体武器打击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/story/skypiea/index.html",
+            "note": "官方空岛回顾：心网与雷电；雷迎需额外雷云条件。感知与预判的回避窗口；雷迎需额外雷云不列为随时可用技能；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "lucci",
+      "names": [
+        "罗布·路奇",
+        "Rob Lucci",
+        "路奇"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "lucci",
+        "era": "蛋头岛（豹形态觉醒后） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "lucci.shugan",
+            "version": 1,
+            "name": "手枪",
+            "englishName": "Hand Pistol (Shugan)",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 14,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "猫猫果实豹形态",
+              "猫猫果实普通种豹形态",
+              "Neko Neko no Mi Model Leopard"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.6,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/66166/index.html",
+                "note": "动画1100：五档与觉醒路奇。原作1069、动画1100对战桃丸使用觉醒豹爪贯穿攻击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "lucci.rokuogan",
+            "version": 1,
+            "name": "六王枪",
+            "englishName": "Six King Gun",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 19,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.8,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/66165/index.html",
+                "note": "动画1099：路奇对阿特拉斯使用六王枪。六式体术奥义；不是凭果实复制的招式；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "lucci.awakened-leopard",
+            "version": 1,
+            "name": "豹形态觉醒",
+            "englishName": "Awakened leopard form",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "猫猫果实豹形态",
+              "猫猫果实普通种豹形态",
+              "Neko Neko no Mi Model Leopard"
+            ],
+            "effects": [
+              {
+                "type": "ATTACK_UP",
+                "power": 0.22,
+                "duration": 3
+              },
+              {
+                "type": "EVASION",
+                "power": 0.12,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/66166/index.html",
+                "note": "动画1100：五档与觉醒路奇。猫猫果实豹形态的觉醒，不默认获得治疗；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/66166/index.html",
+            "note": "动画1100：五档与觉醒路奇。猫猫果实豹形态的觉醒，不默认获得治疗；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/66165/index.html",
+            "note": "动画1099：路奇对阿特拉斯使用六王枪。六式体术奥义；不是凭果实复制的招式；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "hancock",
+      "names": [
+        "波雅·汉库克",
+        "Boa Hancock",
+        "汉库克",
+        "女帝"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "hancock",
+        "era": "九蛇时期（已公开石化能力） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "hancock.love-love-mellow",
+            "version": 1,
+            "name": "甜甜甘风",
+            "englishName": "Love-Love Mellow",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "甜甜果实",
+              "メロメロの実",
+              "Mero Mero no Mi",
+              "迷恋果实",
+              "Love-Love Fruit"
+            ],
+            "effects": [
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/412/index.html",
+                "note": "动画412：甜甜甘风对路飞无效。情感相关石化以一次打断折算；路飞在原作不受此招影响；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": [
+              "HANCOCK_MELLOW"
+            ]
+          },
+          {
+            "id": "hancock.perfume-femur",
+            "version": 1,
+            "name": "芳香脚",
+            "englishName": "Perfume Femur",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 14,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "甜甜果实",
+              "メロメロの実",
+              "Mero Mero no Mi",
+              "迷恋果实",
+              "Love-Love Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              },
+              {
+                "type": "DEFENSE_DOWN",
+                "power": 0.12,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/figure/o5365/index.html",
+                "note": "官方动画场景商品说明：芳香脚的接触石化。接触石化的踢击；不能把甜甜甘风的例外推广到所有踢击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/412/index.html",
+            "note": "动画412：甜甜甘风对路飞无效。情感相关石化以一次打断折算；路飞在原作不受此招影响；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/figure/o5365/index.html",
+            "note": "官方动画场景商品说明：芳香脚的接触石化。接触石化的踢击；不能把甜甜甘风的例外推广到所有踢击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "kuma",
+      "names": [
+        "巴索罗缪·大熊",
+        "Bartholomew Kuma",
+        "大熊",
+        "巴索罗米·熊",
+        "巴索罗缪·熊"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "kuma",
+        "era": "恐怖三桅帆船—香波地交战时期 · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "kuma.ursus-shock",
+            "version": 1,
+            "name": "熊之冲击",
+            "englishName": "Ursus Shock",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 24,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "肉球果实",
+              "ニキュニキュの実",
+              "Nikyu Nikyu no Mi",
+              "Paw-Paw Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.9,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/377/index.html",
+                "note": "动画377：熊之冲击与改造人光束。压缩大气爆发的范围攻击；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "kuma.cyborg-beam",
+            "version": 1,
+            "name": "改造人光束（能力）",
+            "englishName": "Cyborg beam (ability)",
+            "origin": "EQUIPMENT",
+            "target": "ENEMY",
+            "energy": 11,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.45,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/377/index.html",
+                "note": "动画377：熊之冲击与改造人光束。光束来自身体改造，与肉球果实来源分开；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/377/index.html",
+            "note": "动画377：熊之冲击与改造人光束。光束来自身体改造，与肉球果实来源分开；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "moria",
+      "names": [
+        "月光·莫利亚",
+        "Gecko Moria",
+        "莫利亚",
+        "月光·摩利亚"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "moria",
+        "era": "恐怖三桅帆船（预存影子时） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "moria.shadow-asgard",
+            "version": 1,
+            "name": "影子集合地",
+            "englishName": "Shadow’s Asgard",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 16,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "影影果实",
+              "影子果实",
+              "カゲカゲの実",
+              "Kage Kage no Mi",
+              "Shadow-Shadow Fruit"
+            ],
+            "effects": [
+              {
+                "type": "ATTACK_UP",
+                "power": 0.28,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/374/index.html",
+                "note": "动画374：影子集合地。吸收影子后的有限强化窗口，不永久加属性；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "moria.doppelman",
+            "version": 1,
+            "name": "影法师",
+            "englishName": "Doppelman",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 10,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "影影果实",
+              "影子果实",
+              "カゲカゲの実",
+              "Kage Kage no Mi",
+              "Shadow-Shadow Fruit"
+            ],
+            "effects": [
+              {
+                "type": "EVASION",
+                "power": 0.23,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/371/index.html",
+                "note": "动画371：影法师换位。本人与影子换位的回避抽象；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "moria.shadow-spear",
+            "version": 1,
+            "name": "角刀影",
+            "englishName": "Shadow Spear",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 14,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "影影果实",
+              "影子果实",
+              "カゲカゲの実",
+              "Kage Kage no Mi",
+              "Shadow-Shadow Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.6,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/465/index.html",
+                "note": "动画465：角刀影。影子穿刺攻击，不生成独立行动的影分身；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/374/index.html",
+            "note": "动画374：影子集合地。吸收影子后的有限强化窗口，不永久加属性；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/371/index.html",
+            "note": "动画371：影法师换位。本人与影子换位的回避抽象；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/465/index.html",
+            "note": "动画465：角刀影。影子穿刺攻击，不生成独立行动的影分身；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "perona",
+      "names": [
+        "佩罗娜",
+        "Perona"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "perona",
+        "era": "恐怖三桅帆船—新世界已公开能力 · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "perona.negative-hollow",
+            "version": 1,
+            "name": "消极幽灵",
+            "englishName": "Negative Hollow",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "灵灵果实",
+              "ホロホロの実",
+              "Horo Horo no Mi",
+              "鬼魂果实",
+              "Hollow-Hollow Fruit"
+            ],
+            "effects": [
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              },
+              {
+                "type": "ATTACK_DOWN",
+                "power": 0.2,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/357/index.html",
+                "note": "动画357：消极幽灵对乌索普无效。保留乌索普的特定免疫；不是所有幽灵都造成同样效果；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": [
+              "NEGATIVE_HOLLOW"
+            ]
+          },
+          {
+            "id": "perona.ghost-bomb",
+            "version": 1,
+            "name": "幽灵炸弹（能力）",
+            "englishName": "Ghost bomb (ability)",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 10,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "灵灵果实",
+              "ホロホロの実",
+              "Horo Horo no Mi",
+              "鬼魂果实",
+              "Hollow-Hollow Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/361/index.html",
+                "note": "动画361：佩罗娜灵体与对乌索普交战。爆炸型幽灵仍能影响乌索普，不套用消极幽灵免疫；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/357/index.html",
+            "note": "动画357：消极幽灵对乌索普无效。保留乌索普的特定免疫；不是所有幽灵都造成同样效果；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/361/index.html",
+            "note": "动画361：佩罗娜灵体与对乌索普交战。爆炸型幽灵仍能影响乌索普，不套用消极幽灵免疫；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "magellan",
+      "names": [
+        "麦哲伦",
+        "Magellan"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "magellan",
+        "era": "推进城 · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "magellan.hydra",
+            "version": 1,
+            "name": "毒龙",
+            "englishName": "Hydra",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 14,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "毒毒果实",
+              "ドクドクの実",
+              "Doku Doku no Mi",
+              "Venom-Venom Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.15,
+                "duration": 0
+              },
+              {
+                "type": "POISON",
+                "power": 0.025,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/435/index.html",
+                "note": "动画435：毒龙。接触中毒折算持续掉血；不将毒伤当火焰；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "magellan.venom-demon",
+            "version": 1,
+            "name": "毒之巨兵·地狱之审判",
+            "englishName": "Venom Demon: Hell’s Judgment",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 25,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "毒毒果实",
+              "ドクドクの実",
+              "Doku Doku no Mi",
+              "Venom-Venom Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              },
+              {
+                "type": "POISON",
+                "power": 0.04,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/450/index.html",
+                "note": "动画450：甚平的枪波；麦哲伦的毒之巨兵。更强接触传播毒以范围毒伤抽象；不模拟毒素实体传播网络；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/435/index.html",
+            "note": "动画435：毒龙。接触中毒折算持续掉血；不将毒伤当火焰；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/450/index.html",
+            "note": "动画450：甚平的枪波；麦哲伦的毒之巨兵。更强接触传播毒以范围毒伤抽象；不模拟毒素实体传播网络；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "bartolomeo",
+      "names": [
+        "巴托洛米奥",
+        "Bartolomeo",
+        "巴托罗米奥"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "bartolomeo",
+        "era": "德雷斯罗萨 · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "bartolomeo.barrier",
+            "version": 1,
+            "name": "屏障",
+            "englishName": "Barrier",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "屏障果实",
+              "バリバリの実",
+              "Bari Bari no Mi",
+              "护罩果实",
+              "Barrier-Barrier Fruit"
+            ],
+            "effects": [
+              {
+                "type": "SHIELD",
+                "power": 0.3,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o2783/index.html",
+                "note": "动画695：屏障防御。本引擎以有上限护盾折算；不声称原作屏障会被同数值打碎；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "bartolomeo.barrier-pistol",
+            "version": 1,
+            "name": "致敬神拳·屏障手枪",
+            "englishName": "Homage Holy Fist: Barrier Pistol",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 14,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "屏障果实",
+              "バリバリの実",
+              "Bari Bari no Mi",
+              "护罩果实",
+              "Barrier-Barrier Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.6,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/o2819/index.html",
+                "note": "动画713：致敬神拳。模仿路飞动作的屏障拳，不获得橡胶果实技能；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/o2783/index.html",
+            "note": "动画695：屏障防御。本引擎以有上限护盾折算；不声称原作屏障会被同数值打碎；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/o2819/index.html",
+            "note": "动画713：致敬神拳。模仿路飞动作的屏障拳，不获得橡胶果实技能；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "bonclay",
+      "names": [
+        "本萨姆",
+        "Bentham",
+        "冯·克雷",
+        "冯克雷",
+        "Mr. 2",
+        "Bon Clay"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "bonclay",
+        "era": "阿拉巴斯坦—推进城 · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "bonclay.ballet-kenpo",
+            "version": 1,
+            "name": "人妖拳法（芭蕾拳法）",
+            "englishName": "Okama Kenpo (Ballet Kenpo)",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/116/index.html",
+                "note": "动画116：人妖拳法与模仿变身限制。体术流派，不要求模仿果实才能出拳；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "bonclay.mane-mane-feint",
+            "version": 1,
+            "name": "模仿变身（佯动）",
+            "englishName": "Clone-Clone disguise feint",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 8,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "模仿果实",
+              "模模果实",
+              "マネマネの実",
+              "Mane Mane no Mi",
+              "Clone-Clone Fruit"
+            ],
+            "effects": [
+              {
+                "type": "EVASION",
+                "power": 0.18,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/anime/92/index.html",
+                "note": "动画92：模仿果实变身。仅把外貌伪装映射为佯动；不复制属性、技能或假定能以娜美外形使用芭蕾拳法；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/anime/116/index.html",
+            "note": "动画116：人妖拳法与模仿变身限制。体术流派，不要求模仿果实才能出拳；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          },
+          {
+            "url": "https://one-piece.com/anime/92/index.html",
+            "note": "动画92：模仿果实变身。仅把外貌伪装映射为佯动；不复制属性、技能或假定能以娜美外形使用芭蕾拳法；倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    }
+  ]
+}
