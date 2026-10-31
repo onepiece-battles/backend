@@ -1,0 +1,4504 @@
+{
+  "version": 1,
+  "characters": [
+    {
+      "code": "luffy",
+      "names": [
+        "蒙奇·D·路飞",
+        "Monkey D. Luffy",
+        "路飞"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "luffy",
+        "era": "和之国决战",
+        "coatingLevel": 2,
+        "skills": [
+          {
+            "id": "luffy.signature",
+            "version": 1,
+            "name": "橡胶连击",
+            "englishName": "Monkey D. Luffy signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "橡胶果实",
+              "ゴムゴムの実",
+              "Gomu Gomu no Mi",
+              "人人果实幻兽种尼卡形态",
+              "人人果实尼卡形态",
+              "Hito Hito no Mi Model Nika"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/luffy/index.html",
+                "note": "路飞的橡胶招式、四档与和之国决战的霸王色运用；倍率和消耗为游戏设计。"
+              }
+            ]
+          },
+          {
+            "id": "luffy.followup",
+            "version": 1,
+            "name": "橡胶连击·追击",
+            "englishName": "Monkey D. Luffy follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "橡胶果实",
+              "ゴムゴムの実",
+              "Gomu Gomu no Mi",
+              "人人果实幻兽种尼卡形态",
+              "人人果实尼卡形态",
+              "Hito Hito no Mi Model Nika"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/luffy/index.html",
+                "note": "路飞的橡胶招式、四档与和之国决战的霸王色运用；倍率和消耗为游戏设计。"
+              }
+            ]
+          },
+          {
+            "id": "luffy.coating",
+            "version": 1,
+            "name": "霸王色缠绕",
+            "englishName": "Conqueror coating",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 5,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "COATING",
+                "power": 0,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/luffy/index.html",
+                "note": "路飞的橡胶招式、四档与和之国决战的霸王色运用；倍率和消耗为游戏设计。"
+              }
+            ]
+          },
+          {
+            "id": "luffy.special",
+            "version": 1,
+            "name": "四档强化",
+            "englishName": "Gear Four",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "橡胶果实",
+              "ゴムゴムの実",
+              "Gomu Gomu no Mi",
+              "人人果实幻兽种尼卡形态",
+              "人人果实尼卡形态",
+              "Hito Hito no Mi Model Nika"
+            ],
+            "effects": [
+              {
+                "type": "ATTACK_UP",
+                "power": 0.22,
+                "duration": 3
+              },
+              {
+                "type": "GUARD",
+                "power": 0.12,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/luffy/index.html",
+                "note": "路飞的橡胶招式、四档与和之国决战的霸王色运用；倍率和消耗为游戏设计。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/character/luffy/index.html",
+            "note": "路飞的橡胶招式、四档与和之国决战的霸王色运用；倍率和消耗为游戏设计。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "zoro",
+      "names": [
+        "罗罗诺亚·索隆",
+        "Roronoa Zoro",
+        "索隆",
+        "卓洛"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "zoro",
+        "era": "和之国决战",
+        "coatingLevel": 1,
+        "skills": [
+          {
+            "id": "zoro.signature",
+            "version": 1,
+            "name": "三刀流斩击",
+            "englishName": "Roronoa Zoro signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "罗罗诺亚·索隆的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "zoro.followup",
+            "version": 1,
+            "name": "三刀流斩击·追击",
+            "englishName": "Roronoa Zoro follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "罗罗诺亚·索隆的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "zoro.coating",
+            "version": 1,
+            "name": "霸王色缠绕",
+            "englishName": "Conqueror coating",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 5,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "COATING",
+                "power": 0,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "罗罗诺亚·索隆的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "罗罗诺亚·索隆的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "sanji",
+      "names": [
+        "山治",
+        "Sanji",
+        "文斯莫克·山治",
+        "香吉士"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "sanji",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "sanji.signature",
+            "version": 1,
+            "name": "恶魔风脚",
+            "englishName": "Sanji signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/sanji/index.html",
+                "note": "山治的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "sanji.followup",
+            "version": 1,
+            "name": "恶魔风脚·追击",
+            "englishName": "Sanji follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/sanji/index.html",
+                "note": "山治的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/character/sanji/index.html",
+            "note": "山治的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "nami",
+      "names": [
+        "娜美",
+        "Nami"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "nami",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "nami.signature",
+            "version": 1,
+            "name": "雷电天候",
+            "englishName": "Nami signature",
+            "origin": "TECHNIQUE",
+            "target": "ALL_ENEMIES",
+            "energy": 12,
+            "cooldown": 3,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.3,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/",
+                "note": "娜美的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "nami.followup",
+            "version": 1,
+            "name": "雷电天候·追击",
+            "englishName": "Nami follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/",
+                "note": "娜美的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/character/",
+            "note": "娜美的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "usopp",
+      "names": [
+        "乌索普",
+        "Usopp",
+        "撒谎布"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "usopp",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "usopp.signature",
+            "version": 1,
+            "name": "植物弹束缚",
+            "englishName": "Usopp signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 0.8,
+                "duration": 0
+              },
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/usopp/index.html",
+                "note": "乌索普的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "usopp.followup",
+            "version": 1,
+            "name": "植物弹束缚·追击",
+            "englishName": "Usopp follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/usopp/index.html",
+                "note": "乌索普的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/character/usopp/index.html",
+            "note": "官方角色资料明确描述乌索普不受消极幽灵影响；仅免疫该标签，不免疫其他控制或幽灵爆炸。"
+          }
+        ],
+        "immunities": [
+          "NEGATIVE_HOLLOW"
+        ]
+      }
+    },
+    {
+      "code": "chopper",
+      "names": [
+        "托尼托尼·乔巴",
+        "Tony Tony Chopper",
+        "乔巴"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "chopper",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "chopper.signature",
+            "version": 1,
+            "name": "强化形态",
+            "englishName": "Tony Tony Chopper signature",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "人人果实",
+              "ヒトヒトの実",
+              "Hito Hito no Mi"
+            ],
+            "effects": [
+              {
+                "type": "ATTACK_UP",
+                "power": 0.22,
+                "duration": 3
+              },
+              {
+                "type": "GUARD",
+                "power": 0.12,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "托尼托尼·乔巴的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "chopper.strike",
+            "version": 1,
+            "name": "托尼托尼·乔巴·反击",
+            "englishName": "Tony Tony Chopper strike",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "人人果实",
+              "ヒトヒトの実",
+              "Hito Hito no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "托尼托尼·乔巴的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "chopper.special",
+            "version": 1,
+            "name": "医疗处理",
+            "englishName": "Medical treatment",
+            "origin": "TECHNIQUE",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 0.7,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "HEAL",
+                "power": 0.24,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "托尼托尼·乔巴的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "托尼托尼·乔巴的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "robin",
+      "names": [
+        "妮可·罗宾",
+        "Nico Robin",
+        "罗宾"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "robin",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "robin.signature",
+            "version": 1,
+            "name": "花开束缚",
+            "englishName": "Nico Robin signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "花花果实",
+              "ハナハナの実",
+              "Hana Hana no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 0.8,
+                "duration": 0
+              },
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "妮可·罗宾的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "robin.followup",
+            "version": 1,
+            "name": "花开束缚·追击",
+            "englishName": "Nico Robin follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "花花果实",
+              "ハナハナの実",
+              "Hana Hana no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "妮可·罗宾的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "妮可·罗宾的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "franky",
+      "names": [
+        "弗兰奇",
+        "Franky",
+        "佛朗基"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "franky",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "franky.signature",
+            "version": 1,
+            "name": "激光炮击",
+            "englishName": "Franky signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "弗兰奇的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "franky.followup",
+            "version": 1,
+            "name": "激光炮击·追击",
+            "englishName": "Franky follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "弗兰奇的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "弗兰奇的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "brook",
+      "names": [
+        "布鲁克",
+        "Brook"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "brook",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "brook.signature",
+            "version": 1,
+            "name": "灵魂剑击",
+            "englishName": "Brook signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "黄泉果实",
+              "ヨミヨミの実",
+              "Yomi Yomi no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.15,
+                "duration": 0
+              },
+              {
+                "type": "DEFENSE_DOWN",
+                "power": 0.18,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "布鲁克的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "brook.followup",
+            "version": 1,
+            "name": "灵魂剑击·追击",
+            "englishName": "Brook follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "黄泉果实",
+              "ヨミヨミの実",
+              "Yomi Yomi no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "布鲁克的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "布鲁克的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "jinbe",
+      "names": [
+        "甚平",
+        "Jinbe",
+        "吉贝尔"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "jinbe",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "jinbe.signature",
+            "version": 1,
+            "name": "鱼人空手道",
+            "englishName": "Jinbe signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "甚平的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "jinbe.followup",
+            "version": 1,
+            "name": "鱼人空手道·追击",
+            "englishName": "Jinbe follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "甚平的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "jinbe.special",
+            "version": 1,
+            "name": "鱼人防御",
+            "englishName": "Fish-man defense",
+            "origin": "TECHNIQUE",
+            "target": "SELF",
+            "energy": 10,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 0.9,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "SHIELD",
+                "power": 0.22,
+                "duration": 0
+              },
+              {
+                "type": "GUARD",
+                "power": 0.25,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "甚平的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "甚平的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "shanks",
+      "names": [
+        "香克斯",
+        "Shanks",
+        "红发香克斯",
+        "红发"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "shanks",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 3,
+        "skills": [
+          {
+            "id": "shanks.signature",
+            "version": 1,
+            "name": "剑击",
+            "englishName": "Shanks signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/Shanks/index.html",
+                "note": "香克斯的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "shanks.followup",
+            "version": 1,
+            "name": "剑击·追击",
+            "englishName": "Shanks follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/Shanks/index.html",
+                "note": "香克斯的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "shanks.coating",
+            "version": 1,
+            "name": "霸王色缠绕",
+            "englishName": "Conqueror coating",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 5,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "COATING",
+                "power": 0,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/Shanks/index.html",
+                "note": "香克斯的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/character/Shanks/index.html",
+            "note": "香克斯的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "whitebeard",
+      "names": [
+        "爱德华·纽盖特",
+        "Edward Newgate",
+        "白胡子"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "whitebeard",
+        "era": "顶上战争：不预设巅峰时期霸缠",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "whitebeard.signature",
+            "version": 1,
+            "name": "震动冲击",
+            "englishName": "Edward Newgate signature",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 12,
+            "cooldown": 3,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "震震果实",
+              "グラグラの実",
+              "Gura Gura no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.3,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/news/o20210220_12159/index.html",
+                "note": "爱德华·纽盖特的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "whitebeard.followup",
+            "version": 1,
+            "name": "震动冲击·追击",
+            "englishName": "Edward Newgate follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "震震果实",
+              "グラグラの実",
+              "Gura Gura no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/news/o20210220_12159/index.html",
+                "note": "爱德华·纽盖特的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/news/o20210220_12159/index.html",
+            "note": "爱德华·纽盖特的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "roger",
+      "names": [
+        "哥尔·D·罗杰",
+        "Gol D. Roger",
+        "罗杰",
+        "哥尔D罗杰",
+        "Gol D Roger"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "roger",
+        "era": "御田回忆中的罗杰",
+        "coatingLevel": 3,
+        "skills": [
+          {
+            "id": "roger.signature",
+            "version": 1,
+            "name": "神避",
+            "englishName": "Gol D. Roger signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "哥尔·D·罗杰的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "roger.followup",
+            "version": 1,
+            "name": "神避·追击",
+            "englishName": "Gol D. Roger follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "哥尔·D·罗杰的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "roger.coating",
+            "version": 1,
+            "name": "霸王色缠绕",
+            "englishName": "Conqueror coating",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 5,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "COATING",
+                "power": 0,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "哥尔·D·罗杰的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "哥尔·D·罗杰的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "kaido",
+      "names": [
+        "凯多",
+        "Kaido",
+        "百兽凯多",
+        "Kaidou"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "kaido",
+        "era": "和之国决战",
+        "coatingLevel": 3,
+        "skills": [
+          {
+            "id": "kaido.signature",
+            "version": 1,
+            "name": "雷鸣八卦",
+            "englishName": "Kaido signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "凯多的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "kaido.followup",
+            "version": 1,
+            "name": "雷鸣八卦·追击",
+            "englishName": "Kaido follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "凯多的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "kaido.coating",
+            "version": 1,
+            "name": "霸王色缠绕",
+            "englishName": "Conqueror coating",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 5,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "COATING",
+                "power": 0,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "凯多的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "凯多的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "bigmom",
+      "names": [
+        "夏洛特·玲玲",
+        "Charlotte Linlin",
+        "大妈",
+        "BIG MOM",
+        "Big Mom"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "bigmom",
+        "era": "和之国决战",
+        "coatingLevel": 2,
+        "skills": [
+          {
+            "id": "bigmom.signature",
+            "version": 1,
+            "name": "威国",
+            "englishName": "Charlotte Linlin signature",
+            "origin": "TECHNIQUE",
+            "target": "ALL_ENEMIES",
+            "energy": 12,
+            "cooldown": 3,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.3,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "夏洛特·玲玲的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "bigmom.followup",
+            "version": 1,
+            "name": "威国·追击",
+            "englishName": "Charlotte Linlin follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "夏洛特·玲玲的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "bigmom.coating",
+            "version": 1,
+            "name": "霸王色缠绕",
+            "englishName": "Conqueror coating",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 5,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "COATING",
+                "power": 0,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "夏洛特·玲玲的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "夏洛特·玲玲的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "blackbeard",
+      "names": [
+        "马歇尔·D·蒂奇",
+        "Marshall D. Teach",
+        "黑胡子",
+        "蒂奇"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "blackbeard",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "blackbeard.signature",
+            "version": 1,
+            "name": "暗水牵制",
+            "englishName": "Marshall D. Teach signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "暗暗果实",
+              "ヤミヤミの実",
+              "Yami Yami no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 0.8,
+                "duration": 0
+              },
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "马歇尔·D·蒂奇的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "blackbeard.followup",
+            "version": 1,
+            "name": "暗水牵制·追击",
+            "englishName": "Marshall D. Teach follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "暗暗果实",
+              "ヤミヤミの実",
+              "Yami Yami no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "马歇尔·D·蒂奇的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "马歇尔·D·蒂奇的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "akainu",
+      "names": [
+        "萨卡斯基",
+        "Sakazuki",
+        "赤犬",
+        "Akainu"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "akainu",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "akainu.signature",
+            "version": 1,
+            "name": "岩浆重击",
+            "englishName": "Sakazuki signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "岩浆果实",
+              "マグマグの実",
+              "Magu Magu no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "萨卡斯基的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "akainu.followup",
+            "version": 1,
+            "name": "岩浆重击·追击",
+            "englishName": "Sakazuki follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "岩浆果实",
+              "マグマグの実",
+              "Magu Magu no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "萨卡斯基的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "萨卡斯基的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "kuzan",
+      "names": [
+        "库赞",
+        "Kuzan",
+        "青雉",
+        "Aokiji"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "kuzan",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "kuzan.signature",
+            "version": 1,
+            "name": "冰冻束缚",
+            "englishName": "Kuzan signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "冰冻果实",
+              "冰冰果实",
+              "ヒエヒエの実",
+              "Hie Hie no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 0.8,
+                "duration": 0
+              },
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/kuzan/index.html",
+                "note": "库赞的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "kuzan.followup",
+            "version": 1,
+            "name": "冰冻束缚·追击",
+            "englishName": "Kuzan follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "冰冻果实",
+              "冰冰果实",
+              "ヒエヒエの実",
+              "Hie Hie no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/kuzan/index.html",
+                "note": "库赞的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/character/kuzan/index.html",
+            "note": "库赞的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "kizaru",
+      "names": [
+        "波鲁萨利诺",
+        "Borsalino",
+        "黄猿",
+        "Kizaru"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "kizaru",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "kizaru.signature",
+            "version": 1,
+            "name": "光速射击",
+            "englishName": "Borsalino signature",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 12,
+            "cooldown": 3,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "闪闪果实",
+              "闪光果实",
+              "ピカピカの実",
+              "Pika Pika no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.3,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "波鲁萨利诺的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "kizaru.followup",
+            "version": 1,
+            "name": "光速射击·追击",
+            "englishName": "Borsalino follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "闪闪果实",
+              "闪光果实",
+              "ピカピカの実",
+              "Pika Pika no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "波鲁萨利诺的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "波鲁萨利诺的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "fujitora",
+      "names": [
+        "一笑",
+        "Issho",
+        "藤虎",
+        "Fujitora"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "fujitora",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "fujitora.signature",
+            "version": 1,
+            "name": "重力压制",
+            "englishName": "Issho signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "重重果实",
+              "ズシズシの実",
+              "Zushi Zushi no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 0.8,
+                "duration": 0
+              },
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "一笑的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "fujitora.followup",
+            "version": 1,
+            "name": "重力压制·追击",
+            "englishName": "Issho follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "重重果实",
+              "ズシズシの実",
+              "Zushi Zushi no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "一笑的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "一笑的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "garp",
+      "names": [
+        "蒙奇·D·卡普",
+        "Monkey D. Garp",
+        "卡普",
+        "Garp"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "garp",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "garp.signature",
+            "version": 1,
+            "name": "铁拳",
+            "englishName": "Monkey D. Garp signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "原作铁拳表现；不根据称号或战力自动推断高级霸气。"
+              }
+            ]
+          },
+          {
+            "id": "garp.followup",
+            "version": 1,
+            "name": "铁拳·追击",
+            "englishName": "Monkey D. Garp follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "原作铁拳表现；不根据称号或战力自动推断高级霸气。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "原作铁拳表现；不根据称号或战力自动推断高级霸气。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "sengoku",
+      "names": [
+        "战国",
+        "Sengoku"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "sengoku",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "sengoku.signature",
+            "version": 1,
+            "name": "大佛冲击",
+            "englishName": "Sengoku signature",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 12,
+            "cooldown": 3,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "人人果实大佛形态",
+              "人人果实幻兽种大佛形态",
+              "Hito Hito no Mi Model Daibutsu"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.3,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "战国的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "sengoku.followup",
+            "version": 1,
+            "name": "大佛冲击·追击",
+            "englishName": "Sengoku follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "人人果实大佛形态",
+              "人人果实幻兽种大佛形态",
+              "Hito Hito no Mi Model Daibutsu"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "战国的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "战国的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "rayleigh",
+      "names": [
+        "西尔巴兹·雷利",
+        "Silvers Rayleigh",
+        "雷利",
+        "冥王雷利"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "rayleigh",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "rayleigh.signature",
+            "version": 1,
+            "name": "剑术压制",
+            "englishName": "Silvers Rayleigh signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.15,
+                "duration": 0
+              },
+              {
+                "type": "DEFENSE_DOWN",
+                "power": 0.18,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "西尔巴兹·雷利的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "rayleigh.followup",
+            "version": 1,
+            "name": "剑术压制·追击",
+            "englishName": "Silvers Rayleigh follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "西尔巴兹·雷利的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "西尔巴兹·雷利的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "mihawk",
+      "names": [
+        "乔拉可尔·米霍克",
+        "Dracule Mihawk",
+        "鹰眼",
+        "米霍克",
+        "Mihawk"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "mihawk",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "mihawk.signature",
+            "version": 1,
+            "name": "黑刀斩击",
+            "englishName": "Dracule Mihawk signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "乔拉可尔·米霍克的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "mihawk.followup",
+            "version": 1,
+            "name": "黑刀斩击·追击",
+            "englishName": "Dracule Mihawk follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "乔拉可尔·米霍克的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "乔拉可尔·米霍克的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "law",
+      "names": [
+        "特拉法尔加·罗",
+        "Trafalgar Law",
+        "特拉法尔加·D·瓦铁尔·罗",
+        "罗"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "law",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "law.signature",
+            "version": 1,
+            "name": "ROOM·手术斩击",
+            "englishName": "Trafalgar Law signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "手术果实",
+              "オペオペの実",
+              "Ope Ope no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.15,
+                "duration": 0
+              },
+              {
+                "type": "DEFENSE_DOWN",
+                "power": 0.18,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/news/o20201006_11603/index.html",
+                "note": "特拉法尔加·罗的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "law.followup",
+            "version": 1,
+            "name": "ROOM·手术斩击·追击",
+            "englishName": "Trafalgar Law follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "手术果实",
+              "オペオペの実",
+              "Ope Ope no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/news/o20201006_11603/index.html",
+                "note": "特拉法尔加·罗的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "law.special",
+            "version": 1,
+            "name": "ROOM·位置交换",
+            "englishName": "ROOM movement",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 8,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "手术果实",
+              "オペオペの実",
+              "Ope Ope no Mi"
+            ],
+            "effects": [
+              {
+                "type": "EVASION",
+                "power": 0.22,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/news/o20201006_11603/index.html",
+                "note": "特拉法尔加·罗的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/news/o20201006_11603/index.html",
+            "note": "特拉法尔加·罗的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "kid",
+      "names": [
+        "尤斯塔斯·基德",
+        "Eustass Kid",
+        "基德",
+        "Eustass Kidd"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "kid",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "kid.signature",
+            "version": 1,
+            "name": "磁力重击",
+            "englishName": "Eustass Kid signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "磁磁果实",
+              "ジキジキの実",
+              "Jiki Jiki no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "尤斯塔斯·基德的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "kid.followup",
+            "version": 1,
+            "name": "磁力重击·追击",
+            "englishName": "Eustass Kid follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "磁磁果实",
+              "ジキジキの実",
+              "Jiki Jiki no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "尤斯塔斯·基德的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "尤斯塔斯·基德的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "killer",
+      "names": [
+        "基拉",
+        "Killer",
+        "杀戮武人基拉"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "killer",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "killer.signature",
+            "version": 1,
+            "name": "回旋镰击",
+            "englishName": "Killer signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "基拉的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "killer.followup",
+            "version": 1,
+            "name": "回旋镰击·追击",
+            "englishName": "Killer follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "基拉的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "基拉的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "yamato",
+      "names": [
+        "大和",
+        "Yamato"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "yamato",
+        "era": "和之国决战",
+        "coatingLevel": 1,
+        "skills": [
+          {
+            "id": "yamato.signature",
+            "version": 1,
+            "name": "雷鸣八卦",
+            "englishName": "Yamato signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "大和的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "yamato.followup",
+            "version": 1,
+            "name": "雷鸣八卦·追击",
+            "englishName": "Yamato follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "大和的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "yamato.coating",
+            "version": 1,
+            "name": "霸王色缠绕",
+            "englishName": "Conqueror coating",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 5,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "COATING",
+                "power": 0,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "大和的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "大和的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "oden",
+      "names": [
+        "光月·御田",
+        "Kozuki Oden",
+        "光月御田",
+        "御田"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "oden",
+        "era": "御田回忆；高级霸气细分需单独确认",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "oden.signature",
+            "version": 1,
+            "name": "御田二刀流",
+            "englishName": "Kozuki Oden signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "光月·御田的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "oden.followup",
+            "version": 1,
+            "name": "御田二刀流·追击",
+            "englishName": "Kozuki Oden follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "光月·御田的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "光月·御田的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "ace",
+      "names": [
+        "波特卡斯·D·艾斯",
+        "Portgas D. Ace",
+        "艾斯",
+        "Ace"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "ace",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "ace.signature",
+            "version": 1,
+            "name": "火拳",
+            "englishName": "Portgas D. Ace signature",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 12,
+            "cooldown": 3,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "烧烧果实",
+              "メラメラの実",
+              "Mera Mera no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.3,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "波特卡斯·D·艾斯的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "ace.followup",
+            "version": 1,
+            "name": "火拳·追击",
+            "englishName": "Portgas D. Ace follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "烧烧果实",
+              "メラメラの実",
+              "Mera Mera no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "波特卡斯·D·艾斯的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "波特卡斯·D·艾斯的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "sabo",
+      "names": [
+        "萨博",
+        "Sabo",
+        "炎帝萨博"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "sabo",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "sabo.signature",
+            "version": 1,
+            "name": "龙爪拳",
+            "englishName": "Sabo signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.15,
+                "duration": 0
+              },
+              {
+                "type": "DEFENSE_DOWN",
+                "power": 0.18,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "萨博的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "sabo.followup",
+            "version": 1,
+            "name": "龙爪拳·追击",
+            "englishName": "Sabo follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "萨博的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "萨博的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "marco",
+      "names": [
+        "马尔高",
+        "Marco",
+        "马尔科"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "marco",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "marco.signature",
+            "version": 1,
+            "name": "不死鸟踢击",
+            "englishName": "Marco signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "鸟鸟果实不死鸟形态",
+              "鸟鸟果实不死鸟型态",
+              "鸟鸟果实幻兽种不死鸟形态",
+              "鸟鸟果实幻兽种不死鸟型态",
+              "Tori Tori no Mi Model Phoenix"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/marco/index.html",
+                "note": "马尔高的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "marco.followup",
+            "version": 1,
+            "name": "不死鸟踢击·追击",
+            "englishName": "Marco follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "鸟鸟果实不死鸟形态",
+              "鸟鸟果实不死鸟型态",
+              "鸟鸟果实幻兽种不死鸟形态",
+              "鸟鸟果实幻兽种不死鸟型态",
+              "Tori Tori no Mi Model Phoenix"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/marco/index.html",
+                "note": "马尔高的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "marco.special",
+            "version": 1,
+            "name": "再生之炎",
+            "englishName": "Phoenix regeneration",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 0.7,
+            "requiredFruits": [
+              "鸟鸟果实不死鸟形态",
+              "鸟鸟果实不死鸟型态",
+              "鸟鸟果实幻兽种不死鸟形态",
+              "鸟鸟果实幻兽种不死鸟型态",
+              "Tori Tori no Mi Model Phoenix"
+            ],
+            "effects": [
+              {
+                "type": "HEAL",
+                "power": 0.24,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/marco/index.html",
+                "note": "马尔高的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/character/marco/index.html",
+            "note": "马尔高的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "jozu",
+      "names": [
+        "乔兹",
+        "Jozu"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "jozu",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "jozu.signature",
+            "version": 1,
+            "name": "钻石防御",
+            "englishName": "Jozu signature",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 10,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 0.9,
+            "requiredFruits": [
+              "闪亮果实",
+              "钻石果实",
+              "キラキラの実",
+              "Kira Kira no Mi"
+            ],
+            "effects": [
+              {
+                "type": "SHIELD",
+                "power": 0.22,
+                "duration": 0
+              },
+              {
+                "type": "GUARD",
+                "power": 0.25,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "乔兹的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "jozu.strike",
+            "version": 1,
+            "name": "乔兹·反击",
+            "englishName": "Jozu strike",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "闪亮果实",
+              "钻石果实",
+              "キラキラの実",
+              "Kira Kira no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "乔兹的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "乔兹的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "vista",
+      "names": [
+        "比斯塔",
+        "Vista",
+        "花剑比斯塔"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "vista",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "vista.signature",
+            "version": 1,
+            "name": "花剑斩击",
+            "englishName": "Vista signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "比斯塔的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "vista.followup",
+            "version": 1,
+            "name": "花剑斩击·追击",
+            "englishName": "Vista follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "比斯塔的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "比斯塔的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "katakuri",
+      "names": [
+        "夏洛特·卡塔库栗",
+        "Charlotte Katakuri",
+        "卡塔库栗"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "katakuri",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "katakuri.signature",
+            "version": 1,
+            "name": "糯团重击",
+            "englishName": "Charlotte Katakuri signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "糯糯果实",
+              "モチモチの実",
+              "Mochi Mochi no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/wholecakeisland/index.html",
+                "note": "夏洛特·卡塔库栗的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "katakuri.followup",
+            "version": 1,
+            "name": "糯团重击·追击",
+            "englishName": "Charlotte Katakuri follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "糯糯果实",
+              "モチモチの実",
+              "Mochi Mochi no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/wholecakeisland/index.html",
+                "note": "夏洛特·卡塔库栗的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "katakuri.special",
+            "version": 1,
+            "name": "见闻预判",
+            "englishName": "Observation prediction",
+            "origin": "HAKI",
+            "target": "SELF",
+            "energy": 8,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "EVASION",
+                "power": 0.22,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/wholecakeisland/index.html",
+                "note": "夏洛特·卡塔库栗的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/story/wholecakeisland/index.html",
+            "note": "夏洛特·卡塔库栗的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "cracker",
+      "names": [
+        "夏洛特·克力架",
+        "Charlotte Cracker",
+        "克力架"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "cracker",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "cracker.signature",
+            "version": 1,
+            "name": "饼干装甲",
+            "englishName": "Charlotte Cracker signature",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 10,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 0.9,
+            "requiredFruits": [
+              "饼干果实",
+              "ビスビスの実",
+              "Bisu Bisu no Mi"
+            ],
+            "effects": [
+              {
+                "type": "SHIELD",
+                "power": 0.22,
+                "duration": 0
+              },
+              {
+                "type": "GUARD",
+                "power": 0.25,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "夏洛特·克力架的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "cracker.strike",
+            "version": 1,
+            "name": "夏洛特·克力架·反击",
+            "englishName": "Charlotte Cracker strike",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "饼干果实",
+              "ビスビスの実",
+              "Bisu Bisu no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "夏洛特·克力架的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "夏洛特·克力架的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "king",
+      "names": [
+        "烬",
+        "King",
+        "炎灾烬"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "king",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "king.signature",
+            "version": 1,
+            "name": "翼击",
+            "englishName": "King signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "龙龙果实无齿翼龙形态",
+              "龙龙果实古代种无齿翼龙形态",
+              "Ryu Ryu no Mi Model Pteranodon"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "烬的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "king.followup",
+            "version": 1,
+            "name": "翼击·追击",
+            "englishName": "King follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "龙龙果实无齿翼龙形态",
+              "龙龙果实古代种无齿翼龙形态",
+              "Ryu Ryu no Mi Model Pteranodon"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "烬的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "烬的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "queen",
+      "names": [
+        "奎因",
+        "Queen",
+        "疫灾奎因"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "queen",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "queen.signature",
+            "version": 1,
+            "name": "机械炮击",
+            "englishName": "Queen signature",
+            "origin": "TECHNIQUE",
+            "target": "ALL_ENEMIES",
+            "energy": 12,
+            "cooldown": 3,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.3,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "奎因的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "queen.followup",
+            "version": 1,
+            "name": "机械炮击·追击",
+            "englishName": "Queen follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "奎因的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "奎因的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "jack",
+      "names": [
+        "杰克",
+        "Jack",
+        "旱灾杰克"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "jack",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "jack.signature",
+            "version": 1,
+            "name": "猛犸重击",
+            "englishName": "Jack signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "象象果实猛犸象形态",
+              "象象果实古代种猛犸象形态",
+              "Zou Zou no Mi Model Mammoth"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "杰克的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "jack.followup",
+            "version": 1,
+            "name": "猛犸重击·追击",
+            "englishName": "Jack follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "象象果实猛犸象形态",
+              "象象果实古代种猛犸象形态",
+              "Zou Zou no Mi Model Mammoth"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "杰克的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "杰克的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "doflamingo",
+      "names": [
+        "唐吉诃德·多弗朗明哥",
+        "Donquixote Doflamingo",
+        "多弗朗明哥",
+        "明哥"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "doflamingo",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "doflamingo.signature",
+            "version": 1,
+            "name": "线的切割",
+            "englishName": "Donquixote Doflamingo signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "线线果实",
+              "イトイトの実",
+              "Ito Ito no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "唐吉诃德·多弗朗明哥的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "doflamingo.followup",
+            "version": 1,
+            "name": "线的切割·追击",
+            "englishName": "Donquixote Doflamingo follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "线线果实",
+              "イトイトの実",
+              "Ito Ito no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "唐吉诃德·多弗朗明哥的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "doflamingo.special",
+            "version": 1,
+            "name": "线的束缚",
+            "englishName": "String restraint",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "线线果实",
+              "イトイトの実",
+              "Ito Ito no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 0.8,
+                "duration": 0
+              },
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "唐吉诃德·多弗朗明哥的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "唐吉诃德·多弗朗明哥的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "crocodile",
+      "names": [
+        "克洛克达尔",
+        "Crocodile",
+        "沙鳄鱼",
+        "沙·克洛克达尔"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "crocodile",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "crocodile.signature",
+            "version": 1,
+            "name": "沙岚",
+            "englishName": "Crocodile signature",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 12,
+            "cooldown": 3,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "沙沙果实",
+              "スナスナの実",
+              "Suna Suna no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.3,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "克洛克达尔的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "crocodile.followup",
+            "version": 1,
+            "name": "沙岚·追击",
+            "englishName": "Crocodile follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "沙沙果实",
+              "スナスナの実",
+              "Suna Suna no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "克洛克达尔的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "克洛克达尔的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "enel",
+      "names": [
+        "艾尼路",
+        "Enel",
+        "Eneru"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "enel",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "enel.signature",
+            "version": 1,
+            "name": "雷击",
+            "englishName": "Enel signature",
+            "origin": "FRUIT",
+            "target": "ALL_ENEMIES",
+            "energy": 12,
+            "cooldown": 3,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "响雷果实",
+              "ゴロゴロの実",
+              "Goro Goro no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.3,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "艾尼路的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "enel.followup",
+            "version": 1,
+            "name": "雷击·追击",
+            "englishName": "Enel follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "响雷果实",
+              "ゴロゴロの実",
+              "Goro Goro no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "艾尼路的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "艾尼路的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "lucci",
+      "names": [
+        "罗布·路奇",
+        "Rob Lucci",
+        "路奇"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "lucci",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "lucci.signature",
+            "version": 1,
+            "name": "六王枪",
+            "englishName": "Rob Lucci signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 16,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.7,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "罗布·路奇的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "lucci.followup",
+            "version": 1,
+            "name": "六王枪·追击",
+            "englishName": "Rob Lucci follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "罗布·路奇的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "罗布·路奇的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "hancock",
+      "names": [
+        "波雅·汉库克",
+        "Boa Hancock",
+        "汉库克",
+        "女帝"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "hancock",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "hancock.signature",
+            "version": 1,
+            "name": "芳香脚",
+            "englishName": "Boa Hancock signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "甜甜果实",
+              "メロメロの実",
+              "Mero Mero no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 0.8,
+                "duration": 0
+              },
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "波雅·汉库克的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "hancock.followup",
+            "version": 1,
+            "name": "芳香脚·追击",
+            "englishName": "Boa Hancock follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "甜甜果实",
+              "メロメロの実",
+              "Mero Mero no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "波雅·汉库克的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "波雅·汉库克的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "kuma",
+      "names": [
+        "巴索罗缪·大熊",
+        "Bartholomew Kuma",
+        "大熊",
+        "巴索罗米·熊",
+        "巴索罗缪·熊"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "kuma",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "kuma.signature",
+            "version": 1,
+            "name": "压力炮",
+            "englishName": "Bartholomew Kuma signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "肉球果实",
+              "ニキュニキュの実",
+              "Nikyu Nikyu no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "巴索罗缪·大熊的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "kuma.followup",
+            "version": 1,
+            "name": "压力炮·追击",
+            "englishName": "Bartholomew Kuma follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "肉球果实",
+              "ニキュニキュの実",
+              "Nikyu Nikyu no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "巴索罗缪·大熊的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "kuma.special",
+            "version": 1,
+            "name": "肉球防御",
+            "englishName": "Paw defense",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 10,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 0.9,
+            "requiredFruits": [
+              "肉球果实",
+              "ニキュニキュの実",
+              "Nikyu Nikyu no Mi"
+            ],
+            "effects": [
+              {
+                "type": "SHIELD",
+                "power": 0.22,
+                "duration": 0
+              },
+              {
+                "type": "GUARD",
+                "power": 0.25,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "巴索罗缪·大熊的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "巴索罗缪·大熊的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "moria",
+      "names": [
+        "月光·莫利亚",
+        "Gecko Moria",
+        "莫利亚",
+        "月光·摩利亚"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "moria",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "moria.signature",
+            "version": 1,
+            "name": "影子集结",
+            "englishName": "Gecko Moria signature",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "影影果实",
+              "影子果实",
+              "カゲカゲの実",
+              "Kage Kage no Mi"
+            ],
+            "effects": [
+              {
+                "type": "ATTACK_UP",
+                "power": 0.22,
+                "duration": 3
+              },
+              {
+                "type": "GUARD",
+                "power": 0.12,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "月光·莫利亚的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "moria.strike",
+            "version": 1,
+            "name": "月光·莫利亚·反击",
+            "englishName": "Gecko Moria strike",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "影影果实",
+              "影子果实",
+              "カゲカゲの実",
+              "Kage Kage no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "月光·莫利亚的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "月光·莫利亚的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "perona",
+      "names": [
+        "佩罗娜",
+        "Perona"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "perona",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "perona.signature",
+            "version": 1,
+            "name": "消极幽灵",
+            "englishName": "Perona signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "灵灵果实",
+              "ホロホロの実",
+              "Horo Horo no Mi"
+            ],
+            "effects": [
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              },
+              {
+                "type": "ATTACK_DOWN",
+                "power": 0.2,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/Perona/index.html",
+                "note": "佩罗娜的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ],
+            "tags": [
+              "NEGATIVE_HOLLOW"
+            ]
+          },
+          {
+            "id": "perona.followup",
+            "version": 1,
+            "name": "幽灵炸弹",
+            "englishName": "Ghost bomb",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "灵灵果实",
+              "ホロホロの実",
+              "Horo Horo no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/Perona/index.html",
+                "note": "佩罗娜的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/character/Perona/index.html",
+            "note": "佩罗娜的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "magellan",
+      "names": [
+        "麦哲伦",
+        "Magellan"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "magellan",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "magellan.signature",
+            "version": 1,
+            "name": "毒龙",
+            "englishName": "Magellan signature",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 13,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "毒毒果实",
+              "ドクドクの実",
+              "Doku Doku no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 0.8,
+                "duration": 0
+              },
+              {
+                "type": "POISON",
+                "power": 0.025,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "麦哲伦的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "magellan.followup",
+            "version": 1,
+            "name": "毒龙·追击",
+            "englishName": "Magellan follow-up",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "毒毒果实",
+              "ドクドクの実",
+              "Doku Doku no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "麦哲伦的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "麦哲伦的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "bartolomeo",
+      "names": [
+        "巴托洛米奥",
+        "Bartolomeo",
+        "巴托罗米奥"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "bartolomeo",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "bartolomeo.signature",
+            "version": 1,
+            "name": "屏障防御",
+            "englishName": "Bartolomeo signature",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 10,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 0.9,
+            "requiredFruits": [
+              "屏障果实",
+              "バリバリの実",
+              "Bari Bari no Mi"
+            ],
+            "effects": [
+              {
+                "type": "SHIELD",
+                "power": 0.22,
+                "duration": 0
+              },
+              {
+                "type": "GUARD",
+                "power": 0.25,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "巴托洛米奥的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "bartolomeo.strike",
+            "version": 1,
+            "name": "巴托洛米奥·反击",
+            "englishName": "Bartolomeo strike",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "屏障果实",
+              "バリバリの実",
+              "Bari Bari no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "巴托洛米奥的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "巴托洛米奥的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    },
+    {
+      "code": "bonclay",
+      "names": [
+        "本萨姆",
+        "Bentham",
+        "冯·克雷",
+        "冯克雷",
+        "Mr. 2",
+        "Bon Clay"
+      ],
+      "profile": {
+        "version": 1,
+        "identity": "bonclay",
+        "era": "原作已展示能力 · 游戏规则 v1",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "bonclay.signature",
+            "version": 1,
+            "name": "人妖拳法",
+            "englishName": "Bentham signature",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "本萨姆的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          },
+          {
+            "id": "bonclay.followup",
+            "version": 1,
+            "name": "人妖拳法·追击",
+            "englishName": "Bentham follow-up",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 9,
+            "cooldown": 2,
+            "maxUses": 6,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.4,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/vivre/info/index.html",
+                "note": "本萨姆的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+              }
+            ]
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/vivre/info/index.html",
+            "note": "本萨姆的原作已展示能力；招式效果的数值、冷却和次数为游戏设计，不是原作设定数值。"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,5 +1,8 @@
 package com.yichi.onepiece.battle.service;
 
+import static com.yichi.onepiece.constants.OnepieceConstants.*;
+import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.*;
+
 import com.yichi.onepiece.battle.core.Battlefield;
 import com.yichi.onepiece.battle.core.CharacterInBattle;
 import com.yichi.onepiece.battle.model.*;
@@ -13,21 +16,16 @@ import com.yichi.onepiece.model.BattleFullView;
 import com.yichi.onepiece.quartz.jobs.ReportGeneratingJob;
 import com.yichi.onepiece.user.UserHelper;
 import com.yichi.onepiece.user.service.UserService;
-
+import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import java.time.Clock;
 import java.util.List;
 import java.util.UUID;
-
-import com.yichi.onepiece.user_facing_constants.UserFacingConstants;
 import org.apache.commons.lang3.tuple.Pair;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
-
-import static com.yichi.onepiece.constants.OnepieceConstants.*;
-import static com.yichi.onepiece.user_facing_constants.UserFacingConstantsKey.*;
 
 @Service
 public class BattleService {
@@ -44,16 +42,21 @@ public class BattleService {
   private final BattleStatusDetailDao battleStatusDetailDao;
   private final UserService userService;
   private final Clock clock;
+  private final com.yichi.onepiece.battle.skill.CombatSession combat;
 
+  @org.springframework.beans.factory.annotation.Autowired
   public BattleService(
-          BattleDao battleDao,
-          BattleExecutionDao battleExecutionDao, SchedulerFactoryBean schedulerFactoryBean,
-          CharacterService characterService,
-          FruitService fruitService,
-          ActionRecordService actionRecordService,
-          BattleProcessDetailDao battleProcessDetailDao,
-          BattleStatusDetailDao battleStatusDetailDao,
-          UserService userService, Clock clock) {
+      BattleDao battleDao,
+      BattleExecutionDao battleExecutionDao,
+      SchedulerFactoryBean schedulerFactoryBean,
+      CharacterService characterService,
+      FruitService fruitService,
+      ActionRecordService actionRecordService,
+      BattleProcessDetailDao battleProcessDetailDao,
+      BattleStatusDetailDao battleStatusDetailDao,
+      UserService userService,
+      Clock clock,
+      com.yichi.onepiece.battle.skill.CombatSession combat) {
     this.battleDao = battleDao;
     this.battleExecutionDao = battleExecutionDao;
     this.schedulerFactoryBean = schedulerFactoryBean;
@@ -63,15 +66,42 @@ public class BattleService {
     this.battleProcessDetailDao = battleProcessDetailDao;
     this.battleStatusDetailDao = battleStatusDetailDao;
     this.userService = userService;
-      this.clock = clock;
+    this.clock = clock;
+    this.combat = combat;
+  }
+
+  public BattleService(
+      BattleDao battleDao,
+      BattleExecutionDao battleExecutionDao,
+      SchedulerFactoryBean schedulerFactoryBean,
+      CharacterService characterService,
+      FruitService fruitService,
+      ActionRecordService actionRecordService,
+      BattleProcessDetailDao battleProcessDetailDao,
+      BattleStatusDetailDao battleStatusDetailDao,
+      UserService userService,
+      Clock clock) {
+    this(
+        battleDao,
+        battleExecutionDao,
+        schedulerFactoryBean,
+        characterService,
+        fruitService,
+        actionRecordService,
+        battleProcessDetailDao,
+        battleStatusDetailDao,
+        userService,
+        clock,
+        null);
   }
 
   public CreateBattleResponse createBattle(CreateBattleRequest request) {
     var actionRecord = actionRecordService.create();
     if (request.getStarterId().equals(request.getReceiverId())) {
-      return new CreateBattleResponse().result(Boolean.FALSE).notification(
-              UserFacingConstants.getConstant(SAME_STARTER_AND_RECEIVER).getDisplayName()
-      );
+      return new CreateBattleResponse()
+          .result(Boolean.FALSE)
+          .notification(
+              UserFacingConstants.getConstant(SAME_STARTER_AND_RECEIVER).getDisplayName());
     }
     var starter = characterService.getCharacterEntityById(request.getStarterId());
     var receiver = characterService.getCharacterEntityById(request.getReceiverId());
@@ -174,7 +204,7 @@ public class BattleService {
    * This is the function where battle started to execute.
    * <p>
    * Step1: A battlefield will be created based on the two sides of participants.
-   * Step2: A battle will get started when the starter initiate its attack.
+   * Step2: Seeded initiative chooses the first attacker using speed and intelligence.
    * Step3: A battle ends when energy/blood of any participant reaches 0, or less than 0.
    * Step4:
    *  - If the energy of any participant is less than 10% and this character has eaten any fruit, this fruit will
@@ -192,7 +222,7 @@ public class BattleService {
    */
   public void startBattle(UUID battleId, UUID userId, String email, String nickname, String roleName, String locale) {
     var battleEntity = battleDao.findById(battleId).orElseThrow();
-    var battlefield = createBattleField(battleId);
+    var battlefield = createBattleField(battleId,locale);
     int currentBattleTurn = 0;
     while (battlefield.allAlive()) {
       if (currentBattleTurn>BATTLE_MAXIMUM_TURNS) {
@@ -207,33 +237,68 @@ public class BattleService {
       battlefield.refreshAttackSide();
       currentBattleTurn ++;
     }
+    if (battlefield.mutualDefeat()) {
+      recordDraw(battleEntity, battlefield);
+      return;
+    }
     battlefield.completeFinalStatus();
-    battleStatusDetailDao.batchInsert(battlefield.getBattleStatusDetailEntities());
-    battleProcessDetailDao.batchInsert(battlefield.getBattleProcessDetailEntities());
+    if (combat != null)
+      combat.complete(
+          battleId,
+          battlefield,
+          () -> recordVictory(battleId, battleEntity, battlefield, userId, roleName));
+    else {
+      battleStatusDetailDao.batchInsert(battlefield.getBattleStatusDetailEntities());
+      battleProcessDetailDao.batchInsert(battlefield.getBattleProcessDetailEntities());
+      recordVictory(battleId, battleEntity, battlefield, userId, roleName);
+    }
+    scheduleFileGeneratingJob(battleId, userId, email, nickname, roleName, locale);
+  }
+
+  private void recordVictory(
+      UUID battleId,
+      BattleEntity battleEntity,
+      com.yichi.onepiece.battle.core.Battlefield battlefield,
+      UUID userId,
+      String roleName) {
     logger.info("Battle finish");
     var winner = battlefield.getWinner();
     var loser = battlefield.getLoser();
+    if (combat != null) {
+      var latestWinner = characterService.getCharacterEntityById(winner.getCharacterId());
+      var latestLoser = characterService.getCharacterEntityById(loser.getCharacterId());
+      winner.setResultScore(latestWinner.getScore());
+      loser.setResultScore(latestLoser.getScore());
+    }
     // pair of [winner score, loser score]
     var scores = calculateCharacterScores(winner, loser);
     var battleExecution = battleExecutionDao.findByBattleId(battleId).orElseThrow();
-    var battleExecutionBuilder = battleExecution.toBuilder()
+    var battleExecutionBuilder =
+        battleExecution.toBuilder()
             .setBattleStatus(BattleStatus.FINISHED)
             .setModificationTimestamp(clock.millis())
             .setWinnerId(winner.getCharacterId());
     if (battleEntity.getStarterId().equals(winner.getCharacterId())) {
-      battleExecutionBuilder.setStarterScoreBefore(winner.getScore()).setStarterScoreAfter(scores.getLeft())
-              .setReceiverScoreBefore(loser.getScore()).setReceiverScoreAfter(scores.getRight());
+      battleExecutionBuilder
+          .setStarterScoreBefore(winner.getScore())
+          .setStarterScoreAfter(scores.getLeft())
+          .setReceiverScoreBefore(loser.getScore())
+          .setReceiverScoreAfter(scores.getRight());
     } else {
-      battleExecutionBuilder.setStarterScoreBefore(loser.getScore()).setStarterScoreAfter(scores.getRight())
-              .setReceiverScoreBefore(winner.getScore()).setReceiverScoreAfter(scores.getLeft());
+      battleExecutionBuilder
+          .setStarterScoreBefore(loser.getScore())
+          .setStarterScoreAfter(scores.getRight())
+          .setReceiverScoreBefore(winner.getScore())
+          .setReceiverScoreAfter(scores.getLeft());
     }
     battleExecutionBuilder.setWinnerScoreChange(scores.getLeft()- winner.getScore());
-    battleExecutionBuilder.setLoserScoreChange(scores.getRight()- loser.getScore());
+    battleExecutionBuilder.setLoserScoreChange(scores.getRight() - loser.getScore());
     battleExecution = battleExecutionBuilder.build();
     battleExecutionDao.update(battleExecution);
-    updateCharacter(winner.getCharacterId(), scores.getLeft(), userId, UserRole.fromValue(roleName));
-    updateCharacter(loser.getCharacterId(), scores.getRight(), userId, UserRole.fromValue(roleName));
-    scheduleFileGeneratingJob(battleId, userId, email, nickname, roleName, locale);
+    updateCharacter(
+        winner.getCharacterId(), scores.getLeft(), userId, UserRole.fromValue(roleName));
+    updateCharacter(
+        loser.getCharacterId(), scores.getRight(), userId, UserRole.fromValue(roleName));
   }
 
   /**
@@ -243,14 +308,29 @@ public class BattleService {
    */
   private void recordDraw(BattleEntity battle, Battlefield battlefield) {
     battlefield.completeFinalStatus();
-    battleStatusDetailDao.batchInsert(battlefield.getBattleStatusDetailEntities());
-    battleProcessDetailDao.batchInsert(battlefield.getBattleProcessDetailEntities());
+    if (combat != null)
+      combat.complete(battle.getId(), battlefield, () -> recordDrawResult(battle, battlefield));
+    else {
+      battleStatusDetailDao.batchInsert(battlefield.getBattleStatusDetailEntities());
+      battleProcessDetailDao.batchInsert(battlefield.getBattleProcessDetailEntities());
+      recordDrawResult(battle, battlefield);
+    }
+  }
+
+  private void recordDrawResult(BattleEntity battle, Battlefield battlefield) {
     var attacker = battlefield.getAttackSide();
     var defender = battlefield.getDefenseSide();
     var starter = battle.getStarterId().equals(attacker.getCharacterId()) ? attacker : defender;
     var receiver = starter == attacker ? defender : attacker;
+    if (combat != null) {
+      starter.setResultScore(
+          characterService.getCharacterEntityById(starter.getCharacterId()).getScore());
+      receiver.setResultScore(
+          characterService.getCharacterEntityById(receiver.getCharacterId()).getScore());
+    }
     var battleExecution = battleExecutionDao.findByBattleId(battle.getId()).orElseThrow();
-    battleExecutionDao.update(battleExecution.toBuilder()
+    battleExecutionDao.update(
+        battleExecution.toBuilder()
             .setBattleStatus(BattleStatus.FAILED)
             .setModificationTimestamp(clock.millis())
             .setWinnerId(null)
@@ -368,12 +448,17 @@ public class BattleService {
   }
 
   Battlefield createBattleField(UUID battleId) {
+    return createBattleField(battleId, "zh_CN");
+  }
+
+  private Battlefield createBattleField(UUID battleId, String locale) {
     var battle =
         battleDao
             .findById(battleId)
             .orElseThrow(ExceptionUtils.notFound("Battle with id %s not found", battleId));
     UUID starterId = battle.getStarterId();
     UUID receiverId = battle.getReceiverId();
+    if (combat != null) return combat.open(battleId, starterId, receiverId, locale);
     // prepare start character
     var startCharacter = characterService.getCharacterEntityById(starterId);
     var startFruits = fruitService.listFruitEntityByCharacterId(startCharacter.getId());
