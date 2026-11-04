@@ -153,7 +153,11 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
         }
         String payload = message.getPayload();
         if ("ping".equalsIgnoreCase(payload)) {
-            logger.debug("Received heartbeat from user");
+            // Reply with a pong so every heartbeat produces server->client
+            // traffic: it keeps the reverse proxy's read timeout fresh and lets
+            // the client tell a live-but-idle socket from a silently dead one
+            // (otherwise an idle conversation gets dropped and reconnect-churned).
+            sendMessageSafely(session, new TextMessage("{\"type\":\"pong\"}"));
             return;
         }
 
@@ -165,7 +169,7 @@ public class ChattingWebSocketHandler extends AbstractWebSocketHandler {
             return;
         }
         if ("ping".equalsIgnoreCase(messageType)) {
-            logger.debug("Received heartbeat from user");
+            sendMessageSafely(session, new TextMessage("{\"type\":\"pong\"}"));
             return;
         }
         if (messageType == null) {
