@@ -57,7 +57,7 @@ public class CombatSimulationTests {
           }
         }
       }
-    assertThat(games).isEqualTo(300);
+    assertThat(games).isEqualTo(entries.size() * 3 * 2);
     assertThat(heals).isPositive();
     assertThat(coatings).isPositive();
     assertThat(misses).isPositive();
