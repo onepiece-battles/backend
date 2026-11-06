@@ -5503,6 +5503,691 @@
         ],
         "immunities": []
       }
+    },
+    {
+      "code": "buggy",
+      "names": [
+        "巴基",
+        "Buggy",
+        "道化师巴基"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "buggy",
+        "era": "顶上战争—十字公会（分裂果实） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "buggy.bara-bara-ho",
+            "version": 1,
+            "name": "巴拉巴拉炮",
+            "englishName": "Bara Bara Cannon",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 8,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "分裂果实",
+              "バラバラの実",
+              "Bara Bara no Mi",
+              "Chop-Chop Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.35,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/marineford/index.html",
+                "note": "官方篇章资料（顶上战争编）：巴基的飞刀投掷。原作未公开可独立核实的更多命名绝招; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "buggy.muggy-ball",
+            "version": 1,
+            "name": "巴基球",
+            "englishName": "Muggy Ball",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 10,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "分裂果实",
+              "バラバラの実",
+              "Bara Bara no Mi",
+              "Chop-Chop Fruit"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.45,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/impel_down/index.html",
+                "note": "官方篇章资料（大监狱编）：巴基的爆裂球。基于原作表现; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "buggy.bara-bara-festival",
+            "version": 1,
+            "name": "巴拉巴拉嘉年华",
+            "englishName": "Bara Bara Festival",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 9,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "分裂果实",
+              "バラバラの実",
+              "Bara Bara no Mi",
+              "Chop-Chop Fruit"
+            ],
+            "effects": [
+              {
+                "type": "EVASION",
+                "power": 0.2,
+                "duration": 2
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/marineford/index.html",
+                "note": "官方篇章资料（顶上战争编）：分裂身体规避斩击。仅作闪避加成,不等同绝对免疫; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/story/marineford/index.html",
+            "note": "官方篇章资料（顶上战争编）：巴基的飞刀投掷。原作未公开可独立核实的更多命名绝招; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "caesar",
+      "names": [
+        "凯撒·克劳恩",
+        "Caesar Clown",
+        "凯撒"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "caesar",
+        "era": "庞克哈萨德（气气果实·自然系） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "caesar.koro-gas",
+            "version": 1,
+            "name": "毒瓦斯·杀戮气体",
+            "englishName": "Koro Poison Gas",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "气气果实",
+              "ガスガスの実",
+              "Gas-Gas Fruit",
+              "Gasu Gasu no Mi"
+            ],
+            "effects": [
+              {
+                "type": "POISON",
+                "power": 0.12,
+                "duration": 4
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/caesar/index.html",
+                "note": "官方角色资料：自然系气气果实能力者,施放毒气。持续毒伤; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "caesar.flame-blast",
+            "version": 1,
+            "name": "焰·火箭",
+            "englishName": "Flame Rocket",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "气气果实",
+              "ガスガスの実",
+              "Gas-Gas Fruit",
+              "Gasu Gasu no Mi"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.55,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/punk_hazard/index.html",
+                "note": "官方篇章资料（庞克哈萨德编）：点燃氧气制造爆炎。基于原作表现; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "caesar.gas-body",
+            "version": 1,
+            "name": "瓦斯之躯",
+            "englishName": "Gas Body",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 10,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "气气果实",
+              "ガスガスの実",
+              "Gas-Gas Fruit",
+              "Gasu Gasu no Mi"
+            ],
+            "effects": [
+              {
+                "type": "EVASION",
+                "power": 0.22,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/caesar/index.html",
+                "note": "官方角色资料：自然系躯体,攻击穿透。仅作闪避加成,无霸气者无效; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/character/caesar/index.html",
+            "note": "官方角色资料：自然系气气果实能力者,施放毒气。持续毒伤; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "smoker",
+      "names": [
+        "斯摩格",
+        "Smoker",
+        "白猎的斯摩格"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "smoker",
+        "era": "庞克哈萨德（烟烟果实·白猎） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "smoker.white-snake",
+            "version": 1,
+            "name": "白蛇·烟缚",
+            "englishName": "White Snake",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "烟烟果实",
+              "モクモクの実",
+              "Smoke-Smoke Fruit",
+              "Moku Moku no Mi"
+            ],
+            "effects": [
+              {
+                "type": "STUN",
+                "power": 0,
+                "duration": 1
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/smoker/index.html",
+                "note": "官方角色资料：烟烟果实以烟雾缠缚束缚对手。控制一次行动; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "smoker.jitte-strike",
+            "version": 1,
+            "name": "十手·强打",
+            "englishName": "Jitte Strike",
+            "origin": "EQUIPMENT",
+            "target": "ENEMY",
+            "energy": 11,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.5,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/punk_hazard/index.html",
+                "note": "官方篇章资料（庞克哈萨德编）：海楼石十手重击。武器来源,非果实; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "smoker.smoke-form",
+            "version": 1,
+            "name": "烟隐",
+            "englishName": "Smoke Form",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 10,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "烟烟果实",
+              "モクモクの実",
+              "Smoke-Smoke Fruit",
+              "Moku Moku no Mi"
+            ],
+            "effects": [
+              {
+                "type": "EVASION",
+                "power": 0.22,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/character/smoker/index.html",
+                "note": "官方角色资料：自然系烟体规避。仅作闪避加成,无霸气者无效; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/character/smoker/index.html",
+            "note": "官方角色资料：烟烟果实以烟雾缠缚束缚对手。控制一次行动; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "judge",
+      "names": [
+        "文斯莫克·贾吉",
+        "Vinsmoke Judge",
+        "贾吉"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "judge",
+        "era": "蛋糕岛·杰尔马66（突袭服·科技） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "judge.sparking-lance",
+            "version": 1,
+            "name": "电光长枪",
+            "englishName": "Sparking Lance",
+            "origin": "TECHNIQUE",
+            "target": "ENEMY",
+            "energy": 12,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.55,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/wholecakeisland/index.html",
+                "note": "官方篇章资料（蛋糕岛编）：贾吉的长枪突刺。无恶魔果实,招式来源; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "judge.raid-suit",
+            "version": 1,
+            "name": "突袭服·强化",
+            "englishName": "Raid Suit Boost",
+            "origin": "EQUIPMENT",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "ATTACK_UP",
+                "power": 0.22,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/wholecakeisland/index.html",
+                "note": "官方篇章资料（蛋糕岛编）：杰尔马突袭服提升战力。装备来源; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "judge.exoskeleton",
+            "version": 1,
+            "name": "外骨骼",
+            "englishName": "Exoskeleton",
+            "origin": "RACIAL",
+            "target": "SELF",
+            "energy": 10,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "GUARD",
+                "power": 0.22,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/wholecakeisland/index.html",
+                "note": "官方篇章资料（蛋糕岛编）：杰尔马改造体的外骨骼防御。种族/改造来源; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/story/wholecakeisland/index.html",
+            "note": "官方篇章资料（蛋糕岛编）：贾吉的长枪突刺。无恶魔果实,招式来源; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "drake",
+      "names": [
+        "X·德雷克",
+        "X Drake",
+        "迪艾斯·德雷克"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "drake",
+        "era": "鬼岛·飞六胞（龙龙果实·异特龙形态·古代种） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "drake.savage-bite",
+            "version": 1,
+            "name": "凶暴噬咬",
+            "englishName": "Savage Bite",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 14,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "龙龙果实异特龙形态",
+              "リュウリュウの実モデルアロサウルス",
+              "Ryu Ryu no Mi Model Allosaurus",
+              "Dragon-Dragon Fruit Model Allosaurus"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.65,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/land_of_wano/index.html",
+                "note": "官方篇章资料（和之国编）：异特龙巨颚噬咬。古代种兽形攻击; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "drake.tail-swipe",
+            "version": 1,
+            "name": "尾击横扫",
+            "englishName": "Tail Swipe",
+            "origin": "FRUIT",
+            "target": "ENEMY",
+            "energy": 11,
+            "cooldown": 2,
+            "maxUses": 5,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "龙龙果实异特龙形态",
+              "リュウリュウの実モデルアロサウルス",
+              "Ryu Ryu no Mi Model Allosaurus",
+              "Dragon-Dragon Fruit Model Allosaurus"
+            ],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.5,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/land_of_wano/index.html",
+                "note": "官方篇章资料（和之国编）：龙尾横扫撞击。基于原作表现; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "drake.allosaurus-form",
+            "version": 1,
+            "name": "异特龙·人兽形态",
+            "englishName": "Allosaurus Hybrid Form",
+            "origin": "FRUIT",
+            "target": "SELF",
+            "energy": 15,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [
+              "龙龙果实异特龙形态",
+              "リュウリュウの実モデルアロサウルス",
+              "Ryu Ryu no Mi Model Allosaurus",
+              "Dragon-Dragon Fruit Model Allosaurus"
+            ],
+            "effects": [
+              {
+                "type": "ATTACK_UP",
+                "power": 0.24,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/land_of_wano/index.html",
+                "note": "官方篇章资料（和之国编）：人兽形态强化战斗力。古代种形态; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/story/land_of_wano/index.html",
+            "note": "官方篇章资料（和之国编）：异特龙巨颚噬咬。古代种兽形攻击; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
+    },
+    {
+      "code": "saturn",
+      "names": [
+        "杰伊加西亚·土星圣",
+        "Jaygarcia Saturn",
+        "五老星·土星圣",
+        "土星圣"
+      ],
+      "profile": {
+        "version": 2,
+        "identity": "saturn",
+        "era": "蛋头岛—艾尔巴夫·五老星（牛鬼形态） · 资料截至2026-10",
+        "coatingLevel": 0,
+        "skills": [
+          {
+            "id": "saturn.demon-strike",
+            "version": 1,
+            "name": "牛鬼·妖击",
+            "englishName": "Ushi-Oni Strike",
+            "origin": "RACIAL",
+            "target": "ENEMY",
+            "energy": 17,
+            "cooldown": 3,
+            "maxUses": 4,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "DAMAGE",
+                "power": 1.75,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/egghead/index.html",
+                "note": "官方篇章资料（蛋头岛编）：五老星土星圣的妖怪形态攻击。五老星之力并非恶魔果实; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "saturn.ushi-oni-form",
+            "version": 1,
+            "name": "牛鬼形态",
+            "englishName": "Ushi-Oni Form",
+            "origin": "RACIAL",
+            "target": "SELF",
+            "energy": 16,
+            "cooldown": 5,
+            "maxUses": 2,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "ATTACK_UP",
+                "power": 0.26,
+                "duration": 3
+              },
+              {
+                "type": "GUARD",
+                "power": 0.14,
+                "duration": 3
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/egghead/index.html",
+                "note": "官方篇章资料（蛋头岛编）：变身牛鬼(牛头蛛身)提升攻防与耐久。形态来源,非治疗或无限体力; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          },
+          {
+            "id": "saturn.regeneration",
+            "version": 1,
+            "name": "不朽再生",
+            "englishName": "Undying Regeneration",
+            "origin": "RACIAL",
+            "target": "SELF",
+            "energy": 14,
+            "cooldown": 4,
+            "maxUses": 3,
+            "healthBelow": 1,
+            "requiredFruits": [],
+            "effects": [
+              {
+                "type": "HEAL",
+                "power": 0.18,
+                "duration": 0
+              }
+            ],
+            "evidence": [
+              {
+                "url": "https://one-piece.com/story/elbaph/index.html",
+                "note": "官方篇章资料（艾尔巴夫编）：五老星近乎不死的再生。上限回血,非无限; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+              }
+            ],
+            "tags": []
+          }
+        ],
+        "evidence": [
+          {
+            "url": "https://one-piece.com/story/egghead/index.html",
+            "note": "官方篇章资料（蛋头岛编）：五老星土星圣的妖怪形态攻击。五老星之力并非恶魔果实; 倍率、消耗、时长为回合制游戏参数。资料核对截止2026-10-31。"
+          }
+        ],
+        "immunities": []
+      }
     }
   ]
 }
