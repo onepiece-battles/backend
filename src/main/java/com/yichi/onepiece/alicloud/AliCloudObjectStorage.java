@@ -149,6 +149,18 @@ public class AliCloudObjectStorage {
     return client().generatePresignedUrl(request);
   }
 
+  /** Signs a read for one stored file object; file bytes never pass through the app server. */
+  public static URL signFileUrl(String uri, Date expiration) throws FileStorageException {
+    if (uri == null || uri.indexOf('?') >= 0 || uri.indexOf('#') >= 0) {
+      throw new FileStorageException("Expected a stored OSS file URI");
+    }
+    String key = extractFromUri(uri);
+    if (key.isBlank()) throw new FileStorageException("File object key is empty");
+    var request = new GeneratePresignedUrlRequest(OSS_BUCKET_NAME, key, com.aliyun.oss.HttpMethod.GET);
+    request.setExpiration(expiration);
+    return client().generatePresignedUrl(request);
+  }
+
   public static InputStream getReportImageStream(String uri) throws FileStorageException {
     return getProcessedImageStream(uri, "image/resize,m_lfit,w_256,h_256/format,jpg/quality,Q_80");
   }
