@@ -134,24 +134,6 @@ public class ImageService {
     }
   }
 
-  public String getImage(String uri, @Nullable Boolean fullImage) {
-    try (InputStream imageStream = AliCloudObjectStorage.getImageStream(uri, fullImage)) {
-        return EncryptHelper.base64Encode(imageStream.readAllBytes());
-    } catch (Exception e) {
-      if (fullImage == null || !fullImage) {
-        logger.warn("failed to load compressed image {}, falling back to original image", uri, e);
-        try (InputStream imageStream = AliCloudObjectStorage.getImageStream(uri, true)) {
-          return EncryptHelper.base64Encode(imageStream.readAllBytes());
-        } catch (Exception fallbackException) {
-          logger.error("failed to load original image after compressed image fallback {}", uri, fallbackException);
-        }
-      } else {
-        logger.error("failed to load original image {}", uri, e);
-      }
-    }
-    throw new RuntimeException("file retrieval failed");
-  }
-
   public ImageAccess getImageAccess(String uri, @Nullable Boolean fullImage)
       throws FileStorageException {
     Date expiration = Date.from(Instant.now().plus(Duration.ofMinutes(15)));
